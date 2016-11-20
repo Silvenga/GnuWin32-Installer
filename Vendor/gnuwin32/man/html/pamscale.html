@@ -1,0 +1,574 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pamscale User Manual</TITLE></HEAD>
+<BODY>
+<H1>pamscale</H1>
+Updated: 18 February 2005
+<BR>
+<A HREF="pamscale.html#index">Table Of Contents</A>
+
+<H2 id="lbAB">NAME</H2>
+
+pamscale - scale a Netpbm image
+<H2 id="lbAC">SYNOPSIS</H2>
+
+<pre>
+   <B>pamscale</B>
+      [ 
+         <I>scale_factor</I> 
+         |
+         {<B>-xyfit</B> | <B>-xyfill</b> | <b>-xysize</b>} <I>cols</i> <i>rows</I> 
+         |
+         <B>-reduce</B> <I>reduction_factor</I> 
+         |
+         [<B>-xsize=</B><I>cols</I> | <B>-width=</B><I>cols</I> | <B>-xscale=</B><I>factor</I>]
+         [<B>-ysize=</B><I>rows</I> | <B>-height=</B><I>rows</I> | <B>-yscale=</B><I>factor</I>]
+         |
+         <b>-pixels</B> <I>n</I>
+      ]
+      [
+         [<B>-verbose</b>]
+         [
+            <b>-nomix</B> 
+            |
+            <b>-filter=</b><i>functionName</i> [<b>-window=</b>functionName]
+         ]
+         [<b>-linear</b>]
+      }
+      [<I>pnmfile</I>]
+
+</pre>
+<?makeman .SH OPTION USAGE ?>
+
+<P>Minimum unique abbreviation of option is acceptable.  You may use
+double hyphens instead of single hyphen to denote options.  You may use
+white space in place of the equals sign to separate an option name
+from its value.
+
+<H2 id="lbAD">DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<P><b>pamscale</b> scales a Netpbm image by a specified factor, or
+scales individually horizontally and vertically by specified factors.
+
+<P>You can either enlarge (scale factor &gt; 1) or reduce (scale factor
+&lt; 1).
+
+<h3 id="scalefactor">The Scale Factors</h3>
+
+<P>When you specify an absolute size or scale factor for both
+dimensions, <B>pamscale</B> scales each dimension independently
+without consideration of the aspect ratio.
+
+<P>If you specify one dimension as a pixel size and don't specify the
+other dimension, <B>pamscale</B> scales the unspecified dimension to
+preserve the aspect ratio.
+
+<P>If you specify one dimension as a scale factor and don't specify
+the other dimension, <B>pamscale</B> leaves the unspecified dimension
+unchanged from the input.
+
+<P>If you specify the <I>scale_factor</I> parameter instead of
+dimension options, that is the scale factor for both dimensions.  It
+is equivalent to <B>-xscale=</B><I>scale_factor</I><B>
+-yscale=</B><I>scale_factor</I>.
+
+<P>Specifying the <B>-reduce</B> <I>reduction_factor</I> option is
+equivalent to specifying the <I>scale_factor </I> parameter, where
+<I>scale_factor</I> is the reciprocal of <I>reduction_factor</I>.
+
+<P><B>-xyfit</B> specifies a bounding box.  <B>pamscale</B> scales
+the input image to the largest size that fits within the box, while
+preserving its aspect ratio.  <b>-xysize</b> is a synonym for this.
+Before Netpbm 10.20 (January 2004), <b>-xyfit</b> did not exist, but
+<b>-xysize</b> did.
+
+<p><b>-xyfill</b> is similar, but <b>pamscale</b> scales the input image
+to the smallest size that completely fills the box, while preserving
+its aspect ratio.  This option has existed since Netpbm 10.20 (January
+2004).
+
+<P><B>-pixels</B> specifies a maximum total number of output pixels.
+<B>pamscale</B> scales the image down to that number of pixels.  If
+the input image is already no more than that many pixels,
+<B>pamscale</B> just copies it as output; <B>pamscale</B> does not
+scale up with <B>-pixels</B>.
+
+<P>If you enlarge by a factor of 3 or more, you should probably add a
+<I>pnmsmooth</I> step; otherwise, you can see the original pixels in
+the resulting image.
+
+
+<h3 id="usage">Usage Notes</h3>
+
+<P>A useful application of <B>pamscale</B> is to blur an image.  Scale
+it down (without <B>-nomix )</B> to discard some information, then
+scale it back up using <B>pamstretch</B>.
+
+<P>Or scale it back up with <B>pamscale</B> and create a
+&quot;pixelized&quot; image, which is sort of a computer-age version
+of blurring.
+
+
+<h3>Transparency</h3>
+
+<p><b>pamscale</b> understands transparency and properly mixes pixels
+considering the pixels' transparency.  
+
+<p>Proper mixing <em>does not</em> mean just mixing the transparency
+value and the color component values separately.  In a PAM image, a
+pixel which is not opaque represents a color that contains light of
+the foreground color indicated explicitly in the PAM and light of a
+background color to be named later.  But the numerical scale of a
+color component sample in a PAM is as if the pixel is opaque.  So a
+pixel that is supposed to contain half-strength red light for the
+foreground plus some light from the background has a red color sample
+that says <em>full</em> red and a transparency sample that says 50%
+opaque.  In order to mix pixels, you have to first convert the color
+sample values to numbers that represent amount of light directly
+(i.e. multiply by the opaqueness) and after mixing, convert back
+(divide by the opaqueness).
+
+<h3 id="imagetype">Input And Output Image Types</h3>
+
+<p><b>pamscale</b> produces output of the same type (and tuple type if
+the type is PAM) as the input, except if the input is PBM.  In that
+case, the output is PGM with maxval 255.  The purpose of this is to
+allow meaningful pixel mixing.  Note that there is no equivalent
+exception when the input is PAM.  If the PAM input tuple type is
+BLACKANDWHITE, the PAM output tuple type is also BLACKANDWHITE, and
+you get no meaningful pixel mixing.
+
+<P>If you want PBM output with PBM input, use <B>pamditherbw</B> to
+convert <B>pamscale</B>'s output to PBM.  Also consider
+<B>pbmreduce</B>.
+
+<p><b>pamscale</b>'s function is essentially undefined for PAM input
+images that are not of tuple type RGB, GRAYSCALE, BLACKANDWHITE, or
+the _ALPHA variations of those.  (By standard Netpbm backward compatibility,
+this includes PBM, PGM, and PPM images).
+
+<p>You might think it would have an obvious effect on other tuple
+types, but remember that the aforementioned tuple types have
+gamma-adjusted sample values, and <b>pamscale</b> uses that fact in
+its calculations.  And it treats a transparency plane different from any
+other plane.
+
+<p><b>pamscale</b> does not simply reject unrecognized tuple types
+because there's a possibility that just by coincidence you can get
+useful function out of it with some other tuple type and the right
+combination of options (consider <b>-linear</b> in particular).
+
+
+<h3 id="methods">Methods Of Scaling</h3>
+
+<p>There are numerous ways to scale an image.  <b>pamscale</b> implements
+a bunch of them; you select among them with invocation options.
+
+<h4 id="mixing">Pixel Mixing</h4>
+
+<p>Pamscale's default method is pixel mixing.  To understand this,
+imagine the source image as composed of square tiles.  Each tile is a
+pixel and has uniform color.  The tiles are all the same size.  Now
+lay over that a transparent sheet of the same size, marked off in a
+square grid.  Each cell in the grid stands for a pixel of the target
+image.  For example, if you are scaling a 100x200 image up by 1.5, the
+source image is 100 x 200 tiles, and the transparent sheet is marked
+off in 150 x 300 cells.
+
+<p>Each cell covers parts of multiple tiles.  To make the target image,
+just color in each cell with the color which is the average of the colors
+the cell covers -- weighted by the amount of that color it covers.  A
+cell in our example might cover 4/9 of a blue tile, 2/9 of a red tile,
+2/9 of a green tile, and 1/9 of a white tile.  So the target pixel
+would be somewhat unsaturated blue.
+
+<p>When you are scaling up or down by an integer, the results are
+simple.  When scaling up, pixels get duplicated.  When scaling down,
+pixels get thrown away.  In either case, the colors in the target
+image are a subset of those in the source image.
+
+<p>When the scale factor is weirder than that, the target image can
+have colors that didn't exist in the original.  For example, a red
+pixel next to a white pixel in the source might become a red pixel,
+a pink pixel, and a white pixel in the target.
+
+<p>This method tends to replicate what the human eye does as it moves
+closer to or further away from an image.  It also tends to replicate
+what the human eye sees, when far enough away to make the pixelization
+disappear, if an image is not made of pixels and simply stretches
+or shrinks.
+
+<h4 id="sampling">Discrete Sampling</h4>
+
+<p>Discrete sampling is basically the same thing as pixel mixing except
+that, in the model described above, instead of averaging the colors of
+the tiles the cell covers, you pick the one color that covers the most
+area.
+
+<p>The result you see is that when you enlarge an image, pixels
+get duplicated and when you reduce an image, some pixels get discarded.
+
+<p>The advantage of this is that you end up with an image made from the
+same color palette as the original.  Sometimes that's important.
+
+<p>The disadvantage is that it distorts the picture.  If you scale up
+by 1.5 horizontally, for example, the even numbered input pixels are
+doubled in the output and the odd numbered ones are copied singly.  If
+you have a bunch of one pixel wide lines in the source, you may find
+that some of them stretch to 2 pixels, others remain 1 pixel when you
+enlarge.  When you reduce, you may find that some of the lines
+disappear completely.
+
+<p>You select discrete sampling with <b>pamscale</b>'s <b>-nomix</b>
+option.
+
+<p>Actually, <B>-nomix</b> doesn't do exactly what I described above.
+It does the scaling in two passes - first horizontal, then vertical.
+This can produce slightly different results.
+
+<p>There is one common case in which one often finds it burdensome to
+have <b>pamscale</b> make up colors that weren't there originally:
+Where one is working with an image format such as GIF that has a
+limited number of possible colors per image.  If you take a GIF with
+256 colors, convert it to PPM, scale by .625, and convert back to GIF,
+you will probably find that the reduced image has way more than 256
+colors, and therefore cannot be converted to GIF.  One way to solve
+this problem is to do the reduction with discrete sampling instead of
+pixel mixing.  Probably a better way is to do the pixel mixing, but
+then color quantize the result with <b>pnmquant</b> before converting
+to GIF.
+
+<P>When the scale factor is an integer (which means you're scaling
+up), discrete sampling and pixel mixing are identical -- output pixels
+are always just N copies of the input pixels.  In this case, though,
+consider using <B>pamstretch</B> instead of <B>pamscale</B> to get the
+added pixels interpolated instead of just copied and thereby get a
+smoother enlargement.
+
+<P><b>pamscale</b>'s discrete sampling is faster than pixel mixing,
+but <B>pnmenlarge</B> is faster still.  <B>pnmenlarge</B> works only
+on integer enlargements.
+
+<p>discrete sampling (<b>-nomix</b>) was new in Netpbm 9.24 (January
+2002).
+
+
+<h4 id="resampling">Resampling</h4>
+
+<p>Resampling assumes that the source image is a discrete sampling of some
+original continuous image.  That is, it assumes there is some non-pixelized
+original image and each pixel of the source image is simply the color of
+that image at a particular point.  Those points, naturally, are the
+intersections of a square grid.
+
+<p>The idea of resampling is just to compute that original image, then
+sample it at a different frequency (a grid of a different scale).
+
+<p>The problem, of course, is that sampling necessarily throws away the
+information you need to rebuild the original image.  So we have to make
+a bunch of assumptions about the makeup of the original image.
+
+<p>You tell <b>pamscale</b> to use the resampling method by specifying
+the <b>-filter</b> option.  The value of this option is the name of a
+function, from the set listed below.
+
+<p><strong>To explain resampling, we are going to talk about a simple
+one dimensional scaling</strong> -- scaling a single row of grayscale
+pixels horizontally.  If you can understand that, you can easily
+understand how to do a whole image: Scale each of the rows of the
+image, then scale each of the resulting columns.  And scale each of the
+color component planes separately.
+
+<p>As a first step in resampling, <b>pamscale</b> converts the source
+image, which is a set of discrete pixel values, into a continuous step
+function.  A step function is a function whose graph is a staircase-y
+thing.
+
+<p>Now, we convolve the step function with a proper scaling of the
+filter function that you identified with <b>-filter</b>.  If you don't
+know what the mathematical concept of convolution (convolving) is, you
+are officially lost.  You cannot understand this explanation.  The
+result of this convolution is the imaginary original continuous image
+we've been talking about.
+
+<p>Finally, we make target pixels by picking values from that function.
+
+<p>To understand what is going on, we use Fourier analysis:
+
+<p>The idea is that the only difference between our step function and
+the original continuous function (remember that we constructed the
+step function from the source image, which is itself a sampling of the
+original continuous function) is that the step function has a bunch of
+high frequency Fourier components added.  If we could chop out all the
+higher frequency components of the step function, and know that
+they're all higher than any frequency in the original function, we'd
+have the original function back.  
+
+<p>The resampling method <em>assumes</em> that the original function
+was sampled at a high enough frequency to form a perfect sampling.  A
+perfect sampling is one from which you can recover exactly the
+original continuous function.  The Nyquist theorem says that as long
+as your sample rate is at least twice the highest frequency in your
+original function, the sampling is perfect.  So we <em>assume</em>
+that the image is a sampling of something whose highest frequency is
+half the sample rate (pixel resolution) or less.  Given that, our
+filtering does in fact recover the original continuous image from the
+samples (pixels).
+
+<p>To chop out all the components above a certain frequency, we just
+multiply the Fourier transform of the step function by a rectangle
+function.
+
+<p>We could find the Fourier transform of the step function, multiply
+it by a rectangle function, and then Fourier transform the result
+back, but there's an easier way.  Mathematicians tell us that
+multiplying in the frequency domain is equivalent to convolving in the
+time domain.  That means multiplying the Fourier transform of F by a
+rectangle function R is the same as convolving F with the Fourier
+transform of R.  It's a lot better to take the Fourier transform of
+R, and build it into <b>pamscale</b> than to have <b>pamscale</b>
+take the Fourier transform of the input image dynamically.
+
+<p>That leaves only one question:  What <em>is</em> the Fourier
+transform of a rectangle function?  Answer: sinc.  Recall from
+math that sinc is defined as sinc(x) = sin(PI*x)/PI*x.
+
+<p>Hence, when you specify <b>-filter=sinc</b>, you are effectively
+passing the step function of the source image through a low pass
+frequency filter and recovering a good approximation of the original
+continuous image.
+
+<h5>Refiltering</h5>
+
+<p>There's another twist: If you simply sample the reconstructed
+original continuous image at the new sample rate, and that new sample
+rate isn't at least twice the highest frequency in the original
+continuous image, you won't get a perfect sampling.  In fact, you'll
+get something with ugly aliasing in it.  Note that this can't be a
+problem when you're scaling up (increasing the sample rate), because
+the fact that the old sample rate was above the Nyquist level means so
+is the new one.  But when scaling down, it's a problem.  Obviously,
+you have to give up image quality when scaling down, but aliasing is
+not the best way to do it.  It's better just to remove high frequency
+components from the original continuous image before sampling, and
+then get a perfect sampling of that.
+
+<p>Therefore, <b>pamscale</b> filters out frequencies above half the
+new sample rate before picking the new samples.
+
+<h5>Approximations</h5>
+
+<p>Unfortunately, <b>pamscale</b> doesn't do the convolution
+precisely.  Instead of evaluating the filter function at every point,
+it samples it -- assumes that it doesn't change any more often than
+the step function does.  <b>pamscale</b> could actually do the true
+integration fairly easily.  Since the filter functions are built into
+the program, the integrals of them could be too.  Maybe someday it
+will.
+
+<p>There is one more complication with the Fourier analysis.  sinc
+has nonzero values on out to infinity and minus infinity.  That makes
+it hard to compute a convolution with it.  So instead, there are
+filter functions that approximate sinc but are nonzero only within a
+manageable range.  To get those, you multiply the sinc function by a
+<i>window function</i>, which you select with the <b>-window</b>
+option.  The same holds for other filter functions that go on forever
+like sinc.  By default, for a filter that needs a window function,
+the window function is the Blackman function.
+
+<h5>Filter Functions Besides Sinc</h5>
+
+<p>The math described above works only with sinc as the filter
+function.  <b>pamscale</b> offers many other filter functions, though.
+Some of these approximate sinc and are faster to compute.  For most of
+them, I have no idea of the mathematical explanation for them, but
+people do find they give pleasing results.  They may not be based on
+resampling at all, but just exploit the fact the convolution that is
+coincidentally part of a resampling calculation.
+
+<p>For some filter functions, you can tell just by looking at the
+convolution how they vary the resampling process from the perfect one
+based on sinc:
+
+<p>The impulse filter assumes that the original continuous image is in
+fact a step function -- the very one we computed as the first step in
+the resampling.  This is mathematically equivalent to the discrete
+sampling method.
+
+<p>The box (rectangle) filter assumes the original image is a piecewise
+linear function.  Its graph just looks like straight lines connecting
+the pixel values.  This is mathematically equivalent to the pixel mixing
+method when scaling down, and interpolation (ala <b>pamstretch</b>)
+when scaling up.
+
+<h5>Gamma</h5>
+
+<p><b>pamscale</b> assumes the underlying continuous function is a
+function of brightness (as opposed to light intensity), and therefore
+does all this math using the gamma-adjusted numbers found in a PNM or
+PAM image.  The <b>-linear</b> option is not available with resampling
+(it causes <b>pamscale</b> to fail), because it wouldn't be useful enough
+to justify the implementation effort.
+
+<p>Resampling (<b>-filter</b>) was new in Netpbm 10.20 (January 2004).
+
+<h5>The filter functions</h5>
+
+<p>Here is a list of the function names you can specify for the
+<b>-filter</b> option.  For most of them, you're on your own to figure
+out just what the function is and what kind of scaling it does.  These
+are common functions from mathematics.
+
+<dl>
+<dt>point
+<dd>The graph of this is a single point at X=0, Y=1.
+
+<dt>box
+
+<dd>The graph of this is a rectangle sitting on the X axis and centered
+on the Y axis with height 1 and base 1.
+
+<dt>triangle
+
+<dd>The graph of this is an isosceles triangle sitting on the X axis
+and centered on the Y axis with height 1 and base 2.
+
+<dt>quadratic
+<dt>cubic
+<dt>catrom
+<dt>mitchell
+<dt>gauss
+<dt>sinc
+<dt>bessel
+<dt>hanning
+<dt>hamming
+<dt>blackman
+<dt>kaiser
+<dt>normal
+<dt>hermite
+<dt>lanczos
+</dl>
+
+
+<H3 id="linear">Linear vs Gamma-adjusted</H3>
+
+<p>The pixel mixing scaling method described above involves intensities
+of pixels (more precisely, it involves individual intensities of
+primary color components of pixels).  But the PNM and PNM-equivalent
+PAM image formats represent intensities with gamma-adjusted numbers
+that are not linearly proportional to intensity.  So <b>pamscale</b>,
+by default, performs a calculation on each sample read from its input
+and each sample written to its output to convert between these
+gamma-adjusted numbers and internal intensity-proportional numbers.
+
+<p>Sometimes you are not working with true PNM or PAM images, but
+rather a variation in which the sample values are in fact directly
+proportional to intensity.  If so, use the <b>-linear</b> option to
+tell <b>pamscale</b> this.  <b>pamscale</B> then will skip the
+conversions.
+
+<p>The conversion takes time.  In one experiment, it increased the
+time required to reduce an image by a factor of 10.  And the
+difference between intensity-proportional values and gamma-adjusted
+values may be small enough that you would barely see a difference in
+the result if you just pretended that the gamma-adjusted values were
+in fact intensity-proportional.  So just to save time, at the expense
+of some image quality, you can specify <b>-linear</b> even when you
+have true PPM input and expect true PPM output.
+
+<p>For the first 13 years of Netpbm's life, until Netpbm 10.20
+(January 2004), <b>pamscale</b>'s predecessor <b>pnmscale</b> always
+treated the PPM samples as intensity-proportional even though they
+were not, and drew few complaints.  So using <b>-linear</b> as a lie
+is a reasonable thing to do if speed is important to you.  But if
+speed is important, you also should consider the <b>-nomix</b> option
+and <b>pnmscalefixed</b>.
+
+<p>Another technique to consider is to convert your PNM image to the
+linear variation with <b>pnmgamma</b>, run <b>pamscale</b> on it and
+other transformations that like linear PNM, and then convert it back
+to true PNM with <b>pnmgamma -ungamma</b>.  <b>pnmgamma</b> is often
+faster than <b>pamscale</b> in doing the conversion.
+
+<p>With <b>-nomix</b>, <b>-linear</b> has no effect.  That's because
+<b>pamscale</b> does not concern itself with the meaning of the sample
+values in this method; <b>pamscale</b> just copies numbers from its
+input to its output.
+
+
+<H3 id="precision">Precision</H3>
+
+<P><B>pamscale</B> uses floating point arithmetic internally.  There
+is a speed cost associated with this.  For some images, you can get
+the acceptable results (in fact, sometimes identical results) faster
+with <B>pnmscalefixed</B>, which uses fixed point arithmetic.
+<B>pnmscalefixed</B> may, however, distort your image a little.  See
+the <B>pnmscalefixed</B> user manual for a complete discussion of the
+difference.
+
+<H2 id="lbAF">SEE ALSO</H2>
+
+<B><A HREF="pnmscalefixed.html">pnmscalefixed</A></B>,
+<B><A HREF="pamstretch.html">pamstretch</A></B>,
+<B><A HREF="pamditherbw.html">pamditherbw</A></B>,
+<B><A HREF="pbmreduce.html">pbmreduce</A></B>,
+<B><A HREF="pbmpscale.html">pbmpscale</A></B>,
+<B><A HREF="pnmenlarge.html">pnmenlarge</A></B>,
+<B><A HREF="pnmsmooth.html">pnmsmooth</A></B>,
+<B><A HREF="pamcut.html">pamcut</A></B>,
+<B><A HREF="pnmgamma.html">pnmgamma</A></B>,
+<B><A HREF="pnmscale.html">pnmscale</A></B>,
+<B><A HREF="pnm.html">pnm</A></B>,
+<B><A HREF="pam.html">pam</A></B>
+
+<H2 id="history">HISTORY</H2>
+
+<p><b>pamscale</b> was new in Netpbm 10.20 (January 2004).  It was
+adapted from, and obsoleted, <b>pnmscale</b>.  <b>pamscale</b>'s
+primary difference from <b>pnmscale</b> is that it handles the PAM
+format and uses the "pam" facilities of the Netpbm programming
+library.  But it also added the resampling class of scaling method.
+Furthermore, it properly does its pixel mixing arithmetic (by default)
+using intensity-proportional values instead of the gamma-adjusted
+values the <b>pnmscale</b> uses.  To get the old <b>pnmscale</b>
+arithmetic, you can specify the <b>-linear</b> option.
+
+<p>The intensity proportional stuff came out suggestions by <a
+href="mailto://amc+j5luho+@nicemice.net">Adam M Costello</a> in January
+2004.
+
+<p>The resampling algorithms are mostly taken from code contributed by
+<a href="mailto://reinelt@eunet.at">Michael Reinelt</a> in December 2003.
+
+<p>The version of <b>pnmscale</b> from which <b>pamscale</b> was
+derived, itself evolved out of the original Pbmplus version of
+<b>pnmscale</b> by Jef Poskanzer (1989, 1991).  But none of that
+original code remains.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+  <LI><A HREF="pamscale.html#lbAB">NAME</A>
+  <LI><A HREF="pamscale.html#lbAC">SYNOPSIS</A>
+  <LI><A HREF="pamscale.html#lbAD">DESCRIPTION</A>
+  <UL>
+    <LI><A HREF="pamscale.html#scalefactor">The Scale Factors</a>
+    <LI><A HREF="pamscale.html#usage">Usage Notes</a>
+    <LI><A HREF="pamscale.html#imagetype">Input And Output Image Types</a>
+    <LI><A HREF="pamscale.html#methods">Methods Of Scaling</a>
+    <UL>
+      <LI><A HREF="pamscale.html#mixing">Pixel Mixing</a>
+      <LI><A HREF="pamscale.html#sampling">Discreate Sampling</a>
+      <LI><A HREF="pamscale.html#resampling">Resampling</a>
+      </UL>
+    <LI><A HREF="pamscale.html#linear">Linear vs Gamma-adjusted</a>
+    <LI><A HREF="pamscale.html#precision">Precision</A>
+    </UL>
+  <LI><A HREF="pamscale.html#lbAF">SEE ALSO</A>  
+  <LI><A HREF="pamscale.html#history">HISTORY</A>  
+  </UL>
+
+</BODY>
+</HTML>

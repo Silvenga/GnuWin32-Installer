@@ -1,0 +1,136 @@
+Pnmrotate User Manual(0)               Pnmrotate User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       pnmrotate - rotate a PNM image by some angle
+
+
+SYNOPSIS
+       pnmrotate [-noantialias] [-background=color] angle [pnm-
+       file]
+
+       All options can be abbreviated to their shortest  unique
+       prefix.   You may use two hyphens instead of one to des-
+       ignate an option.  You may use  either  white  space  or
+       equals signs between an option name and its value.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       pnmrotate  reads a PNM image as input.  It rotates it by
+       the specified angle and produces the same  kind  of  PNM
+       image as output.
+
+       The input is the file named by pnmfile or Standard Input
+       if you don't specify pnmfile.  The output goes to  Stan-
+       dard Output.
+
+       The  resulting  image  is  a rectangle that contains the
+       (rectangular)  input  image  within  it,  rotated   with
+       respect to its bottom edge.  The containing rectangle is
+       as small as possible to contain the rotated image.   The
+       background  of  the  containing  image is a single color
+       that pnmrotate determines to be the background color  of
+       the original image, or that you specify explicitly.
+
+       angle  is  in decimal degrees (floating point), measured
+       counter-clockwise.  It can be negative, but it should be
+       between -90 and 90.
+
+       You  should use pamflip instead for rotations that are a
+       multiple of a quarter turn.  It is faster and more accu-
+       rate.
+
+       For rotations greater than 45 degrees you may get better
+       results if you first use pamflip to do a 90 degree rota-
+       tion  and  then  pnmrotate less than 45 degrees back the
+       other direction.
+
+       The  rotation  algorithm  is  Alan  Paeth's  three-shear
+       method.   Each  shear is implemented by looping over the
+       source pixels and distributing fractions to each of  the
+       destination  pixels.  This has an 'anti-aliasing' effect
+       - it avoids jagged edges and  similar  artifacts.   How-
+       ever,  it  also  means  that the original colors or gray
+       levels in the image are modified.  If you need  to  keep
+       precisely the same set of colors, you can use the -noan-
+       tialias option.
+
+       The program runs faster and uses less real  memory  with
+       the -noantialias option.  It uses a large amount of vir-
+       tual memory either way, as it keeps a copy of the  input
+       image and a copy of the output image in memory, using 12
+       bytes per pixel for each.   But  with  -noantialias,  it
+       accesses  this  memory  sequentially  in  half  a  dozen
+       passes, with only a  few  pages  of  memory  at  a  time
+       required in real memory.
+
+       In  contrast,  without  -noantialias, the program's real
+       memory working set size is one page per input image  row
+       plus one page per output image row.  Before Netpbm 10.16
+       (June 2003), -noantialias had the same  memory  require-
+       ment.
+
+
+OPTIONS
+       -background=color
+              This  determines  the  color of the background on
+              which the rotated image sits.
+
+              Specify the color (color) as  described  for  the
+              argument  of the ppm_parsecolor() library routine
+              .
+
+              By default, if you  don't  specify  this  option,
+              pnmrotate  selects  what  appears to it to be the
+              background  color  of  the  original  image.   It
+              determines  this  color  rather  simplisticly, by
+              taking an average of the colors of  the  two  top
+              corners of the image.
+
+              This  option  was  new  in  Netpbm 10.l5.  Before
+              that, pnmrotate always behaved as is the  default
+              now.
+
+
+       -noantialias
+              This  option forces pnmrotate to simply move pix-
+              els around instead of synthesizing output  pixels
+              from  multiple  input  pixels.   The latter could
+              cause the output to contain colors that  are  not
+              in  the  input,  which  may not be desirable.  It
+              also probably makes the output  contain  a  large
+              number  of colors.  If you need a small number of
+              colors, but it doesn't matter  if  they  are  the
+              exact   ones   from  the  input,  consider  using
+              pnmquant on the output instead  of  using  -noan-
+              tialias.
+
+              Note  that  to ensure the output does not contain
+              colors that are not in the input, you  also  must
+              consider  the  background  color.  See the -back-
+              ground option.
+
+
+
+
+REFERENCES
+       'A Fast Algorithm for General Raster Rotation'  by  Alan
+       Paeth, Graphics Interface '86, pp. 77-81.
+
+
+SEE ALSO
+       pnmshear(1), pamflip(1), pnmquant(1), pnm(1)
+
+
+AUTHOR
+       Copyright (C) 1989, 1991 by Jef Poskanzer.
+
+
+
+netpbm documentation     30 August 2002Pnmrotate User Manual(0)

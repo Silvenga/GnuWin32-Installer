@@ -1,0 +1,216 @@
+Ppmtogif User Manual(0)                 Ppmtogif User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       ppmtogif - convert a PPM image to a GIF image
+
+
+SYNOPSIS
+       ppmtogif
+
+       [-interlace]
+
+       [-sort]
+
+       [-mapfile mapfile] [-transparent=[=]color]
+
+       [-alpha=pgmfile]
+
+       [-comment=text]
+
+       [-nolzw] [ppmfile]
+
+       All  options can be abbreviated to their shortest unique
+       prefix.  You may use two hyphens instead of one to  des-
+       ignate  an  option.   You  may use either white space or
+       equals signs between an option name and its value.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       ppmtogif reads a PPM iamge as input and produces  a  GIF
+       file as output.
+
+       This  program  creates  only  individual GIF images.  To
+       combine multiple GIF images into an  animated  GIF,  use
+       gifsicle  (not part of the Netpbm package).
+
+       ppmtogif  creates  either  an  original GIF87 format GIF
+       file or the newer GIF89 format.  It creates  GIF89  when
+       you  request  features  that were new with GIF89, to wit
+       the -transparent or  -comment  options.   Otherwise,  it
+       creates GIF87.  Really old GIF readers conceivably could
+       not recognize GIF89.
+
+
+OPTIONS
+       -interlace
+              Produce an interlaced GIF file.
+
+
+       -sort  Produce a GIF file with a sorted color map.
+
+
+       -mapfile=mapfile
+
+              Use the colors found in the file mapfile to  cre-
+              ate  the colormap in the GIF file, instead of the
+              colors from ppmfile.   mapfile  can  be  any  PPM
+              file;  all  that matters is the colors in it.  If
+              the colors in ppmfile do not match those in  map-
+              file,  ppmtogif  matches  them to a 'best match.'
+              You can obtain a much better result by using pnm-
+              remap  to change the colors in the input to those
+              in the map file.
+
+              The mapfile file is not a palette file,  just  an
+              image whose colors you want to use.  The order of
+              colors in the GIF palette have nothing to do with
+              where  they  appear  in  the  mapfile  image, and
+              duplication of colors in the image is irrelevant.
+
+
+       -transparent=color
+              ppmtogif marks the specified color as transparent
+              in the GIF image.
+
+              If you don't specify -transparent, ppmtogif  does
+              not  mark  any color transparent (except as indi-
+              cated by the -alpha option).
+
+              Specify the color (color) as  described  for  the
+              argument  of the ppm_parsecolor() library routine
+              .
+
+              If the color you specify is not  present  in  the
+              image,  ppmtogif selects instead the color in the
+              image that is closest to  the  one  you  specify.
+              Closeness  is  measured  as  a cartesian distance
+              between colors in RGB space.  If multiple  colors
+              are  equidistant,  ppmtogif  chooses  one of them
+              arbitrarily.
+
+              However, if you prefix your  color  specification
+              with '=', e.g.  -transparent==red, only the exact
+              color you specify will be transparent.   If  that
+              color does not appear in the image, there will be
+              no transparency.  ppmtogif issues an  information
+              message when this is the case.
+
+              You  cannot specify both -transparent and -alpha.
+
+
+       -alpha=pgmfile
+               This option names a PGM file  that  contains  an
+              alpha mask for the image.  ppmtogif creates fully
+              transparent pixels wherever the alpha mask  indi-
+              cates  transparency  greater than 50%.  The color
+              of those pixels is that specified by the  -alpha-
+              color option, or black by default.
+
+              To  do this, ppmtogif creates an entry in the GIF
+              colormap in addition to the  entries  for  colors
+              that  are  actually  in the image.  It marks that
+              colormap entry as transparent and uses that  col-
+              ormap  index  in  the  output  image  to create a
+              transparent pixel.
+
+               The alpha image must be the same  dimensions  as
+              the  input image, but may have any maxval.  White
+              means opaque and black means transparent.
+
+               You cannot specify both -transparent and -alpha.
+
+
+       -alphacolor
+              See -alpha.
+
+
+       -comment=text
+              Include  a comment in the GIF output with comment
+              text text.
+
+              Without this option, there are no comments in the
+              output.
+
+              Note  that in a command shell, you'll have to use
+              quotation marks around text if it contains  char-
+              acters  (e.g.  space)  that  would make the shell
+              think it is multiple arguments:
+              $ ppmtogif -comment "this is a comment" <xxx.ppm >xxx.gif
+
+
+       -nolzw
+
+              This option is mainly of historical  interest  --
+              it  involves use of a patent that is now expired.
+
+              This option causes the GIF output, and thus  ppm-
+              togif,  not  to use LZW (Lempel-Ziv) compression.
+              As a result, the image file is larger and, before
+              the patent expired, no royalties would be owed to
+              the holder of the patent on LZW.  See the section
+              LICENSE below.
+
+              LZW  is  a  method  for combining the information
+              from multiple pixels  into  a  single  GIF  code.
+              With  the -nolzw option, ppmtogif creates one GIF
+              code per pixel, so it is not doing  any  compres-
+              sion   and  not  using  LZW.   However,  any  GIF
+              decoder, whether it uses an LZW  decompressor  or
+              not, will correctly decode this uncompressed for-
+              mat.  An LZW decompressor would  see  this  as  a
+              particular case of LZW compression.
+
+              Note  that  if  someone  uses an LZW decompressor
+              such as the one in giftopnm or  pretty  much  any
+              graphics display program to process the output of
+              ppmtogif -nolzw  ,  he  is  then  using  the  LZW
+              patent.  But the patent holder expressed far less
+              interest in enforcing the patent on decoding than
+              on encoding.
+
+
+
+
+SEE ALSO
+       giftopnm(1), ppmquant(1), pngtopnm(1),
+
+       gifsicle http://www.lcdf.org/gifsicle , ppm(1).
+
+
+AUTHOR
+       Based on GIFENCOD by David Rowley <mgardi@watdcsu.water-
+       loo.edu>.  Lempel-Ziv compression based on 'compress'.
+
+       The non-LZW format is generated by code based  on  djpeg
+       by the Independent Jpeg Group.
+
+       Copyright (C) 1989 by Jef Poskanzer.
+
+
+LICENSE
+       If  you  use ppmtogif without the -nolzw option, you are
+       using a patent on the LZW compression  method  which  is
+       owned by Unisys.  The patent has expired (in 2003 in the
+       US and in 2004 elsewhere), so it doesn't matter.   While
+       the  patent  was in force, most people who used ppmtogif
+       and similar programs  did  so  without  a  license  from
+       Unisys  to  do  so.   Unisys typically asked $5000 for a
+       license for trivial use of  the  patent.   Unisys  never
+       enforced the patent against trivial users.
+
+       Rumor has it that IBM also owns or owned a patent cover-
+       ing ppmtogif.
+
+       A replacement for the GIF format that never required any
+       patents to use is the PNG format.
+
+
+
+netpbm documentation   15 September 2002Ppmtogif User Manual(0)

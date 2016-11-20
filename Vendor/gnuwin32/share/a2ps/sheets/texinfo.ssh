@@ -1,0 +1,142 @@
+# Style sheet for Texinfo files
+# Copyright (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+# Copyright (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+# $Id: texinfo.ssh,v 1.1.1.1.2.1 2007/12/29 01:58:34 mhatta Exp $
+#
+
+#
+# This file is part of a2ps.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+style Texinfo is
+requires a2ps 4.12a
+
+written by "Akim Demaille <akim@freefriends.org>"
+version is 1.0
+
+documentation is
+
+   "Heavy highlighting prints the nodes on separate pages"
+   "which title is the name of the node."
+
+end documentation
+
+first alphabet is
+   "@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_#$%\\"
+second alphabet is
+   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_#$%"
+
+case sensitive
+
+keywords in Keyword_strong are
+    # A keyword from TeX
+    \input,
+
+    @@, @^, @`, @AA, @aa, @AE, @ae, @afourpaper, @appendix,
+    @appendixsec, @appendixsection, @appendixsubsec, @appendixsubsubsec,
+    @apply, @asis, @author, @b, @bye, @cartouche, @center, @centerchap,
+    @chapheading, @cindex, @cite, @clear, @columnfractions, @comment,
+    @contents, @cropmarks, @defcodeindex, @defcv, @deffn, @deffnx,
+    @defindex, @definfoenclose, @defivar, @defmac, @defmethod, @defop,
+    @defopt, @defspec, @deftp, @deftypefn, @deftypefun, @deftypevar,
+    @deftypevr, @defun, @defvar, @defvr, @dfn, @dircategory, @direntry,
+    @display, @dmn, @dotaccent, @dotless, @dots, @email, @emph, @end,
+    @enumerate, @evenfooting, @evenheading, @everyfooting, @everyheading,
+    @example, @exclamdown, @exdent, @file, @filll, @finalout, @findex,
+    @flushleft, @flushright, @foobar, @footnote, @footnotestyle, @format,
+    @forward-word, @ftable, @group, @H, @heading, @headings, @html,
+    @hyphenation, @ifclear, @ifhtml, @ifinfo, @ifnothtml,
+    @ifnotinfo, @ifnottex, @ifset, @iftex, @ignore, @image, @include,
+    @inforef, @item, @itemize, @kbd, @kbdinputstyle, @key, @kindex, @l,
+    @L, @lisp, @lowersections, @macro, @mag, @majorheading,
+    @makeinfo-buffer, @math, @menu, @minus, @multitable, @need, @noindent,
+    @o, @O, @oddfooting, @oddheading, @OE, @oe, @page, @paragraphindent,
+    @pindex, @pounds, @printindex, @pxref, @questiondown, @quotation,
+    @raisesections, @ref, @refill, @ringaccent, @set, @setchapternewpage,
+    @setfilename, @settitle, @shortcontents, @shorttitlepage, @smallbook,
+    @smallexample, @smalllisp, @sp, @ss, @strong, @subheading,
+    @subsubheading, @subtitle, @summarycontents, @syncodeindex, @synindex,
+    @t, @table, @tex, @thischapter, @thischaptername, @thisfile,
+    @thispage, @thistitle, @tieaccent, @tindex, @title, @titlefont,
+    @titlepage, @today, @top, @u, @ubaraccent, @udotaccent, @unmacro,
+    @up-list, @uref, @url, @v, @value, @var, @vindex, @vskip, @vtable, @w,
+    @xref, @{, @}, @~
+
+end keywords
+
+# Too much bold is a bit painful
+keywords in Keyword are
+  /@itemx?/
+end keywords
+
+
+# Some special characters
+keywords in Keyword are
+  /@copyright(\\{\\})?/, /@bullet/
+end keywords
+
+
+# They might look like dupicates, but they are not:
+# Then can appear as an argument to @table
+keywords in Keyword_strong are
+  /@(strong|sc|code|email|emph|samp|i|r|var|file)/ 
+	Keyword_strong
+end keywords
+
+sequences are
+    # The comments
+    /@c / Comment,
+    /@comment / Comment,
+
+    # Font formatting commands
+    /@(strong|sc|code|email|emph|samp|i|r|var|file)\\{/ 
+	Keyword_strong String } Keyword_strong
+	exceptions are 
+	  @@, @}
+	 end exceptions,
+
+    # Sectionning
+    /@chapter +/ 	Keyword_strong Label_strong,
+    /@section +/ 	Keyword_strong Label,
+    /@subsection +/ 	Keyword_strong Label,
+    /@subsubsection +/ 	Keyword_strong Label,
+    /@unnumbered +/ 	Keyword_strong Label_strong,
+    /@unnumberedsec +/ 	Keyword_strong Label,
+    /@unnumberedsubsec +/ Keyword_strong Label,
+    /@unnumberedsubsubsec +/ Keyword_strong Label,
+
+    # The nodes
+    /@node +/ Keyword_strong Label "," Plain,
+
+    # Open environments
+    "@table " Keyword_strong Keyword,
+
+    # End environment
+    "@end " Keyword_strong Keyword
+end sequences
+
+# In -g mode, we want node to start on a new page, and give the name
+# of the node as page title.
+optional sequences are
+   (/@node +/ "\f" Plain, Keyword_strong) (Label + Tag1)
+      closers in Plain are 
+	",", /$/
+      end closers
+end sequences
+
+end style

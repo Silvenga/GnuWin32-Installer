@@ -1,0 +1,1842 @@
+This is gcal.info, produced by makeinfo version 4.0 from gcal.texi.
+
+INFO-DIR-SECTION GNU packages
+START-INFO-DIR-ENTRY
+* Gcal: (gcal).                       GNU calendar program.
+* Tcal: (gcal)Invoking tcal.          Run Gcal with tomorrow's date.
+* Txt2gcal: (gcal)Invoking txt2gcal.  Calendar text to resource file.
+* Gcal2txt: (gcal)Invoking gcal2txt.  Calendar resource to text file.
+END-INFO-DIR-ENTRY
+
+  This file documents Gcal, a program for calculating and printing
+calendars.
+
+  Copyright (c) 1994, 95, 96, 1997, 2000 Thomas Esken
+
+  This edition is for Gcal version 3.01.
+
+  Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+  Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+  Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation approved by the Free Software Foundation.
+
+  Any suggestions, improvements, extensions, bug reports, donations,
+proposals for contract work, and so forth are welcome!  Please send
+them directly to my eMail address <esken@gmx.net>.  If you like my
+work, I'd appreciate a postcard from you!
+
+------------------------oOO      \\\_''/      OOo---------------------------
+Thomas Esken               O     (/o-o\)     O  eMail: esken@gmx.net
+Im Hagenfeld 84                 ((  ^  ))       Phone: +49 251 232585
+D-48147 Muenster; Germany    \____) ~ (____/    MotD : 2old2live, 2young2die
+
+
+File: gcal.info,  Node: Biorhythm,  Next: Difference value,  Prev: Moon phase,  Up: Replacements with date argument
+
+Biorhythm `%?[DATE]' special texts
+..................................
+
+  Gcal is able to create a "biorhythm" for any specified date of birth.
+The created text shows the three standard biorhythm cycles, and that
+are the 28 day emotional cycle, the 33 day intellectual cycle, and the
+23 day physical cycle.  The emotional cycle governs sensibility,
+nerves, moodiness, and creative ability.  The intellectual cycle
+reflects intelligence, memory, mental alertness, and reasoning power.
+The physical cycle represents physical strength, endurance, energy and
+resistance.  All cycles start in the zero point at the date of birth
+and swing like sine curves between their positive and negative maximum
+values.  The periods above the zero point show the days of full
+vitality and efficiency while the periods below the zero point indicate
+days of reduced efficiency.  The biorhythm is implemented for
+entertaining purposes only!  It is up to the user to interpret the
+biorhythm texts.
+
+  Gcal counts "critical" days, "positive" likewise "negative" days.
+Critical days are those days in which one or more of the biological
+cycles crosses the zero point.  At that time, one's system is said to
+be in a state of flux and it may be desirable to exhibit caution.
+Positive days are those days in which one or more of the biological
+cycles have a positive maximum value.  At that time, one's system is
+said to be in a raised state.  Negative days are those days in which
+one or more of the biological cycles have a negative maximum value.  At
+that time, one's system is said to be in a lessen state.
+
+  The following biorhythm `%?[DATE]' special texts are respected:
+
+`%,[DATE]'
+     Is replaced by the *biorhythm text* of the current day of year,
+     e.g.:
+
+          The text `%,19620921' will be expanded to
+          ==> `1! 0+ 0- , Emo=+022%- Int=-091%+ Phy=-014%-', in case
+          the actual system date is the 12th December 1996.
+
+     The preceding example shows the calculated biorhythm expressed as
+     a series of values for a person born in 1962, September 21st.  The
+     constructed text consists of two parts, and that is on the one
+     hand a triplet of total values which indicate the critical,
+     positive and negative day.  And on the other hand a triplet of
+     values which indicate the emotional, intellectual and physical
+     cycle.
+
+     In the first triplet of total values, a `!' suffix means a
+     critical day, a `+' indicates a positive day, and a `-' suffix
+     marks a negative day.
+
+     In the second triplet of values, each single cycle percent value
+     consists of a leading positive or negative sign that tells
+     something about the distance of this value to the zero point, and
+     a trailing character that tells something about the state of each
+     cycle.  A trailing `+' character marks a waxing phase, a `-'
+     suffix means a waning phase, and a `@' indicates the maximum value
+     of a phase.
+
+`%;[DATE]'
+     Is replaced by the *biorhythm text graphics* of the current day of
+     year, e.g.:
+
+          The text `%;19620921' will be expanded to
+          ==> `0-  I               P 1   E                +0', in case
+          the actual system date is the 12th December 1996.
+
+     The preceding example shows the calculated biorhythm expressed as
+     a text graphics line for a person born in 1962, September 21st.
+     The constructed line is a bar with a negative and positive axis of
+     adjustable length (*note Fixed date option
+     `--biorhythm-axis=NUMBER': x-biorhythm-axis.), which left margin
+     is represented by the total value of the negative days (the `0-'
+     in this case), and which right margin is represented by the total
+     value of the positive days (the `+0' in this case).  The zero
+     point of the co-ordinate is represented by the total value of the
+     critical days, which is the `1' in this case.  The emotional,
+     intellectual and the physical phase value is accordingly placed in
+     scaled manner on this bar, and that by using the initial letter of
+     the cycle in each case (`E', `I' and `P').  Coincidental phase
+     values are marked by a `@' character.
+
+
+File: gcal.info,  Node: Difference value,  Prev: Biorhythm,  Up: Replacements with date argument
+
+Difference value `%[FORMAT]?[DATE]' special texts
+.................................................
+
+  The following difference value `%[FORMAT]?[DATE]' special texts are
+respected:
+
+`%yDATE'
+     Is replaced by a *year difference value*, e.g.:
+
+          The text `Sylvester 1912 is %y1912  years ago' will be
+          expanded to
+          ==> `Sylvester 1912 is -82 years ago', in case the year of
+          the actual system date is 1994.
+
+`%B[DATE]'
+     Is replaced by an *age value*, e.g.:
+
+          The text `My %B1962  birthday%i1952#2062' will be expanded to
+          ==> `My 32 birthday', in case the year of the actual system
+          date is 1994.
+
+     Those age values are only displayed, if the computation of an age
+     value is greater zero.  The fixed date warning in preceding example
+     is displayed only in case the current year is greater than 1952
+     and less than 2062.
+
+`%>1&*B[DATE]'
+     Is replaced by an *age value* with trailing Ordinal Number suffix,
+     e.g.:
+
+          The text `My %>1&*B1962  birthday%i1952#2062' will be
+          expanded to
+          ==> `My 32nd birthday', in case the year of the actual system
+          date is 1994.
+
+     Those age values are only displayed, if the computation of an age
+     value is greater zero.  The fixed date warning in preceding example
+     is displayed only in case the current year is greater than 1952
+     and less than 2062.
+
+
+File: gcal.info,  Node: Replacements with other argument,  Next: Replacements without any argument,  Prev: Replacements with date argument,  Up: Replacements
+
+Replacements with other argument `%[FORMAT]?[ARGUMENT]' special texts
+---------------------------------------------------------------------
+
+* Menu:
+
+* Actual clocktime::
+* Textual date::
+* Julian day number::
+* Geographical distance and course angle::
+* Sun data::
+* Moon data::
+* Contents of Environment variable::
+
+  Apart from different representations of the actual system time, a
+fixed format date text can be created.  Moreover, it is possible to
+produce a day number, which bears the Julian date as base date and
+which can be deferred if needed.  Furthermore, the approximate distance
+and the course angle between two geographic point locations, and
+different Sun and Moon oriented data and times for at pleasure any
+geographical location can be created.  It is also possible to display
+the contents of environment variables in the fixed date text.
+
+  For the ARGUMENT these `%?[ARGUMENT]' special texts may have, no
+special rules concerning definite omission values are valid.
+
+
+File: gcal.info,  Node: Actual clocktime,  Next: Textual date,  Prev: Replacements with other argument,  Up: Replacements with other argument
+
+Actual clocktime `%[FORMAT]?[ARGUMENT]' special texts
+.....................................................
+
+  Gcal is able to represent the actual clocktime as local/zone time and
+as Universal time (UTC/GMT), and additionally the RFC-822(1) (*note
+Actual clocktime-Footnote-1::) style numerical Universal time timezone
+offset value and the actual numerical local time timezone offset value.
+*Note Actual local time `%t[ARGUMENT]' special text:
+x-Actual-local-time, for the detailed description of all components of
+the ARGUMENT, which may trail the actual clocktime
+`%[FORMAT]?[ARGUMENT]' special texts.  All actual clocktime
+`%[FORMAT]?[ARGUMENT]' special texts *must* always be trailed by a
+_whitespace_ character which is removed in output!  The following
+actual clocktime `%[FORMAT]?[ARGUMENT]' special texts are respected:
+
+`%t[ARGUMENT]'
+     `%t[*][[+|-]MMMM|HH:[MM]]' references the *actual local time*,
+     which is displayed by using the `HH:MM' output format, e.g.:
+
+          The text `Local time: %t  --> Dentist at 10:00' will be
+          expanded to
+          ==> `Local time: 07:32 --> Dentist at 10:00', in case the
+          actual local time value is 07:32 o'clock (`HH:MM').
+
+     If only `%t' is specified, the local time value will implicitly be
+     displayed by using the _24-hours_ format.  For displaying using the
+     _12-hours_ format, add a `*' character directly behind `%t', e.g.
+     `%t*'.
+
+     A displacement value may trail the `%t' special text, which has to
+     be specified either by using the `[+|-]MMMM' format or the
+     `[+|-]HH:[MM]' format.  `[+|-]MMMM' adds respectively subtracts
+     the specified amount of minutes MMMM from the local time value
+     (range `0...9999'), while `[+|-]HH:[MM]' adds respectively
+     subtracts the given amount of hours HH (range `0...99') and
+     minutes MM (range `0...59') from the local time value.  The
+     displacement value is always added to the local time value in case
+     it is specified without a `+|-' sign.  In case Gcal is unable to
+     compute the actual local time in `HH:MM' format by reason of a
+     misspecified ARGUMENT, a `??:??' text will be created instead of
+     the actual local time in `HH:MM' format.
+
+          The text `Local time: %t-3:  --> Dentist at 10:00' will be
+          expanded to
+          ==> `Local time: 04:32 --> Dentist at 10:00', in case the
+          actual local time value is 07:32 o'clock (`HH:MM').
+
+`%[FORMAT]'[ARGUMENT]'
+     `%[FORMAT]'[[+|-]MMMM|HH:[MM]]' references the *actual local time
+     in minutes since midnight*, which is displayed by using the
+     M[M...] output format, e.g.:
+
+          The text `Local time: %'  --> Dentist at 10:00' will be
+          expanded to
+          ==> `Local time: 452 --> Dentist at 10:00', in case the
+          actual local time value is 07:32 o'clock (`HH:MM').
+
+     In case Gcal is unable to compute the actual local time in M[M...]
+     format by reason of a misspecified ARGUMENT, a `??' text will be
+     created instead of the actual local time in M[M...] format.
+
+`%[FORMAT]_[ARGUMENT]'
+     `%[FORMAT]_[*][[+|-]MMMM|HH:[MM]]' references the *actual local
+     time hour*, which is displayed by using the H[H...] output format,
+     e.g.:
+
+          The text `Local time hour: %_-1:' will be expanded to
+          ==> `Local time hour: 6' in case the actual local time value
+          is 07:32 o'clock (`HH:MM').
+
+     In case Gcal is unable to compute the actual local time hour by
+     reason of a misspecified ARGUMENT, a `??' text will be created
+     instead of the actual local time hour H[H...].
+
+`%[FORMAT]?[ARGUMENT]'
+     `%[FORMAT]?[[+|-]MMMM|HH:[MM]]' references the *actual local time
+     minute*, which is displayed by using the M[M...] output format,
+     e.g.:
+
+          The text `Local time minute: %>04*?+:2' will be expanded to
+          ==> `Local time minute: 0034' in case the actual local time
+          value is 07:32 o'clock (`HH:MM').
+
+     In case Gcal is unable to compute the actual local time minute by
+     reason of a misspecified ARGUMENT, a `??' text will be created
+     instead of the actual local time minute M[M...].
+
+`%[FORMAT]{[ARGUMENT]'
+     `%[FORMAT]{[[+|-]MMMM|HH:[MM]]' references the *actual local time
+     12-hour format suffix*, which is displayed as `am|pm', e.g.:
+
+          The text `Local time suffix: %{' will be expanded to
+          ==> `Local time suffix: am' in case the actual local time
+          value is 07:32 o'clock (`HH:MM').
+
+     In case Gcal is unable to compute the actual local time 12-hour
+     format suffix by reason of a misspecified ARGUMENT, a `??' text
+     will be created instead of the actual local time 12-hour format
+     suffix `am|pm'.
+
+`%@[ARGUMENT]'
+     `%@[*][[+|-]MMMM|HH:[MM]]' references the *actual Universal time*
+     (UTC/GMT), which is displayed by using the `HH:MM/DATE' output
+     format, e.g.:
+
+          The text `Universal time: %@*-3.' will be expanded to
+          ==> `Universal time: 03:32am/15-Feb-1999', in case the actual
+          date is the 15th February 1999 and the actual Universal time
+          value is 06:32 o'clock (`HH:MM').
+
+     In case Gcal is unable to compute the actual Universal time in
+     `HH:MM/DATE' format by reason of a misspecified ARGUMENT, a
+     `??:??/??-???-????' text will be created instead of the actual
+     Universal time in `HH:MM/DATE' format.
+
+`%[FORMAT]`[ARGUMENT]'
+     `%[FORMAT]`[[+|-]MMMM|HH:[MM]]' references the *actual Universal
+     time in minutes since midnight*, which is displayed by using the
+     `M[M...]/DATE' output format, e.g.:
+
+          The text `Universal time: %>06*`-3:' will be expanded to
+          ==> `Universal time: 000212/15-Feb-1999' in case the actual
+          date is the 15th February 1999 and the actual Universal time
+          value is 06:32 o'clock (`HH:MM').
+
+     In case Gcal is unable to compute the actual Universal time in
+     `M[M...]/DATE' format by reason of a misspecified ARGUMENT, a
+     `??/??-???-????' text will be created instead of the actual
+     Universal time in `M[M...]/DATE' format.
+
+`%[FORMAT].[ARGUMENT]'
+     `%[FORMAT].[*][[+|-]MMMM|HH:[MM]]' references the *actual
+     Universal time hour*, which is displayed by using the H[H...]
+     output format, e.g.:
+
+          The text `Universal time hour: %.-1:' will be expanded to
+          ==> `Universal time hour: 5' in case the actual Universal
+          time value is 06:32 o'clock (`HH:MM').
+
+     In case Gcal is unable to compute the actual Universal time hour
+     by reason of a misspecified ARGUMENT, a `??' text will be created
+     instead of the actual Universal time hour H[H...].
+
+`%[FORMAT]/[ARGUMENT]'
+     `%[FORMAT]/[[+|-]MMMM|HH:[MM]]' references the *actual Universal
+     time minute*, which is displayed by using the M[M...] output
+     format, e.g.:
+
+          The text `Universal time minute: %>04*/+:2' will be expanded
+          to
+          ==> `Universal time minute: 0034' in case the actual
+          Universal time value is 06:32 o'clock (`HH:MM').
+
+     In case Gcal is unable to compute the actual Universal time minute
+     by reason of a misspecified ARGUMENT, a `??' text will be created
+     instead of the actual Universal time minute M[M...].
+
+`%[FORMAT]}[ARGUMENT]'
+     `%[FORMAT]}[[+|-]MMMM|HH:[MM]]' references the *actual Universal
+     time 12-hour format suffix*, which is displayed as `am|pm', e.g.:
+
+          The text `Universal time suffix: %>1w*}+10:' will be expanded
+          to
+          ==> `Universal time suffix: Pm' in case the actual Universal
+          time value is 06:32 o'clock (`HH:MM').
+
+     In case Gcal is unable to compute the actual Universal time
+     12-hour format suffix by reason of a misspecified ARGUMENT, a `??'
+     text will be created instead of the actual Universal time 12-hour
+     format suffix `am|pm'.
+
+`%"[ARGUMENT]'
+     `%"[[+|-]MMMM|HH:[MM]]' references the RFC-822 style *numerical
+     Universal time timezone offset value*, which is displayed by using
+     the `+|-HHMM' output format, e.g.:
+
+          The text `Universal time timezone offset value: %"-90' will
+          be expanded to
+          ==> `Universal time timezone offset value: -0130', at which
+          calculations are always based on the timezone of the
+          Universal time UTC/GMT.
+
+     In case Gcal is unable to compute the numerical Universal time
+     timezone offset value by reason of a misspecified ARGUMENT, a
+     `+????' text will be created instead of the numerical Universal
+     time timezone offset value `+|-HHMM'.
+
+`%=[ARGUMENT]'
+     `%=[[+|-]MMMM|HH:[MM]]' references the RFC-822 style *actual
+     numerical local time timezone offset value*, which is displayed by
+     using the `+|-HHMM' output format, e.g.:
+
+          The text `Local time timezone offset value CET: %=-10' will
+          be expanded to
+          ==> `Local time timezone offset value CET: +0050', in case
+          the actual timezone is equal the Central European (winter)time
+          CEWT/CET (`+HHMM').  Calculations are always based on the
+          timezone of the local time.
+
+     In case Gcal is unable to compute the actual numerical local time
+     timezone offset value by reason of a misspecified ARGUMENT, a
+     `+????' text will be created instead of the actual numerical local
+     time timezone offset value `+|-HHMM'.
+
+
+File: gcal.info,  Node: Actual clocktime-Footnotes,  Up: Actual clocktime
+
+  (1) RFC is the abbreviation of `Request for Comments'.
+
+
+File: gcal.info,  Node: Textual date,  Next: Julian day number,  Prev: Actual clocktime,  Up: Replacements with other argument
+
+Textual date `%n[ARGUMENT]' special text
+........................................
+
+  `%n[[+|-]N]' references the current respectively queried *day number*
+relative to the current date `+/-' N days and is replaced by a *date
+text* by using the fixed `%>02*D-%>3#U-%>04*Y' format, e.g.:
+
+     The resource file line `1962Sep21 10000 days old: %n+10000' will
+     be expanded to
+     ==> `10000 days old: 06-Feb-1990', in case you call Gcal with the
+     simple `-c' option and the command `sep 1962' (*note Single
+     command `MM YYYY': x-mm-yyyy.).
+
+
+File: gcal.info,  Node: Julian day number,  Next: Geographical distance and course angle,  Prev: Textual date,  Up: Replacements with other argument
+
+Julian day number `%[FORMAT]j[ARGUMENT]' special text
+.....................................................
+
+  `%[FORMAT]j[[+|-]N]' references the current respectively queried
+*Julian day number* relative to the actual system date (==today).  This
+day number is based on the date 1st January 4713 BCE --which is the
+starting day zero of a consecutive day counting used in astronomical
+computations-- and is known as the Julian Date (J.D.).  The real zero
+of this date is at 12 o'clock Universal time (UTC/GMT); the day does
+not change at midnight, but at noon Universal time.  Here, Gcal does
+not evaluate the timezone returned by the systems date function.  For
+that reason, this day number is represented without a time fraction on
+the supposition that the day has already changed at noon.  If you do
+not like the feature that the day displayed has already changed at
+noon, you can decrease the resulting Julian day number of that special
+text always by one, e.g. `%j-1'.
+
+  For example:
+
+     The resource file line `0 Julian day %j since 01-Jan-4713 BCE'
+     will be expanded to
+     ==> `Julian day 2437929 since 01-Jan-4713 BCE', in case you call
+     Gcal with the `-c %19620921' option and no command.
+
+  If the `%[FORMAT]j' text is directly trailed by an unsigned number,
+this number is always subtracted from the real Julian day number.  So
+you are able to work with any quantities referenced, e.g.:
+
+     The resource file line `0 Julian day %j2415021 since 01-Jan-1900'
+     will be expanded to
+     ==> `Julian day 4 since 01-Jan-1900', in case you call Gcal with
+     the `-c %19000105' option and no command.
+
+
+File: gcal.info,  Node: Geographical distance and course angle,  Next: Sun data,  Prev: Julian day number,  Up: Replacements with other argument
+
+Geographical distance and course angle `%[FORMAT]bARGUMENT' special text
+........................................................................
+
+`%[FORMAT]b[*][MODE]ISO-6709:1983-CO-ORDINATE-1/ISO-6709:1983-CO-ORDINATE-2'
+references either the approximate *air line distance* or the
+approximate *course angle (true track)*(1) (*note Geographical distance
+and course angle-Footnote-1::) between any of two geographic point
+locations.  The selection, which value has to be calculated by using
+this special text is done by specifying the MODE part of the preceding
+argument.  Actually, exactly three different modes can be used that are
+represented by the `0'...`2' characters:
+
+*Mode*      *Description*
+
+`0'         Calculates the air line distance between
+            ISO-6709:1983-CO-ORDINATE-1 and ISO-6709:1983-CO-ORDINATE-2.
+            The calculated air line distance value is displayed in
+            kilometers by default.  A `*' character directly before this
+            mode character causes Gcal to display the distance value for
+            another quantity, and that in "statute miles"; where one
+            statute mile is equal to 1.609344 kilometer.  If Gcal is
+            unable to compute the approximate distance between the two
+            geographic point locations by reason of a misspecified
+            ARGUMENT, a `??' text will be created instead of the
+            distance value.
+
+`1'         Calculates the course angle (true track) between
+            ISO-6709:1983-CO-ORDINATE-1 and ISO-6709:1983-CO-ORDINATE-2.
+            The calculated course angle value is displayed in degrees
+            and arcminutes by default.  The course angle is measured
+            clockwise relative to the geographic, true North (not the
+            magnetic North as shown by a compass), where angle values
+            for the North direction are both denoted as 0 degree and 360
+            degree.  A `*' character directly before this mode character
+            causes Gcal to display the course angle value using another
+            style; and that in decimal degrees.  If Gcal is unable to
+            compute the approximate course angle between the two
+            geographic point locations by reason of a misspecified
+            ARGUMENT, a `???d??'' text will be created instead of the
+            course angle value.
+
+`2'         Like mode `1', but the course angle (true track) between
+            ISO-6709:1983-CO-ORDINATE-2 and ISO-6709:1983-CO-ORDINATE-1
+            is calculated.
+
+  If no MODE is given, Gcal automatically uses that mode, which is
+enabled by the mode character `0'.  If a mode character is given that
+is not according to one of the `0'...`2' characters, Gcal also
+automatically uses that mode, which is enabled by the mode character
+`0'.
+
+  After the optional style and mode characters, the latitude and
+longitude of the geographic co-ordinates follows, for which the
+calculations must be made.  They must be conform the ISO-6709:1983
+standard representation of latitude and longitude for geographic point
+locations.  The two co-ordinates have to be separated by a `/'
+termination character from each other.
+
+  *Note Arguments of the Sun oriented special texts: x-Sun-arguments,
+for the detailed description of the components of the ISO-6709:1983
+standard representation of latitude and longitude for geographic point
+locations.
+
+  For example:
+
+     The text `Distance Paris-Tokyo: %b+4852+00220/+3542+13946 km' will
+     be expanded to
+     ==> `Distance Paris-Tokyo: 9746km'.
+
+     The text `Distance Paris-Tokyo: %b*0+4852+00220/+3542+13946 ms'
+     will be expanded to
+     ==> `Distance Paris-Tokyo: 6056ms'.
+
+     The text `Course angle Paris-Tokyo: %b1+4852+00220/+3542+13946'
+     will be expanded to
+     ==> `Course angle Paris-Tokyo: 033d22''.
+
+     The text `Course angle Tokyo-Paris: %b*2+4852+00220/+3542+13946'
+     will be expanded to
+     ==> `Course angle Tokyo-Paris: 333.548'.
+
+  While praying, people of Islamic faith always turn their heads into
+the direction of Makkah, Saudi-Arabia.  Now by means of Gcal, these
+people can easily find out for their respective location, where they
+have to turn to, and that by:
+
+     %b1ISO-6709:1983-CO-ORDINATE-1/+212516+0394929
+
+where ISO-6709:1983-CO-ORDINATE-1 is simply replaced by the co-ordinate
+of the respective location.
+
+  *Note Fixed date option `--precise': x-precise, how to obtain a more
+precise representation of the values that are caused by this special
+text.
+
+  This special text *must* always be trailed by a _whitespace_
+character which is removed in output!
+
+
+File: gcal.info,  Node: Geographical distance and course angle-Footnotes,  Up: Geographical distance and course angle
+
+  (1) The course angle gives the direction, which is the vertex of a
+great circles arc ("Orthodrome") that is casted between two points on a
+surface of a sphere, at a meridian (Gcal uses a geoid (rotation
+ellipsoid) that is calculated taking pattern from the `World Geodetic
+System', short W.G.S, that was designed in 1961).  Such an arc is the
+shortest geodetic connecting line between two points on a sphere.
+Indeed, the course angles on such an arc are changing continually,
+because the circular line that is casted intersects each meridian with
+another angle -- except the case, that both co-ordinates are referring
+to exactly the same "meridian" (longitude), or to exactly the same
+latitude.
+
+
+File: gcal.info,  Node: Sun data,  Next: Moon data,  Prev: Geographical distance and course angle,  Up: Replacements with other argument
+
+Sun data `%[FORMAT]?ARGUMENT' special texts
+...........................................
+
+  `%[FORMAT]o[*][MODE]ISO-6709:1983-CO-ORDINATE[,[+|-]MMMM|HH:[MM]]'
+references the approximate time of *sunrise* by default,
+`%[FORMAT]s[*][MODE]ISO-6709:1983-CO-ORDINATE[,[+|-]MMMM|HH:[MM]]'
+references the approximate time of *sunset* by default,
+`%[FORMAT]u[*][MODE]ISO-6709:1983-CO-ORDINATE[,[+|-]MMMM|HH:[MM]]'
+references the approximate period of *visibility* of the Sun (solar day
+length) by default,
+`%[FORMAT]z[*][MODE]ISO-6709:1983-CO-ORDINATE[,[+|-]MMMM|HH:[MM]]'
+references the approximate period of *non-visibility* of the Sun (solar
+night length) by default.
+
+  All these special texts can be used for at pleasure any geographic
+point location, i.e. it is possible to determine different astronomical
+values for any location on the globe, and that for at pleasure any
+clocktime with a resolution of a single minute within the period of the
+years AD 1 until AD 9999, that is respected by Gcal.
+
+  The selection which value has to be calculated by these special texts
+is done by specifying the MODE part of the preceding argument.
+Actually, exactly 54 different modes can be used that are represented
+by the `0'...`9', `a'...`z' and `A'...`R' characters, and which create
+different kind of results that are depending on the special text used.
+First of all, here is a table in which all usable modes are described
+and explained sufficiently.  You can also see from this table, which
+Sun oriented special text or texts are corresponding to which mode,
+i.e. cause the determination of an astronomical value as it is
+described in the table:
+
+*Mode*  *Special      *Description*
+        text*         
+
+`0'     `o', `s'      Calculates the approximate midnight time of the Sun.
+                      The astronomical midnight time of the Sun is at
+                      that clocktime, when the Sun holds an "azimuth"
+                      (horizontal angular distance between the vertical
+                      circle, that passes the Sun, and the North point)
+                      of either precisely 0 degrees of precisely 180
+                      degrees ("noon line"), which depends on the season
+                      and the geographical location.  At that clocktime,
+                      the Sun is close its "lowest culmination point",
+                      i.e. close the lowest point below or above the
+                      horizontal plane the Sun transits during this day.
+
+`1'     `o', `s'      Calculates the approximate noon time of the Sun.
+                      The astronomical noon time of the Sun is at that
+                      clocktime, when the Sun holds an azimuth of either
+                      precisely 180 degrees of precisely 0 degrees (noon
+                      line), which depends on the season and the
+                      geographical location.  At that clocktime, the Sun
+                      is close its "highest culmination point", i.e.
+                      close the highest point above or below the
+                      horizontal plane the Sun transits during this day.
+                      People of Islamic faith normally pray for the
+                      second time on the day during the period, which is
+                      between the astronomical noon time of the Sun (or
+                      some minutes later) and the Islamic prayer time by
+                      the name of "Asr".  These people commonly use the
+                      term "Zuhr" for this prayer time.  The timing of
+                      Asr depends on the length of the shadow cast by a
+                      vertical pole ("gnomon").  According to the Shafi
+                      school of jurisprudence, Asr begins when the length
+                      of the shadow of a vertical pole exceeds the length
+                      of the pole.  According to the Hanafi school of
+                      jurisprudence, Asr begins when the length of the
+                      shadow exceeds twice the length of the vertical
+                      pole.  In both cases, the minimum length of the
+                      shadow at astronomical noon time of the Sun is
+                      subtracted from the length of the shadow before
+                      comparing it with the length of the pole.  *Note
+                      Islamic Asr-1 prayer time: x-Sun-asr-1, and *Note
+                      Islamic Asr-2 prayer time: x-Sun-asr-2, for further
+                      details.
+
+`2'     `o'           Calculates the approximate time when the center of
+                      the Sun passes a reference altitude of 0 degrees on
+                      a "mathematical-geocentric" horizon in the morning;
+                      thus rising.  A mathematical horizon is a purely
+                      geometrically-built horizon which disregards the
+                      phenomenon of refraction as it arises in reality by
+                      the influence of the Earth's atmosphere.  A
+                      geocentrical horizon is the horizontal plane that
+                      passes through the Earth's center, orthogonal to
+                      the observer's local vertical.  In the further
+                      context, the shorter term _mathematical horizon_ is
+                      used which actually means the
+                      mathematical-geocentric horizon.
+
+`2'     `s'           Calculates the approximate time when the center of
+                      the Sun passes a reference altitude of 0 degrees on
+                      a mathematical horizon in the evening; thus setting.
+
+`2'     `u'           Calculates the approximate period while the center
+                      of the Sun is above a reference altitude of 0
+                      degrees on a mathematical horizon; thus is visible.
+
+`2'     `z'           Calculates the approximate period while the center
+                      of the Sun is below a reference altitude of 0
+                      degrees on a mathematical horizon; thus is
+                      non-visible.
+
+`3'     `o'           Calculates the approximate time when the upper limb
+                      of the Sun passes a reference altitude of 0 degrees
+                      on a mathematical horizon in the morning; thus
+                      rising.  The above mentioned reference altitude is
+                      computed from the value of the Sun's semidiameter
+                      as it appear at that clocktime.  If the reference
+                      altitude that is referring to the Sun's upper limb
+                      is converted to a reference altitude that is
+                      referring to the Sun's center, this results in a
+                      value of about 16 arcminutes below the geocentric
+                      horizon.
+
+`3'     `s'           Calculates the approximate time when the upper limb
+                      of the Sun passes a reference altitude of 0 degrees
+                      on a mathematical horizon in the evening; thus
+                      setting.  The above mentioned reference altitude is
+                      computed from the value of the Sun's semidiameter
+                      as it appear at that clocktime.
+
+`3'     `u'           Calculates the approximate period while the upper
+                      limb of the Sun is above a reference altitude of 0
+                      degrees on a mathematical horizon; thus is visible.
+
+`3'     `z'           Calculates the approximate period while the upper
+                      limb of the Sun is below a reference altitude of 0
+                      degrees on a mathematical horizon; thus is
+                      non-visible.
+
+`4'     `o'           Calculates the approximate time when the center of
+                      the Sun passes a reference altitude of 34
+                      arcminutes below the geocentric horizon in the
+                      morning; thus rising.  The phenomenon of refraction
+                      is already respected in this as it arises in
+                      reality by the influence of the Earth's atmosphere,
+                      and that with the standard value of 34 arcminutes,
+                      which can indirectly be changed by using the
+                      `--atmosphere' option.  *Note Fixed dates option
+                      `--atmosphere=AIR-PRESSURE[,TEMPERATURE]':
+                      x-atmosphere, how to change the base data of the
+                      atmosphere, so that the atmospheric conditions as
+                      defined by it are used to calculate the amount of
+                      refraction.
+
+`4'     `s'           Calculates the approximate time when the center of
+                      the Sun passes a reference altitude of 34
+                      arcminutes below the geocentric horizon in the
+                      evening; thus setting.  The phenomenon of
+                      refraction is already respected in this as it
+                      arises in reality by the influence of the Earth's
+                      atmosphere, and that with the standard value of 34
+                      arcminutes, which can indirectly be changed by
+                      using the `--atmosphere' option.
+
+`4'     `u'           Calculates the approximate period while the center
+                      of the Sun is above a reference altitude of 34
+                      arcminutes below the geocentric horizon; thus is
+                      visible.
+
+`4'     `z'           Calculates the approximate period while the center
+                      of the Sun is below a reference altitude of 34
+                      arcminutes below the geocentric horizon; thus is
+                      non-visible.
+
+`5'     `o'           Calculates the approximate time when the upper limb
+                      of the Sun passes a reference altitude of 34
+                      arcminutes below the geocentric horizon in the
+                      morning; thus rising.  This kind of rise time
+                      calculation is done according to the standard
+                      calculation method as it is commonly used
+                      internationally.  The phenomenon of refraction is
+                      already respected in this as it arises in reality
+                      by the influence of the Earth's atmosphere, and
+                      that with the standard value of 34 arcminutes,
+                      which can indirectly be changed by using the
+                      `--atmosphere' option.  *Note Fixed dates option
+                      `--atmosphere=AIR-PRESSURE[,TEMPERATURE]':
+                      x-atmosphere, how to change the base data of the
+                      atmosphere, so that the atmospheric conditions as
+                      defined by it are used to calculate the amount of
+                      refraction.  The above mentioned reference altitude
+                      is computed from the respective values of the Sun's
+                      semidiameter and (standard) refraction as they
+                      appear at that clocktime.  If the reference
+                      altitude that is referring to the Sun's upper limb
+                      is converted to a reference altitude that is
+                      referring to the Sun's center, this results in a
+                      value of about 50 arcminutes below the geocentric
+                      horizon.
+
+`5'     `s'           Calculates the approximate time when the upper limb
+                      of the Sun passes a reference altitude of 34
+                      arcminutes below the geocentric horizon in the
+                      evening; thus setting.  This kind of set time
+                      calculation is done according to the standard
+                      calculation method as it is commonly used
+                      internationally.  The phenomenon of refraction is
+                      already respected in this as it arises in reality
+                      by the influence of the Earth's atmosphere, and
+                      that with the standard value of 34 arcminutes,
+                      which can indirectly be changed by using the
+                      `--atmosphere' option.  The above mentioned
+                      reference altitude is computed from the respective
+                      values of the Sun's semidiameter and (standard)
+                      refraction as they appear at that clocktime.
+                      People of Islamic faith normally pray for the
+                      second-last time on the day at this clocktime, or
+                      some minutes later.  These people commonly use the
+                      term "Maghrib" for this prayer time.
+
+`5'     `u'           Calculates the approximate period while the upper
+                      limb of the Sun is above a reference altitude of 34
+                      arcminutes below the geocentric horizon; thus is
+                      visible.  This kind of visibility period
+                      calculation is done according to the standard
+                      calculation method as it is commonly used
+                      internationally.
+
+`5'     `z'           Calculates the approximate period while the upper
+                      limb of the Sun is above a reference altitude of 34
+                      arcminutes below the geocentric horizon; thus is
+                      non-visible.  This kind of non-visibility period
+                      calculation is done according to the standard
+                      calculation method as it is commonly used
+                      internationally.
+
+`6'     `o'           Calculates the approximate time when the center of
+                      the Sun passes a reference altitude of 6 degrees
+                      below a mathematical horizon in the morning; thus
+                      the beginning of "civil twilight".  The scattered
+                      light of the Sun that is remaining at the beginning
+                      of the civil twilight phase is in general not yet
+                      sufficient for reading outside without artificial
+                      illumination.
+
+`6'     `s'           Calculates the approximate time when the center of
+                      the Sun passes a reference altitude of 6 degrees
+                      below a mathematical horizon in the evening; thus
+                      the ending of civil twilight.
+
+`6'     `u'           Calculates the approximate period while the center
+                      of the Sun is above a reference altitude of 6
+                      degrees below a mathematical horizon; thus the
+                      period, while the center of the Sun is always above
+                      -6 degrees.
+
+`6'     `z'           Calculates the approximate period while the center
+                      of the Sun is below a reference altitude of 6
+                      degrees below a mathematical horizon; thus the
+                      period, while the center of the Sun is always below
+                      -6 degrees.
+
+`7'     `o'           Calculates the approximate time when the center of
+                      the Sun passes a reference altitude of 12 degrees
+                      below a mathematical horizon in the morning; thus
+                      the beginning of "nautical twilight".  The
+                      scattered light of the Sun that is remaining at the
+                      beginning of the nautical twilight phase is in
+                      general not yet sufficient for navigation using a
+                      sea horizon.
+
+`7'     `s'           Calculates the approximate time when the center of
+                      the Sun passes a reference altitude of 12 degrees
+                      below a mathematical horizon in the evening; thus
+                      the ending of nautical twilight.
+
+`7'     `u'           Calculates the approximate period while the center
+                      of the Sun is above a reference altitude of 12
+                      degrees below a mathematical horizon; thus the
+                      period, while the center of the Sun is always above
+                      -12 degrees.
+
+`7'     `z'           Calculates the approximate period while the center
+                      of the Sun is below a reference altitude of 12
+                      degrees below a mathematical horizon; thus the
+                      period, while the center of the Sun is always below
+                      -12 degrees.
+
+`8'     `o'           Calculates the approximate time when the center of
+                      the Sun passes a reference altitude of 15 degrees
+                      below a mathematical horizon in the morning; thus
+                      the beginning of "amateur-astronomical twilight".
+                      The scattered light of the Sun that is remaining at
+                      the beginning of the amateur-astronomical twilight
+                      phase is in general yet so faint that most
+                      astronomical observations can be made.
+
+`8'     `s'           Calculates the approximate time when the center of
+                      the Sun passes a reference altitude of 15 degrees
+                      below a mathematical horizon in the evening; thus
+                      the ending of amateur-astronomical twilight.
+
+`8'     `u'           Calculates the approximate period while the center
+                      of the Sun is above a reference altitude of 15
+                      degrees below a mathematical horizon; thus the
+                      period, while the center of the Sun is always above
+                      -15 degrees.
+
+`8'     `z'           Calculates the approximate period while the center
+                      of the Sun is below a reference altitude of 15
+                      degrees below a mathematical horizon; thus the
+                      period, while the center of the Sun is always below
+                      -15 degrees.
+
+`8'     `o'           Calculates the approximate time when the center of
+                      the Sun passes a reference altitude of 18 degrees
+                      below a mathematical horizon in the morning; thus
+                      the beginning of "astronomical twilight".  No
+                      appreciable scattered sunlight is remaining at the
+                      beginning of the astronomical twilight phase, the
+                      sky is completely dark yet.  People of Islamic
+                      faith normally pray for the first time on the day
+                      during the period, which is between this clocktime
+                      and the time of standard sunrise.  These people
+                      commonly use the term "Fajr" for this prayer time.
+                      *Note Standard rise time of the Sun:
+                      x-Sun-standard-rise, for further details.
+
+`9'     `s'           Calculates the approximate time when the center of
+                      the Sun passes a reference altitude of 18 degrees
+                      below a mathematical horizon in the evening; thus
+                      the ending of astronomical twilight.  People of
+                      Islamic faith normally pray for the last time on the
+                      day at this clocktime, or some minutes later.
+                      These people commonly use the term "Isha" for this
+                      prayer time.
+
+`9'     `u'           Calculates the approximate period while the center
+                      of the Sun is above a reference altitude of 18
+                      degrees below a mathematical horizon; thus the
+                      period, while the center of the Sun is always above
+                      -18 degrees.
+
+`9'     `z'           Calculates the approximate period while the center
+                      of the Sun is below a reference altitude of 18
+                      degrees below a mathematical horizon; thus the
+                      period, while the center of the Sun is always below
+                      -18 degrees.
+
+`a'     `o', `s'      Calculates the approximate "topocentric", apparent
+                      "elevation" of the Sun, thus the vertical angular
+                      distance between the Sun's center and the horizon,
+                      in degrees and arcminutes as it happen at civil
+                      midnight time.  Results with a negative sign
+                      signify that the Sun's center is below the horizon
+                      at the moment, and results with a positive sign
+                      mean that the momentary center of the Sun is above
+                      the horizon.  Observations of celestial objects
+                      that are done from the surface of the Earth yield
+                      in topocentrically based data.  The locations of
+                      the celestial bodies are often at another place if
+                      the data is topocentrically determined instead of
+                      determine it "geocentrically", i.e. at the
+                      fictitious center of the Earth.  This is mainly
+                      caused by the refraction, which raises a celestial
+                      body to another location as it is been in reality.
+                      Because the terrestrial globe flattens towards the
+                      pole caps and therefore cannot be taken as an
+                      ideally shaped sphere, the individual Earth radius
+                      between the observer's location and the center of
+                      the Earth also affects the computation of
+                      topocentrically based data.
+
+`b'     `o', `s'      Calculates the approximate topocentric, apparent
+                      azimuth of the Sun in degrees and arcminutes as it
+                      happen at civil midnight time.
+
+`c'     `o', `s'      Calculates the approximate topocentric, apparent
+                      "declination" of the Sun, thus the vertical angular
+                      distance between the Sun's center and the celestial
+                      equator, in degrees and arcminutes as it happen at
+                      civil midnight time.  Results with a negative sign
+                      signify that the Sun's center is below the
+                      celestial equator at the moment, and results with a
+                      positive sign mean that the momentary center of the
+                      Sun is below the celestial equator.
+
+`d'     `o', `s'      Calculates the approximate topocentric, apparent
+                      "ecliptic longitude" of the Sun, thus the
+                      horizontal angular distance between the Sun's
+                      center and the vernal equinox point on the
+                      "ecliptic" (the zodiacal line or Sun's orbit), in
+                      degrees and arcminutes as it happen at civil
+                      midnight time.
+
+`e'     `o', `s'      Calculates the approximate topocentric, apparent
+                      "right ascension" of the Sun, thus the horizontal
+                      angular distance between the Sun's center and the
+                      hour circle that passes through the vernal equinox
+                      point on the ecliptic, as time value in hours and
+                      minutes as it happen at civil midnight time.
+
+`f'     `o', `s'      Calculates the approximate topocentric, apparent
+                      distance of the Sun from the Earth in "astronomical
+                      units" as it happen at civil midnight time.  An
+                      astronomical unit, abbreviated by ae, is equal to
+                      the mean distance of the Sun from the Earth, which
+                      is about 149,597,870.691 kilometers.
+
+`g'     `o', `s'      Calculates the approximate topocentric, apparent
+                      "horizontal parallax" of the Sun in degrees and
+                      arcminutes as it happen at civil midnight time.
+                      The horizontal parallax of the Sun specifies the
+                      diameter of the Earth as it is seen from the
+                      surface of the Sun.
+
+`h'     `o', `s'      Calculates the approximate topocentric, apparent
+                      semidiameter of the Sun in degrees and arcminutes
+                      as it happen at civil midnight time.
+
+`i'     `o', `s'      Calculates the approximate refraction of the
+                      Earth's atmosphere in degrees and arcminutes as it
+                      happen at civil midnight time.
+
+`j'     `o', `s'      Calculates the approximate geocentric, apparent
+                      elevation of the Sun in degrees and arcminutes as
+                      it happen at civil midnight time.  Results with a
+                      negative sign signify that the Sun's center is
+                      below the horizon at the moment, and results with a
+                      positive sign mean that the momentary center of the
+                      Sun is above the horizon.
+
+`k'     `o', `s'      Calculates the approximate geocentric, apparent
+                      azimuth of the Sun in degrees and arcminutes as it
+                      happen at civil midnight time.
+
+`l'     `o', `s'      Calculates the approximate geocentric, apparent
+                      declination of the Sun in degrees and arcminutes as
+                      it happen at civil midnight time.  Results with a
+                      negative sign signify that the Sun's center is
+                      below the celestial equator at the moment, and
+                      results with a positive sign mean that the
+                      momentary center of the Sun is above the celestial
+                      equator.
+
+`m'     `o', `s'      Calculates the approximate geocentric, apparent
+                      ecliptic longitude of the Sun in degrees and
+                      arcminutes as it happen at civil midnight time.
+
+`n'     `o', `s'      Calculates the approximate geocentric, apparent
+                      right ascension of the Sun as time value in hours
+                      and minutes as it happen at civil midnight time.
+
+`o'     `o', `s'      Calculates the approximate geocentric, apparent
+                      distance of the Sun from the Earth in astronomical
+                      units as it happen at civil midnight time.
+
+`p'     `o', `s'      Calculates the approximate geocentric, apparent
+                      horizontal parallax of the Sun in degrees and
+                      arcminutes as it happen at civil midnight time.
+
+`q'     `o', `s'      Calculates the approximate geocentric, apparent
+                      semidiameter of the Sun in degrees and arcminutes
+                      as it happen at civil midnight time.
+
+`r'     `o', `s'      Calculates the approximate "delta-t" in seconds as
+                      it happen at civil midnight time.  Delta-t is the
+                      difference between the Terrestrial Dynamical time
+                      (abbreviated by TDT), that was formerly known as
+                      _Ephemeris time_ (abbreviated by ET), and the
+                      Universal time (UT).  Thus, `delta-t == TDT - UT'.
+
+`s'     `o', `s'      Calculates the approximate, apparent location
+                      oriented "sidereal time" (local sidereal time
+                      (LAST), also known as _local star time_) in hours
+                      and minutes as it happen at civil midnight time.  A
+                      "star day" is the period between two consecutive
+                      upper culminations of the vernal equinox point on
+                      the ecliptic in the meridian of the observer's
+                      location.  Therefore, the local "star time" is the
+                      momentary period, which is past between the last
+                      upper culmination of the vernal equinox point in
+                      the meridian of the observer's location (the
+                      momentary hour angle of the vernal equinox point),
+                      thus the right ascension of the stars in the
+                      observer's meridian at the moment.
+
+`t'     `o', `s'      Outputs the base time as time value in hours and
+                      minutes, for which the dynamical, i.e. depending on
+                      the respective clocktime, astronomical data and
+                      times of the Sun are calculated.  Without a given
+                      `--time-offset=ARGUMENT' option, the astronomical
+                      data and times of the Sun are always calculated for
+                      0 o'clock Universal time (UTC/GMT).  *Note Calendar
+                      option `--time-offset=ARGUMENT': x-time-offset, for
+                      further details.
+
+`u'     `o', `s'      Calculates the approximate Julian date in days as
+                      it happen at civil midnight time.  *Note Julian day
+                      number::, for further information about the Julian
+                      date.
+
+`v'     `o', `s'      Calculates the approximate "Julian Ephemeris date",
+                      thus a Julian date that is corrected by _delta-t_,
+                      in days as it happen at civil midnight time.
+
+`w'     `o', `s'      Calculates the approximate difference between "true
+                      solar time" and "mean solar time" as time value in
+                      hours and minutes as it happen at civil midnight
+                      time.  This so-called "equation of time" is a
+                      correction to be added to the true solar time --as
+                      read on a sundial-- to obtain the mean solar time.
+                      A "true solar day" is the period between two
+                      consecutive lower culminations of the Sun.  This
+                      entity is taken as the base for deriving the true
+                      solar time (as it is also shown by a sundial during
+                      the day).  A star day is also known as a `mean
+                      solar day'.  Because the Sun apparently shifts with
+                      respect to the vernal equinox point on the ecliptic
+                      due to the Earth's orbit around the Sun, the star
+                      day and the true solar day have a different length.
+                      As the true Sun namely moves irregularly through
+                      the ecliptic, a fictitious "mean Sun" with a
+                      symmetrical motion through the celestial equator is
+                      used for deriving the mean solar time.  So, this
+                      difference in time is a consequence of the
+                      ellipticity and tilt of the Earth's orbit, causing
+                      the irregular apparent movement of the Sun across
+                      the sky.
+
+`x'     `o', `s'      Calculates the difference of the approximate
+                      topocentric, apparent elevation of Sun and Moon
+                      (delta), at which the Sun is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      civil midnight time.  Results with a negative sign
+                      signify that the momentary center of the Sun is at
+                      an elevation that is below the momentary elevation
+                      of the Moon's center; thus the Sun is lower than
+                      the Moon.  Results with a positive sign signify
+                      that the momentary center of the Sun is at an
+                      elevation that is above the momentary elevation of
+                      the Moon's center; thus the Sun is higher than the
+                      Moon.
+
+`y'     `o', `s'      Calculates the difference of the approximate
+                      topocentric, apparent azimuth of Sun and Moon
+                      (delta), at which the Sun is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      civil midnight time.  The result specifies the
+                      horizontal angular distance, by which the momentary
+                      center of the Sun is distant from the momentary
+                      Moon's center, and that measured at the vertical
+                      circles that pass the Sun and the North point and
+                      the Moon and the North point.  Results with a
+                      negative sign signify that the Moon is to the right
+                      (clockwise) of the Sun if one looks to the Sun --
+                      or alternatively expressed, that the Sun is to the
+                      left (anti-clockwise) of the Moon.  Results with a
+                      positive sign signify that the Moon is to the left
+                      (anti-clockwise) of the Sun if one looks to the Sun
+                      -- or alternatively expressed, that the Sun is to
+                      the right (clockwise) of the Moon.
+
+`z'     `o', `s'      Calculates the difference of the approximate
+                      geocentric, apparent elevation of Sun and Moon
+                      (delta), at which the Sun is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      civil midnight time.
+
+`A'     `o', `s'      Calculates the difference of the approximate
+                      geocentric, apparent azimuth of Sun and Moon
+                      (delta), at which the Sun is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      civil midnight time.
+
+`B'     `o'           Calculates the difference of the approximate
+                      topocentric, apparent elevation of Sun and Moon
+                      (delta), at which the Sun is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard rise time of the Sun.  *Note Standard rise
+                      time of the Sun: x-Sun-standard-rise, for further
+                      details.
+
+`B'     `s'           Calculates the difference of the approximate
+                      topocentric, apparent elevation of Sun and Moon
+                      (delta), at which the Sun is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard set time of the Sun.  *Note Standard set
+                      time of the Sun: x-Sun-standard-set, for further
+                      details.
+
+`C'     `o'           Calculates the difference of the approximate
+                      topocentric, apparent azimuth of Sun and Moon
+                      (delta), at which the Sun is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard rise time of the Sun.  *Note Standard rise
+                      time of the Sun: x-Sun-standard-rise, for further
+                      details.
+
+`C'     `s'           Calculates the difference of the approximate
+                      topocentric, apparent azimuth of Sun and Moon
+                      (delta), at which the Sun is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard set time of the Sun.  *Note Standard set
+                      time of the Sun: x-Sun-standard-set, for further
+                      details.
+
+`D'     `o'           Calculates the difference of the approximate
+                      geocentric, apparent elevation of Sun and Moon
+                      (delta), at which the Sun is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard rise time of the Sun.  *Note Standard rise
+                      time of the Sun: x-Sun-standard-rise, for further
+                      details.
+
+`D'     `s'           Calculates the difference of the approximate
+                      geocentric, apparent elevation of Sun and Moon
+                      (delta), at which the Sun is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard set time of the Sun.  *Note Standard set
+                      time of the Sun: x-Sun-standard-set, for further
+                      details.
+
+`E'     `o'           Calculates the difference of the approximate
+                      geocentric, apparent azimuth of Sun and Moon
+                      (delta), at which the Sun is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard rise time of the Sun.  *Note Standard rise
+                      time of the Sun: x-Sun-standard-rise, for further
+                      details.
+
+`E'     `s'           Calculates the difference of the approximate
+                      geocentric, apparent azimuth of Sun and Moon
+                      (delta), at which the Sun is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard set time of the Sun.  *Note Standard set
+                      time of the Sun: x-Sun-standard-set, for further
+                      details.
+
+`F'     `o', `s'      Calculates the difference of the approximate
+                      astronomical midnight times of Sun and Moon (delta),
+                      at which the Sun is used as the reference point, as
+                      time value in hours and minutes as it happen at
+                      astronomical midnight time of the Sun.  Results
+                      with a negative sign signify that the astronomical
+                      midnight time of the Sun is earlier than the
+                      astronomical midnight time of the Moon; thus the
+                      solar midnight is before the lunar midnight.
+                      Results with a positive sign signify that the
+                      astronomical midnight time of the Sun is later than
+                      the astronomical midnight time of the Moon; thus
+                      the solar midnight is after the lunar midnight.
+                      *Note Astronomical midnight time of the Sun:
+                      x-Sun-midnight, and *Note Astronomical midnight
+                      time of the Moon: x-Moon-midnight, for further
+                      details.
+
+`G'     `o', `s'      Calculates the difference of the approximate
+                      astronomical noon times of Sun and Moon (delta), at
+                      which the Sun is used as the reference point, as
+                      time value in hours and minutes as it happen at
+                      astronomical noon time of the Sun.  Results with a
+                      negative sign signify that the astronomical noon
+                      time of the Sun is earlier than the astronomical
+                      noon time of the Moon; thus the solar noon is
+                      before the lunar noon.  Results with a positive
+                      sign signify that the astronomical noon time of the
+                      Sun is later than the astronomical noon time of the
+                      Moon; thus the solar noon is after the lunar noon.
+                      *Note Astronomical noon time of the Sun: x-Sun-noon,
+                      and *Note Astronomical noon time of the Moon:
+                      x-Moon-noon, for further details.
+
+`H'     `o'           Calculates the difference of the approximate
+                      standard rise times of Sun and Moon (delta), at
+                      which the Sun is used as the reference point, as
+                      time value in hours and minutes as it happen at
+                      standard rise time of the Sun.  Results with a
+                      negative sign signify that the standard rise time
+                      of the Sun is earlier than the standard rise time
+                      of the Moon; thus the sunrise is before the
+                      moonrise.  Results with a positive sign signify
+                      that the standard rise time of the Sun is later
+                      than the standard rise time of the Moon; thus the
+                      sunrise is after the moonrise.  *Note Standard rise
+                      time of the Sun: x-Sun-standard-rise, and *Note
+                      Standard rise time of the Moon:
+                      x-Moon-standard-rise, for further details.
+
+`H'     `s'           Calculates the difference of the approximate
+                      standard set times of Sun and Moon (delta), at
+                      which the Sun is used as the reference point, as
+                      time value in hours and minutes as it happen at
+                      standard set time of the Sun.  Results with a
+                      negative sign signify that the standard set time of
+                      the Sun is earlier than the standard set time of
+                      the Moon; thus the sunset is before the moonset.
+                      Results with a positive sign signify that the
+                      standard set time of the Sun is later than the
+                      standard set time of the Moon; thus the sunset is
+                      after the moonset.  *Note Standard set time of the
+                      Sun: x-Sun-standard-set, and *Note Standard set
+                      time of the Moon: x-Moon-standard-set, for further
+                      details.
+
+`I'     `o', `s'      Calculates the approximate topocentric, apparent
+                      elevation of the Sun in degrees and arcminutes as
+                      it happen at astronomical midnight time of the Sun
+                      (topocentric "midnight height").  *Note
+                      Astronomical midnight time of the Sun:
+                      x-Sun-midnight, for further details.
+
+`J'     `o', `s'      Calculates the approximate topocentric, apparent
+                      elevation of the Sun in degrees and arcminutes as
+                      it happen at astronomical midnight time of the Sun
+                      (topocentric "midnight height").  *Note
+                      Astronomical noon time of the Sun: x-Sun-noon, for
+                      further details.
+
+`K'     `o'           Calculates the approximate topocentric, apparent
+                      elevation of the Sun in degrees and arcminutes as
+                      it happen at standard rise time of the Sun
+                      (topocentric "rise height").  *Note Standard rise
+                      time of the Sun: x-Sun-standard-rise, for further
+                      details.
+
+`K'     `s'           Calculates the approximate topocentric, apparent
+                      elevation of the Sun in degrees and arcminutes as
+                      it happen at standard set time of the Sun
+                      (topocentric "set height").  *Note Standard set
+                      time of the Sun: x-Sun-standard-set, for further
+                      details.
+
+`L'     `o'           Calculates the approximate topocentric, apparent
+                      azimuth of the Sun in degrees and arcminutes as it
+                      happen at standard rise time of the Sun
+                      (topocentric "rise azimuth").  The horizontal
+                      angular distance between the topocentric rise
+                      azimuth and the East direction is also known as the
+                      topocentric "morning width" of the Sun.  *Note
+                      Standard rise time of the Sun: x-Sun-standard-rise,
+                      for further details.
+
+`L'     `s'           Calculates the approximate topocentric, apparent
+                      azimuth of the Sun in degrees and arcminutes as it
+                      happen at standard set time of the Sun (topocentric
+                      "set azimuth").  The horizontal angular distance
+                      between the topocentric set azimuth and the West
+                      direction is also known as the topocentric "evening
+                      width" of the Sun.  *Note Standard set time of the
+                      Sun: x-Sun-standard-set, for further details.
+
+`M'     `o', `s'      Calculates the approximate geocentric, apparent
+                      elevation of the Sun in degrees and arcminutes as
+                      it happen at astronomical midnight time of the Sun
+                      (geocentric "midnight height").  *Note Astronomical
+                      midnight time of the Sun: x-Sun-midnight, for
+                      further details.
+
+`N'     `o', `s'      Calculates the approximate geocentric, apparent
+                      elevation of the Sun in degrees and arcminutes as
+                      it happen at astronomical midnight time of the Sun
+                      (geocentric "midnight height").  *Note Astronomical
+                      noon time of the Sun: x-Sun-noon, for further
+                      details.
+
+`O'     `o'           Calculates the approximate geocentric, apparent
+                      elevation of the Sun in degrees and arcminutes as
+                      it happen at standard rise time of the Sun
+                      (geocentric "rise height").  *Note Standard rise
+                      time of the Sun: x-Sun-standard-rise, for further
+                      details.
+
+`O'     `s'           Calculates the approximate geocentric, apparent
+                      elevation of the Sun in degrees and arcminutes as
+                      it happen at standard set time of the Sun
+                      (geocentric "set height").  *Note Standard set time
+                      of the Sun: x-Sun-standard-set, for further details.
+
+`P'     `o'           Calculates the approximate geocentric, apparent
+                      azimuth of the Sun in degrees and arcminutes as it
+                      happen at standard rise time of the Sun (geocentric
+                      "rise azimuth").  The horizontal angular distance
+                      between the geocentric rise azimuth and the East
+                      direction is also known as the geocentric "morning
+                      width" of the Sun.  *Note Standard rise time of the
+                      Sun: x-Sun-standard-rise, for further details.
+
+`P'     `s'           Calculates the approximate geocentric, apparent
+                      azimuth of the Sun in degrees and arcminutes as it
+                      happen at standard set time of the Sun (geocentric
+                      "set azimuth").  The horizontal angular distance
+                      between the geocentric set azimuth and the West
+                      direction is also known as the geocentric "evening
+                      width" of the Sun.  *Note Standard set time of the
+                      Sun: x-Sun-standard-set, for further details.
+
+`Q'     `o'           Calculates the approximate time when the length of
+                      the shadow cast by a vertical pole in the forenoon
+                      is *equal* the length of the pole.  Nevertheless,
+                      the minimum length of the shadow is subtracted from
+                      the length of the shadow before comparing it with
+                      the length of the pole.  *Note Fixed dates option
+                      `--adjust-value=ARGUMENT': x-adjust-value, how to
+                      change the shadow length factor.
+
+`Q'     `s'           Calculates the approximate time when the length of
+                      the shadow cast by a vertical pole in the afternoon
+                      is *equal* the length of the pole.  Nevertheless,
+                      the minimum length of the shadow is subtracted from
+                      the length of the shadow before comparing it with
+                      the length of the pole.  People of Islamic faith,
+                      and that the people holding the _Shafi_ school of
+                      jurisprudence, normally pray for the third time on
+                      the day at this clocktime, or some minutes later.
+                      These people commonly use the term "Asr" for this
+                      prayer time.  *Note Astronomical noon time of the
+                      Sun: x-Sun-noon, for more information.  And note
+                      *Note Fixed dates option `--adjust-value=ARGUMENT':
+                      x-adjust-value, how to change the shadow length
+                      factor.
+
+`Q'     `u'           Calculates the approximate period while the center
+                      of the Sun is above a reference altitude, at which
+                      the length of the shadow cast by a vertical pole is
+                      of single or shorter length than the pole itself.
+
+`Q'     `z'           Calculates the approximate period while the center
+                      of the Sun is below a reference altitude, at which
+                      a vertical pole either casts no shadow anymore, or
+                      casts a shadow that is longer than the single length
+                      of the pole itself.
+
+`R'     `o'           Calculates the approximate time when the length of
+                      the shadow cast by a vertical pole at forenoon is
+                      *twice* the length of the pole.  Nevertheless, the
+                      minimum length of the shadow is subtracted from the
+                      length of the shadow before comparing it with the
+                      length of the pole.  *Note Fixed dates option
+                      `--adjust-value=ARGUMENT': x-adjust-value, how to
+                      change the shadow length factor.
+
+`R'     `s'           Calculates the approximate time when the length of
+                      the shadow cast by a vertical pole in the afternoon
+                      is *twice* the length of the pole.  Nevertheless,
+                      the minimum length of the shadow is subtracted from
+                      the length of the shadow before comparing it with
+                      the length of the pole.  People of Islamic faith,
+                      and that the people holding the _Hanafi_ school of
+                      jurisprudence, normally pray for the third time on
+                      the day at this clocktime, or some minutes later.
+                      These people commonly use the term "Asr" for this
+                      prayer time.  *Note Astronomical noon time of the
+                      Sun: x-Sun-noon, for more information.  And note
+                      *Note Fixed dates option `--adjust-value=ARGUMENT':
+                      x-adjust-value, how to change the shadow length
+                      factor.
+
+`R'     `u'           Calculates the approximate period while the center
+                      of the Sun is above a reference altitude, at which
+                      the length of the shadow cast by a vertical pole is
+                      of double or shorter length than the pole itself.
+
+`R'     `z'           Calculates the approximate period while the center
+                      of the Sun is below a reference altitude, at which
+                      a vertical pole either casts no shadow anymore, or
+                      casts a shadow that is longer than twice the length
+                      of the pole itself.
+
+  If no MODE is given, Gcal automatically uses that mode, which is
+enabled by the mode character `5'.  If a mode character is given that
+is not according to one of the `0'...`9', `a'...`z' and `A'...`R'
+characters, Gcal also automatically uses that mode, which is enabled by
+the mode character `5'.
+
+  Gcal represents the Sun oriented special texts depending on the
+selected mode using the following types and styles:
+
+  1. Unsigned decimal based rational number value
+     Unsigned decimal based rational number values are represented using
+     the `N.N...' format by default.  A `*' character that is directly
+     given before some mode characters causes Gcal to represent the
+     value for another quantity.  For the mode characters, which
+
+       a. cause the calculation of Earth/Sun or Earth/Moon distances,
+          the calculated distance is represented in kilometers.
+
+       b. cause the calculation of phase angles of the Moon, the
+          calculated phase angle is represented as a phase value in
+          percents.
+
+     If definite events happen, Gcal displays special event oriented
+     texts instead of using the previously described representations.
+     *Note Event texts of the Sun oriented special texts:
+     x-Sun-event-texts, where you can find the event oriented texts
+     that are created for clocktime values, which are schematically and
+     analogously used for the type of representation as it is described
+     here.
+
+  2. Signed decimal based rational number value
+     Signed decimal based rational number values are represented using
+     the `+|-N.N...' format by default.  A `*' character that is
+     directly given before a mode character causes Gcal not to
+     represent such values using another style.
+
+     If definite events happen, Gcal displays special event oriented
+     texts instead of using the previously described representations.
+     *Note Event texts of the Sun oriented special texts:
+     x-Sun-event-texts, where you can find the event oriented texts
+     that are created for clocktime values, which are schematically and
+     analogously used for the type of representation as it is described
+     here.
+
+  3. Clocktime value
+     Clocktime values are represented in hours and minutes, and that in
+     the `HH:MM' _24-hour_ format by default.  A `*' character that is
+     directly given before a mode character causes Gcal to represent
+     the clocktime value using the _12-hour_ format, thus to provide it
+     with a time suffix.  *Note Actual local time `%t[ARGUMENT]'
+     special text: x-Actual-local-time, for more details about the
+     above mentioned time value template.
+
+     If definite events happen, Gcal displays special event oriented
+     texts instead of using the previously described representations:
+
+        * In case Gcal is unable to compute the approximate clocktime
+          by reason of a misspecified ARGUMENT, a `??:??' text will be
+          created instead of the clocktime text.
+
+        * In case Gcal calculates an approximate clocktime that refers
+          to a previous or next day, or Gcal is unable to calculate a
+          clocktime because the event calculated does not occur during
+          this day, a `**:**' text will be created instead of the
+          clocktime text.
+
+        * In case Gcal is unable to calculate an approximate clocktime
+          because the reference point of the astronomical object, thus
+          either the center or the upper limb of the Sun's or the
+          Moon's disk, is always above the respective reference
+          altitude, a `++:++' text will be created instead of the
+          clocktime text.
+
+        * In case Gcal is unable to calculate an approximate clocktime
+          because the reference point of the astronomical object, thus
+          either the center or the upper limb of the Sun's or the
+          Moon's disk, is always below the respective reference
+          altitude, a `--:--' text will be created instead of the
+          clocktime text.
+
+  4. Unsigned time value
+     Unsigned time values, which mostly denote a period or interval of
+     time, are represented in hours and minutes using the `HHhMM''
+     format by default.  A `*' character that is directly given before
+     a mode character causes Gcal to represent the time value using
+     another style, and that in decimal hours, i.e. in the `HH.H...'
+     format.
+
+     If definite events happen, Gcal displays special event oriented
+     texts instead of using the previously described representations.
+     *Note Event texts of the Sun oriented special texts:
+     x-Sun-event-texts, where you can find the event oriented texts
+     that are created for clocktime values, which are schematically and
+     analogously used for the type of representation as it is described
+     here.
+
+  5. Signed time value
+     Signed time values, which mostly denote a period or interval of
+     time, are represented in hours and minutes using the `+|-HHhMM''
+     format by default.  A `*' character that is directly given before
+     a mode character causes Gcal to represent the time value using
+     another style, and that in decimal hours, i.e. in the `+|-HH.H...'
+     format.
+
+     If definite events happen, Gcal displays special event oriented
+     texts instead of using the previously described representations.
+     *Note Event texts of the Sun oriented special texts:
+     x-Sun-event-texts, where you can find the event oriented texts
+     that are created for clocktime values, which are schematically and
+     analogously used for the type of representation as it is described
+     here.
+
+  6. Unsigned angular value
+     Unsigned angular values are represented in degrees and arcminutes
+     using the `DDDdMM'' format by default.  A `*' character that is
+     directly given before a mode character causes Gcal to represent
+     the angular value using another style, and that in decimal
+     degrees, i.e. in the `DDD.D...' format.
+
+     If definite events happen, Gcal displays special event oriented
+     texts instead of using the previously described representations.
+     *Note Event texts of the Sun oriented special texts:
+     x-Sun-event-texts, where you can find the event oriented texts
+     that are created for clocktime values, which are schematically and
+     analogously used for the type of representation as it is described
+     here.
+
+  7. Signed angular value
+     Signed angular values are represented in degrees and arcminutes
+     using the `+|-DDDdMM'' format by default.  A `*' character that is
+     directly given before a mode character causes Gcal to represent
+     the angular value using another style, and that in decimal
+     degrees, i.e. in the `+|-DDD.D...' format.
+
+     If definite events happen, Gcal displays special event oriented
+     texts instead of using the previously described representations.
+     *Note Event texts of the Sun oriented special texts:
+     x-Sun-event-texts, where you can find the event oriented texts
+     that are created for clocktime values, which are schematically and
+     analogously used for the type of representation as it is described
+     here.
+
+  After the optional style and mode characters, the latitude and
+longitude of the geographic co-ordinates follows, for which the
+calculations must be made.  They must be conform the ISO-6709:1983
+standard representation of latitude and longitude for geographic point
+locations, so that the co-ordinate has to be declared like this:
+
+   * Latitude (`+' for North and on the equator, `-' for South of the
+     equator.)
+
+    `+|-DD[.DD]'
+          Degrees (2 digits), and optionally decimal degrees
+
+    `+|-DDMM[.MM]'
+          Degrees (2 digits), arcminutes (2 digits), and optionally
+          decimal minutes
+
+    `+|-DDMMSS[.SS]'
+          Degrees (2 digits), arcminutes (2 digits), arcseconds (2
+          digits), and optionally decimal seconds
+
+   * Longitude (`+' for East and on the prime meridian (Greenwich), `-'
+     for West of Greenwich and up to the 180th meridian.)
+
+    `+|-DDD[.DD]'
+          Degrees (3 digits), and optionally decimal degrees
+
+    `+|-DDDMM[.MM]'
+          Degrees (3 digits), arcminutes (2 digits), and optionally
+          decimal minutes
+
+    `+|-DDDMMSS[.SS]'
+          Degrees (3 digits), arcminutes (2 digits), arcseconds (2
+          digits), and optionally decimal seconds
+
+   * Optionally, the relative height in meters above the sea level (`+'
+     for heights above and on the sea level, `-' for heights below the
+     sea level.)
+
+    `[+|-N[N[N[N]]]]'
+          Height in meters (integer number) in range `-9999'...`+9999'
+          (1...4 digits)
+
+  All components of the co-ordinates must have leadings zeroes in case
+they have less digits than the templates shown above.  Declared decimal
+seconds are not respected by Gcal.  Heights which have a negative sign
+remain unrespected if Gcal determinates Sun and Moon data and times,
+respectively.  In such a case, Gcal always uses the height `+0'.
+Latitude and longitude co-ordinates, and the height of the observer's
+location are connected without any separating characters, like
+`+40-075+61', `+401213.1-0750015.1' or `+40.20361-075.00417+0061'.  See
+the pertinent literature for more details.
+
+  A time value `[+|-]MMMM|HH:[MM]', which is separated by a `,'
+character, may trail the co-ordinate.  Such a time value informs Gcal,
+about how many minutes MMMM respectively hours HH and minutes MM the
+geographic location is displaced from Universal time (UTC/GMT).  This
+time displacement value defines the timezone, which is actually valid
+for this location.  If summer- and wintertimes are respected for the
+location, you should include that change in time into the timezone
+value for the period in which the summertime is valid, by which the
+clock is put on during the summertime period -- such a change is either
+subtracted from the timezone value for locations West of the prime
+meridian (Greenwich), or it is added for locations East of the prime
+meridian, because Gcal is actually unable to perform such operations
+automatically!  *Note Actual local time `%t[ARGUMENT]' special text:
+x-Actual-local-time, for more details about the above mentioned time
+value template.  If no time displacement value is specified for a given
+co-ordinate, Gcal assumes a time displacement value of `0', which is
+equal to the actual Universal time (UTC/GMT).
+
+  The following table informs you about which type of representation is
+caused by a mode.  The previously defined numbering scheme, as it has
+been used for the introduction of the types of representations, is used
+as key value in the column that holds the type of representation.  The
+table also contains a column that shows whether a mode enables
+dynamical values, i.e. values that are depending on the respective
+clocktime (if you use the `--time-offset=ARGUMENT' option, you can
+change the respective clocktime that is used for calculating such
+values).  In a next table column, it is listed whether the given
+co-ordinate of the location influences the determination of a value,
+and the last column of the table gives you the information whether a
+given timezone value affects the values determination:
+
+*Mode*  *Representation Type*  *Dynamical*    *Co-ordinate*  *Timezone*
+
+`0'     3                      No             Yes            Yes
+`1'     3                      No             Yes            Yes
+`2'     3 or 4                 No             Yes            Yes
+`3'     3 or 4                 No             Yes            Yes
+`4'     3 or 4                 No             Yes            Yes
+`5'     3 or 4                 No             Yes            Yes
+`6'     3 or 4                 No             Yes            Yes
+`7'     3 or 4                 No             Yes            Yes
+`8'     3 or 4                 No             Yes            Yes
+`9'     3 or 4                 No             Yes            Yes
+`a'     7                      Yes            Yes            Yes
+`b'     6                      Yes            Yes            Yes
+`c'     7                      Yes            Yes            Yes
+`d'     6                      Yes            Yes            Yes
+`e'     4                      Yes            Yes            Yes
+`f'     1 or 1a                Yes            Yes            Yes
+`g'     6                      Yes            Yes            Yes
+`h'     6                      Yes            Yes            Yes
+`i'     6                      Yes            No             No
+`j'     7                      Yes            Yes            Yes
+`k'     6                      Yes            Yes            Yes
+`l'     7                      Yes            Yes            Yes
+`m'     6                      Yes            Yes            Yes
+`n'     4                      Yes            Yes            Yes
+`o'     1 or 1a                Yes            Yes            Yes
+`p'     6                      Yes            Yes            Yes
+`q'     6                      Yes            Yes            Yes
+`r'     2                      Yes            No             No
+`s'     3                      Yes            Yes            Yes
+`t'     3                      Yes            No             No
+`u'     1                      Yes            No             No
+`v'     1                      Yes            No             No
+`w'     5                      Yes            No             Yes
+`x'     7                      Yes            Yes            Yes
+`y'     7                      Yes            Yes            Yes
+`z'     7                      Yes            Yes            Yes
+`A'     7                      Yes            Yes            Yes
+`B'     7                      No             Yes            Yes
+`C'     7                      No             Yes            Yes
+`D'     7                      No             Yes            Yes
+`E'     7                      No             Yes            Yes
+`F'     5                      No             Yes            Yes
+`G'     5                      No             Yes            Yes
+`H'     5                      No             Yes            Yes
+`I'     7                      No             Yes            Yes
+`J'     7                      No             Yes            Yes
+`K'     7                      No             Yes            Yes
+`L'     6                      No             Yes            Yes
+`M'     7                      No             Yes            Yes
+`N'     7                      No             Yes            Yes
+`O'     7                      No             Yes            Yes
+`P'     6                      No             Yes            Yes
+`Q'     3 or 4                 No             Yes            Yes
+`R'     3 or 4                 No             Yes            Yes
+
+And now some examples to these special texts:
+
+     The text `Sunrise at %o+5158+00738,120  in MS, BRD' will be
+     expanded to
+     ==> `Sunrise at 05:16 in MS, BRD', in case the actual system date
+     is the 1st June 1998.
+
+     The text `Sunset at %s*5+5158+00738,120  in MS, BRD' will be
+     expanded to
+     ==> `Sunset at 09:39pm in MS, BRD', in case the actual system date
+     is the 1st June 1998.
+
+     The text `Sun visible %u5+5158+00738,120  in MS, BRD' will be
+     expanded to
+     ==> `Sun visible 16h24' in MS, BRD', in case the actual system
+     date is the 1st June 1998.
+
+     The text `Sun non-visible %z*+5158+00738,120  in MS, BRD' will be
+     expanded to
+     ==> `Sun non-visible 7.607 in MS, BRD', in case the actual system
+     date is the 1st June 1998.
+
+     The text `Sun azimuth 0 o'clock=%s*a+5158+00738,120  in MS, BRD'
+     will be expanded to
+     ==> `Sun azimuth 0 o'clock=339d16' in MS, BRD', in case the actual
+     system date is the 1st June 1998.
+
+     The text `Equation of time %ot+00+000=%o*w+00+000,120  BRD' will
+     be expanded to
+     ==> `Equation of time +16h00'=+00h02'13.201" BRD', in case you
+     call Gcal with the `--time-offset=16:' and `--precise' options and
+     the actual system date is the 1st June 1998.
+
+     The text `Julian date at %ot+00+000 =%ou+00+000' will be expanded
+     to
+     ==> `Julian date at +10h15'=2450965.927', in case you call Gcal
+     with the `--time-offset=10:15' option and the actual system date
+     is the 1st June 1998.
+
+  Here is a list that reports about the used reference systems in a
+short manner, describes other aspects that are unmentioned now, and
+informs about the lacks and limitations that are existing for the Sun
+oriented special texts:
+
+   * All astronomical calculations are based on methods that use
+     --astronomically seen-- low-precision elements, which of course is
+     shown in the precision of the results that are caused by them.
+     Nevertheless in most cases, these results can be treated as more
+     as sufficiently precise if one measures their practical use.
+
+   * All azimuth and elevation values are always referring to the
+     center of the respective astronomical object, except the case, it
+     is stated otherwise.
+
+   * The base point of azimuth values, right ascension values and other
+     ecliptic co-ordinate values is always measured clockwise relative
+     to the geographical, true North (not the magnetic North as shown
+     by a compass), where angular values for the North direction are
+     both denoted as 0 degree and 360 degree.
+
+   * All topocentrically based azimuth and elevation values are always
+     corrected by the amount of atmospheric refraction.  Such a kind of
+     correction is always done if the center of the respective
+     astronomical object is above 2 degrees below the horizon.
+
+   * Generally, the rise and set times of the Sun cannot be precisely
+     predicted, because depending on unpredictable atmospheric
+     conditions, i.e. the local weather conditions as they appear
+     during these times change the amount of atmospheric refraction at
+     the horizon, so that the precalculated rise and set times may
+     throughout be in error by a minute or more.
+
+   * The accuracy of rise and set computations decreases again at high
+     latitudes, i.e. within in the solar Arctic Circle.  There, small
+     variations in atmospheric refraction can change the time of
+     sunrise or sunset by many minutes, since the Sun intersects the
+     horizon at a very shallow angle.  For the same reason, at high
+     latitudes, the effects of observer height and local topography are
+     magnified and can substantially change the times of the phenomena
+     actually observed, or even whether the phenomena are observed to
+     occur at all.
+
+   * The short explanations that are given to the different twilight
+     phases all assume the model of ideal atmospheric conditions by
+     default.  It is obvious that these explanations all become
+     meaningless if other conditions occur in reality, like a cloudy
+     sky or a badly polluted atmosphere.
+
+*Please also note the following references:*
+
+   * *Note Fixed dates option `--precise': x-precise, how to obtain a
+     more precise representation of the values which are cause by these
+     special texts.
+
+   * And note *Note Calendar option `--time-offset=ARGUMENT':
+     x-time-offset, how to change the clocktime, for which the
+     dynamical, i.e. depending on the respective clocktime, Sun
+     oriented special texts are calculated.
+
+   * Likewise, see *Note Fixed dates option `--cycle-end=ARGUMENT':
+     x-cycle-end, how the dynamical, i.e. depending on the respective
+     clocktime, Sun oriented special texts are calculated for a series
+     of clocktimes for the current day.
+
+   * And also note *Note Fixed dates option `--adjust-value=ARGUMENT':
+     x-adjust-value, how to change the reference altitude that is used
+     to calculate the rise and set times, as well as the shadow length
+     factor.
+
+   * Furthermore, see *Note Fixed dates option
+     `--atmosphere=AIR-PRESSURE[,TEMPERATURE]': x-atmosphere, how to
+     change the base data of the atmosphere that influences the
+     calculation of the Sun oriented special texts.
+
+   * And last, note *Note Fixed dates option `--limit': x-limit, how to
+     limit the rise and set times of the Sun to the actual day.
+
+  All Sun oriented special texts *must* always be trailed by a
+_whitespace_ character which is removed in output!
+

@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>The PBM Format</TITLE>
+<META NAME="manual_section" CONTENT="5">
+</HEAD>
+<BODY>
+<H1>pbm</H1>
+Updated: 03 October 2003
+<BR>
+<A HREF="pbm.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pbm - Netpbm bi-level image format
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<P>The PBM format is a lowest common denominator monochrome file format.
+<A NAME="ixAAB"></A> It serves as the common language of a large
+family of bitmap image conversion filters.  Because the format pays no heed
+to efficiency, it is simple and general enough that one can easily
+develop programs to convert to and from just about any other graphics
+format, or to manipulate the image.
+
+<P>The name "PBM" is an acronym derived from "Portable Bit Map."
+
+<P>This is not a format that one would normally use to store a file
+or to transmit it to someone -- it's too expensive and not expressive
+enough for that.  It's just an intermediary format.  In it's purest
+use, it lives only in a pipe between two other programs.
+
+<P>The format definition is as follows.
+
+<P>A PBM file consists of a sequence of one or more PBM images. There are
+no data, delimiters, or padding before, after, or between images.
+
+<P>Each PBM image consists of the following:
+
+<OL>
+
+<LI>A &quot;magic number&quot; for identifying the file type.
+A pbm image's magic number is the two characters &quot;P4&quot;.
+
+<LI>Whitespace (blanks, TABs, CRs, LFs).
+
+<LI>The width in pixels of the image, formatted as ASCII characters in decimal.
+
+<LI>Whitespace.
+
+<LI>The height in pixels of the image, again in ASCII decimal.
+
+<LI>Newline or other single whitespace character.
+
+<LI>A raster of Height rows, in order from top to bottom.  Each row is
+Width bits, packed 8 to a byte, with don't care bits to fill out the
+last byte in the row.  Each bit represents a pixel: 1 is black, 0 is
+white.  The order of the pixels is left to right.  The order of their
+storage within each file byte is most significant bit to least
+significant bit.  The order of the file bytes is from the beginning of
+the file toward the end of the file.
+
+
+<P>A row of an image is horizontal.  A column is vertical.  The pixels
+in the image are square and contiguous.
+
+<LI>Characters from a &quot;#&quot; to the next end-of-line, before
+the width/height line, are comments and are ignored.
+
+</OL>
+
+<P>
+There is actually another version of the PBM format, even more more
+simplistic, more lavishly wasteful of space than PBM, called Plain
+PBM.  Plain PBM actually came first, but even its inventor couldn't
+stand its recklessly squanderous use of resources after a while and
+switched to what we now know as the regular PBM format.  But Plain PBM
+is so redundant -- so overstated -- that it's virtually impossible to
+break.  You can send it through the most liberal mail system (which
+was the original purpose of the PBM format) and it will arrive still
+readable.  You can flip a dozen random bits and easily piece back
+together the original image.  And we hardly need to define the format
+here, because you can decode it by inspection.
+<P>
+
+The difference is:
+<DL COMPACT>
+<DT>-<DD>
+There is exactly one image in a file.
+<DT>-<DD>
+The &quot;magic number&quot; is &quot;P1&quot; instead of &quot;P4&quot;.
+<DT>-<DD>
+Each pixel in the raster is represented by a byte containing ASCII '1' or '0',
+representing black and white respectively.  There are no fill bits at the
+end of a row.
+<DT>-<DD>
+White space in the raster section is ignored.
+<DT>-<DD>
+You can put any junk you want after the raster, if it starts with a 
+white space character.
+<DT>-<DD>
+No line should be longer than 70 characters.
+</DL>
+<P>
+
+Here is an example of a small image in the plain PBM format:
+<PRE>
+P1
+# feep.pbm
+24 7
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+0 1 1 1 1 0 0 1 1 1 1 0 0 1 1 1 1 0 0 1 1 1 1 0
+0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 1 0
+0 1 1 1 0 0 0 1 1 1 0 0 0 1 1 1 0 0 0 1 1 1 1 0
+0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0
+0 1 0 0 0 0 0 1 1 1 1 0 0 1 1 1 1 0 0 1 0 0 0 0
+0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+</PRE>
+
+<P>You can generate the Plain PBM format from the regular PBM format
+(first image in the file only) with the <B>pnmtoplainpnm</B> program.
+
+<P>Programs that read this format should be as lenient as possible,
+accepting anything that looks remotely like a bitmap.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>COMPATIBILITY</H2>
+
+<P>Before July 2000, there could be at most one image in a PBM file.  As
+a result, most tools to process PBM files ignore (and don't read) any
+data after the first image.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="libnetpbm.html">libnetpbm</A></B>,
+<B><A HREF="pnm.html">pnm</A></B>,
+<B><A HREF="pgm.html">pgm</A></B>,
+<B><A HREF="ppm.html">ppm</A></B>,
+<B><A HREF="pam.html">pam</A></B>,
+<B><A HREF="directory.html">programs that process PBM</A></B>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1989, 1991 by Jef Poskanzer.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pbm.html#lbAB">NAME</A>
+<LI><A HREF="pbm.html#lbAC">DESCRIPTION</A>
+<LI><A HREF="pbm.html#lbAD">COMPATIBILITY</A>
+<LI><A HREF="pbm.html#lbAE">SEE ALSO</A>
+<LI><A HREF="pbm.html#lbAF">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

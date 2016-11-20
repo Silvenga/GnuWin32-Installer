@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>Netpbm User Manual</TITLE>
+</HEAD>
+<BODY>
+<H1>Error Handling</H1>
+
+<h2>Netpbm Programming Library Errors</h2>
+
+<p>As part of Netpbm's mission to make writing graphics programs quick
+and easy, Netpbm recognizes that no programmer likes to deal with
+error conditions.  Therefore, very few Netpbm programming library
+functions return error information.  There are no return codes to
+check.  If for some reason a function can't do what was asked of it,
+it doesn't return at all.
+
+<p>Netpbm's response to encountering an error is called &quot;throwing
+an error.&quot;
+
+<p>The typical way a Netpbm function throws an error (for example,
+when you attempt to open a non-existent file with <b>pm_openr()</b>)
+is that the function writes an error message the the Standard Error
+file and then causes the program to terminate with an exit() system
+call.  The function doesn't do any explicit cleanup, because everything
+a library function sets up gets cleaned up by normal process
+termination.
+
+<p>In many cases, that simply isn't acceptable.  If you're calling
+Netpbm functions from inside a server program, you'd want the program
+to recognize that the immediate task failed, but keep running to do
+other work.
+
+<p>So as an alternative, you can have the library functions throw an
+error by executing a longjmp instead.  A longjmp is a classic Unix
+exception handling concept.  See the documentation of the standard C
+library <b>setjmp()</b> and <b>longjmp()</b> functions.
+
+<p>In short, you identify a point in your programs for execution to
+hyperjump to from whatever depths of whatever functions it may be in
+at the time it detects an exception.  That hyperjump is called a
+longjmp.  The longjmp unwinds the stack and puts the program in the
+same state as if the subroutines had returned all the way up to the
+function that contains the jump point.  A longjmp does not in itself
+undo things like memory allocations.  But when you have a Netpbm
+function do a longjmp, it also cleans up everything it started.
+
+<p>To select this form of throwing an error, use the
+<b>pm_setjmpbuf()</b> function.  This alternative is not available
+before Netpbm 10.27 (March 2005).
+
+<h3 id="pm_setjmpbuf">pm_setjmpbuf()</h3>
+
+<p>pm_setjmpbuf() sets up the process so that when future calls to the
+Netpbm programming library throw an error, they execute a longjmp
+instead of causing the process to exit as they would by default.
+
+<p>This is <em>not</em> analogous to <b>setjmp()</b>.  You do a
+setjmp() first, then tell the Netpbm programming library with
+<b>pm_setjmpbuf()</b> to use the result.
+
+<p>Example:
+
+<pre>
+<code>
+  #include &lt;setjmp.h&gt;
+  #include &lt;pam.h&gt;
+
+  jmp_buf jmpbuf;
+  int rc;
+
+  rc = setjmp(jmpbuf);
+  if (rc == 0) {
+    struct pam pam;
+    pm_setjmpbuf(&amp;jmpbuf);
+    
+    pnm_readpam(stdin, &amp;pam, PAM_STRUCT_SIZE(tuple_type));
+
+    printf(&quot;pnm_readpam() succeeded!\n&quot;);
+
+  } else {
+    printf(&quot;pnm_readpam() failed.  You should have seen &quot;
+           &quot;messages to Standard Error telling you why.\n&quot;);
+  }
+</code>
+</pre>
+
+<P>This example should look really strange to you if you haven't read
+the documentation of <b>setjmp()</b>.  Remember that there is a
+hyperjump such that code that the program is executing the
+<b>pnm_readpam()</b> and then suddenly is returning a second time from
+the setjmp()!
+
+<p>Even <b>pm_error()</b> works this way -- if you set up a longjmp with
+<b>pm_setjmpbuf()</b> and then call <b>pm_error()</b>, <b>pm_error()</b>
+will, after issuing your error message, execute the longjmp.
+
+
+<p><b>pm_setjmpbuf()</b> was new in Netpbm 10.27 (March 2005).  Before
+that, Netpbm programming library functions always throw an error by
+exiting the program.
+
+
+<h2>User Detected Errors</h2>
+
+<p>The Netpbm programming library provides a function for you to throw
+an error explicitly: <b>pm_error()</b>.  <b>pm_error()</b> does
+nothing but throw an error, and does so the same way any Netpbm
+library function you call would.  <b>pm_error()</b> is more convenient
+than most standard C facilities for handling errors.
+
+
+<h3 id="pm_error">pm_error()</h3>
+
+
+<h4>Overview</h4>
+
+<p>
+<B>void pm_error(</b>
+<b>char *</B> <I>fmt</I><B>,</B>
+<B>... );</B>
+
+<h4>Example</h4>
+
+<pre>
+<code>
+if (argc-1 &lt; 3)
+    pm_error(&quot;You must specify at least 3 arguments.  &quot;
+             &quot;You specified&quot; only %d&quot;, argc-1);
+</code>
+</pre>
+
+<P><B>pm_error()</B> is a <B>printf()</B> style routine that 
+simply throws an error.  The error message it issues as part of that
+is the message described by the arguments.
+
+<p>Note that the arguments specify the message text, not any formatting
+of it.  Formatting is handled by <b>pm_error()</b>.  So don't put any
+newlines or tabs in it.
+
+
+<h2>Error Handling In Netpbm Programs</h2>
+
+<p>Most Netpbm programs respond to encountering an error by issuing a
+message describing the error to the Standard Error file and then
+exiting with exit status 1.
+
+<p>Netpbm programs generally do not follow the Unix convention of very
+terse error messages.  Conventional Unix programs produce error
+messages as if they had to pay by the word.  Netpbm programs tend to
+give a complete description of the problem in human-parseable English.
+These messages are often many terminal lines long.
+
+</body>
+</html>

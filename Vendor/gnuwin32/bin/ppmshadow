@@ -1,0 +1,244 @@
+#!/usr/bin/perl -w
+
+#                         P P M S H A D O W
+
+#            by John Walker  --  http://www.fourmilab.ch/
+#                          version = 1.2;
+#   --> with minor changes by Bryan Henderson to adapt to Netbpm.  
+#   See above web site for the real John Walker work, named pnmshadow.
+
+#   Bryan Henderson later made some major style changes (use strict, etc) and
+#   eliminated most use of shells.  See Netbpm HISTORY file.
+
+#   Pnmshadow is a brutal sledgehammer implemented in Perl which
+#   adds attractive shadows to images, as often seen in titles
+#   of World-Wide Web pages.  This program does not actually
+#   *do* any image processing--it simply invokes components of
+#   Jef Poskanzer's PBMplus package (which must be present on
+#   the path when this script is run) to bludgeon the source
+#   image into a plausible result.
+#
+#               This program is in the public domain.
+#
+#
+
+use strict;
+
+my $true=1; my $false=0;
+
+my $tmpdir = $ENV{TMPDIR} || "/tmp";
+chomp($ourtmp = `mktemp -d -t PPMshadow.XXXXXX`);
+if ($? >> 8) {
+    die "Can't create tmpdir";
+}
+
+#   Process command line options
+
+
+my $ifile; # Input file name
+my ($xoffset, $yoffset);
+
+my $convolve = 11;                   # Default blur convolution kernel size
+my $keeptemp = $false;               # Don't preserve intermediate files
+my $translucent = $false;            # Default not translucent
+
+while (@ARGV) {
+    my $arg = shift;
+    if ((substr($arg, 0, 1) eq '-') && (length($arg) > 1)) {
+        my $opt;
+        $opt = substr($arg, 1, 1);
+        $opt =~ tr/A-Z/a-z/;
+        if ($opt eq 'b') {        # -B n  --  Blur size
+            if (!defined($convolve = shift)) {
+                die("Argument missing after -b option\n");
+            }
+            if (($convolve < 11) && (($convolve & 1) == 0)) {
+                $convolve++;      # Round up even kernel specification
+            }
+        } elsif ($opt eq 'k') {   # -K  --  Keep temporary files
+            $keeptemp = $true;
+        } elsif ($opt eq 't') {   # -T  --  Translucent image
+            $translucent = $true;
+        } elsif ($opt eq 'x') {   # -X n  --  X offset
+            if (!defined($xoffset = shift)) {
+                die("Argument missing after -x option\n");
+            }
+            if ($xoffset < 0) {
+                $xoffset = -$xoffset;
+            }
+        } elsif ($opt eq 'y') {   # -Y n  --  Y offset
+            if (!defined($yoffset = shift)) {
+                die("Argument missing after -x option\n");
+            }
+            if ($yoffset < 0) {
+                $yoffset = -$xoffset;
+            }
+        }
+    } else {
+        if (defined $ifile) {
+            die("Duplicate input file specification.");
+        }
+        $ifile = $arg;   
+    }
+}
+
+#   Apply defaults for arguments not specified
+
+if (!(defined $xoffset)) {
+    #   Xoffset defaults to half the blur distance
+    $xoffset = int($convolve / 2);
+}
+
+if (!(defined $yoffset)) {
+    #   Yoffset defaults to Xoffset, however specified
+    $yoffset = $xoffset;
+}
+
+# Save the Standard Output open instance so we can use the STDOUT
+# file descriptor to pass files to our children.
+open(OLDOUT, ">&STDOUT");
+select(OLDOUT);  # avoids Perl bug where it says we never use STDOUT 
+
+my $infile = "$ourtmp/infile.ppm";
+
+if (defined($ifile) && $ifile ne "-") {
+    open(STDIN, "<", "$ifile") or die();
+}
+open(STDOUT, ">", $infile) or die("Unable to open '$infile' as STDOUT");
+system("ppmtoppm");
+
+# You would think we could and should close stdin and stdout now, but if
+# we do that, system() pipelines later on fail mysteriously.  They don't
+# seem to be able to open stdin and stdout pipes properly if stdin and 
+# stdout didn't already exist.  2002.09.07 BJH
+
+my ($xsize, $ysize);
+{
+    #   Determine the size of the source image
+
+    my $a = `pnmfile $infile`;
+    $a =~ m/.*\sP[BGP]M\s.*,\s*(\d*)\sby\s(\d*)/;
+    $xsize = $1;
+    $ysize = $2;
+}    
+
+#   Create an all-background-color image (same size as original image)
+
+my $backgroundfile = "$ourtmp/background.ppm";
+system("pamcut -left=0 -top=0 -width=1 -height=1 $infile | " .
+       "pamscale -xsize=$xsize -ysize=$ysize >$backgroundfile");
+
+#   Create mask file for background.  It is white wherever there is background
+#   image in the input.
+
+my $bgmaskfile = "$ourtmp/bgmask.ppm";
+system("pamarith -difference $infile $backgroundfile | pnminvert | ppmtopgm " .
+       "| pgmtopbm -thresh -value 1.0 >$bgmaskfile");
+
+my $ckern;
+{
+    #   Create convolution kernel file to generate shadow
+
+    open(OF, ">$ourtmp/convkernel.ppm") or die();
+    $ckern = $convolve <= 11 ? $convolve : 11;
+    printf(OF "P2\n$ckern $ckern\n%d\n", $ckern * $ckern * 2);
+    my $a = ($ckern * $ckern) + 1;
+    my $i;
+    for ($i = 0; $i < $ckern; $i++) {
+        my $j;
+        for ($j = 0; $j < $ckern; $j++) {
+            printf(OF "%d%s", $a, ($j < ($ckern - 1)) ? " " : "\n");
+        }
+    }
+    close(OF);
+}
+
+if ($translucent) {
+
+    #   Convolve the input color image with the kernel
+    #   to create a translucent shadow image.
+
+    system("pnmconvol $ourtmp/convkernel.ppm $infile >$ourtmp/blurred.ppm");
+    unlink("$ourtmp/convkernel.ppm") unless $keeptemp;
+    while ($ckern < $convolve) {
+        system("pnmsmooth $ourtmp/blurred.ppm >$ourtmp/convolvedx.ppm");
+        rename("$ourtmp/convolvedx.ppm", "$ourtmp/blurred.ppm");
+        $ckern++;
+    }
+} else {
+
+    #   Convolve the positive mask with the kernel to create shadow
+
+    system("pnmconvol $ourtmp/convkernel.ppm $bgmaskfile " .
+           ">$ourtmp/blurred2.ppm");
+    unlink("$ourtmp/convkernel.ppm") unless $keeptemp;
+
+    while ($ckern < $convolve) {
+        system("pnmsmooth $ourtmp/blurred2.ppm >$ourtmp/convolvedx.ppm");
+        rename("$ourtmp/convolvedx.ppm", "$ourtmp/blurred2.ppm");
+        $ckern++;
+    }
+
+    #   Multiply the shadow by the background colour
+
+    system("pamarith -multiply $ourtmp/blurred2.ppm $backgroundfile " .
+           ">$ourtmp/blurred.ppm");
+    unlink("$ourtmp/blurred2.ppm") unless $keeptemp;
+}
+
+#   Cut shadow image down to size of our frame.
+
+my $shadowfile = "$ourtmp/shadow.ppm";
+{
+    my $width = $xsize - $xoffset;
+    my $height = $ysize - $yoffset;
+    open(STDIN, "<", "$ourtmp/blurred.ppm") or die();
+    open(STDOUT, ">", $shadowfile) or die();
+    system("pamcut", "-left=0", "-top=0", 
+           "-width=$width", "-height=$height");
+}
+unlink("$ourtmp/blurred.ppm") unless $keeptemp;
+
+#   Make mask for foreground
+
+my $fgmaskfile = "$ourtmp/fgmask.ppm";
+open(STDIN, "<", $bgmaskfile) or die();
+open(STDOUT, ">", $fgmaskfile) or die();
+system("pnminvert");
+
+#   Make image which is just foreground; rest is black.
+
+my $justfgfile = "$ourtmp/justfg.ppm";
+open(STDOUT, ">", $justfgfile) or die();
+system("pamarith", "-multiply", $infile, $fgmaskfile);
+
+unlink($fgmaskfile) unless $keeptemp;
+unlink($infile) unless $keeptemp;
+
+#   Paste shadow onto background.
+
+my $shadbackfile = "$ourtmp/shadback.ppm";
+open(STDOUT, ">", $shadbackfile) or die();
+system("pnmpaste", "-replace", $shadowfile, $xoffset, $yoffset,
+       $backgroundfile);
+unlink($shadowfile) unless $keeptemp;
+unlink($backgroundfile) unless $keeptemp;
+
+#   Knock out (make black) foreground area
+
+my $allbutfgfile = "$ourtmp/allbutfg.ppm";
+open(STDOUT, ">", $allbutfgfile) or die();
+system("pamarith", "-multiply", $shadbackfile, $bgmaskfile);
+
+unlink($shadbackfile) unless $keeptemp;
+unlink($bgmaskfile) unless $keeptemp;
+
+#   Place foreground in blacked out area, send to original Standard Output.
+
+open(STDOUT, ">&OLDOUT");
+
+system("pamarith", "-add", $justfgfile, $allbutfgfile);
+unlink($justfgfile) unless $keeptemp;
+unlink($allbutfgfile) unless $keeptemp;
+
+rmdir($ourtmp) or die ("Unable to remove temporary directory '$ourtmp'");

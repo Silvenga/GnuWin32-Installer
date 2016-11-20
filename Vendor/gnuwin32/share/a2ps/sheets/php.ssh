@@ -1,0 +1,106 @@
+# Style sheet for PHP
+# Copyright (c) 2000 Hartmut Holzgraefe
+# $Id: php.ssh,v 1.1.2.2 2007/12/29 01:58:31 mhatta Exp $ 
+#
+
+#
+# This file is part of a2ps.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+style PHP is
+requires a2ps 4.12
+
+written by "Hartmut Holzgraefe <hartmut@six.de>"
+version is 0.1
+documentation is
+"This is a a2ps stylesheet for PHP syntax highlighting "
+"(just the PHP part, HTML is left 'as is'). "
+"This is my first try on a2ps stylesheets. "
+"It works OK for me. If it doesn't come up to "
+"your expectatios, then please tell me."
+end documentation
+
+first alphabet is
+   "abcdefghijklmnopqrstuvwxyz_"
+second alphabet is
+   "0123456789abcdefghijklmnopqrstuvwxyz_"
+case insensitive
+
+keywords in Keyword are
+  class, extends, include, require, new
+end keywords
+
+keywords in Keyword_strong are
+   true, false, 
+   return, continue, for, 
+   switch, do
+   "case", default, break, if, while, else, elseif, 
+   endif, endfor, endwhile, endswitch,
+   print, echo
+end keywords
+
+optional operators are
+   -> \rightarrow,
+   && \wedge,
+   || \vee,
+   != \neq,
+   == \equiv,
+   # We need to protect these, so that <= is not replaced in <<=
+   <= \leq,
+   >= \geq,
+   ! \not
+end operators
+
+# Function declaration
+operators in Plain are
+  # variables
+  /\\$[a-z_][a-z_0-9]*/ Label_strong,
+  # Functions calls
+  /\\(&[[:alnum:]_]+\\)/ Label_strong,
+  # Function defs.
+  (/^\\([ \t]*\\)\\(function\\)\\([ \t]*\\)\\([a-z_][a-z_0-9]*\\)\\([ \t]*\\)/
+        \1 Plain , \2 Label_strong , \3 Plain , \4 Label_strong  , \5 Plain , "(" Plain)
+end operators
+
+
+operators in Keyword_strong are
+  "<?", "<?php", "<?=", "?>",
+  "<%", "%>",
+  (/<\\([^>]*\\)>/ "<", \1, ">")
+end operators
+
+sequences are
+    "/*" Comment "*/",
+    "//" Comment,
+    "#" Comment,
+    "<!--" Comment "-->",
+    C-string,
+    C-char,
+    "case " Keyword_strong Label : Plain
+	exceptions are
+	  "':'"
+	end exceptions,
+  # Tags with arguments (E.g., <a>, <img>, <table>...)
+  (/<\\([[:alpha:]]+\\) / "<" Keyword_strong, \1 Keyword_strong, " " Plain) Keyword ">" Keyword_strong
+    # Exceptions are double-quoted strings inside tags
+    exceptions are
+        (/"\\(\\([^"]\\|\\\\.\\)*\\)"/ "\"" Plain, \1 String, "\"" Plain)
+    end exceptions
+end sequences
+
+end style

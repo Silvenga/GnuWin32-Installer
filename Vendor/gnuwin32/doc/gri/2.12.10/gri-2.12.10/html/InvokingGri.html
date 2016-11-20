@@ -1,0 +1,434 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: running</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile InvokingGri.html "Gri: running" "Invoking Gri" --> 
+
+<!-- @node   Invoking Gri, Getting More Control, Simple Example, Top -->
+<a name="InvokingGri" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="index.html#Top" shape="rect" coords="516,2,532,24" href="index.html#Top">
+<area alt="Gri: simple example" shape="rect" coords="557,2,573,24" href="SimpleExample.html">
+<area alt="Gri: getting more control" shape="rect" coords="581,2,599,24" href="GettingMoreControl.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: getting more control" shape="rect" coords="581,2,599,24" href="GettingMoreControl.html">
+</map>
+<h1>3: Invoking Gri</h1>
+
+<h2>3.1: Invoking Gri in a nutshell</h2>
+First, the short story.  In 90 percent of cases, Gri is run as
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+gri myscript
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+where the file `<font color="#82140F"><samp>myscript.gri</samp></font>' holds a script (list of Gri
+commands), and Gri will create a PostScript file called
+`<font color="#82140F"><samp>myscript.ps</samp></font>' with the output.  
+<p>
+Some folks like to give the `<font color="#82140F"><samp>.gri</samp></font>' suffix explicitly, so they
+would invoke Gri as
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+gri myscript.gri
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+ instead.  
+<p>
+If you'd rather not have `<font color="#82140F"><samp>myscript.ps</samp></font>' as the PostScript output file
+name (let's say you prefer `<font color="#82140F"><samp>graph1.ps</samp></font>') you'd do
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+gri -output graph1.ps myscript.gri
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Few readers will need to know more than this.  But, for the rest, the
+table in the next section gives full details on all the optional
+arguments that Gri can handle.
+<p>
+<h2>3.2: Using Gri to draw things</h2>
+To draw things, invoke Gri as
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+gri [OPTIONS] [CmdFile [optional_arguments]]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+
+where the square brackets indicate that the enclosed items
+are optional.  The `<font color="#82140F"><code>OPTIONS</code></font>' item may consist of one 
+or more of the following (explained below):
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+[-batch]
+[-b]
+[-chatty N]
+[-c      N]
+[-debug]
+[-d]
+[-directory_default]
+[-directory pathname]
+[-help]
+[-h]
+[-no_bounding_box]
+[-no_cmd_in_ps]
+[-no_startup_message]
+[-output PS_file_name]
+[-private]
+[-no_private]
+[-publication] 
+[-p]
+[-superuser N]
+[-trace]
+[-t]
+[-yes]
+[-y]
+[-version]
+[-v]
+[-warn_offpage]
+[-no_warn_offpage]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Here, the optional `<font color="#82140F"><code>optional_arguments</code></font>' are a mechanism to
+customize the action of the given Gri script from the commandline.
+After Gri processes standard arguments (e.g. `<font color="#82140F"><code>-t</code></font>' for tracing), it
+puts the remaining commandline arguments into a list.  This behavior is
+borrowed from C and othe languages, so Gri borrows the name of the list
+as well: it's called the "arg" list, and its elements are available with
+the RPN operators named `<font color="82140F"><samp>argc</samp></font>' (see <a href="SolitaryOperators.html#SolitaryOperators">Solitary Operators</a>)
+and `<font color="82140F"><samp>argv</samp></font>' (see <a href="UnaryOperators.html#UnaryOperators">Unary Operators</a>).
+<p>
+For a note on usage within the Emacs gri-mode, see see <a href="Emacs5.html#Filenameargumentswhenrunninggri">Filename arguments when running gri</a>.
+<p>
+
+<b>Details of command-line options</b>
+<p>
+<ul>
+<p>
+<li>  `<font color="#82140F"><code>-batch</code></font>' or `<font color="#82140F"><code>-b</code></font>'
+Stops Gri from printing out prompts and hints.
+<p>
+<li>  `<font color="#82140F"><code>-chatty N</code></font>' or `<font color="#82140F"><code>-c N</code></font>'
+Make Gri print out various informative messages.  The numerical
+value gives a level of chattiness.  A value
+of 1, the default if the `<font color="#82140F"><code>-chatty</code></font>' code is not supplied, tells Gri to
+keep you informed of some important things, like the success in gridding
+data for contouring.  Higher values make Gri tell you more:
+<p>
+Information printed at various chatty levels:
+<ul>
+<p>
+<li> <b>0</b>
+The bare minimum is printed.  Thus invoking Gri as `<font color="#82140F"><code>gri -c 0</code></font>'...
+will make it as quiet as can be.
+<p>
+<li> <b>1 or higher</b> (the default)
+The full filenames of the commandfiles are displayed at startup time.
+<p>
+`<font color="#82140F"><code>convert columns to grid</code></font>' prints percentage of grid filled, as well
+as a suite of diagnostics, if you've let it calculate the region of
+influence automatically.  It also prints a warning of the time it
+expects to take, before starting the calculation.
+<p>
+`<font color="#82140F"><code>convert grid to image</code></font>' prints characteristics of image created,
+including amount of image clipped.
+<p>
+`<font color="#82140F"><code>read grid data</code></font>' reports number of data values it could not read
+(since they were nonnumeric).
+<p>
+`<font color="#82140F"><code>draw symbol</code></font>' reports number of data points not drawn because they
+were missing or outside clip region (if one exists).
+<p>
+<li> <b>2 or higher</b>
+`<font color="#82140F"><code>draw contour</code></font>' prints value of contour being drawn.
+<p>
+`<font color="#82140F"><code>open "...|"</code></font>' prints the command to be passed to the operating
+system as well as the name of the temporary file being created; also
+notifies user when the temporary file is destroyed.
+<p>
+`<font color="#82140F"><code>show image</code></font>' reports histograms in intensity bands of 8 units, 
+instead of the default 16 units.
+<p>
+<li> <b>3 or higher</b>
+`<font color="#82140F"><code>show image</code></font>' reports histograms in intensity bands of 4 units, 
+instead of the default 16 units.
+<p>
+</ul>
+<p>
+<li>  `<font color="#82140F"><code>-debug</code></font>' or `<font color="#82140F"><code>-d</code></font>'
+<!-- latex: \index{@code{..debug..}, for debugging (by normal users)} -->
+Sets the built-in variable flag `<font color="#82140F"><code>..debug..</code></font>' that you can use to
+isolate blocks of code.
+<p>
+<li>  `<font color="#82140F"><code>-directory_default</code></font>' 
+Reports directory where `<font color="#82140F"><samp>gri.cmd</samp></font>' is expected to be found, either
+in the default location or the one specified by `<font color="#82140F"><code>-directory</code></font>'
+commandline option.
+<p>
+<li>  `<font color="#82140F"><code>-directory pathname</code></font>' 
+Specifies the directory where Gri looks for the startup file
+`<font color="#82140F"><samp>gri.cmd</samp></font>'.  (This file teaches Gri the standard commands; Gri will
+report an error and die if it cannot find this file.)  If this switch is
+not provided -- and it is normally not -- then Gri looks for
+`<font color="#82140F"><samp>gri.cmd</samp></font>' in a standard system directory (sometimes,
+but not always,
+`<font color="#82140F"><samp>/usr/local/share/gri/2.12.10</samp></font>') which was specified 
+during the compilation of the Gri program itself.  For more on how Gri looks
+for `<font color="#82140F"><samp>gri.cmd</samp></font>', see the subsection below.
+<p>
+<li>  `<font color="#82140F"><code>-no_bounding_box</code></font>'
+Make the so-called ``bounding box'' in the PostScript file be the full
+page.  The bounding box is used by some PostScript previewers to clip
+the image to just the drawn parts of the page, and is used by the
+`<font color="#82140F"><code>epsfbox</code></font>' macro in `<font color="#82140F"><code>latex</code></font>' to automatically determine the
+geometry of the graph for inclusion in text.  Normally the bounding box
+is calculated automatically, to enclose all the items drawn on the page.
+But the box may also be set with the `<font color="#82140F"><code>set bounding box</code></font>' command
+(see <a href="Set.html#SetBoundingBox">Set Bounding Box</a>).
+<p>
+<li>  `<font color="#82140F"><code>-no_cmd_in_ps</code></font>'
+Prevent Gri from inserting the lines of the commandfile into the
+PostScript file as comments.  (These comments can be used by the
+`<font color="#82140F"><code>-creator</code></font>' commandline option (see above), but they take up a little
+bit of space and users might sometimes want to get rid of them.)
+<p>
+<li>  `<font color="#82140F"><code>-no_warn_offpage</code></font>'
+Do not warn if items are offpage.  (Contrast this with `<font color="#82140F"><code>-warn_offpage</code></font>'.)
+<p>
+<li> `<font color="#82140F"><code>-output PS_file_name</code></font>'
+Specify the PostScript filename.  If this is not specified, the
+PostScript filename is derived from the name of the commandfile
+(e.g. `<font color="#82140F"><samp>mygraph.gri</samp></font>' produces `<font color="#82140F"><samp>mygraph.ps</samp></font>'), or, for
+interactive use, it will have a name like `<font color="#82140F"><samp>gri-00.ps</samp></font>', or
+`<font color="#82140F"><samp>gri-01.ps</samp></font>' if the former file exists, etc.
+<p>
+<li>  `<font color="#82140F"><code>-no_startup_message</code></font>'
+Stops Gri from printing the startup message.
+<p>
+
+<li>  `<font color="#82140F"><code>-private</code></font>'
+Prevents inserting any information about the user into the PostScript
+file (see `<font color="#82140F"><code>-no_private</code></font>', next).  As of version 2.12.10, 
+this privacy option is assumed by default.
+<p>
+<li>  `<font color="#82140F"><code>-no_private</code></font>'
+Instructs Gri to include comments in the PostScript file that identify
+the user, state the commandline arguments used in invoking Gri, and
+that list all the commands that were executed.  This information can
+be recovered by calling Gri on the PostScript file, with the
+`<font color="#82140F"><code>-creator</code></font>' commandline argument.  Until version 2.12.10,
+the default was to include this information, but a change was
+made out of privacy concerns.
+<p>
+<li>  `<font color="#82140F"><code>-publication</code></font>' or `<font color="#82140F"><code>-p</code></font>'
+Sets the built-in variable `<font color="#82140F"><code>..publication..</code></font>' to 1.  You may use
+this to distinguish between working plots and publication plots, as in
+this example:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+if !..publication..
+  draw time stamp
+  draw title "working version of plot"
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>  `<font color="#82140F"><code>-superuser</code></font>'
+<!-- latex: \index{@code{..superuser..}, for debugging (by developers)} -->
+(This option is included here only for completeness.  It should only be
+used by developers (who will alter the code to print debugging
+information if `<font color="#82140F"><code>-superuser</code></font>' is set in addition to `<font color="#82140F"><code>-debug</code></font>').
+An optional value can be inserted (e.g. `<font color="#82140F"><code>-superuser 2</code></font>') to set the
+debugging level (retrievable by the function superuser()) to indicated
+integer value.  Specifying the `<font color="#82140F"><code>-superuser</code></font>' command-line option
+sets the built-in variable `<font color="#82140F"><code>..superuser..</code></font>' to 1 or the specified
+value.)
+<p>
+For flag meanings, see `<font color="82140F"><code>superuser</code></font>' command (see <a href="Superuser.html#Superuser">Superuser</a>).
+Using the question-mark symbol `<font color="#82140F"><code>?</code></font>' instead of a flag number makes
+Gri print out the list of flags.
+<p>
+<li>  `<font color="#82140F"><code>-trace</code></font>' or `<font color="#82140F"><code>-t</code></font>'
+Makes Gri print out command lines as they are executed; this has the
+same effect as the `<font color="#82140F"><code>set trace</code></font>' command.
+<p>
+<li>  `<font color="#82140F"><code>-version</code></font>' or `<font color="#82140F"><code>-v</code></font>'
+Display version information and exit successfully.
+<p>
+<li>  `<font color="#82140F"><code>-warn_offpage</code></font>'
+Causes warnings to be issued for all items drawn far off a 8.5x11 inch
+page.  This is the default.  (Contrast with `<font color="#82140F"><code>-no_warn_offpage</code></font>'.)
+<p>
+<li>  `<font color="#82140F"><code>-yes</code></font>' or `<font color="#82140F"><code>-y</code></font>'
+<!-- latex: \index{@code{..use_default_for_query..}, simulate @code{-yes} commandline flag} -->
+Bypasses all `<font color="#82140F"><code>query</code></font>' commands, making Gri act as though the user
+typed a carriage-return (thus giving the default) for each `<font color="#82140F"><code>query</code></font>'.
+<p>
+<li>  `<font color="#82140F"><code>-help</code></font>' or `<font color="#82140F"><code>-h</code></font>'
+Prints explanation of options.
+<p>
+<li> `<font color="#82140F"><code>CommandFile</code></font>'
+If a command file `<font color="#82140F"><code>CommandFile</code></font>' is specified, then commands will
+be read from that file instead of the keyboard.  If the `<font color="#82140F"><code>chatty</code></font>'
+level is 1 or larger, Gri prints the names of the commandfiles at
+startup time.  It is conventional but not necessary that the filename
+ends in `<font color="#82140F"><code>.gri</code></font>'.  If the filename does end in `<font color="#82140F"><code>.gri</code></font>', you may
+delete this suffix; Gri will assume it as implied. 
+<p>
+</ul>
+<p>
+<b>Executable scripts.</b> If you don't need to supply commandline
+options, you can put the following line as the first line in your Gri
+program
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+#!/usr/bin/gri
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+ (or point to wherever Gri is located on your machine), and
+`<font color="#82140F"><code>chmod +x</code></font>' the file.  Then you can run Gri simply by naming the
+file.  There is no particular advantage in this, except for saving the
+typing of a few characters, but some folks like this.
+<p>
+
+<b>How Gri locates the</b> `<font color="#82140F"><samp>gri.cmd</samp></font>' <b>file</b>.
+In a normal installation, Gri finds the `<font color="#82140F"><samp>gri.cmd</samp></font>' file all by
+itself.  However, developers and some others may wish to control where
+Gri looks for this file.  The rules below specify how Gri looks for
+`<font color="#82140F"><samp>gri.cmd</samp></font>'.
+<dl>
+<p>
+<dt> <i>Case 1</i>
+<dd>If `<font color="#82140F"><code>-directory</code></font>' was given on the commandline used to invoke Gri
+(e.g. `<font color="#82140F"><code>gri -directory /some/place mycommand_file.gri</code></font>'), then
+Gri will use the `<font color="#82140F"><samp>gri.cmd</samp></font>' in the named directory.  An error will
+result if `<font color="#82140F"><samp>gri.cmd</samp></font>' is not found there.
+<p>
+<dt> <i>Case 2</i>
+<dd>If `<font color="#82140F"><code>-directory</code></font>' was not given on the commandline, then
+Gri looks for `<font color="#82140F"><samp>gri.cmd</samp></font>' in a location that was specified during
+compilation.  If `<font color="#82140F"><samp>gri.cmd</samp></font>' is found there, then it is used.  If it
+is not found, then Gri checks to see if an environment variable named
+`<font color="#82140F"><code>GRI_DIRECTORY_LIBRARY</code></font>' is defined.  If so, then Gri takes this to
+be the name of a directory that contains the `<font color="#82140F"><samp>gri.cmd</samp></font>' file.  If
+`<font color="#82140F"><samp>gri.cmd</samp></font>' is not found there, an error results.
+</dl>
+<p>
+
+
+<h2>3.3: Extracting commandfile from a PostScript file</h2>
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+gri -creator PostScriptFile
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+ <b>See also</b> `<font color="#82140F"><code>-no_cmd_in_ps</code></font>'.
+<p>
+The `<font color="#82140F"><code>-creator</code></font>' flag makes gri examine the indicate PostScript file,
+and produce a facsimile of the command file (or interactively-typed
+commands) that created this PostScript file.  (This only works if the
+Gri command that created the PostScript file used the
+`<font color="#82140F"><code>-no_private</code></font>' commandline argument.)
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

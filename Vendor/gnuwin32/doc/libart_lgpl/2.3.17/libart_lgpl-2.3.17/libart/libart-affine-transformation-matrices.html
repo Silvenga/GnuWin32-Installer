@@ -1,0 +1,1790 @@
+<HTML
+><HEAD
+><TITLE
+>Affine transformation matrices</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="The libart library"
+HREF="libart.html"><LINK
+REL="UP"
+TITLE="Miscealeanous useful APIs"
+HREF="basic.html#BASIC-MISC"><LINK
+REL="PREVIOUS"
+TITLE="Memory Management"
+HREF="libart-memory-management.html"><LINK
+REL="NEXT"
+TITLE="Art Alpha Gamma Stuff"
+HREF="libart-art-alpha-gamma-stuff.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The libart library</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="libart-memory-management.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libart.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="basic.html#BASIC-MISC"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="libart-art-alpha-gamma-stuff.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="LIBART-AFFINE-TRANSFORMATION-MATRICES"
+>Affine transformation matrices</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN207"
+></A
+><H2
+>Name</H2
+>Affine transformation matrices&nbsp;--&nbsp;Instantiate and manipulate Affine transforms.</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN210"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;
+
+void        <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-POINT"
+>art_affine_point</A
+>                (<A
+HREF="libart-core-construction-apis.html#ARTPOINT"
+>ArtPoint</A
+> *dst,
+                                             const <A
+HREF="libart-core-construction-apis.html#ARTPOINT"
+>ArtPoint</A
+> *src,
+                                             const double affine[6]);
+void        <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-INVERT"
+>art_affine_invert</A
+>               (double dst_affine[6],
+                                             const double src_affine[6]);
+void        <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-FLIP"
+>art_affine_flip</A
+>                 (double dst_affine[6],
+                                             const double src_affine[6],
+                                             int horz,
+                                             int vert);
+void        <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-TO-STRING"
+>art_affine_to_string</A
+>            (char str[128],
+                                             const double src[6]);
+void        <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-MULTIPLY"
+>art_affine_multiply</A
+>             (double dst[6],
+                                             const double src1[6],
+                                             const double src2[6]);
+void        <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-IDENTITY"
+>art_affine_identity</A
+>             (double dst[6]);
+void        <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-SCALE"
+>art_affine_scale</A
+>                (double dst[6],
+                                             double sx,
+                                             double sy);
+void        <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-ROTATE"
+>art_affine_rotate</A
+>               (double dst[6],
+                                             double theta);
+void        <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-SHEAR"
+>art_affine_shear</A
+>                (double dst[6],
+                                             double theta);
+void        <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-TRANSLATE"
+>art_affine_translate</A
+>            (double dst[6],
+                                             double tx,
+                                             double ty);
+double      <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-EXPANSION"
+>art_affine_expansion</A
+>            (const double src[6]);
+int         <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-RECTILINEAR"
+>art_affine_rectilinear</A
+>          (const double src[6]);
+int         <A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-EQUAL"
+>art_affine_equal</A
+>                (double matrix1[6],
+                                             double matrix2[6]);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN253"
+></A
+><H2
+>Description</H2
+><P
+>These API functions allow you to instantiate and manipulate
+Affine transforms. An Affine transformation is a geometrical
+transformation which is known to preserve the parallelism of 
+lines but not lengths and angles.</P
+><DIV
+CLASS="FIGURE"
+><A
+NAME="AEN256"
+></A
+><P
+><B
+>Figure 1. Affine transforms</B
+></P
+><P
+><IMG
+SRC="art-affines.png"></P
+></DIV
+><P
+>Affine transforms are usually represented using Homogeneous 
+coordinates: given a point (x,y) in the traditional plane, its
+canonical Homogenous coordinate is (x,y,1).
+The Affine transforms are represented in Homogeneous coordinates
+because the transformation of point A by any Affine transformation
+can be expressed by the multiplication of a 3x3 Matrix and a 3x1 
+Point vector.</P
+><P
+>The above property is not trivial. For example, a translation in
+normal cartesian space results in the addition of a Point vector
+to the Point vector to transform while in Homogeneous space, the
+same translation transformation results in a matrix/vector 
+multiplication. To convince you that I am telling you the truth,
+the diagram below summarizes the different kinds of Affine matrixes
+used and shows the scaling of point (x,y) by multiplication with a
+scaling matrix in homogeneous space.</P
+><DIV
+CLASS="FIGURE"
+><A
+NAME="AEN261"
+></A
+><P
+><B
+>Figure 2. Affine transform Matrixes in Homogenous space</B
+></P
+><P
+><IMG
+SRC="art-affine-matrix.png"></P
+></DIV
+><P
+>To compose two Affine transforms, all you need to do is to multiply
+their matrices to get the matrix representing the resulting
+Affine transform. Given Affines A and B represented the matrices
+MA and MB, the Affine C = AoB is represented by the matrix MC = MA x MB.</P
+><P
+>Hopefully, all the above gory details (which are unfortunatly necessary
+to understand the API) are more or less hidden by the API.
+LibArt thus represents an Affine transform by an array of six doubles:</P
+><DIV
+CLASS="FIGURE"
+><A
+NAME="AEN266"
+></A
+><P
+><B
+>Figure 3. An Affine as seen by LibArt</B
+></P
+><P
+><IMG
+SRC="art-affine-libart.png"></P
+></DIV
+><P
+>Those arrays of six doubles can be easily generated with the 
+<A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-SHEAR"
+>art_affine_shear</A
+>, 
+<A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-SCALE"
+>art_affine_scale</A
+>,
+<A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-ROTATE"
+>art_affine_rotate</A
+>,
+<A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-TRANSLATE"
+>art_affine_translate</A
+> and
+<A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-IDENTITY"
+>art_affine_identity</A
+> functions which 
+generate the affines corresponding to the given transformations.
+It is possible to composite Affine transformation's matrices with
+<A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-MULTIPLY"
+>art_affine_multiply</A
+>
+and to invert an Affine transformation:
+<A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-INVERT"
+>art_affine_invert</A
+>.
+Finally, I to apply an Affine transformation to a point, you can use
+<A
+HREF="libart-affine-transformation-matrices.html#ART-AFFINE-POINT"
+>art_affine_point</A
+></P
+><P
+>Affine transformations are reused a little everywhere in LibArt: it is possible
+to apply them to Vector Paths and pixel buffers. 
+<A
+HREF="libart-transformation-operations.html#ART-VPATH-AFFINE-TRANSFORM"
+>art_vpath_affine_transform</A
+>,
+<A
+HREF="libart-transformation-operations.html#ART-BPATH-AFFINE-TRANSFORM"
+>art_bpath_affine_transform</A
+> and
+art_rgb_affine are such examples.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN282"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN284"
+></A
+><H3
+><A
+NAME="ART-AFFINE-POINT"
+></A
+>art_affine_point ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_affine_point                (<A
+HREF="libart-core-construction-apis.html#ARTPOINT"
+>ArtPoint</A
+> *dst,
+                                             const <A
+HREF="libart-core-construction-apis.html#ARTPOINT"
+>ArtPoint</A
+> *src,
+                                             const double affine[6]);</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN293"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>dst</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Where the result point is stored.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>src</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The original point.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>affine</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The affine transformation.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN310"
+></A
+><H3
+><A
+NAME="ART-AFFINE-INVERT"
+></A
+>art_affine_invert ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_affine_invert               (double dst_affine[6],
+                                             const double src_affine[6]);</PRE
+></TD
+></TR
+></TABLE
+><P
+>All non-degenerate affine transforms are invertible. If the original
+affine is degenerate or nearly so, expect numerical instability and
+very likely core dumps on Alpha and other fp-picky architectures.
+Otherwise, <TT
+CLASS="PARAMETER"
+><I
+>dst</I
+></TT
+> multiplied with <TT
+CLASS="PARAMETER"
+><I
+>src</I
+></TT
+>, or <TT
+CLASS="PARAMETER"
+><I
+>src</I
+></TT
+> multiplied with <TT
+CLASS="PARAMETER"
+><I
+>dst</I
+></TT
+>
+will be (to within roundoff error) the identity affine.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN322"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>dst_affine</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Where the resulting affine is stored.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>src_affine</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The original affine transformation.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN335"
+></A
+><H3
+><A
+NAME="ART-AFFINE-FLIP"
+></A
+>art_affine_flip ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_affine_flip                 (double dst_affine[6],
+                                             const double src_affine[6],
+                                             int horz,
+                                             int vert);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Flips the affine transform. FALSE for both <TT
+CLASS="PARAMETER"
+><I
+>horiz</I
+></TT
+> and <TT
+CLASS="PARAMETER"
+><I
+>vert</I
+></TT
+> implements
+a simple copy operation. TRUE for both <TT
+CLASS="PARAMETER"
+><I
+>horiz</I
+></TT
+> and <TT
+CLASS="PARAMETER"
+><I
+>vert</I
+></TT
+> is a
+180 degree rotation. It is ok for <TT
+CLASS="PARAMETER"
+><I
+>src_affine</I
+></TT
+> and <TT
+CLASS="PARAMETER"
+><I
+>dst_affine</I
+></TT
+> to
+be equal pointers.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN349"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>dst_affine</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Where the resulting affine is stored.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>src_affine</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The original affine transformation.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>horz</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Whether or not to flip horizontally.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>vert</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Whether or not to flip horizontally.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN370"
+></A
+><H3
+><A
+NAME="ART-AFFINE-TO-STRING"
+></A
+>art_affine_to_string ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_affine_to_string            (char str[128],
+                                             const double src[6]);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Converts an affine transform into a bit of PostScript code that
+implements the transform. Special cases of scaling, rotation, and
+translation are detected, and the corresponding PostScript
+operators used (this greatly aids understanding the output
+generated). The identity transform is mapped to the null string.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN377"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>str</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Where to store the resulting string.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>src</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The affine transform.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN390"
+></A
+><H3
+><A
+NAME="ART-AFFINE-MULTIPLY"
+></A
+>art_affine_multiply ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_affine_multiply             (double dst[6],
+                                             const double src1[6],
+                                             const double src2[6]);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Multiplies two affine transforms together, i.e. the resulting <TT
+CLASS="PARAMETER"
+><I
+>dst</I
+></TT
+>
+is equivalent to doing first <TT
+CLASS="PARAMETER"
+><I
+>src1</I
+></TT
+> then <TT
+CLASS="PARAMETER"
+><I
+>src2</I
+></TT
+>. Note that the
+PostScript concat operator multiplies on the left, i.e.  "M concat"
+is equivalent to "CTM = multiply (M, CTM)";</P
+><P
+>It is safe to call this function with <TT
+CLASS="PARAMETER"
+><I
+>dst</I
+></TT
+> equal to <TT
+CLASS="PARAMETER"
+><I
+>src1</I
+></TT
+> or <TT
+CLASS="PARAMETER"
+><I
+>src2</I
+></TT
+>.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN406"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>dst</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Where to store the result.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>src1</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The first affine transform to multiply.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>src2</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The second affine transform to multiply.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN423"
+></A
+><H3
+><A
+NAME="ART-AFFINE-IDENTITY"
+></A
+>art_affine_identity ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_affine_identity             (double dst[6]);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Sets up an identity matrix.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN430"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>dst</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Where to store the resulting affine transform.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN439"
+></A
+><H3
+><A
+NAME="ART-AFFINE-SCALE"
+></A
+>art_affine_scale ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_affine_scale                (double dst[6],
+                                             double sx,
+                                             double sy);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Sets up a scaling matrix.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN448"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>dst</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Where to store the resulting affine transform.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>sx</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> X scale factor.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>sy</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Y scale factor.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN465"
+></A
+><H3
+><A
+NAME="ART-AFFINE-ROTATE"
+></A
+>art_affine_rotate ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_affine_rotate               (double dst[6],
+                                             double theta);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Sets up a rotation matrix. In the standard libart coordinate
+system, in which increasing y moves downward, this is a
+counterclockwise rotation. In the standard PostScript coordinate
+system, which is reversed in the y direction, it is a clockwise
+rotation.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN473"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>dst</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Where to store the resulting affine transform.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>theta</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Rotation angle in degrees.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN486"
+></A
+><H3
+><A
+NAME="ART-AFFINE-SHEAR"
+></A
+>art_affine_shear ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_affine_shear                (double dst[6],
+                                             double theta);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Sets up a shearing matrix. In the standard libart coordinate system
+and a small value for theta, || becomes \\. Horizontal lines remain
+unchanged.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN494"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>dst</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Where to store the resulting affine transform.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>theta</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Shear angle in degrees.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN507"
+></A
+><H3
+><A
+NAME="ART-AFFINE-TRANSLATE"
+></A
+>art_affine_translate ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_affine_translate            (double dst[6],
+                                             double tx,
+                                             double ty);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Sets up a translation matrix.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN516"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>dst</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Where to store the resulting affine transform.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>tx</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> X translation amount.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>ty</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Y translation amount.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN533"
+></A
+><H3
+><A
+NAME="ART-AFFINE-EXPANSION"
+></A
+>art_affine_expansion ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>double      art_affine_expansion            (const double src[6]);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Finds the expansion factor, i.e. the square root of the factor
+by which the affine transform affects area. In an affine transform
+composed of scaling, rotation, shearing, and translation, returns
+the amount of scaling.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN541"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>src</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The affine transformation.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the expansion factor.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN554"
+></A
+><H3
+><A
+NAME="ART-AFFINE-RECTILINEAR"
+></A
+>art_affine_rectilinear ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>int         art_affine_rectilinear          (const double src[6]);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Determines whether <TT
+CLASS="PARAMETER"
+><I
+>src</I
+></TT
+> is rectilinear, i.e.  grid-aligned
+rectangles are transformed to other grid-aligned rectangles.  The
+implementation has epsilon-tolerance for roundoff errors.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN562"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>src</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The original affine transformation.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> TRUE if <TT
+CLASS="PARAMETER"
+><I
+>src</I
+></TT
+> is rectilinear.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN576"
+></A
+><H3
+><A
+NAME="ART-AFFINE-EQUAL"
+></A
+>art_affine_equal ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>int         art_affine_equal                (double matrix1[6],
+                                             double matrix2[6]);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Determines whether <TT
+CLASS="PARAMETER"
+><I
+>matrix1</I
+></TT
+> and <TT
+CLASS="PARAMETER"
+><I
+>matrix2</I
+></TT
+> are equal, with
+epsilon-tolerance for roundoff errors.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN586"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>matrix1</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> An affine transformation.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>matrix2</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Another affine transformation.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><I
+CLASS="EMPHASIS"
+>Returns</I
+> :</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> TRUE if <TT
+CLASS="PARAMETER"
+><I
+>matrix1</I
+></TT
+> and <TT
+CLASS="PARAMETER"
+><I
+>matrix2</I
+></TT
+> are equal.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="libart-memory-management.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libart.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="basic.html#BASIC-MISC"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="libart-art-alpha-gamma-stuff.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Memory Management</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Art Alpha Gamma Stuff</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

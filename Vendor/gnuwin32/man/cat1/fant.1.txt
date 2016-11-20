@@ -1,0 +1,89 @@
+FANT(1)                                                 FANT(1)
+
+
+
+
+
+NAME
+       fant - perform simple spatial transforms on an image
+
+SYNOPSIS
+       fant  [ -a angle ] [ -b blurfactor ] [ -o outfile ] [ -p
+              xoff yoff ] [ -s xscale yscale ] [ -S xsize ysize
+              ] [ -v ] [ infile ]
+
+DESCRIPTION
+       Fant  rotates or scales an image by an arbitrary amount.
+       It does this by using pixel integration  (if  the  image
+       size  is  reduced)  or  pixel interpolation if the image
+       size is increased.  Because it works with subpixel  pre-
+       cision,  aliasing artifacts are not introduced (hah! see
+       BUGS).  Fant uses a two-pass sampling technique to  per-
+       form  the  transformation.   If infile is "-" or absent,
+       input is read from the standard input.
+
+OPTIONS
+       -a angle
+              Amount to rotate image by, a real number  from  0
+              to  45  degrees  (positive  numbers rotate clock-
+              wise).  Use rleflip(1) first to rotate  an  image
+              by larger amounts.
+
+       -b blur_factor
+              Control  the  amount  of  blurring  in the output
+              image.  If the blur factor is greater  than  one,
+              image blurring will increase.  If the blur factor
+              is smaller than one, image blurring will decrease
+              but aliasing artifacts may be visible.
+
+
+       -o outfile
+              Specifies  where  to  place  the resulting image.
+              The default is to write to stdout.  If outfile is
+              "-",  the  output will be written to the standard
+              output stream.
+
+       -p xoff yoff
+              Specifies where the origin of the image is -  the
+              image  is rotated or scaled about this point.  If
+              no origin is specified, the center of  the  image
+              is used.
+
+       -s xscale yscale
+              The  amount  (in  real numbers) to scale an image
+              by.  This is  often  useful  for  correcting  the
+              aspect  of an image for display on a frame buffer
+              with non square pixels.  For this use, the origin
+              should  be  specified as 0, 0 (see -p above).  If
+              an image is only scaled in Y and no  rotation  is
+              performed,  fant only uses one sampling pass over
+              the image, cutting the computation time in  half.
+
+       -S xsize ysize
+              An  alternate method of specifying the scale fac-
+              tors.  xsize and ysize give  the  desired  output
+              image size.
+
+              The -S option can not be used in combination with
+              -a, -p, or -s.
+
+
+       -v     Verbose output.  Primarily for debugging.
+
+
+SEE ALSO
+       avg4(1), rleflip(1), rlezoom(1), urt(1), RLE(5),
+       Fant, Karl M. "A Nonaliasing, Real-Time, Spatial  Trans-
+       form Technique", IEEE CG&A, January, 1986, p. 71.
+
+AUTHORS
+       John W. Peterson, James S. Painter
+
+BUGS
+       Fant uses a rather poor anti-aliasing filter (a triangle
+       filter).  This is usually good enough but  will  exhibit
+       noticeable aliasing artifacts on nasty input images.
+
+
+
+                          Dec 4, 1990                   FANT(1)

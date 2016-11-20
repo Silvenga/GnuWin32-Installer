@@ -1,0 +1,3673 @@
+<html lang="en">
+<head>
+<title>Modeling Language GNU MathProg</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Modeling Language GNU MathProg">
+<meta name="generator" content="makeinfo 4.7">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+The GLPK package is part of the GNU Project released under the aegis of
+GNU.
+
+Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
+2008 Andrew Makhorin, Department for Applied Informatics, Moscow
+Aviation Institute, Moscow, Russia. All rights reserved.
+
+Free Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+02110-1301, USA.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+entire resulting derived work is distributed under the terms of
+a permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc { font-variant:small-caps }
+  span.roman { font-family: serif; font-weight: normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">Modeling Language GNU MathProg</h1>
+   <div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Top" href="#Top">GNU MathProg Language Reference</a>
+<li><a name="toc_Introduction" href="#Introduction">1 Introduction</a>
+<ul>
+<li><a href="#Linear-programming-problem">1.1 Linear programming problem</a>
+<li><a href="#Model-objects">1.2 Model objects</a>
+<li><a href="#Structure-of-model-description">1.3 Structure of model description</a>
+</li></ul>
+<li><a name="toc_Coding-model-description" href="#Coding-model-description">2 Coding model description</a>
+<ul>
+<li><a href="#Symbolic-names">2.1 Symbolic names</a>
+<li><a href="#Numeric-literals">2.2 Numeric literals</a>
+<li><a href="#String-literals">2.3 String literals</a>
+<li><a href="#Keywords">2.4 Keywords</a>
+<li><a href="#Delimiters">2.5 Delimiters</a>
+<li><a href="#Comments">2.6 Comments</a>
+</li></ul>
+<li><a name="toc_Expressions" href="#Expressions">3 Expressions</a>
+<ul>
+<li><a href="#Numeric-expressions">3.1 Numeric expressions</a>
+<li><a href="#Symbolic-expressions">3.2 Symbolic expressions</a>
+<li><a href="#Indexing-expressions-and-dummy-indices">3.3 Indexing expressions and dummy indices</a>
+<li><a href="#Set-expressions">3.4 Set expressions</a>
+<li><a href="#Logical-expressions">3.5 Logical expressions</a>
+<li><a href="#Linear-expressions">3.6 Linear expressions</a>
+</li></ul>
+<li><a name="toc_Statements" href="#Statements">4 Statements</a>
+<ul>
+<li><a href="#Set-statement">4.1 Set statement</a>
+<li><a href="#Parameter-statement">4.2 Parameter statement</a>
+<li><a href="#Variable-statement">4.3 Variable statement</a>
+<li><a href="#Constraint-statement">4.4 Constraint statement</a>
+<li><a href="#Objective-statement">4.5 Objective statement</a>
+<li><a href="#Solve-statement">4.6 Solve statement</a>
+<li><a href="#Check-statement">4.7 Check statement</a>
+<li><a href="#Display-statement">4.8 Display statement</a>
+<li><a href="#Printf-statement">4.9 Printf statement</a>
+<li><a href="#For-statement">4.10 For statement</a>
+</li></ul>
+<li><a name="toc_Model-data" href="#Model-data">5 Model data</a>
+<ul>
+<li><a href="#Coding-data-section">5.1 Coding data section</a>
+<li><a href="#Set-data-block">5.2 Set data block</a>
+<li><a href="#Parameter-data-block">5.3 Parameter data block</a>
+</li></ul>
+<li><a name="toc_Date-and-time-functions" href="#Date-and-time-functions">Appendix A Date and time functions</a>
+<ul>
+<li><a href="#Obtaining-current-calendar-time">A.1 Obtaining current calendar time</a>
+<li><a href="#Converting-character-string-to-calendar-time">A.2 Converting character string to calendar time</a>
+<li><a href="#Converting-calendar-time-to-character-string">A.3 Converting calendar time to character string</a>
+</li></ul>
+<li><a name="toc_Solving-models-with-glpsol" href="#Solving-models-with-glpsol">Appendix B Solving models with <code>glpsol</code></a>
+<li><a name="toc_Example-model-description" href="#Example-model-description">Appendix C Example model description</a>
+</li></ul>
+</div>
+
+
+
+<div class="node">
+<p><hr>
+<a name="Top"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Introduction">Introduction</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+<br>
+</div>
+
+<h2 class="unnumbered">GNU MathProg Language Reference</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Introduction">Introduction</a>
+<li><a accesskey="2" href="#Coding-model-description">Coding model description</a>
+<li><a accesskey="3" href="#Expressions">Expressions</a>
+<li><a accesskey="4" href="#Statements">Statements</a>
+<li><a accesskey="5" href="#Model-data">Model data</a>
+<li><a accesskey="6" href="#Date-and-time-functions">Date and time functions</a>
+<li><a accesskey="7" href="#Solving-models-with-glpsol">Solving models with glpsol</a>
+<li><a accesskey="8" href="#Example-model-description">Example model description</a>
+<li><a accesskey="9" href="#Acknowledgements">Acknowledgements</a>
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Introduction"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Coding-model-description">Coding model description</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">1 Introduction</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Linear-programming-problem">Linear programming problem</a>
+<li><a accesskey="2" href="#Model-objects">Model objects</a>
+<li><a accesskey="3" href="#Structure-of-model-description">Structure of model description</a>
+</ul>
+
+<p><dfn>GNU MathProg</dfn> is a modeling language intended for describing linear
+mathematical programming models.<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>
+
+   <p class="indent">Model descriptions written in the GNU MathProg language consist of a set
+of statements and data blocks constructed by the user from the language
+elements described in this document.
+
+   <p>In a process called translation, a program called the model translator
+analyzes the model description and translates it into internal data
+structures, which may be then used either for generating mathematical
+programming problem instance or directly by a program called the solver
+to obtain numeric solution of the problem.
+
+<div class="node">
+<p><hr>
+<a name="Linear-programming-problem"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Model-objects">Model objects</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Introduction">Introduction</a>
+<br>
+</div>
+
+<h3 class="section">1.1 Linear programming problem</h3>
+
+<p>In MathProg it is assumed that the linear programming (LP) problem has
+the following statement:
+
+   <blockquote>
+Minimize (or maximize)
+
+        <blockquote>
+<i>z</i> = <i>c</i>1 <i>x</i>1 + <i>c</i>2 <i>x</i>2 + <small class="dots">...</small> + <i>cn xn</i> + <i>c</i>0
+</blockquote>
+
+        <p>subject to linear constraints
+
+        <blockquote>
+<i>L</i>1 &lt;= <i>a</i>11 <i>x</i>1 + <i>a</i>12 <i>x</i>2 + <small class="dots">...</small> + <i>a</i>1<i>n</i> <i>xn</i>
+&lt;= <i>U</i>1 <br>
+<i>L</i>2 &lt;= <i>a</i>21 <i>x</i>1 + <i>a</i>22 <i>x</i>2 + <small class="dots">...</small> + <i>a</i>2<i>n</i> <i>xn</i>
+&lt;= <i>U</i>2 <br>
+. . . . . <br>
+<i>Lm</i> &lt;= <i>am</i>1 <i>x</i>1 + <i>am</i>2 <i>x</i>2 + <small class="dots">...</small> + <i>amn</i> <i>xn</i> &lt;=
+<i>Um</i>
+</blockquote>
+
+        <p>and bounds of variables
+
+        <blockquote>
+<i>l</i>1 &lt;= <i>x</i>1 &lt;= <i>u</i>1 <br>
+<i>l</i>2 &lt;= <i>x</i>2 &lt;= <i>u</i>2 <br>
+. . . . . <br>
+<i>ln</i> &lt;= <i>xn</i> &lt;= <i>un</i>
+</blockquote>
+   </blockquote>
+
+   <p><table summary=""><tr align="left"><td valign="top" width="30%">where:
+<br></td></tr><tr align="left"><td valign="top" width="30%"><i>x</i>1, <i>x</i>2, <small class="dots">...</small>, <i>xn</i> </td><td valign="top" width="70%">are variables;
+<br></td></tr><tr align="left"><td valign="top" width="30%"><i>z</i> </td><td valign="top" width="70%">is the objective function;
+<br></td></tr><tr align="left"><td valign="top" width="30%"><i>c</i>1, <i>c</i>2, <small class="dots">...</small>, <i>cn</i> </td><td valign="top" width="70%">are coefficients of the
+objective function;
+<br></td></tr><tr align="left"><td valign="top" width="30%"><i>c</i>0 </td><td valign="top" width="70%">is the constant term (&ldquo;shift&rdquo;) of the objective
+function;
+<br></td></tr><tr align="left"><td valign="top" width="30%"><i>a</i>11, <i>a</i>12, <small class="dots">...</small>, <i>amn</i> </td><td valign="top" width="70%">are constraint
+coefficients;
+<br></td></tr><tr align="left"><td valign="top" width="30%"><i>L</i>1, <i>L</i>2, <small class="dots">...</small>, <i>Lm</i> </td><td valign="top" width="70%">are lower constraint bounds;
+<br></td></tr><tr align="left"><td valign="top" width="30%"><i>U</i>1, <i>U</i>2, <small class="dots">...</small>, <i>Um</i> </td><td valign="top" width="70%">are upper constraint bounds;
+<br></td></tr><tr align="left"><td valign="top" width="30%"><i>l</i>1, <i>l</i>2, <small class="dots">...</small>, <i>ln</i> </td><td valign="top" width="70%">are lower bounds of
+variables;
+<br></td></tr><tr align="left"><td valign="top" width="30%"><i>u</i>1, <i>u</i>2, <small class="dots">...</small>, <i>un</i> </td><td valign="top" width="70%">are upper bounds of
+variables.
+   <br></td></tr></table>
+
+   <p>Bounds of variables and constraint bounds can be finite as well as
+infinite. Besides, lower bounds can be equal to corresponding upper
+bounds. Thus, the following types of variables and constraints are
+allowed:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="40%">&minus;inf &lt; <i>x</i> &lt; +inf </td><td valign="top" width="60%">Free (unbounded) variable
+<br></td></tr><tr align="left"><td valign="top" width="40%"><i>x</i> &gt;= <i>l</i> </td><td valign="top" width="60%">Variable with lower bound
+<br></td></tr><tr align="left"><td valign="top" width="40%"><i>x</i> &lt;= <i>u</i> </td><td valign="top" width="60%">Variable with upper bound
+<br></td></tr><tr align="left"><td valign="top" width="40%"><i>l</i> &lt;= <i>x</i> &lt;= <i>u</i> </td><td valign="top" width="60%">Double-bounded variable
+<br></td></tr><tr align="left"><td valign="top" width="40%"><i>x</i> = <i>l</i> (= <i>u</i>) </td><td valign="top" width="60%">Fixed variable
+<br></td></tr><tr align="left"><td valign="top" width="40%"></td><td valign="top" width="60%">
+<br></td></tr><tr align="left"><td valign="top" width="40%">&minus;inf &lt; sum <i>aj</i> <i>xj</i> &lt; +inf </td><td valign="top" width="60%">Free (unbounded)
+linear form
+<br></td></tr><tr align="left"><td valign="top" width="40%">sum <i>aj</i> <i>xj</i> &gt;= <i>L</i> </td><td valign="top" width="60%">Inequality constraint &ldquo;greater
+than or equal to&rdquo;
+<br></td></tr><tr align="left"><td valign="top" width="40%">sum <i>aj</i> <i>xj</i> &lt;= <i>U</i> </td><td valign="top" width="60%">Inequality constraint &ldquo;less than
+or equal to&rdquo;
+<br></td></tr><tr align="left"><td valign="top" width="40%"><i>L</i> &lt;= sum <i>aj</i> <i>xj</i> &lt;= <i>U</i> </td><td valign="top" width="60%">Double-bounded inequality
+constraint
+<br></td></tr><tr align="left"><td valign="top" width="40%">sum <i>aj</i> <i>xj</i> = <i>L</i> (= <i>U</i>) </td><td valign="top" width="60%">Equality constraint
+        <br></td></tr></table>
+</blockquote>
+
+   <p>In addition to pure LP problems MathProg allows mixed integer linear
+programming (MIP) problems, where some (or all) structural variables are
+restricted to be integer.
+
+<div class="node">
+<p><hr>
+<a name="Model-objects"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Structure-of-model-description">Structure of model description</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Linear-programming-problem">Linear programming problem</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Introduction">Introduction</a>
+<br>
+</div>
+
+<h3 class="section">1.2 Model objects</h3>
+
+<p>In MathProg the model is described in terms of sets, parameters,
+variables, constraints, and objectives, which are called <dfn>model
+objects</dfn>.
+
+   <p>The user introduces particular model objects using the language
+statements. Each model object is provided with a symbolic name that
+uniquely identifies the object and is intended for referencing purposes.
+
+   <p>Model objects, including sets, can be multidimensional arrays built
+over indexing sets. Formally, <i>n</i>-dimensional array <i>A</i> is the
+mapping:
+
+   <blockquote>
+<i>A</i> : D &minus;&gt; X,
+</blockquote>
+
+<p class="noindent">where D within
+<i>S</i>1&nbsp;<!-- /@w -->x&nbsp;<!-- /@w --><i>S</i>2&nbsp;<!-- /@w -->x&nbsp;<!-- /@w --><small class="dots">...</small>&nbsp;<!-- /@w -->x&nbsp;<!-- /@w --><i>Sn</i> is a
+subset of the Cartesian product of indexing sets, X is a set of the
+array members. In MathProg the set D is called <dfn>subscript domain</dfn>. 
+Its members are <i>n</i>-tuples
+(<i>i</i>1,&nbsp;<!-- /@w --><i>i</i>2,&nbsp;<!-- /@w --><small class="dots">...</small>,&nbsp;<!-- /@w --><i>in</i>), where
+<i>i</i>1&nbsp;<!-- /@w -->in&nbsp;<!-- /@w --><i>S</i>1, <i>i</i>2&nbsp;<!-- /@w -->in&nbsp;<!-- /@w --><i>S</i>2, <small class="dots">...</small>,
+<i>in</i>&nbsp;<!-- /@w -->in&nbsp;<!-- /@w --><i>Sn</i>.
+
+   <p>If <i>n</i> = 0, the Cartesian product above has exactly one element
+(namely, 0-tuple), so it is convenient to think scalar objects as
+0-dimensional arrays which have one member.
+
+   <p>The type of array members is determined by the type of corresponding
+model object as follows:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="20%"><i>Model object</i> </td><td valign="top" width="80%"><i>Array member</i>
+<br></td></tr><tr align="left"><td valign="top" width="20%">Set </td><td valign="top" width="80%">Elemental plain set
+<br></td></tr><tr align="left"><td valign="top" width="20%">Parameter </td><td valign="top" width="80%">Number or symbol
+<br></td></tr><tr align="left"><td valign="top" width="20%">Variable </td><td valign="top" width="80%">Elemental variable
+<br></td></tr><tr align="left"><td valign="top" width="20%">Constraint </td><td valign="top" width="80%">Elemental constraint
+<br></td></tr><tr align="left"><td valign="top" width="20%">Objective </td><td valign="top" width="80%">Elemental objective
+        <br></td></tr></table>
+</blockquote>
+
+   <p>In order to refer to a particular object member the object should be
+provided with subscripts. For example, if <i>a</i> is 2-dimensional
+parameter built over
+<i>I</i>&nbsp;<!-- /@w -->x&nbsp;<!-- /@w --><i>J</i>,
+a reference to its particular
+member can be written as <i>a</i>[<i>i</i>,&nbsp;<!-- /@w --><i>j</i>], where
+<i>i</i>&nbsp;<!-- /@w -->in&nbsp;<!-- /@w --><i>I</i> and <i>j</i>&nbsp;<!-- /@w -->in&nbsp;<!-- /@w --><i>J</i>. 
+It is understood that scalar objects being 0-dimensional need no
+subscripts.
+
+<div class="node">
+<p><hr>
+<a name="Structure-of-model-description"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Model-objects">Model objects</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Introduction">Introduction</a>
+<br>
+</div>
+
+<h3 class="section">1.3 Structure of model description</h3>
+
+<p>It is sometimes desirable to write a model which, at various points,
+may require different data for each problem to be solved using that
+model. For this reason in MathProg the model description consists of
+two parts: model section and data section.
+
+   <p><dfn>Model section</dfn> is a main part of the model description that
+contains declarations of model objects and is common for all problems
+based on the corresponding model.
+
+   <p><dfn>Data section</dfn> is an optional part of the model description that
+contains data specific for a particular problem.
+
+   <p>Depending on what is more convenient model and data sections can be
+placed either in one file or in two separate files. The latter feature
+allows to have arbitrary number of different data sections to be used
+with the same model section.
+
+<div class="node">
+<p><hr>
+<a name="Coding-model-description"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Expressions">Expressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Introduction">Introduction</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">2 Coding model description</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Symbolic-names">Symbolic names</a>
+<li><a accesskey="2" href="#Numeric-literals">Numeric literals</a>
+<li><a accesskey="3" href="#String-literals">String literals</a>
+<li><a accesskey="4" href="#Keywords">Keywords</a>
+<li><a accesskey="5" href="#Delimiters">Delimiters</a>
+<li><a accesskey="6" href="#Comments">Comments</a>
+</ul>
+
+<p>Model description is coded in plain text format using ASCII character
+set. Valid characters acceptable in the model description are the
+following:
+
+     <ul>
+<li>alphabetic characters:
+
+     <blockquote>
+<tt>A B C D E F G H I J K L M N O P Q R S T U V W X Y Z</tt><br>
+<tt>a b c d e f g h i j k l m n o p q r s t u v w x y z _</tt>
+</blockquote>
+
+     <li>numeric characters:
+
+     <blockquote>
+<tt>0 1 2 3 4 5 6 7 8 9</tt>
+</blockquote>
+
+     <li>special characters:
+
+     <blockquote>
+<tt>! " # &amp; ' ( ) * + , - . / : ; &lt; = > [ ] ^ { | }</tt>
+</blockquote>
+
+     <li>white-space characters:
+
+     <blockquote>
+<tt>SP HT CR NL VT FF</tt>
+</blockquote>
+     </ul>
+
+   <p>Within string literals and comments any ASCII characters (except control
+characters) are valid.
+
+   <p>White-space characters are non-significant. They can be used freely
+between lexical units to improve readability of the model description. 
+They are also used to separate lexical units from each other if there
+is no other way to do that.
+
+   <p>Syntactically model description is a sequence of lexical units in the
+following categories:
+
+     <ul>
+<li>symbolic names;
+<li>numeric literals;
+<li>string literals;
+<li>keywords;
+<li>delimiters;
+<li>comments. 
+</ul>
+
+   <p>The lexical units of the language are discussed below.
+
+<div class="node">
+<p><hr>
+<a name="Symbolic-names"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Numeric-literals">Numeric literals</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Coding-model-description">Coding model description</a>
+<br>
+</div>
+
+<h3 class="section">2.1 Symbolic names</h3>
+
+<p><dfn>Symbolic name</dfn> consists of alphabetic and numeric characters, the
+first of which must be alphabetic. All symbolic names are distinct (case
+sensitive).
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     alpha123
+     This_is_a_name
+     _P123_abc_321
+</pre>
+   <p>Symbolic names are used to identify model objects (sets, parameters,
+variables, constraints, objectives) and dummy indices.
+
+   <p>All symbolic names (except names of dummy indices) must be unique,
+i.e. the model description must have no objects with the same name. 
+Symbolic names of dummy indices must be unique within the scope, where
+they are valid.
+
+<div class="node">
+<p><hr>
+<a name="Numeric-literals"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#String-literals">String literals</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Symbolic-names">Symbolic names</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Coding-model-description">Coding model description</a>
+<br>
+</div>
+
+<h3 class="section">2.2 Numeric literals</h3>
+
+<p><dfn>Numeric literal</dfn> has the form <i>xx</i><code>E</code><i>syy</i>, where <i>xx</i>
+is a real number with optional decimal point, <i>s</i> is the sign <code>+</code>
+or <code>-</code>, <i>yy</i> is an integer decimal exponent. The letter <code>E</code>
+is case insensitive and can be coded as <code>e</code>.
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     123
+     3.14159
+     56.E+5
+     .78
+     123.456e-7
+</pre>
+   <p>Numeric literals are used to represent numeric quantities. They have
+obvious fixed meaning.
+
+<div class="node">
+<p><hr>
+<a name="String-literals"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Keywords">Keywords</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Numeric-literals">Numeric literals</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Coding-model-description">Coding model description</a>
+<br>
+</div>
+
+<h3 class="section">2.3 String literals</h3>
+
+<p><dfn>String literal</dfn> is a sequence of arbitrary characters enclosed
+either in single quotes or in double quotes. Both these forms are
+equivalent.
+
+   <p>If the single quote is a part of a string literal enclosed in single
+quotes, it must be coded twice. Analogously, if the double quote is
+a part of string literal enclosed in double quotes, it must be coded
+twice.
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     'This is a string'
+     "This is another string"
+     '1 + 2 = 3'
+     'That''s all'
+     "She said: ""No"""
+</pre>
+   <p>String literals are used to represent symbolic quantities.
+
+<div class="node">
+<p><hr>
+<a name="Keywords"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Delimiters">Delimiters</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#String-literals">String literals</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Coding-model-description">Coding model description</a>
+<br>
+</div>
+
+<h3 class="section">2.4 Keywords</h3>
+
+<p><dfn>Keyword</dfn> is a sequence of alphabetic characters and possibly some
+special characters. All keywords fall into two categories: reserved
+keywords, which cannot be used as symbolic names, and non-reserved
+keywords, which being recognized by context can be used as symbolic
+names.
+
+   <p>Reserved keywords are the following:
+
+<pre class="example">     and      else     mod      union
+     by       if       not      within
+     cross    in       or
+     diff     inter    symdiff
+     div      less     then
+</pre>
+   <p>Non-reserved keywords are described in following sections.
+
+   <p>All the keywords have fixed meaning, which will be explained on
+discussion of corresponding syntactic constructions, where the keywords
+are used.
+
+<div class="node">
+<p><hr>
+<a name="Delimiters"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Comments">Comments</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Keywords">Keywords</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Coding-model-description">Coding model description</a>
+<br>
+</div>
+
+<h3 class="section">2.5 Delimiters</h3>
+
+<p><dfn>Delimiter</dfn> is either a single special character or a sequence of
+two special characters as follows:
+
+<pre class="example">     +    ^    ==   !    :    )
+     -    &amp;    &gt;=   &amp;&amp;   ;    [
+     *    &lt;    &gt;    ||   :=   |
+     /    &lt;=   &lt;&gt;   .    ..   {
+     **   =    !=   ,    (    }
+</pre>
+   <p>If delimiter consists of two characters, there must be no spaces between
+the characters.
+
+   <p>All the delimiters have fixed meaning, which will be explained on
+discussion corresponding syntactic constructions, where the delimiters
+are used.
+
+<div class="node">
+<p><hr>
+<a name="Comments"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Delimiters">Delimiters</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Coding-model-description">Coding model description</a>
+<br>
+</div>
+
+<h3 class="section">2.6 Comments</h3>
+
+<p>For documenting purposes the model description can be provided with
+<dfn>comments</dfn>, which have two different forms. The first form is
+a single-line comment, which begins with the character <code>#</code> and
+extends until end of line. The second form is a comment sequence,
+which is a sequence of any characters enclosed between <code>/*</code> and
+<code>*/</code>.
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     set s{1..10}; # This is a comment
+     /* This is another comment */
+</pre>
+   <p>Comments are ignored by the model translator and can appear anywhere in
+the model description, where white-space characters are allowed.
+
+<div class="node">
+<p><hr>
+<a name="Expressions"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Statements">Statements</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Coding-model-description">Coding model description</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">3 Expressions</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Numeric-expressions">Numeric expressions</a>
+<li><a accesskey="2" href="#Symbolic-expressions">Symbolic expressions</a>
+<li><a accesskey="3" href="#Indexing-expressions-and-dummy-indices">Indexing expressions and dummy indices</a>
+<li><a accesskey="4" href="#Set-expressions">Set expressions</a>
+<li><a accesskey="5" href="#Logical-expressions">Logical expressions</a>
+<li><a accesskey="6" href="#Linear-expressions">Linear expressions</a>
+</ul>
+
+<p><dfn>Expression</dfn> is a rule for computing a value. In model description
+expressions are used as constituents of certain statements.
+
+   <p>In general case expressions consist of operands and operators.
+
+   <p>Depending on the type of the resultant value all expressions fall into
+the following categories:
+
+     <ul>
+<li>numeric expressions;
+<li>symbolic expressions;
+<li>indexing expressions;
+<li>set expressions;
+<li>logical expressions;
+<li>linear expressions. 
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Numeric-expressions"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Symbolic-expressions">Symbolic expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Expressions">Expressions</a>
+<br>
+</div>
+
+<h3 class="section">3.1 Numeric expressions</h3>
+
+<p><dfn>Numeric expression</dfn> is a rule for computing a single numeric value
+represented in the form of floating-point number.
+
+   <p>The primary numeric expression may be a numeric literal, dummy index,
+unsubscripted parameter, subscripted parameter, built-in function
+reference, iterated numeric expression, conditional numeric expression,
+or another numeric expression enclosed in parentheses.
+
+   <p><strong>Examples</strong>
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="60%"><tt>1.23</tt> </td><td valign="top" width="40%">(numeric literal)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>j</tt> </td><td valign="top" width="40%">(dummy index)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>time</tt> </td><td valign="top" width="40%">(unsubscripted parameter)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>a['May 2003',j+1]</tt> </td><td valign="top" width="40%">(subscripted parameter)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>abs(b[i,j])</tt> </td><td valign="top" width="40%">(function reference)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>sum{i in S diff T} alpha[i] * b[i,j]</tt> </td><td valign="top" width="40%">(iterated
+expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>if i in I then 2 * p else q[i+1]</tt> </td><td valign="top" width="40%">(conditional
+expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>(b[i,j] + .5 * c)</tt> </td><td valign="top" width="40%">(parenthesized expression)
+        <br></td></tr></table>
+</blockquote>
+
+   <p>More general numeric expressions containing two or more primary numeric
+expressions may be constructed by using certain arithmetic operators.
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     j+1
+     2 * a[i-1,j+1] - b[i,j]
+     sum{j in J} a[i,j] * x[j] + sum{k in K} b[i,k] * x[k]
+     (if i in I then 2 * p else q[i+1]) / (a[i,j] + 1.5)
+</pre>
+   <h4 class="subheading">Numeric literals</h4>
+
+<p>If the primary numeric expression is a numeric literal, the resultant
+value is obvious.
+
+<h4 class="subheading">Dummy indices</h4>
+
+<p>If the primary numeric expression is a dummy index, the resultant value
+is current value assigned to the dummy index.
+
+<h4 class="subheading">Unsubscripted parameters</h4>
+
+<p>If the primary numeric expression is an unsubscripted parameter (which
+must be 0-dimensional), the resultant value is the value of the
+parameter.
+
+<h4 class="subheading">Subscripted parameters</h4>
+
+<p>The primary numeric expression, which refers to a subscripted parameter,
+has the following syntactic form:
+
+   <blockquote>
+<i>name</i>[<i>i</i>1, <i>i</i>2, <small class="dots">...</small>, <i>in</i>],
+</blockquote>
+
+<p class="noindent">where <i>name</i> is the symbolic name of the parameter, <i>i</i>1, <i>i</i>2,
+<small class="dots">...</small>, <i>in</i> are subscripts.
+
+   <p>Each subscript must be a numeric or symbolic expression. The number of
+subscripts in the subscript list must be the same as the dimension of
+the parameter with which the subscript list is associated.
+
+   <p>Actual values of subscript expressions are used to identify a particular
+member of the parameter that determines the resultant value of the
+primary expression.
+
+<h4 class="subheading">Function references</h4>
+
+<p>In MathProg there are the following built-in functions which may be used
+in numeric expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="25%"><tt>abs</tt>(<i>x</i>) </td><td valign="top" width="75%">absolute value
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>atan</tt>(<i>x</i>) </td><td valign="top" width="75%">trigonometric arctangent
+arctan&nbsp;<!-- /@w --><i>x</i> (in radians)
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>atan</tt>(<i>y</i>,&nbsp;<!-- /@w --><i>x</i>) </td><td valign="top" width="75%">trigonometric arctangent
+arctan&nbsp;<!-- /@w --><i>y</i>/<i>x</i> (in radians)
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>card</tt>(<i>x</i>) </td><td valign="top" width="75%">cardinality (the number of elements)
+of set <i>x</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>ceil</tt>(<i>x</i>) </td><td valign="top" width="75%">smallest integer not less than <i>x</i>
+(&ldquo;ceiling of <i>x</i>&rdquo;)
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>cos</tt>(<i>x</i>) </td><td valign="top" width="75%">trigonometric cosine cos&nbsp;<!-- /@w --><i>x</i>
+(in radians)
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>exp</tt>(<i>x</i>) </td><td valign="top" width="75%">base-<i>e</i> exponential
+<i>e</i>^<i>x</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>floor</tt>(<i>x</i>) </td><td valign="top" width="75%">largest integer not greater than <i>x</i>
+(&ldquo;floor of <i>x</i>&rdquo;)
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>gmtime</tt>() </td><td valign="top" width="75%">the number of seconds elapsed since
+00:00:00 Jan 1, 1970,
+<br></td></tr><tr align="left"><td valign="top" width="25%"></td><td valign="top" width="75%">Coordinated Universal Time<a rel="footnote" href="#fn-2" name="fnd-2"><sup>2</sup></a>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>length</tt>(<i>x</i>) </td><td valign="top" width="75%">length of character string <i>x</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>log</tt>(<i>x</i>) </td><td valign="top" width="75%">natural logarithm log&nbsp;<!-- /@w --><i>x</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>log10</tt>(<i>x</i>) </td><td valign="top" width="75%">common (decimal) logarithm
+log10&nbsp;<!-- /@w --><i>x</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>max</tt>(<i>x</i>1, <small class="dots">...</small>, <i>xn</i>) </td><td valign="top" width="75%">the largest of values
+<i>x</i>1, <small class="dots">...</small>, <i>xn</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>min</tt>(<i>x</i>1, <small class="dots">...</small>, <i>xn</i>) </td><td valign="top" width="75%">the smallest of values
+<i>x</i>1, <small class="dots">...</small>, <i>xn</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>round</tt>(<i>x</i>) </td><td valign="top" width="75%">rounding <i>x</i> to nearest integer
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>round</tt>(<i>x</i>,&nbsp;<!-- /@w --><i>n</i>) </td><td valign="top" width="75%">rounding <i>x</i> to <i>n</i>
+fractional decimal digits
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>sin</tt>(<i>x</i>) </td><td valign="top" width="75%">trigonometric sine sin&nbsp;<!-- /@w --><i>x</i> (in
+radians)
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>sqrt</tt>(<i>x</i>) </td><td valign="top" width="75%">square root
+of <i>x</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>str2time</tt>(<i>s</i>,&nbsp;<!-- /@w --><i>f</i>) </td><td valign="top" width="75%">converting character
+string <i>s</i> to calendar time<a rel="footnote" href="#fn-3" name="fnd-3"><sup>3</sup></a>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>trunc</tt>(<i>x</i>) </td><td valign="top" width="75%">truncating <i>x</i> to nearest integer
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>trunc</tt>(<i>x</i>,&nbsp;<!-- /@w --><i>n</i>) </td><td valign="top" width="75%">truncating <i>x</i> to <i>n</i>
+fractional decimal digits
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>Irand224</tt>() </td><td valign="top" width="75%">pseudo-random integer uniformly
+distributed in [0,2^24)
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>Uniform01</tt>() </td><td valign="top" width="75%">pseudo-random number uniformly
+distributed in [0,1)
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>Uniform</tt>(<i>a</i>,&nbsp;<!-- /@w --><i>b</i>) </td><td valign="top" width="75%">pseudo-random number
+uniformly distributed in [<i>a</i>,&nbsp;<!-- /@w --><i>b</i>)
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>Normal01</tt>() </td><td valign="top" width="75%">Gaussian pseudo-random variate
+with
+mu&nbsp;<!-- /@w -->=&nbsp;<!-- /@w -->0 and sigma&nbsp;<!-- /@w -->=&nbsp;<!-- /@w -->1
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>Normal</tt>(mu,&nbsp;<!-- /@w -->sigma)
+</td><td valign="top" width="75%">Gaussian pseudo-random
+variate with given
+mu and sigma
+        <br></td></tr></table>
+</blockquote>
+
+   <p>Arguments of all built-in functions, except <code>card</code>, <code>length</code>,
+and <code>str2time</code>, must be numeric expressions. The argument of
+<code>card</code> must be a set expression. The argument of <code>length</code> and
+both arguments of <code>str2time</code> must be symbolic expressions.
+
+   <p>The resultant value of the numeric expression, which is a function
+reference, is the result of applying the function to its argument(s).
+
+   <p>Note that each pseudo-random generator function have a latent argument
+(i.e. some internal state), which is changed whenever the function has
+been applied. Thus, if the function is applied repeatedly even to
+identical arguments, due to the side effect different resultant values
+are always produced.
+
+<h4 class="subheading">Iterated expressions</h4>
+
+<p>Iterated numeric expression is a primary numeric expression, which has
+the following syntactic form:
+
+   <blockquote>
+<var>iterated-operator</var> <var>indexing-expression</var> <var>integrand</var>
+</blockquote>
+
+<p class="noindent">where <var>iterated-operator</var> is the symbolic name of the iterated
+operator to be performed (see below), <var>indexing expression</var> is an
+indexing expression which introduces dummy indices and controls
+iterating, <var>integrand</var> is a numeric expression that participates in
+the operation.
+
+   <p>In MathProg there are four iterated operators, which may be used in
+numeric expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="10%"><tt>sum</tt> </td><td valign="top" width="15%">summation </td><td valign="top" width="75%">
+of <i>x</i>(<i>i</i>1,&nbsp;<!-- /@w --><small class="dots">...</small>,&nbsp;<!-- /@w --><i>in</i>) for all
+(<i>i</i>1,&nbsp;<!-- /@w --><small class="dots">...</small>,&nbsp;<!-- /@w --><i>in</i>)&nbsp;<!-- /@w -->in&nbsp;<!-- /@w -->D
+<br></td></tr><tr align="left"><td valign="top" width="10%"><tt>prod</tt> </td><td valign="top" width="15%">production </td><td valign="top" width="75%">
+of <i>x</i>(<i>i</i>1,&nbsp;<!-- /@w --><small class="dots">...</small>,&nbsp;<!-- /@w --><i>in</i>) for all
+(<i>i</i>1,&nbsp;<!-- /@w --><small class="dots">...</small>,&nbsp;<!-- /@w --><i>in</i>)&nbsp;<!-- /@w -->in&nbsp;<!-- /@w -->D
+<br></td></tr><tr align="left"><td valign="top" width="10%"><tt>min</tt> </td><td valign="top" width="15%">minimum </td><td valign="top" width="75%">
+of <i>x</i>(<i>i</i>1,&nbsp;<!-- /@w --><small class="dots">...</small>,&nbsp;<!-- /@w --><i>in</i>) for all
+(<i>i</i>1,&nbsp;<!-- /@w --><small class="dots">...</small>,&nbsp;<!-- /@w --><i>in</i>)&nbsp;<!-- /@w -->in&nbsp;<!-- /@w -->D
+<br></td></tr><tr align="left"><td valign="top" width="10%"><tt>max</tt> </td><td valign="top" width="15%">maximum </td><td valign="top" width="75%">
+of <i>x</i>(<i>i</i>1,&nbsp;<!-- /@w --><small class="dots">...</small>,&nbsp;<!-- /@w --><i>in</i>) for all
+(<i>i</i>1,&nbsp;<!-- /@w --><small class="dots">...</small>,&nbsp;<!-- /@w --><i>in</i>)&nbsp;<!-- /@w -->in&nbsp;<!-- /@w -->D
+        <br></td></tr></table>
+</blockquote>
+
+<p class="noindent">where <i>i</i>1, <small class="dots">...</small>, <i>in</i> are dummy indices introduced in the
+indexing expression, D is the domain, a set of <i>n</i>-tuples specified
+by the indexing expression which defines particular values assigned to
+the dummy indices on performing the iterated operation,
+<i>x</i>(<i>i</i>1,&nbsp;<!-- /@w --><small class="dots">...</small>,&nbsp;<!-- /@w --><i>in</i>) is the integrand, a numeric
+expression whose resultant value depends on the dummy indices.
+
+   <p>The resultant value of an iterated numeric expression is the result of
+applying of the iterated operator to its integrand over all <i>n</i>-tuples
+contained in the domain.
+
+<h4 class="subheading">Conditional expressions</h4>
+
+<p>Conditional numeric expression is a primary numeric expression, which
+has one of the following two syntactic forms:
+
+   <blockquote>
+<tt>if</tt> <i>b</i> <tt>then</tt> <i>x</i> <tt>else</tt> <i>y</i>
+
+        <p><tt>if</tt> <i>b</i> <tt>then</tt> <i>x</i>
+</blockquote>
+
+<p class="noindent">where <i>b</i> is an logical expression, <i>x</i> and <i>y</i> are numeric
+expressions.
+
+   <p>The resultant value of the conditional expression depends on the value
+of the logical expression that follows the keyword <code>if</code>. If it
+takes on the value <i>true</i>, the value of the conditional expression is
+the value of the expression that follows the keyword <code>then</code>. 
+Otherwise, if the logical expression takes on the value <i>false</i>, the
+value of the conditional expression is the value of the expression that
+follows the keyword <code>else</code>. If the reduced form of the conditional
+expression is used and the logical expression takes on the value
+<i>false</i>, the resultant value of the conditional expression is zero.
+
+<h4 class="subheading">Parenthesized expressions</h4>
+
+<p>Any numeric expression may be enclosed in parentheses that syntactically
+makes it primary numeric expression.
+
+   <p>Parentheses may be used in numeric expressions, as in algebra, to
+specify the desired order in which operations are to be performed. Where
+parentheses are used, the expression within the parentheses is evaluated
+before the resultant value is used.
+
+   <p>The resultant value of the parenthesized expression is the same as the
+value of the expression enclosed within parentheses.
+
+<h4 class="subheading">Arithmetic operators</h4>
+
+<p>In MathProg there are the following arithmetic operators, which may be
+used in numeric expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="25%"><tt>+</tt> <i>x</i> </td><td valign="top" width="75%">unary plus
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>-</tt> <i>x</i> </td><td valign="top" width="75%">unary minus
+<br></td></tr><tr align="left"><td valign="top" width="25%"><i>x</i> <tt>+</tt> <i>y</i> </td><td valign="top" width="75%">addition
+<br></td></tr><tr align="left"><td valign="top" width="25%"><i>x</i> <tt>-</tt> <i>y</i> </td><td valign="top" width="75%">subtraction
+<br></td></tr><tr align="left"><td valign="top" width="25%"><i>x</i> <tt>less</tt> <i>y</i> </td><td valign="top" width="75%">positive difference (if
+<i>x</i>&nbsp;<!-- /@w -->&lt;&nbsp;<!-- /@w --><i>y</i> then 0 else <i>x</i>&nbsp;<!-- /@w -->&minus;&nbsp;<!-- /@w --><i>y</i>)
+<br></td></tr><tr align="left"><td valign="top" width="25%"><i>x</i> <tt>*</tt> <i>y</i> </td><td valign="top" width="75%">multiplication
+<br></td></tr><tr align="left"><td valign="top" width="25%"><i>x</i> <tt>/</tt> <i>y</i> </td><td valign="top" width="75%">division
+<br></td></tr><tr align="left"><td valign="top" width="25%"><i>x</i> <tt>div</tt> <i>y</i> </td><td valign="top" width="75%">quotient of exact division
+<br></td></tr><tr align="left"><td valign="top" width="25%"><i>x</i> <tt>mod</tt> <i>y</i> </td><td valign="top" width="75%">remainder of exact division
+<br></td></tr><tr align="left"><td valign="top" width="25%"><i>x</i> <tt>**</tt> <i>y</i>, <i>x</i> <tt>^</tt> <i>y</i> </td><td valign="top" width="75%">
+exponentiation (raise to power)
+        <br></td></tr></table>
+</blockquote>
+
+<p class="noindent">where <i>x</i> and <i>y</i> are numeric expressions.
+
+   <p>If the expression includes more than one arithmetic operator, all
+operators are performed from left to right according to the hierarchy
+of operations (see below) with the only exception that the exponentiaion
+operators are performed from right to left.
+
+   <p>The resultant value of the expression, which contains arithmetic
+operators, is the result of applying the operators to their operands.
+
+<h4 class="subheading">Hierarchy of operations</h4>
+
+<p>The following list shows the hierarchy of operations in numeric
+expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="70%"><i>Operation</i> </td><td valign="top" width="30%"><i>Hierarchy</i>
+<br></td></tr><tr align="left"><td valign="top" width="70%">Evaluation of functions (<tt>abs</tt>, <tt>ceil</tt>, etc.) </td><td valign="top" width="30%">
+1st
+<br></td></tr><tr align="left"><td valign="top" width="70%">Exponentiation (<tt>**</tt>, <tt>^</tt>) </td><td valign="top" width="30%">2nd
+<br></td></tr><tr align="left"><td valign="top" width="70%">Unary plus and minus (<tt>+</tt>, <tt>-</tt>) </td><td valign="top" width="30%">3rd
+<br></td></tr><tr align="left"><td valign="top" width="70%">Multiplication and division (<tt>*</tt>, <tt>/</tt>, <tt>div</tt>,
+<tt>mod</tt>) </td><td valign="top" width="30%">4th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Iterated operations (<tt>sum</tt>, <tt>prod</tt>, <tt>min</tt>,
+<tt>max</tt>) </td><td valign="top" width="30%">5th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Addition and subtraction (<tt>+</tt>, <tt>-</tt>, <tt>less</tt>)
+</td><td valign="top" width="30%">6th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Conditional evaluation (<tt>if</tt> <small class="dots">...</small> <tt>then</tt> <small class="dots">...</small>
+<tt>else</tt>) </td><td valign="top" width="30%">7th
+        <br></td></tr></table>
+</blockquote>
+
+   <p>This hierarchy is used to determine which of two consecutive operations
+is performed first. If the first operator is higher than or equal to the
+second, the first operation is performed. If it is not, the second
+operator is compared to the third, etc. When the end of the expression
+is reached, all of the remaining operations are performed in the reverse
+order.
+
+<div class="node">
+<p><hr>
+<a name="Symbolic-expressions"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Indexing-expressions-and-dummy-indices">Indexing expressions and dummy indices</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Numeric-expressions">Numeric expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Expressions">Expressions</a>
+<br>
+</div>
+
+<h3 class="section">3.2 Symbolic expressions</h3>
+
+<p><dfn>Symbolic expression</dfn> is a rule for computing a single symbolic
+value represented in the form of character string.
+
+   <p>The primary symbolic expression may be a string literal, dummy index,
+unsubscripted parameter, subscripted parameter, built-in function
+reference, conditional symbolic expression, or another symbolic
+expression enclosed in parentheses.
+
+   <p>It is also allowed to use a numeric expression as the primary symbolic
+expression, in which case the resultant value of the numeric expression
+is automatically converted to the symbolic type.
+
+   <p><strong>Examples</strong>
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="60%"><tt>'May 2003'</tt> </td><td valign="top" width="40%">(string literal)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>j</tt> </td><td valign="top" width="40%">(dummy index)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>p</tt> </td><td valign="top" width="40%">(unsubscripted parameter)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>s['abc',j+1]</tt> </td><td valign="top" width="40%">(subscripted parameter)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>substr(name[i],k+1,3)</tt> </td><td valign="top" width="40%">(function reference)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>if i in I then s[i,j] else t[i+1]</tt> </td><td valign="top" width="40%">(conditional
+expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>((10 * b[i,j]) &amp; '.bis')</tt> </td><td valign="top" width="40%">(parenthesized expression)
+        <br></td></tr></table>
+</blockquote>
+
+   <p>More general symbolic expressions containing two or more primary
+symbolic expressions may be constructed by using the concatenation
+operator.
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     'abc[' &amp; i &amp; ',' &amp; j &amp; ']'
+     "from " &amp; city[i] &amp; " to " &amp; city[j]
+</pre>
+   <p>The principles of evaluation of symbolic expressions are completely
+analogous to that ones given for numeric expressions (see above).
+
+<h4 class="subheading">Function references</h4>
+
+<p>In MathProg there are the following built-in functions which may be used
+in symbolic expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="25%"><tt>substr</tt>(<i>x</i>,&nbsp;<!-- /@w --><i>y</i>) </td><td valign="top" width="75%">substring of <i>x</i>
+starting from position <i>y</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>substr</tt>(<i>x</i>, <i>y</i>, <i>z</i>) </td><td valign="top" width="75%">substring of <i>x</i>
+starting from position <i>y</i> and having length <i>z</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>time2str</tt>(<i>t</i>, <i>f</i>) </td><td valign="top" width="75%">converting calendar time to
+character string<a rel="footnote" href="#fn-4" name="fnd-4"><sup>4</sup></a>
+        <br></td></tr></table>
+</blockquote>
+
+   <p>The first argument of <code>substr</code> must be a symbolic expression while
+its second and optional third arguments must be numeric expressions.
+
+   <p>The first argument of <code>time2str</code> must be a numeric expression, and
+its second argument must be a symbolic expression.
+
+   <p>The resultant value of the symbolic expression, which is a function
+reference, is the result of applying the function to its arguments.
+
+<h4 class="subheading">Symbolic operators</h4>
+
+<p>Currently in MathProg there is the only symbolic operator:
+
+   <blockquote>
+<i>x</i> <tt>&amp;</tt> <i>y</i>
+</blockquote>
+
+<p class="noindent">where <i>x</i> and <i>y</i> are symbolic expressions. This operator means
+concatenation of its two symbolic operands, which are character strings.
+
+<h4 class="subheading">Hierarchy of operations</h4>
+
+<p>The following list shows the hierarchy of operations in symbolic
+expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="70%"><i>Operation</i> </td><td valign="top" width="30%"><i>Hierarchy</i>
+<br></td></tr><tr align="left"><td valign="top" width="70%">Evaluation of numeric operations </td><td valign="top" width="30%">1st-7th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Concatenation (<tt>&amp;</tt>) </td><td valign="top" width="30%">8th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Conditional evaluation (<tt>if</tt> <small class="dots">...</small> <tt>then</tt> <small class="dots">...</small>
+<tt>else</tt>) </td><td valign="top" width="30%">9th
+        <br></td></tr></table>
+</blockquote>
+
+   <p>This hierarchy has the same meaning as explained in Section &ldquo;Numeric
+expressions&rdquo;.
+
+<div class="node">
+<p><hr>
+<a name="Indexing-expressions-and-dummy-indices"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Set-expressions">Set expressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Symbolic-expressions">Symbolic expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Expressions">Expressions</a>
+<br>
+</div>
+
+<h3 class="section">3.3 Indexing expressions and dummy indices</h3>
+
+<p><dfn>Indexing expression</dfn> is an auxiliary construction, which specifies
+a plain set of n-tuples and introduces dummy indices. It has two
+syntactic forms:
+
+   <blockquote>
+<tt>{</tt> <var>entry</var>-1, <var>entry</var>-2, <small class="dots">...</small>, <var>entry</var>-<i>m</i>
+<tt>}</tt>
+
+        <p><tt>{</tt> <var>entry</var>-1, <var>entry</var>-2, <small class="dots">...</small>, <var>entry</var>-<i>m</i> :
+<var>predicate</var> <tt>}</tt>
+</blockquote>
+
+<p class="noindent">where <var>entry</var>-1, <var>entry</var>-2, <small class="dots">...</small>, <var>entry</var>-<i>m</i> are
+indexing entries, <var>predicate</var> is a logical expression which
+specifies an optional predicate.
+
+   <p>Each indexing entry in the indexing expression has one of the following
+three forms:
+
+   <blockquote>
+<i>t</i> <tt>in</tt> <i>S</i>
+
+        <p>(<i>t</i>1, <i>t</i>2, <small class="dots">...</small>, <i>tk</i>) <tt>in</tt> S
+
+        <p><i>S</i>
+</blockquote>
+
+<p class="noindent">where
+<i>t</i>1, <i>t</i>2, <small class="dots">...</small>, <i>tk</i>
+are indices, <i>S</i> is a set expression (discussed in the next section),
+which specifies the basic set.
+
+   <p>The number of indices in the indexing entry must be the same as the
+dimension of the basic set <i>S</i>, i.e. if <i>S</i> consists of 1-tuples,
+the first form must be used, and if <i>S</i> consists of <i>n</i>-tuples,
+where <i>n</i>&nbsp;<!-- /@w -->&gt;&nbsp;<!-- /@w -->1, the second form must be used.
+
+   <p>If the first form of the indexing entry is used, the index <i>t</i> can
+be a dummy index only. If the second form is used, the indices
+<i>t</i>1, <i>t</i>2, <small class="dots">...</small>, <i>tk</i>
+can be either dummy indices or some numeric or symbolic expressions,
+where at least one index must be a dummy index. The third, reduced form
+of the indexing entry has the same effect as if there were <i>t</i>
+(if <i>S</i> is 1-dimensional) or
+<i>t</i>1, <i>t</i>2, <small class="dots">...</small>, <i>tk</i>
+(if S is n-dimensional) all specified as dummy indices.
+
+   <p><dfn>Dummy index</dfn> is an auxiliary model object, which acts like an
+individual variable. Values assigned to dummy indices are components
+of <i>n</i>-tuples from basic sets, i.e. some numeric and symbolic
+quantities.
+
+   <p>For referencing purposes dummy indices can be provided with symbolic
+names. However, unlike other model objects (sets, parameters, etc.) 
+dummy indices do not need to be explicitly declared. Each
+<em>undeclared</em> symbolic name being used in the indexing position of
+an indexing entry is recognized as the symbolic name of corresponding
+dummy index.
+
+   <p>Symbolic names of dummy indices are valid only within the scope of the
+indexing expression, where the dummy indices were introduced. Beyond
+the scope the dummy indices are completely inaccessible, so the same
+symbolic names may be used for other purposes, in particular, to
+represent dummy indices in other indexing expressions.
+
+   <p>The scope of indexing expression, where implicit declarations of dummy
+indices are valid, depends on the context, in which the indexing
+expression is used:
+
+     <ol type=1 start=1>
+<li>If the indexing expression is used in iterated operator, its
+scope extends until the end of the integrand. 
+<li>If the indexing expression is used as a primary set expression,
+its scope extends until the end of this indexing expression. 
+<li>If the indexing expression is used to define the subscript domain
+in declarations of some model objects, its scope extends until the end
+of the corresponding statement.
+        </ol>
+
+   <p>The indexing mechanism implemented by means of indexing expressions is
+best explained by some examples discussed below.
+
+   <p>Let there be three sets:
+
+   <blockquote>
+<i>A</i> = {4, 7, 9}
+
+        <p><i>B</i> = {(1,<i>Jan</i>), (1,<i>Feb</i>), (2,<i>Mar</i>), (2,<i>Apr</i>),
+(3,<i>May</i>), (3,<i>Jun</i>)}
+
+        <p><i>C</i> = {<i>a</i>, <i>b</i>, <i>c</i>}
+</blockquote>
+
+<p class="noindent">where <i>A</i> and <i>C</i> consist of 1-tuples (singles), <i>B</i> consists of
+2-tuples (doubles). And consider the following indexing expression:
+
+<pre class="example">     {i in A, (j,k) in B, l in C}
+</pre>
+   <p class="noindent">where <i>i</i>, <i>j</i>, <i>k</i>, and <i>l</i> are dummy indices.
+
+   <p>Although MathProg is not a procedural language, for any indexing
+expression an equivalent algorithmic description could be given. In
+particular, the algorithmic description of the indexing expression
+above is the following:
+
+<pre class="example">     for all i in A do
+        for all (j,k) in B do
+           for all l in C do
+              action;
+</pre>
+   <p class="noindent">where the dummy indices <i>i</i>, <i>j</i>, <i>k</i>, <i>l</i> are consecutively
+assigned corresponding components of <i>n</i>-tuples from the basic sets
+<i>A</i>, <i>B</i>, <i>C</i>, and <code>action</code> is some action that depends on
+the context, where the indexing expression is used. For example, if the
+<code>action</code> were printing current values of dummy indices, the output
+would look like follows:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="15%"><i>i</i> = 4 </td><td valign="top" width="15%"><i>j</i> = 1 </td><td valign="top" width="15%"><i>k</i> = <i>Jan</i> </td><td valign="top" width="15%"><i>l</i> = <i>a</i>
+<br></td></tr><tr align="left"><td valign="top" width="15%"><i>i</i> = 4 </td><td valign="top" width="15%"><i>j</i> = 1 </td><td valign="top" width="15%"><i>k</i> = <i>Jan</i> </td><td valign="top" width="15%"><i>l</i> = <i>b</i>
+<br></td></tr><tr align="left"><td valign="top" width="15%"><i>i</i> = 4 </td><td valign="top" width="15%"><i>j</i> = 1 </td><td valign="top" width="15%"><i>k</i> = <i>Jan</i> </td><td valign="top" width="15%"><i>l</i> = <i>c</i>
+<br></td></tr><tr align="left"><td valign="top" width="15%"><i>i</i> = 4 </td><td valign="top" width="15%"><i>j</i> = 1 </td><td valign="top" width="15%"><i>k</i> = <i>Feb</i> </td><td valign="top" width="15%"><i>l</i> = <i>a</i>
+<br></td></tr><tr align="left"><td valign="top" width="15%"><i>i</i> = 4 </td><td valign="top" width="15%"><i>j</i> = 1 </td><td valign="top" width="15%"><i>k</i> = <i>Feb</i> </td><td valign="top" width="15%"><i>l</i> = <i>b</i>
+<br></td></tr><tr align="left"><td valign="top" width="15%"><small class="dots">...</small> </td><td valign="top" width="15%"><small class="dots">...</small> </td><td valign="top" width="15%"><small class="dots">...</small> </td><td valign="top" width="15%"><small class="dots">...</small>
+<br></td></tr><tr align="left"><td valign="top" width="15%"><i>i</i> = 9 </td><td valign="top" width="15%"><i>j</i> = 3 </td><td valign="top" width="15%"><i>k</i> = <i>Jun</i> </td><td valign="top" width="15%"><i>l</i> = <i>b</i>
+<br></td></tr><tr align="left"><td valign="top" width="15%"><i>i</i> = 9 </td><td valign="top" width="15%"><i>j</i> = 3 </td><td valign="top" width="15%"><i>k</i> = <i>Jun</i> </td><td valign="top" width="15%"><i>l</i> = <i>c</i>
+        <br></td></tr></table>
+</blockquote>
+
+   <p>Let the example indexing expression be used in the following iterated
+operation:
+
+<pre class="example">     sum{i in A, (j,k) in B, l in C} p[i,j,k,l]
+</pre>
+   <p class="noindent">where <i>p</i>[<i>i</i>, <i>j</i>, <i>k</i>, <i>l</i>] may be a 4-dimensional numeric
+parameter or some numeric expression whose resultant value depends on
+<i>i</i>, <i>j</i>, <i>k</i>, and <i>l</i>. In this case the action is summation,
+so the resultant value of the primary numeric expression
+is the sum of <i>p</i>[<i>i</i>, <i>j</i>, <i>k</i>, <i>l</i>], where summation is
+performed over all <i>i</i>&nbsp;<!-- /@w -->in&nbsp;<!-- /@w --><i>A</i>,
+(<i>j</i>,<i>k</i>)&nbsp;<!-- /@w -->in&nbsp;<!-- /@w --><i>B</i>, and <i>l</i>&nbsp;<!-- /@w -->in&nbsp;<!-- /@w --><i>C</i>.
+
+   <p>Now let the example indexing expression be used as a primary set
+expression. In this case the action is gathering all 4-tuples
+(quadruples) of the form (<i>i</i>, <i>j</i>, <i>k</i>, <i>l</i>) in one set, so the
+resultant value of such operation is simply the Cartesian product of the
+basic sets:
+
+   <blockquote>
+<i>A</i> x <i>B</i> x <i>C</i> = {(<i>i</i>,<i>j</i>,<i>k</i>,<i>l</i>) :
+<i>i</i>&nbsp;<!-- /@w -->in&nbsp;<!-- /@w --><i>A</i>, (<i>j</i>,<i>k</i>)&nbsp;<!-- /@w -->in&nbsp;<!-- /@w --><i>B</i>,
+<i>l</i>&nbsp;<!-- /@w -->in&nbsp;<!-- /@w --><i>C</i>}
+</blockquote>
+
+<p class="noindent">Note that in this case the same indexing expression might be written
+in the reduced form:
+
+<pre class="example">     {A, B, C}
+</pre>
+   <p class="noindent">because the dummy indices <i>i</i>, <i>j</i>, <i>k</i>, and <i>l</i> are not
+referenced and therefore their symbolic names are not needed.
+
+   <p>Finally, let the example indexing expression be used as the subscript
+domain in the declaration of a 4-dimensional model object, say, a
+numeric parameter:
+
+<pre class="example">     par p{i in A, (j,k) in B, l in C} ... ;
+</pre>
+   <p class="noindent">In this case the action is generating the parameter members, where each
+member has the form <i>p</i>[<i>i</i>,&nbsp;<!-- /@w --><i>j</i>,&nbsp;<!-- /@w --><i>k</i>,&nbsp;<!-- /@w --><i>l</i>].
+
+   <p>As was said above, some indices in the second form of indexing entries
+may be numeric or symbolic expressions, not only dummy indices. In this
+case resultant values of such expressions play role of some logical
+conditions to select only that <i>n</i>-tuples from the Cartesian product
+of basic sets, which satisfy these conditions.
+
+   <p>Consider, for example, the following indexing expression:
+
+<pre class="example">     {i in A, (i-1,k) in B, l in C}
+</pre>
+   <p class="noindent">where <i>i</i>, <i>k</i>, <i>l</i> are dummy indices, and <i>i</i>&minus;1 is
+a numeric expression. The algorithmic decsription of this indexing
+expression is the following:
+
+<pre class="example">     for all i in A do
+        for all (j,k) in B and j = i-1 do
+           for all l in C do
+              action;
+</pre>
+   <p class="noindent">Thus, if this indexing expression were used as a primary set expression,
+the resultant set would be the following:
+
+   <blockquote>
+{(4,<i>May</i>,<i>a</i>), (4,<i>May</i>,<i>b</i>), (4,<i>May</i>,<i>c</i>),
+(4,<i>Jun</i>,<i>a</i>), (4,<i>Jun</i>,<i>b</i>), (4,<i>Jun</i>,<i>c</i>)}. 
+</blockquote>
+
+<p class="noindent">Should note that in this case the resultant set consists of 3-tuples,
+not of 4-tuples, because in the indexing expression there is no dummy
+index that corresponds to the first component of 2-tuples from the set
+<i>B</i>.
+
+   <p>The general rule is: the number of components of <i>n</i>-tuples defined
+by an indexing expression is the same as the number of dummy indices in
+that indexing expression, where the correspondence between dummy indices
+and components on n-tuples in the resultant set is positional,
+i.e. the first dummy index corresponds to the first component, the
+second dummy index corresponds to the second component, etc.
+
+   <p>In many cases it is needed to select a subset from the Cartesian
+product of some sets. This may be attained by using an optional logical
+predicate, which is specified in indexing expression after the last or
+the only indexing entry.
+
+   <p>Consider, for another example, the following indexing expression:
+
+<pre class="example">     {i in A, (j,k) in B, l in C: i &lt;= 5 and k &lt;&gt; 'Mar'}
+</pre>
+   <p class="noindent">where the logical expression following the colon is a predicate. The
+algorithmic description of this indexing expression is the following:
+
+<pre class="example">     for all i in A do
+        for all (j,k) in B do
+           for all l in C do
+              if i &lt;= 5 and k != 'Mar' then
+                 action;
+</pre>
+   <p class="noindent">Thus, if this indexing expression were used as a primary set expression,
+the resultant set would be the following:
+
+   <blockquote>
+{(4,1,<i>Jan</i>,<i>a</i>), (4,1,<i>Feb</i>,<i>a</i>), (4,2,<i>Apr</i>,<i>a</i>),
+<small class="dots">...</small>, (4,3,<i>Jun</i>,<i>c</i>)}. 
+</blockquote>
+
+   <p>If no predicate is specified in the indexing expression, the one, which
+takes on the value <i>true</i>, is assumed.
+
+<div class="node">
+<p><hr>
+<a name="Set-expressions"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Logical-expressions">Logical expressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Indexing-expressions-and-dummy-indices">Indexing expressions and dummy indices</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Expressions">Expressions</a>
+<br>
+</div>
+
+<h3 class="section">3.4 Set expressions</h3>
+
+<p><dfn>Set expression</dfn> is a rule for computing an elemental set, i.e. 
+a collection of <i>n</i>-tuples, where components of <i>n</i>-tuples are
+numeric and symbolic quantities.
+
+   <p>The primary set expression may be a literal set, unsubscripted set,
+subscripted set, &ldquo;arithmetic&rdquo; set, indexing expression, iterated set
+expression, conditional set expression, or another set expression
+enclosed in parentheses.
+
+   <p><strong>Examples</strong>
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="60%"><tt>{(123,'aa'), (i,'bb'), (j-1,'cc')}</tt> </td><td valign="top" width="40%">(literal set)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>I</tt> </td><td valign="top" width="40%">(unsubscripted set)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>S[i-1,j+1]</tt> </td><td valign="top" width="40%">(subscripted set)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>1..t-1 by 2</tt> </td><td valign="top" width="40%">(&ldquo;arithmetic&rdquo; set)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>{t in 1..T, (t+1,j) in S: (t,j) in F}</tt> </td><td valign="top" width="40%">(indexing
+expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>setof{i in I, j in J}(i+1,j-1)</tt> </td><td valign="top" width="40%">(iterated expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>if i &lt; j then S[i] else F diff S[j]</tt> </td><td valign="top" width="40%">(conditional
+expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>(1..10 union 21..30)</tt> </td><td valign="top" width="40%">(parenthesized expression)
+        <br></td></tr></table>
+</blockquote>
+
+   <p>More general set expressions containing two or more primary set
+expressions may be constructed by using certain set operators.
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     (A union B) inter (I cross J)
+     1..10 cross (if i &lt; j then {'a', 'b', 'c'} else {'d', 'e', 'f'})
+</pre>
+   <h4 class="subheading">Literal sets</h4>
+
+<p>Literal set is a primary set expression, which has the following two
+syntactic forms:
+
+   <blockquote>
+{<i>e</i>1, <i>e</i>2, <small class="dots">...</small>, <i>em</i>}
+
+        <p>{(<i>e</i>11, <small class="dots">...</small>, <i>e</i>1<i>n</i>), (<i>e</i>21, <small class="dots">...</small>, <i>e</i>2<i>n</i>),
+<small class="dots">...</small>, (<i>em</i>1, <small class="dots">...</small>, <i>emn</i>)}
+</blockquote>
+
+<p class="noindent">where <i>e</i>1, <small class="dots">...</small>, <i>em</i>, <i>e</i>11, <small class="dots">...</small>, <i>emn</i> are numeric or
+symbolic expressions.
+
+   <p>If the first form is used, the resultant set consists of 1-tuples
+(singles) enumerated within the curly braces. It is allowed to specify
+an empty set, which has no 1-tuples.
+
+   <p>If the second form is used, the resultant set consists of <i>n</i>-tuples
+enumerated within the curly braces, where a particular <i>n</i>-tuple
+consists of corresponding components enumerated within the parentheses. 
+All <i>n</i>-tuples must have the same number of components.
+
+<h4 class="subheading">Unsubscripted sets</h4>
+
+<p>If the primary set expression is an unsubscripted set (which must be
+0-dimensional), the resultant set is an elemental set associated with
+the corresponding set object.
+
+<h4 class="subheading">Subscripted sets</h4>
+
+<p>The primary set expression, which refers to a subscripted set, has the
+following syntactic form:
+
+   <blockquote>
+<i>name</i>[<i>i</i>1, <i>i</i>2, <small class="dots">...</small>, <i>in</i>],
+</blockquote>
+
+<p class="noindent">where <i>name</i> is the symbolic name of the set object, <i>i</i>1, <i>i</i>2,
+<small class="dots">...</small>, <i>in</i> are subscripts.
+
+   <p>Each subscript must be a numeric or symbolic expression. The number of
+subscripts in the subscript list must be the same as the dimension of
+the set object with which the subscript list is associated.
+
+   <p>Actual values of subscript expressions are used to identify a particular
+member of the set object that determines the resultant set.
+
+<h4 class="subheading">&ldquo;Arithmetic&rdquo; set</h4>
+
+<p>The primary set expression, which is an &ldquo;arithmetic&rdquo; set, has the
+following two syntactic forms:
+
+   <blockquote>
+<i>t</i>0 <tt>..</tt> <i>tf</i> <tt>by</tt> <i>dt</i>
+
+        <p><i>t</i>0 <tt>..</tt> <i>tf</i>
+</blockquote>
+
+<p class="noindent">where <i>t</i>0, <i>t</i>1, and <i>dt</i> are numeric expressions (the value of
+<i>dt</i> must not be zero). The second form is equivalent to the first
+form, where <i>dt</i>&nbsp;<!-- /@w -->=&nbsp;<!-- /@w -->1.
+
+   <p>If <i>dt</i>&nbsp;<!-- /@w -->&gt;&nbsp;<!-- /@w -->0, the resultant set is determined as follows:
+
+   <blockquote>
+{<i>t</i>: exists <i>k</i> in Z (<i>t</i> = <i>t</i>0 + <i>k</i> <i>dt</i>, <i>t</i>0 &lt;=
+<i>t</i> &lt;= <i>tf</i>)}
+</blockquote>
+
+<p class="noindent">Otherwise, if <i>dt</i>&nbsp;<!-- /@w -->&lt;&nbsp;<!-- /@w -->0, the resultant set is determined as
+follows:
+
+   <blockquote>
+{<i>t</i>: exists <i>k</i> in Z (<i>t</i> = <i>t</i>0 + <i>k</i> <i>dt</i>, <i>tf</i> &lt;=
+<i>t</i> &lt;= <i>t</i>0)}
+</blockquote>
+
+<h4 class="subheading">Indexing expressions</h4>
+
+<p>If the primary set expression is an indexing expression, the resultant
+set is determined as described in Section &ldquo;Indexing expressions and
+dummy indices&rdquo; (see above).
+
+<h4 class="subheading">Iterated expressions</h4>
+
+<p>Iterated set expression is a primary set expression, which has the
+following syntactic form:
+
+   <blockquote>
+<tt>setof</tt> <var>indexing-expression</var> <var>integrand</var>
+</blockquote>
+
+<p class="noindent">where <var>indexing-expression</var> is an indexing expression which
+introduces dummy indices and controls iterating, <var>integrand</var> is
+either a single numeric or symbolic expression or a list of numeric and
+symbolic expressions separated by commae and enclosed in parentheses.
+
+   <p>If the integrand is a single numeric or symbolic expression, the
+resultant set consists of 1-tuples and is determined as follows:
+
+   <blockquote>
+{<i>x</i>: (<i>i</i>1, <small class="dots">...</small>, <i>in</i>) in D},
+</blockquote>
+
+<p class="noindent">where <i>x</i> is a value of the integrand, <i>i1</i>, <small class="dots">...</small>, <i>in</i> are
+dummy indices introduced in the indexing expression, D
+is the domain, a set of <i>n</i>-tuples specified by the indexing
+expression which defines particular values assigned to the dummy indices
+on performing the iterated operation.
+
+   <p>If the integrand is a list containing <i>m</i> numeric and symbolic
+expressions, the resultant set consists of <i>m</i>-tuples and is
+determined as follows:
+
+   <blockquote>
+{(<i>x</i>1, <small class="dots">...</small>, <i>xm</i>): (<i>i</i>1, <small class="dots">...</small>, <i>in</i>) in D},
+</blockquote>
+
+<p class="noindent">where <i>x</i>1, <small class="dots">...</small>, <i>xm</i> are values of the expressions in the
+integrand list, <i>i</i>1, <small class="dots">...</small>, <i>in</i> and D
+have the same meaning as above.
+
+<h4 class="subheading">Conditional expressions</h4>
+
+<p>Conditional set expression is a primary set expression that has the
+following syntactic form:
+
+   <blockquote>
+<tt>if</tt> <i>b</i> <tt>then</tt> <i>X</i> <tt>else</tt> <i>Y</i>
+</blockquote>
+
+<p class="noindent">where <i>b</i> is an logical expression, <i>X</i> and <i>Y</i> are set
+expressions, which must define sets of the same dimension.
+
+   <p>The resultant value of the conditional expression depends on the value
+of the logical expression that follows the keyword <tt>if</tt>. If it
+takes on the value <i>true</i>, the resultant set is the value of the
+expression that follows the keyword <tt>then</tt>. Otherwise, if the
+logical expression takes on the value <i>false</i>, the resultant set is
+the value of the expression that follows the keyword <tt>else</tt>.
+
+<h4 class="subheading">Parenthesized expressions</h4>
+
+<p>Any set expression may be enclosed in parentheses that syntactically
+makes it primary set expression.
+
+   <p>Parentheses may be used in set expressions, as in algebra, to specify
+the desired order in which operations are to be performed. Where
+parentheses are used, the expression within the parentheses is evaluated
+before the resultant value is used.
+
+   <p>The resultant value of the parenthesized expression is the same as the
+value of the expression enclosed within parentheses.
+
+<h4 class="subheading">Set operators</h4>
+
+<p>In MathProg there are the following set operators, which may be used in
+set expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="20%"><i>X</i> <tt>union</tt> <i>Y</i> </td><td valign="top" width="80%">union
+<br></td></tr><tr align="left"><td valign="top" width="20%"><i>X</i> <tt>diff</tt> <i>Y</i> </td><td valign="top" width="80%">difference
+<br></td></tr><tr align="left"><td valign="top" width="20%"><i>X</i> <tt>symdiff</tt> <i>Y</i> </td><td valign="top" width="80%">symmetric difference
+<br></td></tr><tr align="left"><td valign="top" width="20%"><i>X</i> <tt>inter</tt> <i>Y</i> </td><td valign="top" width="80%">intersection
+<br></td></tr><tr align="left"><td valign="top" width="20%"><i>X</i> <tt>cross</tt> <i>Y</i> </td><td valign="top" width="80%">cross (Cartesian) product
+        <br></td></tr></table>
+</blockquote>
+
+<p class="noindent">where <i>X</i> and <i>Y</i> are set expressions, which must define sets of the
+identical dimension (except for the Cartesian product).
+
+   <p>If the expression includes more than one set operator, all operators are
+performed from left to right according to the hierarchy of operations
+(see below).
+
+   <p>The resultant value of the expression, which contains set operators, is
+the result of applying the operators to their operands.
+
+   <p>The dimension of the resultant set, i.e. the dimension of <i>n</i>-tuples,
+of which the resultant set consists of, is the same as the dimension of
+the operands, except the Cartesian product, where the dimension of the
+resultant set is the sum of dimensions of the operands.
+
+<h4 class="subheading">Hierarchy of operations</h4>
+
+<p>The following list shows the hierarchy of operations in set expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="70%"><i>Operation</i> </td><td valign="top" width="30%"><i>Hierarchy</i>
+<br></td></tr><tr align="left"><td valign="top" width="70%">Evaluation of numeric operations </td><td valign="top" width="30%">1st-7th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Evaluation of symbolic operations </td><td valign="top" width="30%">8th-9th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Evaluation of iterated or &ldquo;arithmetic&rdquo; set (<tt>setof</tt>,
+<tt>..</tt>) </td><td valign="top" width="30%">10th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Cartesian product (<tt>cross</tt>) </td><td valign="top" width="30%">11th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Intersection (<tt>inter</tt>) </td><td valign="top" width="30%">12th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Union and difference (<tt>union</tt>, <tt>diff</tt>,
+<tt>symdiff</tt>) </td><td valign="top" width="30%">13th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Conditional evaluation (<tt>if</tt> <small class="dots">...</small> <tt>then</tt> <small class="dots">...</small>
+<tt>else</tt>) </td><td valign="top" width="30%">14th
+        <br></td></tr></table>
+</blockquote>
+
+   <p>This hierarchy is used to determine which of two consecutive operations
+is performed first. If the first operator is higher than or equal to the
+second, the first operation is performed. If it is not, the second
+operator is compared to the third, etc. When the end of the expression
+is reached, all of the remaining operations are performed in the reverse
+order.
+
+<div class="node">
+<p><hr>
+<a name="Logical-expressions"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Linear-expressions">Linear expressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Set-expressions">Set expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Expressions">Expressions</a>
+<br>
+</div>
+
+<h3 class="section">3.5 Logical expressions</h3>
+
+<p><dfn>Logical expression</dfn> is a rule for computing a single logical value,
+which can be either <i>true</i> or <i>false</i>.
+
+   <p>The primary logical expression may be a numeric expression, relational
+expression, iterated logical expression, or another logical expression
+enclosed in parentheses.
+
+   <p><strong>Examples</strong>
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="60%"><tt>i+1</tt> </td><td valign="top" width="40%">(numeric expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>a[i,j] &lt; 1.5</tt> </td><td valign="top" width="40%">(relational expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>s[i+1,j-1] &lt;> 'Mar' &amp; year</tt> </td><td valign="top" width="40%">(relational expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>(i+1,'Jan') not in I cross J</tt> </td><td valign="top" width="40%">(relational expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>S union T within A[i] inter B[j]</tt> </td><td valign="top" width="40%">(relational
+expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>forall{i in I, j in J} a[i,j] &lt; .5 * b</tt> </td><td valign="top" width="40%">(iterated
+expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>(a[i,j] &lt; 1.5 or b[i] >= a[i,j])</tt> </td><td valign="top" width="40%">(parenthesized
+expression)
+        <br></td></tr></table>
+</blockquote>
+
+   <p>More general logical expressions containing two or more primary logical
+expressions may be constructed by using certain logical operators.
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     not (a[i,j] &lt; 1.5 or b[i] &gt;= a[i,j]) and (i,j) in S
+     (i,j) in S or (i,j) not in T diff U
+</pre>
+   <h4 class="subheading">Numeric expressions</h4>
+
+<p>The resultant value of the primary logical expression, which is a
+numeric expression, is <i>true</i>, if the resultant value of the numeric
+expression is non-zero. Otherwise the resultant value of the logical
+expression is <i>false</i>.
+
+<h4 class="subheading">Relational expressions</h4>
+
+<p>In MathProg there are the following relational operators, which may be
+used in logical expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="50%"><i>x</i> <tt>&lt;</tt> <i>y</i> </td><td valign="top" width="50%">test on <i>x</i> &lt; <i>y</i>
+<br></td></tr><tr align="left"><td valign="top" width="50%"><i>x</i> <tt>&lt;=</tt> <i>y</i> </td><td valign="top" width="50%">test on
+<i>x</i> &lt;= <i>y</i>
+<br></td></tr><tr align="left"><td valign="top" width="50%"><i>x</i> <tt>=</tt> <i>y</i>, <i>x</i> <tt>==</tt> <i>y</i> </td><td valign="top" width="50%">test on
+<i>x</i> = <i>y</i>
+<br></td></tr><tr align="left"><td valign="top" width="50%"><i>x</i> <tt>>=</tt> <i>y</i> </td><td valign="top" width="50%">test on
+<i>x</i> &gt;= <i>y</i>
+<br></td></tr><tr align="left"><td valign="top" width="50%"><i>x</i> <tt>&lt;></tt> <i>y</i>, <i>x</i> <tt>!=</tt> <i>y</i> </td><td valign="top" width="50%">test on
+<i>x</i> != <i>y</i>
+<br></td></tr><tr align="left"><td valign="top" width="50%"><i>x</i> <tt>in</tt> <i>Y</i> </td><td valign="top" width="50%">test on
+<i>x</i> in <i>Y</i>
+<br></td></tr><tr align="left"><td valign="top" width="50%">(<i>x</i>1,<small class="dots">...</small>,<i>xn</i>) <tt>in</tt> <i>Y</i> </td><td valign="top" width="50%">test on
+(<i>x</i>1,<small class="dots">...</small>,<i>xn</i>) in <i>Y</i>
+<br></td></tr><tr align="left"><td valign="top" width="50%"><i>x</i> <tt>not in</tt> <i>Y</i>, <i>x</i> <tt>!in</tt> <i>Y</i> </td><td valign="top" width="50%">test on
+<i>x</i> not in <i>Y</i>
+<br></td></tr><tr align="left"><td valign="top" width="50%">(<i>x</i>1,<small class="dots">...</small>,<i>xn</i>) <tt>not in</tt> <i>Y</i>, </td><td valign="top" width="50%">
+<br></td></tr><tr align="left"><td valign="top" width="50%">(<i>x</i>1,<small class="dots">...</small>,<i>xn</i>) <tt>!in</tt> <i>Y</i> </td><td valign="top" width="50%">test on
+(<i>x</i>1,<small class="dots">...</small>,<i>xn</i>) not in <i>Y</i>
+<br></td></tr><tr align="left"><td valign="top" width="50%"><i>X</i> <tt>within</tt> <i>Y</i> </td><td valign="top" width="50%">test on
+<i>X</i> within <i>Y</i>
+<br></td></tr><tr align="left"><td valign="top" width="50%"><i>X</i> <tt>not within</tt> <i>Y</i>, <i>X</i> <tt>!within</tt> <i>Y</i>
+</td><td valign="top" width="50%">test on
+<i>X</i> not within <i>Y</i>
+        <br></td></tr></table>
+</blockquote>
+
+<p class="noindent">where <i>x</i>,
+<i>x</i>1, <small class="dots">...</small>, <i>xn</i>,
+<i>y</i> are numeric or symbolic expressions, <i>X</i> and <i>Y</i> are set
+expression.
+
+   <p><i>Note:</i>
+
+   <blockquote>
+          <ol type=1 start=1>
+<li>In the operations <tt>in</tt>, <tt>not in</tt>, and <tt>!in</tt>
+the number of components in the first operands must be the same as the
+dimension of the second operand. 
+<li>In the operations <tt>within</tt>, <tt>not within</tt>, and
+<tt>!within</tt> both operands must have identical dimension.
+             </ol>
+</blockquote>
+
+   <p>All the relational operators listed above have their conventional
+mathematical meaning. The resultant value is <i>true</i>, if the
+corresponding relation is satisfied for its operands, otherwise
+<i>false</i>. (Note that symbolic values are ordered lexicographically,
+and any numeric value precedes any symbolic value.)
+
+<h4 class="subheading">Iterated expressions</h4>
+
+<p>Iterated logical expression is a primary logical expression, which has
+the following syntactic form:
+
+   <blockquote>
+<var>iterated-operator</var> <var>indexing-expression</var> <var>integrand</var>
+</blockquote>
+
+<p class="noindent">where <var>iterated-operator</var> is the symbolic name of the iterated
+operator to be performed (see below), <var>indexing expression</var> is an
+indexing expression which introduces dummy indices and controls
+iterating, <var>integrand</var> is a logical expression that participates in
+the operation.
+
+   <p>In MathProg there are two iterated operators, which may be used in
+logical expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="10%"><tt>forall</tt> </td><td valign="top" width="25%">A-quantification </td><td valign="top" width="65%">
+for all (<i>i</i>1,<small class="dots">...</small>,<i>in</i>) in D: <i>x</i>(<i>i</i>1,<small class="dots">...</small>,<i>in</i>)
+<br></td></tr><tr align="left"><td valign="top" width="10%"><tt>exists</tt> </td><td valign="top" width="25%">E-quantification </td><td valign="top" width="65%">
+exists  (<i>i</i>1,<small class="dots">...</small>,<i>in</i>) in D: <i>x</i>(<i>i</i>1,<small class="dots">...</small>,<i>in</i>)
+        <br></td></tr></table>
+</blockquote>
+
+<p class="noindent">where
+<i>i</i>1, <small class="dots">...</small>, <i>in</i>
+are dummy indices introduced in the
+indexing expression,
+D
+is the domain, a set of
+<i>n</i>-tuples specified by the indexing expression which defines
+particular values assigned to the dummy indices on performing the
+iterated operation,
+<i>x</i>(<i>i</i>1,<small class="dots">...</small>,<i>in</i>)
+is the integrand, a logical expression whose resultant value depends on
+the dummy indices.
+
+   <p>For
+A-quantification
+the resultant value of the iterated logical expression is <i>true</i>, if
+the value of the integrand is <i>true</i> for all <i>n</i>-tuples contained in
+the domain, otherwise <i>false</i>.
+
+   <p>For
+E-quantification
+the resultant value of the iterated logical expression is <i>false</i>, if
+the value of the integrand is <i>false</i> for all <i>n</i>-tuples contained
+in the domain, otherwise <i>true</i>.
+
+<h4 class="subheading">Parenthesized expressions</h4>
+
+<p>Any logical expression may be enclosed in parentheses that syntactically
+makes it primary logical expression.
+
+   <p>Parentheses may be used in logical expressions, as in algebra, to
+specify the desired order in which operations are to be performed. Where
+parentheses are used, the expression within the parentheses is evaluated
+before the resultant value is used.
+
+   <p>The resultant value of the parenthesized expression is the same as the
+value of the expression enclosed within parentheses.
+
+<h4 class="subheading">Logical operators</h4>
+
+<p>In MathProg there are the following logical operators, which may be used
+in logical expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="30%"><tt>not</tt> <i>x</i>, <tt>!</tt> <i>x</i> </td><td valign="top" width="70%">negation
+<br></td></tr><tr align="left"><td valign="top" width="30%"><i>x</i> <tt>and</tt> <i>y</i>, <i>x</i> <tt>&amp;&amp;</tt> <i>y</i> </td><td valign="top" width="70%">
+conjunction (logical &ldquo;and&rdquo;)
+<br></td></tr><tr align="left"><td valign="top" width="30%"><i>x</i> <tt>or</tt> <i>y</i>, <i>x</i> <tt>||</tt> <i>y</i> </td><td valign="top" width="70%">
+disjunction (logical &ldquo;or&rdquo;)
+        <br></td></tr></table>
+</blockquote>
+
+<p class="noindent">where <i>x</i> and <i>y</i> are logical expressions.
+
+   <p>If the expression includes more than one logical operator, all
+operators are performed from left to right according to the hierarchy
+of operations (see below).
+
+   <p>The resultant value of the expression, which contains logical
+operators, is the result of applying the operators to their operands.
+
+<h4 class="subheading">Hierarchy of operations</h4>
+
+<p>The following list shows the hierarchy of operations in logical
+expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="70%"><i>Operation</i> </td><td valign="top" width="30%"><i>Hierarchy</i>
+<br></td></tr><tr align="left"><td valign="top" width="70%">Evaluation of numeric operations </td><td valign="top" width="30%">1st-7th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Evaluation of symbolic operations </td><td valign="top" width="30%">8th-9th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Evaluation of set operations </td><td valign="top" width="30%">10th-14th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Relational operations (<tt>&lt;</tt>, <tt>&lt;=</tt>, etc.) </td><td valign="top" width="30%">15th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Negation (<tt>not</tt>, <tt>!</tt>) </td><td valign="top" width="30%">16th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Conjunction (<tt>and</tt>, <tt>&amp;&amp;</tt>) </td><td valign="top" width="30%">17th
+<br></td></tr><tr align="left"><td valign="top" width="70%">A- and E-quantification
+(<tt>forall</tt>, <tt>exists</tt>) </td><td valign="top" width="30%">18th
+<br></td></tr><tr align="left"><td valign="top" width="70%">Disjunction (<tt>or</tt>, <tt>||</tt>) </td><td valign="top" width="30%">19th
+        <br></td></tr></table>
+</blockquote>
+
+   <p>This hierarchy has the same meaning as explained in Section &ldquo;Numeric
+expressions&rdquo;.
+
+<div class="node">
+<p><hr>
+<a name="Linear-expressions"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Logical-expressions">Logical expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Expressions">Expressions</a>
+<br>
+</div>
+
+<h3 class="section">3.6 Linear expressions</h3>
+
+<p><dfn>Linear expression</dfn> is a rule for computing so called <dfn>linear
+form</dfn> or simply <dfn>formula</dfn>, which is a linear (or affine) function of
+elemental variables.
+
+   <p>The primary linear expression may be an unsubscripted variable,
+subscripted variable, iterated linear expression, conditional linear
+expression, or another linear expression enclosed in parentheses.
+
+   <p>It is also allowed to use a numeric expression as the primary linear
+expression, in which case the resultant value of the numeric expression
+is automatically converted to the formula that includes the only
+constant term.
+
+   <p><strong>Examples</strong>
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="60%"><tt>z</tt> </td><td valign="top" width="40%">(unsubscripted variable)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>x[i,j]</tt> </td><td valign="top" width="40%">(subscripted variable)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>sum{j in J} (a[i] * x[i,j] + 3 * y)</tt> </td><td valign="top" width="40%">(iterated
+expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>if i in I then x[i,j] else 1.5 * z + 3</tt> </td><td valign="top" width="40%">
+(conditional expression)
+<br></td></tr><tr align="left"><td valign="top" width="60%"><tt>(a[i,j] * x[i,j] + y[i-1] + .1)</tt> </td><td valign="top" width="40%">(parenthesized
+expression)
+        <br></td></tr></table>
+</blockquote>
+
+   <p>More general linear expressions containing two or more primary linear
+expressions may be constructed by using certain arithmetic operators.
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     2 * x[i-1,j+1] + 3.5 * y[k] + .5 * z
+     (- x[i,j] + 3.5 * y[k]) / sum{t in T} abs(d[i,j,t])
+</pre>
+   <h4 class="subheading">Unsubscripted variables</h4>
+
+<p>If the primary linear expression is an unsubscripted variable (which
+must be 0-dimensional), the resultant formula is that unsubscripted
+variable.
+
+<h4 class="subheading">Subscripted variables</h4>
+
+<p>The primary linear expression, which refers to a subscripted variable,
+has the following syntactic form:
+
+   <blockquote>
+<i>name</i>[<i>i</i>1, <i>i</i>2, <small class="dots">...</small>, <i>in</i>],
+</blockquote>
+
+<p class="noindent">where <i>name</i> is the symbolic name of the variable, <i>i</i>1, <i>i</i>2,
+<small class="dots">...</small>, <i>in</i> are subscripts.
+
+   <p>Each subscript must be a numeric or symbolic expression. The number of
+subscripts in the subscript list must be the same as the dimension of
+the variable with which the subscript list is associated.
+
+   <p>Actual values of subscript expressions are used to identify
+a particular member of the model variable that determines the resultant
+formula, which is an elemental variable associated with the
+corresponding member.
+
+<h4 class="subheading">Iterated expressions</h4>
+
+<p>Iterated linear expression is a primary linear expression, which has the
+following syntactic form:
+
+   <p><tt>sum</tt> <var>indexing-expression</var> <var>integrand</var>
+
+<p class="noindent">where <var>indexing-expression</var> is an indexing expression which
+introduces dummy indices and controls iterating, <var>integrand</var> is a
+linear expression that participates in the operation.
+
+   <p>The iterated linear expression is evaluated exactly in the same way as
+the iterated numeric expression (see Section &ldquo;Numeric expressions&rdquo;
+above) with the exception that the integrand participated in the
+summation is a formula, not a numeric value.
+
+<h4 class="subheading">Conditional expressions</h4>
+
+<p>Conditional linear expression is a primary linear expression, which has
+one of the following two syntactic forms:
+
+   <blockquote>
+<tt>if</tt> <i>b</i> <tt>then</tt> <i>f</i> <tt>else</tt> <i>g</i>
+
+        <p><tt>if</tt> <i>b</i> <tt>then</tt> <i>f</i>
+</blockquote>
+
+<p class="noindent">where <i>b</i> is an logical expression, <i>f</i> and <i>g</i> are linear
+expressions.
+
+   <p>The conditional linear expression is evaluated exactly in the same way
+as the conditional numeric expression (see Section &ldquo;Numeric
+expressions&rdquo; above) with the exception that operands participated in
+the operation are formulae, not numeric values.
+
+<h4 class="subheading">Parenthesized expressions</h4>
+
+<p>Any linear expression may be enclosed in parentheses that syntactically
+makes it primary linear expression.
+
+   <p>Parentheses may be used in linear expressions, as in algebra, to
+specify the desired order in which operations are to be performed. Where
+parentheses are used, the expression within the parentheses is evaluated
+before the resultant formula is used.
+
+   <p>The resultant value of the parenthesized expression is the same as the
+value of the expression enclosed within parentheses.
+
+<h4 class="subheading">Arithmetic operators</h4>
+
+<p>In MathProg there are the following arithmetic operators, which may be
+used in linear expressions:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="20%"><tt>+</tt> <i>f</i> </td><td valign="top" width="80%">unary plus
+<br></td></tr><tr align="left"><td valign="top" width="20%"><tt>-</tt> <i>f</i> </td><td valign="top" width="80%">unary minus
+<br></td></tr><tr align="left"><td valign="top" width="20%"><i>f</i> <tt>+</tt> <i>g</i> </td><td valign="top" width="80%">addition
+<br></td></tr><tr align="left"><td valign="top" width="20%"><i>f</i> <tt>-</tt> <i>g</i> </td><td valign="top" width="80%">subtraction
+<br></td></tr><tr align="left"><td valign="top" width="20%"><i>x</i> <tt>*</tt> <i>f</i>, <i>f</i> <tt>*</tt> <i>x</i> </td><td valign="top" width="80%">multiplication
+<br></td></tr><tr align="left"><td valign="top" width="20%"><i>f</i> <tt>/</tt> <i>x</i> </td><td valign="top" width="80%">division
+        <br></td></tr></table>
+</blockquote>
+
+<p class="noindent">where <i>f</i> and <i>g</i> are linear expressions, <i>x</i> is a numeric
+expression (more precisely, a linear expression containing the constant
+term only).
+
+   <p>If the expression includes more than one arithmetic operator, all
+operators are performed from left to right according to the hierarchy
+of operations (see below).
+
+   <p>The resultant value of the expression, which contains arithmetic
+operators, is the result of applying the operators to their operands.
+
+<h4 class="subheading">Hierarchy of operations</h4>
+
+<p>The hierarchy of arithmetic operations used in linear expressions is
+the same as for numeric expressions (for details see Section &ldquo;Numeric
+expressions&rdquo; above).
+
+<div class="node">
+<p><hr>
+<a name="Statements"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Model-data">Model data</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Expressions">Expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">4 Statements</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Set-statement">Set statement</a>
+<li><a accesskey="2" href="#Parameter-statement">Parameter statement</a>
+<li><a accesskey="3" href="#Variable-statement">Variable statement</a>
+<li><a accesskey="4" href="#Constraint-statement">Constraint statement</a>
+<li><a accesskey="5" href="#Objective-statement">Objective statement</a>
+<li><a accesskey="6" href="#Solve-statement">Solve statement</a>
+<li><a accesskey="7" href="#Check-statement">Check statement</a>
+<li><a accesskey="8" href="#Display-statement">Display statement</a>
+<li><a accesskey="9" href="#Printf-statement">Printf statement</a>
+<li><a href="#For-statement">For statement</a>
+</ul>
+
+<p><dfn>Statements</dfn> are basic units of the model description. In MathProg
+all statements are divided into two categories: declaration statements
+and functional statements.
+
+   <p><dfn>Declaration statements</dfn> (set statement, parameter statement,
+variable statement, constraint statement, and objective statement) are
+used to declare model objects of certain kinds and define certain
+properties of that objects.
+
+   <p><dfn>Functional statements</dfn> (solve statement, check statement, display
+statement, printf statement, loop statement) are intended for performing
+some specific actions.
+
+   <p>Note that declaration statements may follow in arbitrary order which
+does not affect the result of translation. However, any model object
+must be declared before it is referenced in other statements.
+
+<div class="node">
+<p><hr>
+<a name="Set-statement"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Parameter-statement">Parameter statement</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Statements">Statements</a>
+<br>
+</div>
+
+<h3 class="section">4.1 Set statement</h3>
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<tt> set</tt> <var>name</var> <var>alias</var> <var>domain</var> <tt>,</tt>
+<var>attrib</var> <tt>,</tt> <small class="dots">...</small> <tt>,</tt> <var>attrib</var> <tt>;</tt>
+</td></tr></table>
+
+     <dl>
+<dt>Where:<dd><var>name</var> is the symbolic name of the set;
+<br><dt><dd><var>alias</var> is an optional string literal which specifies the alias of
+the set;
+<br><dt><dd><var>domain</var> is an optional indexing expression which specifies the
+subscript domain of the set;
+<br><dt><dd><var>attrib</var>, <small class="dots">...</small>, <var>attrib</var> are optional attributes of the set. 
+(Commae preceding attributes may be omitted.) 
+</dl>
+
+<p class="noindent">Optional attributes:
+
+     <dl>
+<dt><tt>dimen</tt> <i>n</i><dd>specifies dimension of <i>n</i>-tuples, which the set consists of;
+<br><dt><tt>within</tt> <i>expression</i><dd>specifies a superset which restricts the set or all its members
+(elemental sets) to be within this superset;
+<br><dt><tt>:=</tt> <i>expression</i><dd>specifies an elemental set assigned to the set or its members;
+<br><dt><tt>default</tt> <i>expression</i><dd>specifies an elemental set assigned to the set or its members whenever
+no appropriate data are available in the data section. 
+</dl>
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     set V;
+     set E within V cross V;
+     set step{s in 1..maxiter} dimen 2 := if s = 1 then E else step[s-1]
+        union setof{k in V, (i,k) in step[s-1], (k,j) in step[s-1]}(i,j);
+     set A{i in I, j in J}, within B[i+1] cross C[j-1], within D diff E,
+        default {('abc',123), (321,'cba')};
+</pre>
+   <p>The set statement declares a set. If the subscript domain is not
+specified, the set is a simple set, otherwise it is an array of
+elemental sets.
+
+   <p>The <code>dimen</code> attribute specifies dimension of <i>n</i>-tuples, which
+the set (if it is a simple set) or its members (if the set is an array
+of elemental sets) consist of, where <i>n</i> must be unsigned integer from
+1 to 20. At most one <code>dimen</code> attribute can be specified. If the
+<code>dimen</code> attribute is not specified, dimension of <i>n</i>-tuples is
+implicitly determined by other attributes (for example, if there is a
+set expression that follows <code>:=</code> or the keyword <code>default</code>, the
+dimension of <i>n</i>-tuples of the corresponding elemental set is used). 
+If no dimension information is available, <code>dimen 1</code> is assumed.
+
+   <p>The <code>within</code> attribute specifies a set expression whose resultant
+value is a superset used to restrict the set (if it is a simple set) or
+its members (if the set is an array of elemental sets) to be within this
+superset. Arbitrary number of <code>within</code> attributes may be specified
+in the same set statement.
+
+   <p>The assign (<code>:=</code>) attribute specifies a set expression used to
+evaluate elemental set(s) assigned to the set (if it is a simple set) or
+its members (if the set is an array of elemental sets). If the assign
+attribute is specified, the set is <em>computable</em> and therefore needs
+no data to be provided in the data section. If the assign attribute is
+not specified, the set must be provided with data in the data section. 
+At most one assign or <code>default</code> attribute can be specified for the
+same set.
+
+   <p>The <code>default</code> attribute specifies a set expression used to
+evaluate elemental set(s) assigned to the set (if it is a simple set) or
+its members (if the set is an array of elemental sets) whenever
+no appropriate data are available in the data section. If neither assign
+nor <code>default</code> attribute is specified, missing data will cause an
+error.
+
+<div class="node">
+<p><hr>
+<a name="Parameter-statement"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Variable-statement">Variable statement</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Set-statement">Set statement</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Statements">Statements</a>
+<br>
+</div>
+
+<h3 class="section">4.2 Parameter statement</h3>
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<tt> param</tt> <var>name</var> <var>alias</var> <var>domain</var> <tt>,</tt>
+<var>attrib</var> <tt>,</tt> <small class="dots">...</small> <tt>,</tt> <var>attrib</var> <tt>;</tt>
+</td></tr></table>
+
+     <dl>
+<dt>Where:<dd><var>name</var> is the symbolic name of the parameter;
+<br><dt><dd><var>alias</var> is an optional string literal which specifies the alias of
+the parameter;
+<br><dt><dd><var>domain</var> is an optional indexing expression which specifies the
+subscript domain of the parameter;
+<br><dt><dd><var>attrib</var>, <small class="dots">...</small>, <var>attrib</var> are optional attributes of the
+parameter. (Commae preceding attributes may be omitted.) 
+</dl>
+
+<p class="noindent">Optional attributes:
+
+     <dl>
+<dt><tt>integer</tt><dd>specifies that the parameter is integer;
+<br><dt><tt>binary</tt><dd>specifies that the parameter is binary;
+<br><dt><tt>symbolic</tt><dd>specifies that the parameter is symbolic;
+<br><dt><var>relation</var> <var>expression</var><dd>(where <var>relation</var> is one of: <tt>&lt; &lt;= = == &gt;= &gt; &lt;&gt; !=</tt>)<br>
+specifies a condition that restricts the parameter or its members to
+satisfy this condition;
+<br><dt><tt>in</tt> <var>expression</var><dd>specifies a superset that restricts the parameter or its members to be
+in this superset;
+<br><dt><tt>:=</tt> <var>expression</var><dd>specifies a value assigned to the parameter or its members;
+<br><dt><tt>default</tt> <var>expression</var><dd>specifies a value assigned to the parameter or its members whenever no
+appropriate data are available in the data section. 
+</dl>
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     param units{raw, prd} &gt;= 0;
+     param profit{prd, 1..T+1};
+     param N := 20, integer, &gt;= 0, &lt;= 100;
+     param comb 'n choose k' {n in 0..N, k in 0..n} :=
+        if k = 0 or k = n then 1 else comb[n-1,k-1] + comb[n-1,k];
+     param p{i in I, j in J}, integer, &gt;= 0, &lt;= i+j, in A[i] symdiff B[j],
+        in C[i,j], default 0.5 * (i + j);
+     param month symbolic default 'May' in {'Mar', 'Apr', 'May'};
+</pre>
+   <p>The parameter statement declares a parameter. If the subscript domain
+is not specified, the parameter is a simple (scalar) parameter,
+otherwise it is a <i>n</i>-dimensional array.
+
+   <p>The type attributes <code>integer</code>, <code>binary</code>, and <code>symbolic</code>
+qualify the type values which can be assigned to the parameter as shown
+below:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="25%"><i>Type attribute</i> </td><td valign="top" width="75%"><i>Assigned values</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%">not specified </td><td valign="top" width="75%">Any numeric values
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>integer</tt> </td><td valign="top" width="75%">Only integer numeric values
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>binary</tt> </td><td valign="top" width="75%">Either 0 or 1
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>symbolic</tt> </td><td valign="top" width="75%">Any numeric and symbolic values
+        <br></td></tr></table>
+</blockquote>
+
+   <p>The <code>symbolic</code> attribute cannot be specified along with other
+type attributes. Being specified it must precede all other attributes.
+
+   <p>The condition attribute specifies an optional condition that restricts
+values assigned to the parameter to satisfy this condition. This
+attribute has the following syntactic forms:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="25%"><tt>&lt;</tt> <i>v</i> </td><td valign="top" width="75%">Check for <i>x</i> &lt; <i>v</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>&lt;=</tt> <i>v</i> </td><td valign="top" width="75%">Check for
+<i>x</i> &lt;= <i>v</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>=</tt> <i>v</i>, <tt>==</tt> <i>v</i> </td><td valign="top" width="75%">Check for <i>x</i> = <i>v</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>>=</tt> <i>v</i> </td><td valign="top" width="75%">Check for
+<i>x</i> &gt;= <i>v</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>></tt> <i>v</i> </td><td valign="top" width="75%">Check for <i>x</i> &gt; <i>v</i>
+<br></td></tr><tr align="left"><td valign="top" width="25%"><tt>&lt;></tt> <i>v</i>, <tt>!=</tt> <i>v</i> </td><td valign="top" width="75%">Check for
+<i>x</i> != <i>v</i>
+        <br></td></tr></table>
+</blockquote>
+
+<p class="noindent">where <i>x</i> is a value assigned to the parameter, <i>v</i> is the
+resultant value of a numeric or symbolic expression specified in the
+condition attribute. Arbitrary number of condition attributes can be
+specified for the same parameter. If a value being assigned to the
+parameter during model evaluation violates at least one specified
+condition, an error is raised. (Note that symbolic values are ordered
+lexicographically, and any numeric value precedes any symbolic value.)
+
+   <p>The <code>in</code> attribute is similar to the condition attribute and
+specifies a set expression whose resultant value is a superset used
+to restrict numeric or symbolic values assigned to the parameter to be
+in this superset. Arbitrary number of the <code>in</code> attributes can be
+specified for the same parameter. If a value being assigned to the
+parameter during model evaluation is not in at least one specified
+superset, an error is raised.
+
+   <p>The assign (<code>:=</code>) attribute specifies a numeric or symbolic
+expression used to compute a value assigned to the parameter (if it is
+a simple parameter) or its member (if the parameter is an array). If the
+assign attribute is specified, the parameter is <em>computable</em> and
+therefore needs no data to be provided in the data section. If the
+assign attribute is not specified, the parameter must be provided with
+data in the data section. At most one assign or <code>default</code>
+attribute can be specified for the same parameter.
+
+   <p>The <code>default</code> attribute specifies a numeric or symbolic
+expression used to compute a value assigned to the parameter or its
+member whenever no appropriate data are available in the data section. 
+If neither assign nor <code>default</code> attribute is specified, missing
+data will cause an error.
+
+<div class="node">
+<p><hr>
+<a name="Variable-statement"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Constraint-statement">Constraint statement</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Parameter-statement">Parameter statement</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Statements">Statements</a>
+<br>
+</div>
+
+<h3 class="section">4.3 Variable statement</h3>
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<tt> var</tt> <var>name</var> <var>alias</var> <var>domain</var> <tt>,</tt>
+<var>attrib</var> <tt>,</tt> <small class="dots">...</small> <tt>,</tt> <var>attrib</var> <tt>;</tt>
+</td></tr></table>
+
+     <dl>
+<dt>Where:<dd><var>name</var> is the symbolic name of the variable;
+<br><dt><dd><var>alias</var> is an optional string literal which specifies the alias of
+the variable;
+<br><dt><dd><var>domain</var> is an optional indexing expression which specifies the
+subscript domain of the variable;
+<br><dt><dd><var>attrib</var>, <small class="dots">...</small>, <var>attrib</var> are optional attributes of the
+variable. (Commae preceding attributes may be omitted.) 
+</dl>
+
+<p class="noindent">Optional attributes:
+
+     <dl>
+<dt><tt>integer</tt><dd>restricts the variable to be integer;
+<br><dt><tt>binary</tt><dd>restricts the variable to be binary;
+<br><dt><tt>&gt;=</tt> <var>expression</var><dd>specifies an lower bound of the variable;
+<br><dt><tt>&lt;=</tt> <var>expression</var><dd>specifies an upper bound of the variable;
+<br><dt><tt>=</tt> <var>expression</var>, <tt>==</tt> <var>expression</var><dd>specifies a fixed value of the variable;
+</dl>
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     var x &gt;= 0;
+     var y{I,J};
+     var make{p in prd}, integer, &gt;= commit[p], &lt;= market[p];
+     var store{raw, 1..T+1} &gt;= 0;
+     var z{i in I, j in J} &gt;= i+j;
+</pre>
+   <p>The variable statement declares a variable. If the subscript domain
+is not specified, the variable is a simple (scalar) variable,
+otherwise it is a <i>n</i>-dimensional array of elemental variables.
+
+   <p>Elemental variable(s) associated with the model variable (if it is
+a simple variable) or its members (if it is an array) correspond to
+the variables in the LP/MIP problem formulation (see Section &ldquo;Linear
+programming problem&rdquo;). Note that only the elemental variables actually
+referenced in some constraints and/or objectives are included in the
+LP/MIP problem instance to be generated.
+
+   <p>The type attributes <code>integer</code> and <code>binary</code> restrict the
+variable to be integer or binary, respectively. If no type attribute
+is specified, the variable is continuous. If all variables in the model
+are continuous, the corresponding problem is of LP class. If there is
+at least one integer or binary variable, the problem is of MIP class.
+
+   <p>The lower bound (<code>&gt;=</code>) attribute specifies a numeric expression
+for computing the lower bound of the variable. At most one lower bound
+can be specified. By default all variables (except binary ones) have
+no lower bounds, so if a variable is required to be non-negative, its
+zero lower bound should be explicitly specified.
+
+   <p>The upper bound (<code>&lt;=</code>) attribute specifies a numeric expression
+for computing the upper bound of the variable. At most one upper bound
+attribute can be specified.
+
+   <p>The fixed value (<code>=</code>) attribute specifies a numeric expression
+for computing the value, at which the variable is fixed. This attribute
+cannot be specified along with lower/upper bound attributes.
+
+<div class="node">
+<p><hr>
+<a name="Constraint-statement"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Objective-statement">Objective statement</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Variable-statement">Variable statement</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Statements">Statements</a>
+<br>
+</div>
+
+<h3 class="section">4.4 Constraint statement</h3>
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<tt> subject to</tt> <var>name</var> <var>alias</var> <var>domain</var> <tt>:</tt>
+<var>expression</var> <tt>,</tt> <tt>=</tt> <var>expression</var> <tt>;</tt>
+
+<p class="noindent"><tt> subject to</tt> <var>name</var> <var>alias</var> <var>domain</var> <tt>:</tt>
+<var>expression</var> <tt>,</tt> <tt>&lt;=</tt> <var>expression</var> <tt>;</tt>
+
+<p class="noindent"><tt> subject to</tt> <var>name</var> <var>alias</var> <var>domain</var> <tt>:</tt>
+<var>expression</var> <tt>,</tt> <tt>>=</tt> <var>expression</var> <tt>;</tt>
+
+<p class="noindent"><tt> subject to</tt> <var>name</var> <var>alias</var> <var>domain</var> <tt>:</tt>
+<var>expression</var> <tt>,</tt> <tt>&lt;=</tt> <var>expression</var> <tt>,</tt>
+<tt>&lt;=</tt> <var>expression</var> <tt>;</tt>
+
+<p class="noindent"><tt> subject to</tt> <var>name</var> <var>alias</var> <var>domain</var> <tt>:</tt>
+<var>expression</var> <tt>,</tt> <tt>>=</tt> <var>expression</var> <tt>,</tt>
+<tt>>=</tt> <var>expression</var> <tt>;</tt>
+</td></tr></table>
+
+     <dl>
+<dt>Where:<dd><var>name</var> is the symbolic name of the constraint;
+<br><dt><dd><var>alias</var> is an optional string literal which specifies the alias of
+the constraint;
+<br><dt><dd><var>domain</var> is an optional indexing expression which specifies the
+subscript domain of the constraint;
+<br><dt><dd><var>expressions</var> are linear expressions for computing components of the
+constraint. (Commae following expressions may be omitted.) 
+</dl>
+
+     <dl>
+<dt>Note:<dd>The keyword <code>subject to</code> may be reduced to <code>subj to</code>, or to
+<code>s.t.</code>, or be omitted at all. 
+</dl>
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     s.t. r: x + y + z, &gt;= 0, &lt;= 1;
+     limit{t in 1..T}: sum{j in prd} make[j,t] &lt;= max_prd;
+     subject to balance{i in raw, t in 1..T}:
+        store[i,t+1] - store[i,t] - sum{j in prd} units[i,j] * make[j,t];
+     subject to rlim 'regular-time limit' {t in time}:
+        sum{p in prd} pt[p] * rprd[p,t] &lt;= 1.3 * dpp[t] * crews[t];
+</pre>
+   <p>The constraint statement declares a constraint. If the subscript domain
+is not specified, the constraint is a simple (scalar) constraint,
+otherwise it is a <i>n</i>-dimensional array of elemental constraints.
+
+   <p>Elemental constraint(s) associated with the model constraint (if it is
+a simple constraint) or its members (if it is an array) correspond to
+the linear constraints in the LP/MIP problem formulation (see Section
+&ldquo;Linear programming problem&rdquo;).
+
+   <p>If the constraint has the form of equality or single inequality, i.e. 
+includes two expressions, one of which follows the colon and other
+follows the relation sign <code>=</code>, <code>&lt;=</code>, or <code>&gt;=</code>, both
+expressions in the statement can be linear expressions. If the
+constraint has the form of double inequality, i.e. includes three
+expressions, the middle expression can be a linear expression while the
+leftmost and rightmost ones can be only numeric expressions.
+
+   <p>Generating the model is, generally speaking, generating its constraints,
+which are always evaluated for the entire subscript domain. Evaluating
+constraints leads, in turn, to evaluating other model objects such as
+sets, parameters, and variables.
+
+   <p>Constructing the actual linear constraint included in the problem
+instantce, which (constraint) corresponds to a particular elemental
+constraint, is performed as follows.
+
+   <p>If the constraint has the form of equality or single inequality,
+evaluation of both linear expressions gives two resultant linear forms:
+
+   <blockquote>
+<i>f</i> = <i>a</i>1 <i>x</i>1 + <i>a</i>2 <i>x</i>2 + <small class="dots">...</small> + <i>an</i> <i>xn</i> +
+<i>a</i>0,
+
+        <p><i>g</i> = <i>b</i>1 <i>x</i>1 + <i>b</i>2 <i>x</i>2 + <small class="dots">...</small> + <i>bn</i> <i>xn</i> +
+<i>b</i>0,
+</blockquote>
+
+<p class="noindent">where <i>x</i>1, <i>x</i>2, <small class="dots">...</small>, <i>xn</i> are elemental variables, <i>a</i>1,
+<i>a</i>2, <small class="dots">...</small>, <i>an</i>, <i>b</i>1, <i>b</i>2, <small class="dots">...</small>, <i>bn</i> are numeric
+coefficients, <i>a</i>0 and <i>b</i>0 are constant terms. 
+Then all linear terms of <i>f</i> and <i>g</i> are carried to the left-hand
+side, and the constant terms are carried to the right-hand side that
+gives the final elemental constraint in the standard form:
+
+   <blockquote>
+(<i>a</i>1 &minus; <i>b</i>1) <i>x</i>1 + (<i>a</i>2 &minus; <i>b</i>2) <i>x</i>2 +
+<small class="dots">...</small> + (<i>an</i> &minus; <i>bn</i>) <i>xn</i> {= | &lt;= | =&gt;} <i>b</i>0
+&minus; <i>a</i>0
+</blockquote>
+
+   <p>If the constraint has the form of double inequality, evaluation of the
+middle linear expression gives the resultant linear form:
+
+   <blockquote>
+<i>f</i> = <i>a</i>1 <i>x</i>1 + <i>a</i>2 <i>x</i>2 + <small class="dots">...</small> + <i>an</i> <i>xn</i> +
+<i>a</i>0,
+</blockquote>
+
+<p class="noindent">and evaluation of the leftmost and rightmost numeric expressions gives
+two numeric values <i>l</i> and <i>u</i>. Then the constant term of the linear
+form is carried to both left-hand and right-hand sides that gives the
+final elemental constraint in the standard form:
+
+   <blockquote>
+<i>l</i> &minus; <i>a</i>0 &lt;= <i>a</i>1 <i>x</i>1 + <i>a</i>2 <i>x</i>2 + <small class="dots">...</small> +
+<i>an</i> <i>xn</i> &lt;= <i>u</i> &minus; <i>a</i>0. 
+</blockquote>
+
+<div class="node">
+<p><hr>
+<a name="Objective-statement"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Solve-statement">Solve statement</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Constraint-statement">Constraint statement</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Statements">Statements</a>
+<br>
+</div>
+
+<h3 class="section">4.5 Objective statement</h3>
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<tt> minimize</tt> <var>name</var> <var>alias</var> <var>domain</var> <tt>:</tt>
+<var>expression</var> <tt>;</tt>
+
+<p class="noindent"><tt> maximize</tt> <var>name</var> <var>alias</var> <var>domain</var> <tt>:</tt>
+<var>expression</var> <tt>;</tt>
+</td></tr></table>
+
+     <dl>
+<dt>Where:<dd><var>name</var> is the symbolic name of the objective;
+<br><dt><dd><var>alias</var> is an optional string literal which specifies the alias of
+the objective;
+<br><dt><dd><var>domain</var> is an optional indexing expression which specifies the
+subscript domain of the objective;
+<br><dt><dd><var>expression</var> is an linear expression for computing the linear form
+of the objective
+</dl>
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     minimize obj: x + 1.5 * (y + z);
+     maximize total_profit: sum{p in prd} profit[p] * make[p];
+</pre>
+   <p>The objective statement declares an objective. If the subscript domain
+is not specified, the objective is a simple (scalar) objective. 
+Otherwise it is a <i>n</i>-dimensional array of elemental objectives.
+
+   <p>Elemental objective(s) associated with the model objective (if it is
+a simple objective) or its members (if it is an array) correspond to
+general linear constraints in the LP/MIP problem formulation (see
+Section &ldquo;Linear programming problem&rdquo;). However, unlike constraints
+the corresponding linear forms are free (unbounded).
+
+   <p>Constructing the actual linear constraint included in the problem
+instance, which (constraint) corresponds to a particular elemental
+objective, is performed as follows. The linear expression specified in
+the objective statement is evaluated that gives the resultant linear
+form:
+
+   <blockquote>
+<i>f</i> = <i>a</i>1 <i>x</i>1 + <i>a</i>2 <i>x</i>2 + <small class="dots">...</small> + <i>an</i> <i>xn</i> +
+<i>a</i>0,
+</blockquote>
+
+<p class="noindent">where <i>x</i>1, <i>x</i>2, <small class="dots">...</small>, <i>xn</i> are elemental variables, <i>a</i>1,
+<i>a</i>2, <small class="dots">...</small>, <i>an</i> are numeric coefficients, <i>a</i>0 is the constant
+term. Then the linear form is used to construct the final elemental
+constraint in the standard form:
+
+   <blockquote>
+&minus;inf &lt; <i>a</i>1 <i>x</i>1 + <i>a</i>2 <i>x</i>2 + <small class="dots">...</small> + <i>an</i> <i>xn</i> +
+<i>a</i>0 &lt; +inf. 
+</blockquote>
+
+   <p>As a rule the model description contains only one objective statement
+that defines the objective function (1) used in the problem instance. 
+However, it is allowed to declare arbitrary number of objectives, in
+which case the actual objective function is the <em>first</em> objective
+encountered in the model description. Other objectives are also included
+in the problem instance, but they do not affect the objective function.
+
+<div class="node">
+<p><hr>
+<a name="Solve-statement"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Check-statement">Check statement</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Objective-statement">Objective statement</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Statements">Statements</a>
+<br>
+</div>
+
+<h3 class="section">4.6 Solve statement</h3>
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<tt> solve ;</tt>
+</td></tr></table>
+
+     <dl>
+<dt>Note:<dd>The solve statement is optional and can be used only once. If no solve
+statement is used, one is assumed at the end of the model section. 
+</dl>
+
+   <p>The solve statement causes solving the model, i.e. computing numeric
+values of all model variables. This allows using variables in statements
+below the solve statement in the same way as if they were numeric
+parameters.
+
+   <p>Note that variable, constraint, and objective statements cannot be used
+below the solve statement, i.e. all principal components of the model
+must be described above the solve statement.
+
+<div class="node">
+<p><hr>
+<a name="Check-statement"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Display-statement">Display statement</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Solve-statement">Solve statement</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Statements">Statements</a>
+<br>
+</div>
+
+<h3 class="section">4.7 Check statement</h3>
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<tt> check</tt> <var>domain</var> <tt>:</tt> <var>expression</var> <tt>;</tt>
+</td></tr></table>
+
+     <dl>
+<dt>Where:<dd><var>domain</var> is an optional indexing expression which specifies the
+subscript domain of the check statement;
+<br><dt><dd><var>expression</var> is an logical expression which specifies the logical
+condition to be checked. (The colon preceding <var>expression</var> may be
+omitted.) 
+</dl>
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     check: x + y &lt;= 1 and x &gt;= 0 and y &gt;= 0;
+     check sum{i in ORIG} supply[i] = sum{j in DEST} demand[j];
+     check{i in I, j in 1..10}: S[i,j] in U[i] union V[j];
+</pre>
+   <p>The check statement allows checking the resultant value of an logical
+expression specified in the statement. If the value is <i>false</i>, the
+model translator reports an error.
+
+   <p>If the subscript domain is not specified, the check is performed only
+once. Specifying the subscript domain allows performing multiple checks
+for every <i>n</i>-tuple in the domain set. In the latter case the logical
+expression may include dummy indices introduced in the corresponding
+indexing expression.
+
+<div class="node">
+<p><hr>
+<a name="Display-statement"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Printf-statement">Printf statement</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Check-statement">Check statement</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Statements">Statements</a>
+<br>
+</div>
+
+<h3 class="section">4.8 Display statement</h3>
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<tt> display</tt> <var>domain</var> <tt>:</tt> <var>item</var> <tt>,</tt>
+<small class="dots">...</small> <tt>,</tt> <var>item</var> <tt>;</tt>
+</td></tr></table>
+
+     <dl>
+<dt>Where:<dd><var>domain</var> is an optional indexing expression which specifies the
+subscript domain of the display statement;
+<br><dt><dd><var>item</var>, <small class="dots">...</small>, <var>item</var> are items to be displayed. (The colon
+preceding the first item may be omitted.) 
+</dl>
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     display: 'x =', x, 'y =', y, 'z =', z;
+     display sqrt(x ** 2 + y ** 2 + z ** 2);
+     display{i in I, j in J}: i, j, a[i,j], b[i,j];
+</pre>
+   <p>The display statement evaluates all items specified in the statement
+and writes their values to the terminal in plain text format.
+
+   <p>If the subscript domain is not specified, items are evaluated and
+then displayed only once. Specifying the subscript domain causes
+evaluating and displaying items for every <i>n</i>-tuple in the domain
+set. In the latter case items may include dummy indices introduced in
+the corresponding indexing expression.
+
+   <p>Item to be displayed can be a model object (set, parameter, variable,
+constraint, objective) or an expression.
+
+   <p>If the item is a computable object (i.e. a set or parameter provided
+with the assign attribute), the object is evaluated over the entire
+domain and then its content (i.e. the content of the object array) is
+displayed. Otherwise, if the item is not a computable object, only its
+current content (i.e. the members actually generated during the model
+evaluation) is displayed. Note that if the display statement is used
+above the solve statement and the item is a variable, its displayed
+&ldquo;value&rdquo; means &ldquo;elemental variable&rdquo;, not a numeric value, which the
+variable could have in some solution obtained by the solver. To display
+a numeric value of a variable the display statement should be used
+below the solve statement. Analogously, if the item is a constraint or
+objective, its &ldquo;value&rdquo; means &ldquo;elemental constraint&rdquo; or &ldquo;elemental
+objective&rdquo;, not a numeric value.
+
+   <p>If the item is an expression, the expression is evaluated and its
+resultant value is displayed.
+
+<div class="node">
+<p><hr>
+<a name="Printf-statement"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#For-statement">For statement</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Display-statement">Display statement</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Statements">Statements</a>
+<br>
+</div>
+
+<h3 class="section">4.9 Printf statement</h3>
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<tt> printf</tt> <var>domain</var> <tt>:</tt> <var>format</var> <tt>,</tt>
+<var>expression</var> <tt>,</tt> <small class="dots">...</small> <tt>,</tt> <var>expression</var>
+<tt>;</tt>
+
+<p class="noindent"><tt> printf</tt> <var>domain</var> <tt>:</tt> <var>format</var> <tt>,</tt>
+<var>expression</var> <tt>,</tt> <small class="dots">...</small> <tt>,</tt> <var>expression</var>
+<tt>></tt> <var>filename</var> <tt>;</tt>
+
+<p class="noindent"><tt> printf</tt> <var>domain</var> <tt>:</tt> <var>format</var> <tt>,</tt>
+<var>expression</var> <tt>,</tt> <small class="dots">...</small> <tt>,</tt> <var>expression</var>
+<tt>>></tt> <var>filename</var> <tt>;</tt>
+</td></tr></table>
+
+     <dl>
+<dt>Where:<dd><var>domain</var> is an optional indexing expression which specifies the
+subscript domain of the printf statement;
+<br><dt><dd><var>format</var> is a symbolic expression whose value specifies a format
+control string. (The colon preceding the format expression may be
+omitted.) 
+<br><dt><dd><var>expression</var>, <small class="dots">...</small>, <var>expression</var> are zero or more expressions
+whose values have to be formatted and printed. Each expression must be
+of numeric, symbolic, or logical type. 
+<br><dt><dd><var>filename</var> is a symbolic expression whose value specifies the name
+of a text file, to which the printf output should be redirected. The
+flag <code>&gt;</code> means creating a new empty file while the flag <code>&gt;&gt;</code>
+means appending the output to an existing file. If no file name is
+specified, the output is written to the terminal. 
+</dl>
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     printf 'Hello, world!\n';
+     printf: "x = %.3f; y = %.3f; z = %.3f\n", x, y, z &gt; "result.txt";
+     printf{i in I, j in J}: "flow from %s to %s is %d\n", i, j, x[i,j];
+     printf{i in I} 'total flow from %s is %g\n', i, sum{j in J} x[i,j];
+     printf{k in K} "x[%s] = " &amp; (if x[k] &lt; 0 then "?" else "%g"), k, x[k];
+</pre>
+   <p>The printf statement is similar to the display statement, however, it
+allows formatting the data to be written.
+
+   <p>If the subscript domain is not specified, the printf statement is
+executed only once. Specifying the subscript domain causes executing
+the printf statement for every <i>n</i>-tuple in the domain set. In the
+latter case <var>format</var> and <var>expressions</var> may include dummy indices
+introduced in the corresponding indexing expression.
+
+   <p>The format control string is a value of the symbolic expression
+<var>format</var> specified in the printf statement. It is composed of zero
+or more directives as follows: ordinary characters (not <code>%</code>), which
+are copied unchanged to the output stream, and conversion
+specifications, each of which causes evaluating corresponding
+<var>expression</var> specified in the printf statement, formatting it, and
+writing the resultant value to the output stream.
+
+   <p>Conversion specifications which may be used in the format control
+string are the following: <code>d</code>, <code>i</code>, <code>f</code>, <code>F</code>,
+<code>e</code>, <code>E</code>, <code>g</code>, <code>G</code>, and <code>s</code>. These
+specifications have the same syntax and semantics as in the C
+programming language.
+
+<div class="node">
+<p><hr>
+<a name="For-statement"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Printf-statement">Printf statement</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Statements">Statements</a>
+<br>
+</div>
+
+<h3 class="section">4.10 For statement</h3>
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<tt> for</tt> <var>domain</var> <tt>:</tt> <var>statement</var>
+
+<p class="noindent"><tt> for</tt> <var>domain</var> <tt>:</tt> <tt>{</tt> <var>statement</var>
+<small class="dots">...</small> <var>statement</var> <tt>}</tt>
+</td></tr></table>
+
+     <dl>
+<dt>Where:<dd><var>domain</var> is an indexing expression which specifies the subscript
+domain of the for statement. (The colon following the indexing
+expression may be omitted.) 
+<br><dt><dd><var>statement</var> is a statement which should be executed under control of
+the for statement;
+<br><dt><dd><var>statement</var>, <small class="dots">...</small>, <var>statement</var> is a sequence of statements
+(enclosed in curly braces) which should be executed under control of the
+for statement. 
+</dl>
+
+     <dl>
+<dt>Note:<dd>Only the following statements are allowed within the for statement:
+check, display, printf, and another for. 
+</dl>
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     for {(i,j) in E: i != j}
+     {  printf "flow from %s to %s is %g\n", i, j, x[i,j];
+        check x[i,j] &gt;= 0;
+     }
+     for {i in 1..n}
+     {  for {j in 1..n} printf " %s", if x[i,j] then "Q" else ".";
+        printf("\n");
+     }
+     for {1..72} printf("*");
+</pre>
+   <p>The for statement causes executing a statement or a sequence of
+statements specified as part of the for statement for every <i>n</i>-tuple
+in the domain set. Thus, statements within the for statement may refer
+to dummy indices introduced in the corresponding indexing expression.
+
+<div class="node">
+<p><hr>
+<a name="Model-data"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Date-and-time-functions">Date and time functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Statements">Statements</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">5 Model data</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Coding-data-section">Coding data section</a>
+<li><a accesskey="2" href="#Set-data-block">Set data block</a>
+<li><a accesskey="3" href="#Parameter-data-block">Parameter data block</a>
+</ul>
+
+<p><dfn>Model data</dfn> include elemental sets, which are &ldquo;values&rdquo; of model
+sets, and numeric and symbolic values of model parameters.
+
+   <p>In MathProg there are two different ways to saturate model sets and
+parameters with data. One way is simply providing necessary data using
+the assign attribute. However, in many cases it is more practical to
+separate the model itself and particular data needed for the model. 
+For the latter reason in MathProg there is other way, when the model
+description is divided into two parts: model section and data section.
+
+   <p><i>Model section</i> is a main part of the model description that contains
+declarations of all model objects and is common for all problems based
+on that model.
+
+   <p><i>Data section</i> is an optional part of the model description that
+contains model data specific for a particular problem.
+
+   <p>In MathProg model and data sections can be placed either in one text
+file or in two separate text files.
+
+   <p>If both model and data sections are placed in one file, the file is
+composed as follows:
+
+<pre class="example">     +------------+
+     | statement  |
+     | statement  |
+     | . . .      |
+     | statement  |
+     | data;      |
+     | data block |
+     | data block |
+     | . . .      |
+     | data block |
+     | end;       |
+     +------------+
+</pre>
+   <p>If the model and data sections are placed in two separate files, the
+files are composed as follows:
+
+<pre class="example">     +------------+   +------------+
+     | statement  |   | data;      |
+     | statement  |   | data block |
+     | . . .      |   | data block |
+     | statement  |   | . . .      |
+     | end;       |   | data block |
+     |            |   | end;       |
+     +------------+   +------------+
+       Model file       Data file
+</pre>
+     <dl>
+<dt>Note:<dd>If the data section is placed in a separate file, the keyword
+<code>data</code> is optional and may be omitted along with the semicolon
+that follows it. 
+</dl>
+
+<div class="node">
+<p><hr>
+<a name="Coding-data-section"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Set-data-block">Set data block</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Model-data">Model data</a>
+<br>
+</div>
+
+<h3 class="section">5.1 Coding data section</h3>
+
+<p>The data section is a sequence of data blocks in various formats, which
+are discussed in following subsections. The order, in which data blocks
+follow in the data section, may be arbitrary, not necessarily the same
+as in which the corresponding model objects follow in the model section.
+
+   <p>The rules of coding the data section are commonly the same as the rules
+of coding the model description (for details see Section &ldquo;Coding model
+description&rdquo;), i.e. data blocks are composed from basic lexical units
+such as symbolic names, numeric and string literals, keywords,
+delimiters, and comments. However, for the sake of convenience and
+improving readability there is one deviation from the common rule: if
+a string literal consists of only alphanumeric characters (including the
+underscore character), the signs <code>+</code> and <code>-</code>, and/or the
+decimal point, it may be coded <em>without</em> bordering (single or
+double) quotes.
+
+   <p>All numeric and symbolic material provided in the data section is coded
+in the form of numbers and symbols, i.e. unlike the model section
+no expressions are allowed in the data section. Nevertheless the signs
+<code>+</code> and <code>-</code> can precede numeric literals to allow coding
+signed numeric quantities, in which case there must be no white-space
+characters between the sign and following numeric literal (if there is
+at least one white-space, the sign and following numeric literal are
+recognized as <em>two</em> different lexical units).
+
+<div class="node">
+<p><hr>
+<a name="Set-data-block"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Parameter-data-block">Parameter data block</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Coding-data-section">Coding data section</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Model-data">Model data</a>
+<br>
+</div>
+
+<h3 class="section">5.2 Set data block</h3>
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<tt> set</tt> <var>name</var> <tt>,</tt> <var>record</var> <tt>,</tt>
+<small class="dots">...</small> <tt>,</tt> <var>record</var> <tt>;</tt>
+
+<p class="noindent"><tt> set</tt> <var>name</var> <tt>[</tt> <var>symbol</var> <tt>,</tt>
+<small class="dots">...</small> <tt>,</tt> <var>symbol</var> <tt>]</tt> <tt>,</tt> <var>record</var>
+<tt>,</tt> <small class="dots">...</small> <tt>,</tt> <var>record</var> <tt>;</tt>
+</td></tr></table>
+
+     <dl>
+<dt>Where:<dd><var>name</var> is a symbolic name of the set;
+<br><dt><dd><var>symbol</var>, <small class="dots">...</small>, <var>symbol</var> are subscripts which specify a
+particular member of the set (if the set is an array, i.e. a set of
+sets);
+<br><dt><dd><var>record</var>, <small class="dots">...</small>, <var>record</var> are data records. 
+</dl>
+
+     <dl>
+<dt>Note:<dd>Commae preceding data records may be omitted. 
+</dl>
+
+<p class="noindent">Data records:
+
+     <dl>
+<dt><tt>:=</tt><dd>is a non-significant data record which may be used freely to improve
+readability;
+<br><dt><tt>(</tt> <var>slice</var> <tt>)</tt><dd>specifies a slice;
+<br><dt><var>simple-data</var><dd>specifies set data in the simple format;
+<br><dt><tt>:</tt> <var>matrix-data</var><dd>specifies set data in the matrix format;
+<br><dt><tt>(tr) :</tt> <var>matrix-data</var><dd>specifies set data in the transposed matrix format. (In this case the
+colon following the keyword <tt>(tr)</tt> may be omitted.) 
+</dl>
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     set month := Jan Feb Mar Apr May Jun;
+     set month "Jan", "Feb", "Mar", "Apr", "May", "Jun";
+     set A[3,Mar] := (1,2) (2,3) (4,2) (3,1) (2,2) (4,4) (3,4);
+     set A[3,'Mar'] := 1 2 2 3 4 2 3 1 2 2 4 4 2 4;
+     set A[3,'Mar'] : 1 2 3 4 :=
+                    1 - + - -
+                    2 - + + -
+                    3 + - - +
+                    4 - + - + ;
+     set B := (1,2,3) (1,3,2) (2,3,1) (2,1,3) (1,2,2) (1,1,1) (2,1,1);
+     set B := (*,*,*) 1 2 3, 1 3 2, 2 3 1, 2 1 3, 1 2 2, 1 1 1, 2 1 1;
+     set B := (1,*,2) 3 2 (2,*,1) 3 1 (1,2,3) (2,1,3) (1,1,1);
+     set B := (1,*,*) : 1 2 3 :=
+                      1 + - -
+                      2 - + +
+                      3 - + -
+              (2,*,*) : 1 2 3 :=
+                      1 + - +
+                      2 - - -
+                      3 + - - ;
+</pre>
+   <p class="noindent">(In these examples the set <code>month</code> is a simple set of singles,
+<code>A</code> is a 2-dimensional array of doubles, and <code>B</code> is a simple
+set of triples. Data blocks for the same set are equivalent in the sense
+that they specify the same data in different formats.)
+
+   <p>The set data block is used to specify a complete elemental set, which
+is assigned to a set (if it is a simple set) or one of its members (if
+the set is an array of sets).<a rel="footnote" href="#fn-5" name="fnd-5"><sup>5</sup></a>
+
+   <p>Data blocks can be specified only for non-computable sets, i.e. sets
+which have no assign attribute in the corresponding set statements.
+
+   <p>If the set is a simple set, only its symbolic name should be given in
+the header of the data block. Otherwise, if the set is a
+<i>n</i>-dimensional array, its symbolic name should be provided with a
+complete list of subscripts separated by commae and enclosed in square
+brackets to specify a particular member of the set array. The number of
+subscripts must be the same as the dimension of the set array, where
+each subscript must be a number or symbol.
+
+   <p>The elemental set defined in the set data block is coded as a sequence
+of data records described below.<a rel="footnote" href="#fn-6" name="fnd-6"><sup>6</sup></a>
+
+<h4 class="subheading">Assign data record</h4>
+
+<p>The assign (<code>:=</code>) data record is a non-signficant element. It may
+be used for improving readability of data blocks.
+
+<h4 class="subheading">Slice data record</h4>
+
+<p>The slice data record is a control record which specifies a slice of
+the elemental set defined in the data block. It has the following
+syntactic form:
+
+   <blockquote>
+<tt>(</tt> <i>s</i>1 <tt>,</tt> <i>s</i>2 <tt>,</tt> <small class="dots">...</small> <tt>,</tt>
+<i>sn</i> <tt>)</tt>
+</blockquote>
+
+<p class="noindent">where <i>s</i>1, <i>s</i>2, <small class="dots">...</small>, <i>sn</i> are components of the slice.
+
+   <p>Each component of the slice can be a number or symbol or the asterisk
+(<tt>*</tt>). The number of components in the slice must be the same as
+the dimension of <i>n</i>-tuples in the elemental set to be defined. For
+instance, if the elemental set contains 4-tuples (quadruples), the slice
+must have four components. The number of asterisks in the slice is
+called <dfn>slice dimension</dfn>.
+
+   <p>The effect of using slices is the following. If a <i>m</i>-dimensional
+slice (i.e. a slice which has m asterisks) is specified in the
+data block, all subsequent data records must specifiy tuples of the
+dimension <i>m</i>. Whenever a m-tuple is encountered, each
+asterisk in the slice is replaced by corresponding components of the
+m-tuple that gives the resultant <i>n</i>-tuple, which is included
+in the elemental set to be defined. For example, if the slice
+<tt>(a,*,1,2,*)</tt> is in effect, and 2-tuple <tt>(3,b)</tt> is encountered
+in a subsequent data record, the resultant 5-tuple included in the
+elemental set is <tt>(a,3,1,2,b)</tt>.
+
+   <p>The slice that has no asterisks itself defines a complete <i>n</i>-tuple,
+which is included in the elemental set.
+
+   <p>Being once specified the slice effects until either a new slice or the
+end of data block has been encountered. Note that if there is no slice
+specified in the data block, a dummy one, components of which are all
+asterisks, is assumed.
+
+<h4 class="subheading">Simple data record</h4>
+
+<p>The simple data record defines one <i>n</i>-tuple in simple format and has
+the following syntactic form:
+
+   <blockquote>
+<i>t</i>1 <tt>,</tt> <i>t</i>2 <tt>,</tt> <small class="dots">...</small> <tt>,</tt> <i>tn</i>
+</blockquote>
+
+<p class="noindent">where <i>t</i>1, <i>t</i>2, <small class="dots">...</small>, <i>tn</i> are components of the <i>n</i>-tuple. 
+Each component can be a number or symbol. Commae between components are
+optional and may be omitted.
+
+<h4 class="subheading">Matrix data record</h4>
+
+<p>The matrix data record defines several 2-tuples (doubles) in matrix
+format and has the following syntactic form:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="6%"><tt>:</tt> </td><td valign="top" width="6%"><i>c</i>1 </td><td valign="top" width="6%"><i>c</i>2 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>cn</i> </td><td valign="top" width="6%"><tt>:=</tt>
+<br></td></tr><tr align="left"><td valign="top" width="6%"><i>r</i>1 </td><td valign="top" width="6%"><i>a</i>11 </td><td valign="top" width="6%"><i>a</i>12 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>a</i>1<i>n</i>
+<br></td></tr><tr align="left"><td valign="top" width="6%"><i>r</i>2 </td><td valign="top" width="6%"><i>a</i>21 </td><td valign="top" width="6%"><i>a</i>22 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>a</i>2<i>n</i>
+<br></td></tr><tr align="left"><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small>
+<br></td></tr><tr align="left"><td valign="top" width="6%"><i>rm</i> </td><td valign="top" width="6%"><i>am</i>1 </td><td valign="top" width="6%"><i>am</i>2 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>amn</i>
+        <br></td></tr></table>
+</blockquote>
+
+<p class="noindent">where <i>r</i>1, <i>r</i>2, <small class="dots">...</small>, <i>rm</i> are numbers and/or symbols which
+correspond to rows of the matrix, <i>c</i>1, <i>c</i>2, <small class="dots">...</small>, <i>cn</i> are
+numbers and/or symbols which correspond to columns of the matrix,
+<i>a</i>11, <i>a</i>12, <small class="dots">...</small>, <i>amn</i> are the matrix elements, which can be
+either the sign <code>+</code> or the sign <code>-</code>. (In this data record the
+delimiter <code>:</code> preceding the column list and the delimiter <code>:=</code>
+following the column list cannot be omitted.)
+
+   <p>Each element <i>aij</i> of the matrix data block (where
+1&nbsp;<!-- /@w -->&lt;=&nbsp;<!-- /@w -->i&nbsp;<!-- /@w -->&lt;=&nbsp;<!-- /@w --><i>m</i>,
+1&nbsp;<!-- /@w -->&lt;=&nbsp;<!-- /@w -->j&nbsp;<!-- /@w -->&lt;=&nbsp;<!-- /@w --><i>n</i>) corresponds to 2-tuple
+(<i>ri</i>,&nbsp;<!-- /@w --><i>cj</i>). If <i>aij</i> is the plus sign (<code>+</code>), the
+corresponding 2-tuple (or a longer <i>n</i>-tuple, if a slice is used)
+is included in the elemental set. Otherwise, if <i>aij</i> is the minus
+sign (<code>-</code>) sign, the corresponding 2-tuple is not included in the
+elemental set.
+
+   <p>Since the matrix data record defines 2-tuples, either the elemental
+set must consist of 2-tuples or the slice currently used must be
+2-dimensional.
+
+<h4 class="subheading">Transposed matrix data record</h4>
+
+<p>The transposed matrix data record has the following syntactic form:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="10%"><tt>(tr) :</tt> </td><td valign="top" width="6%"><i>c</i>1 </td><td valign="top" width="6%"><i>c</i>2 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>cn</i> </td><td valign="top" width="6%">
+<tt>:=</tt>
+<br></td></tr><tr align="left"><td valign="top" width="10%"><i>r</i>1 </td><td valign="top" width="6%"><i>a</i>11 </td><td valign="top" width="6%"><i>a</i>12 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>a</i>1<i>n</i>
+<br></td></tr><tr align="left"><td valign="top" width="10%"><i>r</i>2 </td><td valign="top" width="6%"><i>a</i>21 </td><td valign="top" width="6%"><i>a</i>22 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>a</i>2<i>n</i>
+<br></td></tr><tr align="left"><td valign="top" width="10%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small>
+<br></td></tr><tr align="left"><td valign="top" width="10%"><i>rm</i> </td><td valign="top" width="6%"><i>am</i>1 </td><td valign="top" width="6%"><i>am</i>2 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>amn</i>
+        <br></td></tr></table>
+</blockquote>
+
+<p class="noindent">(In this case the delimiter <code>:</code> following the keyword <code>(tr)</code>
+is optional and may be omitted.)
+
+   <p>This data record is completely analogous to the matrix data record (see
+above) with the only exception that each element
+<i>aij</i> of the matrix corresponds to 2-tuple (<i>cj</i>,&nbsp;<!-- /@w --><i>ri</i>).
+
+   <p>Being once specified the <code>(tr)</code> indicator effects on <em>all</em>
+subsequent data records until either a slice or the end of data block
+has been encountered.
+
+<div class="node">
+<p><hr>
+<a name="Parameter-data-block"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Set-data-block">Set data block</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Model-data">Model data</a>
+<br>
+</div>
+
+<h3 class="section">5.3 Parameter data block</h3>
+
+<p><table class="cartouche" summary="cartouche" border="1"><tr><td>
+<tt> param</tt> <var>name</var> <tt>,</tt> <var>record</var> <tt>,</tt> <small class="dots">...</small>
+<tt>,</tt> <var>record</var> <tt>;</tt>
+
+<p class="noindent"><tt> param</tt> <var>name</var> <tt>default</tt> <var>value</var> <tt>,</tt>
+<var>record</var> <tt>,</tt> <small class="dots">...</small> <tt>,</tt> <var>record</var> <tt>;</tt>
+
+<p class="noindent"><tt> param</tt> <tt>:</tt> <var>tabbing-data</var> <tt>;</tt>
+
+<p class="noindent"><tt> param</tt> <tt>default</tt> <var>value</var> <tt>:</tt>
+<var>tabbing-data</var> <tt>;</tt>
+</td></tr></table>
+
+     <dl>
+<dt>Where:<dd><var>name</var> is a symbolic name of the parameter;
+<br><dt><dd><var>value</var> is an optional default value of the parameter;
+<br><dt><dd><var>record</var>, <small class="dots">...</small>, <var>record</var> are data records. 
+<br><dt><dd><var>tabbing-data</var> specifies parameter data in the tabbing format. 
+</dl>
+
+     <dl>
+<dt>Note:<dd>Commae preceding data records may be omitted. 
+</dl>
+
+<p class="noindent">Data records:
+
+     <dl>
+<dt><tt>:=</tt><dd>is a non-significant data record which may be used freely to improve
+readability;
+<br><dt><tt>[</tt> <var>slice</var> <tt>]</tt><dd>specifies a slice;
+<br><dt><var>plain-data</var><dd>specifies parameter data in the plain format;
+<br><dt><tt>:</tt> <var>tabular-data</var><dd>specifies parameter data in the tabular format;
+<br><dt><tt>(tr) :</tt> <var>tabular-data</var><dd>specifies parameter data in the transposed tabular format. (In this case
+the colon following the keyword <tt>(tr)</tt> may be omitted.) 
+</dl>
+
+   <p><strong>Examples</strong>
+
+<pre class="example">     param T := 4;
+     param month := 1 Jan 2 Feb 3 Mar 4 Apr 5 May;
+     param month := [1] 'Jan', [2] 'Feb', [3] 'Mar', [4] 'Apr', [5] 'May';
+     param init_stock := iron 7.32 nickel 35.8;
+     param init_stock [*] iron 7.32, nickel 35.8;
+     param cost [iron] .025 [nickel] .03;
+     param value := iron -.1, nickel .02;
+     param       : init_stock  cost  value :=
+           iron       7.32     .025   -.1
+           nickel    35.8      .03     .02 ;
+     param : raw : init stock  cost  value :=
+             iron     7.32     .025   -.1
+             nickel  35.8      .03     .02 ;
+     param demand default 0 (tr)
+            :  FRA  DET  LAN  WIN  STL  FRE  LAF :=
+        bands  300   .   100   75   .   225  250
+        coils  500  750  400  250   .   850  500
+        plate  100   .    .    50  200   .   250 ;
+     param trans_cost :=
+        [*,*,bands]:  FRA  DET  LAN  WIN  STL  FRE  LAF :=
+              GARY     30   10    8   10   11   71    6
+              CLEV     22    7   10    7   21   82   13
+              PITT     19   11   12   10   25   83   15
+        [*,*,coils]:  FRA  DET  LAN  WIN  STL  FRE  LAF :=
+              GARY     39   14   11   14   16   82    8
+              CLEV     27    9   12    9   26   95   17
+              PITT     24   14   17   13   28   99   20
+        [*,*,plate]:  FRA  DET  LAN  WIN  STL  FRE  LAF :=
+              GARY     41   15   12   16   17   86    8
+              CLEV     29    9   13    9   28   99   18
+              PITT     26   14   17   13   31  104   20 ;
+</pre>
+   <p>The parameter data block is used to specify complete data for a
+parameter (or parameters, if data are specified in the tabbing format)
+whose name is given in the block.
+
+   <p>Data blocks can be specified only for the parameters, which are
+non-computable, i.e. which have no assign attribute in the corresponding
+parameter statements.
+
+   <p>Data defined in the parameter data block are coded as a sequence of
+data records described below. Additionally the data block can be
+provided with the optional <code>default</code> attribute, which specifies
+a default numeric or symbolic value of the parameter (parameters). This
+default value is assigned to the parameter or its members, if
+no appropriate value is defined in the parameter data block. The
+<code>default</code> attribute cannot be used, if it is already specified in
+the corresponding parameter statement(s).
+
+<h4 class="subheading">Assign data record</h4>
+
+<p>The assign (<code>:=</code>) data record is a non-signficant element. It may
+be used for improving readability of data blocks.
+
+<h4 class="subheading">Slice data record</h4>
+
+<p>The slice data record is a control record which specifies a slice of
+the parameter array. It has the following syntactic form:
+
+   <blockquote>
+<tt>[</tt> <i>s</i>1 <tt>,</tt> <i>s</i>2 <tt>,</tt> <small class="dots">...</small> <tt>,</tt>
+<i>sn</i> <tt>]</tt>
+</blockquote>
+
+<p class="noindent">where <i>s</i>1, <i>s</i>2, <small class="dots">...</small>, <i>sn</i> are components of the slice.
+
+   <p>Each component of the slice can be a number or symbol or the asterisk
+(<code>|*|</code>). The number of components in the slice must be the same as
+the dimension of the parameter. For instance, if the parameter is a
+4-dimensional array, the slice must have four components. The number of
+asterisks in the slice is called <dfn>slice dimension</dfn>.
+
+   <p>The effect of using slices is the following. If a <i>m</i>-dimensional
+slice (i.e. a slice which has <i>m</i> asterisks) is specified in the
+data block, all subsequent data records must specify subscripts of the
+parameter members as if the parameter were <i>m</i>-dimensional, not
+<i>n</i>-dimensional.
+
+   <p>Whenever <i>m</i> subscripts are encountered, each asterisk in the slice is
+replaced by corresponding subscript that gives <i>n</i> subscripts, which
+define the actual parameter member. For example, if the slice
+<tt>[a,*,1,2,*]</tt> is in effect, and the subscripts <tt>3</tt> and <tt>b</tt> are
+encountered in a subsequent data record, the complete subscript list
+used to choose a parameter member is <tt>[a,3,1,2,b]</tt>.
+
+   <p>It is allowed to specify a slice that has no asterisks. Such slice
+itself defines a complete subscript list, in which case the next data
+record can define only a single value of the corresponding parameter
+member.
+
+   <p>Being once specified the slice effects until either a new slice or the
+end of data block has been encountered. Note that if there is no slice
+specified in the data block, a dummy one, components of which are all
+asterisks, is assumed.
+
+<h4 class="subheading">Plain data record</h4>
+
+<p>The plain data record defines the subscript list and a single value in
+plain format. This record has the following syntactic form:
+
+   <blockquote>
+<i>t</i>1 <tt>,</tt> <i>t</i>2 <tt>,</tt> <small class="dots">...</small> <tt>,</tt> <i>tn</i> <tt>,</tt>
+<i>v</i>
+</blockquote>
+
+<p class="noindent">where <i>t</i>1, <i>t</i>2, <small class="dots">...</small>, <i>tn</i> are subscripts, <i>v</i>
+is a value. Each subscript as well as the value can be a number or
+symbol. Commae following subscripts are optional and may be omitted.
+
+   <p>In case of 0-dimensional parameter or slice the plain data record have
+no subscripts and consists of a single value only.
+
+<h4 class="subheading">Tabular data record</h4>
+
+<p>The tabular data record defines several values, where each value is
+provided with two subscripts. This record has the following syntactic
+form:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="6%"><tt>:</tt> </td><td valign="top" width="6%"><i>c</i>1 </td><td valign="top" width="6%"><i>c</i>2 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>cn</i> </td><td valign="top" width="6%"><tt>:=</tt>
+<br></td></tr><tr align="left"><td valign="top" width="6%"><i>r</i>1 </td><td valign="top" width="6%"><i>a</i>11 </td><td valign="top" width="6%"><i>a</i>12 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>a</i>1<i>n</i>
+<br></td></tr><tr align="left"><td valign="top" width="6%"><i>r</i>2 </td><td valign="top" width="6%"><i>a</i>21 </td><td valign="top" width="6%"><i>a</i>22 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>a</i>2<i>n</i>
+<br></td></tr><tr align="left"><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small>
+<br></td></tr><tr align="left"><td valign="top" width="6%"><i>rm</i> </td><td valign="top" width="6%"><i>am</i>1 </td><td valign="top" width="6%"><i>am</i>2 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>amn</i>
+        <br></td></tr></table>
+</blockquote>
+
+<p class="noindent">where <i>r</i>1, <i>r</i>2, <small class="dots">...</small>, <i>rm</i> are numbers and/or symbols which
+correspond to rows of the table, <i>c</i>1, <i>c</i>2, <small class="dots">...</small>, <i>cn</i> are
+numbers and/or symbols which correspond to columns of the table,
+<i>a</i>11, <i>a</i>12, <small class="dots">...</small>, <i>amn</i> are the table elements. Each element
+can be a number or symbol or the single decimal point. (In this data
+record the delimiter <code>:</code> preceding the column list and the
+delimiter <code>:=</code> following the column list cannot be omitted.)
+
+   <p>Each element <i>aij</i> of the tabular data block
+(1&nbsp;<!-- /@w -->&lt;=&nbsp;<!-- /@w -->i&nbsp;<!-- /@w -->&lt;=&nbsp;<!-- /@w --><i>m</i>,
+1&nbsp;<!-- /@w -->&lt;=&nbsp;<!-- /@w -->j&nbsp;<!-- /@w -->&lt;=&nbsp;<!-- /@w --><i>n</i>) defines two subscripts, where the
+first subscript is <i>ri</i>, and the second one is <i>cj</i>. These
+subscripts are used in conjunction with the current slice to form the
+complete subscript list which identifies a particular member of the
+parameter array. If <i>aij</i> is a number or symbol, this value is
+assigned to the parameter member. However, if <i>aij</i> is the single
+decimal point, the member is assigned a default value specified either
+in the parameter data block or in the parameter statement, or, if
+no default value is specified, the member remains undefined.
+
+   <p>Since the tabular data record provides two subscripts for each value,
+either the parameter or the slice currently used must be 2-dimensional.
+
+<h4 class="subheading">Transposed tabular data record</h4>
+
+<p>The transposed tabular data record has the following syntactic form:
+
+   <blockquote>
+        <p><table summary=""><tr align="left"><td valign="top" width="10%"><tt>(tr) :</tt> </td><td valign="top" width="6%"><i>c</i>1 </td><td valign="top" width="6%"><i>c</i>2 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>cn</i> </td><td valign="top" width="6%">
+<tt>:=</tt>
+<br></td></tr><tr align="left"><td valign="top" width="10%"><i>r</i>1 </td><td valign="top" width="6%"><i>a</i>11 </td><td valign="top" width="6%"><i>a</i>12 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>a</i>1<i>n</i>
+<br></td></tr><tr align="left"><td valign="top" width="10%"><i>r</i>2 </td><td valign="top" width="6%"><i>a</i>21 </td><td valign="top" width="6%"><i>a</i>22 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>a</i>2<i>n</i>
+<br></td></tr><tr align="left"><td valign="top" width="10%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><small class="dots">...</small>
+<br></td></tr><tr align="left"><td valign="top" width="10%"><i>rm</i> </td><td valign="top" width="6%"><i>am</i>1 </td><td valign="top" width="6%"><i>am</i>2 </td><td valign="top" width="6%"><small class="dots">...</small> </td><td valign="top" width="6%"><i>amn</i>
+        <br></td></tr></table>
+</blockquote>
+
+<p class="noindent">(In this case the delimiter <code>:</code> following the keyword <code>(tr)</code>
+is optional and may be omitted.)
+
+   <p>This data record is completely analogous to the tabular data record (see
+above) with the only exception that the first subscript defined by the
+element
+<i>aij</i> is <i>cj</i> while the second one is <i>ri</i>.
+
+   <p>Being once specified the <code>(tr)</code> indicator effects on all subsequent
+data records until either a slice or the end of data block has been
+encountered.
+
+<h4 class="subheading">Tabbing data format</h4>
+
+<p>The parameter data block in the tabbing format has the following
+syntactic form:
+
+<pre class="example">     param default value : s :  p1 ,  p2 , ...,  pk :=
+     t11 , t12 , ... , t1n ,   a11 , a12 , ..., a1k
+     t21 , t22 , ... , t2n ,   a21 , a22 , ..., a2k
+       .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+     tm1 , tm2 , ... , tmn ,   am1 , am2 , ..., amk ;
+</pre>
+     <dl>
+<dt>Note:<dd>The keyword <tt>default</tt> may be omitted along with a value
+following it. 
+<br><dt><dd>The symbolic name s of a set may be omitted along with the
+colon following it. 
+<br><dt><dd>All comae are optional and may be omitted. 
+</dl>
+
+   <p>The data block in the tabbing format shown above is exactly equivalent
+to the following data blocks:
+
+<pre class="example">     set s := (t11,...,t1n) (t21,...,t2n) ... (tm1,...,tmn)
+     
+     param pj default value :=
+              [t11,...,t1n] a1j [t21,...,t2n] a2j ... [tm1,...,tmn] amj;
+</pre>
+   <p class="noindent">where <i>j</i> = 1, 2, <small class="dots">...</small>, <i>k</i>.
+
+<div class="node">
+<p><hr>
+<a name="Date-and-time-functions"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Solving-models-with-glpsol">Solving models with glpsol</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Model-data">Model data</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="appendix">Appendix A Date and time functions</h2>
+
+<div align="center">by Andrew Makhorin <tt>&lt;mao@mai2.rcnet.ru&gt;</tt></div>
+<div align="center">and Heinrich Schuchardt <tt>&lt;heinrich.schuchardt@gmx.de&gt;</tt></div>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Obtaining-current-calendar-time">Obtaining current calendar time</a>
+<li><a accesskey="2" href="#Converting-character-string-to-calendar-time">Converting character string to calendar time</a>
+<li><a accesskey="3" href="#Converting-calendar-time-to-character-string">Converting calendar time to character string</a>
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Obtaining-current-calendar-time"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Converting-character-string-to-calendar-time">Converting character string to calendar time</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Date-and-time-functions">Date and time functions</a>
+<br>
+</div>
+
+<h3 class="section">A.1 Obtaining current calendar time</h3>
+
+<p>To obtain the current calendar time there is the function
+<tt>gmtime</tt>. It has no arguments and returns the number of seconds
+elapsed since 00:00:00 on January 1, 1970, Coordinated Universal Time
+(UTC). For example:
+
+<pre class="example">     param utc := gmtime();
+</pre>
+   <p>GNU MathProg has no functions to convert UTC time returned by the
+function <tt>gmtime</tt> to <em>local</em> calendar times. Thus, if you
+need to determine the current local calendar time, you have to add to
+the UTC time returned the time offset from UTC expressed in seconds. 
+For example, the time in Berlin during the winter is one hour ahead of
+UTC that corresponds to the time offset +1 hour = +3600 secs, so the
+current winter calendar time in Berlin may be determined as follows:
+
+<pre class="example">     param now := gmtime() + 3600;
+</pre>
+   <p class="noindent">Similarly, the summer time in Chicago (Central Daylight Time) is five
+hours behind UTC, so the corresponding current local calendar time may
+be determined as follows:
+
+<pre class="example">     param now := gmtime() - 5 * 3600;
+</pre>
+   <p>Note that the value returned by <tt>gmtime</tt> is volatile, i.e. 
+being called several times this function may return different values.
+
+<div class="node">
+<p><hr>
+<a name="Converting-character-string-to-calendar-time"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Converting-calendar-time-to-character-string">Converting calendar time to character string</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Obtaining-current-calendar-time">Obtaining current calendar time</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Date-and-time-functions">Date and time functions</a>
+<br>
+</div>
+
+<h3 class="section">A.2 Converting character string to calendar time</h3>
+
+<p>The function <tt>str2time</tt>(<i>s</i>,&nbsp;<!-- /@w --><i>f</i>) converts a character
+string (timestamp) specified by its first argument <i>s</i>, which must be
+a symbolic expression, to the calendar time suitable for arithmetic
+calculations. The conversion is controlled by the specified format
+string <i>f</i> (the second argument), which also must be a symbolic
+expression.
+
+   <p>The result of conversion returned by <tt>str2time</tt> has the same
+meaning as the value returned by the function <tt>gmtime</tt>
+(See <a href="#Obtaining-current-calendar-time">Obtaining current calendar time</a>). Note that <tt>str2time</tt>
+does <em>not</em> correct the calendar time returned for the local
+timezone, i.e. being applied to 00:00:00 on January 1, 1970 it always
+returns 0.
+
+   <p>For example, the model statements:
+
+<pre class="example">     param s, symbolic, := "07/14/98 13:47";
+     param t := str2time(s, "%m/%d/%y %H:%M");
+     display t;
+</pre>
+   <p class="noindent">produce the following printout:
+
+<pre class="example">     t = 900424020
+</pre>
+   <p class="noindent">where the calendar time printed corresponds to 13:47:00 on July 14,
+1998.
+
+   <p>The format string passed to the function <tt>str2time</tt> consists of
+conversion specifiers and ordinary characters. Each conversion specifier
+begins with a `<tt>%</tt>' character followed by a letter.
+
+   <p>The following conversion specifiers may be used in the format string:
+
+     <dl>
+<dt><tt>%b</tt><dd>The abbreviated month name (case insensitive). At least three first
+letters of the month name must appear in the input string. 
+<br><dt><tt>%d</tt><dd>The day of the month as a decimal number (range 1 to 31). Leading zero
+is permitted, but not required. 
+<br><dt><tt>%h</tt><dd>The same as <tt>%b</tt>. 
+<br><dt><tt>%H</tt><dd>The hour as a decimal number, using a 24-hour clock (range 0 to 23). 
+Leading zero is permitted, but not required. 
+<br><dt><tt>%m</tt><dd>The month as a decimal number (range 1 to 12). Leading zero is
+permitted, but not required. 
+<br><dt><tt>%M</tt><dd>The minute as a decimal number (range 0 to 59). Leading zero is
+permitted, but not required. 
+<br><dt><tt>%S</tt><dd>The second as a decimal number (range 0 to 60). Leading zero is
+permitted, but not required. 
+<br><dt><tt>%y</tt><dd>The year without a century as a decimal number (range 0 to 99). Leading
+zero is permitted, but not required. Input values in the range 0 to 68
+are considered as the years 2000 to 2068 while the values 69 to 99 as
+the years 1969 to 1999. 
+<br><dt><tt>%z</tt><dd>The offset from GMT in ISO 8601 format. 
+<br><dt><tt>%%</tt><dd>A literal `<tt>%</tt>' character. 
+</dl>
+
+   <p>All other (ordinary) characters in the format string must have
+a matching character in the input string to be converted. Exceptions
+are spaces in the input string which can match zero or more space
+characters in the format string.
+
+   <p>If some date and/or time component(s) are missing in the format and,
+therefore, in the input string, the function <tt>str2time</tt> uses
+their default values corresponding to 00:00:00 on January 1, 1970, that
+is, the default value of the year is 1970, the default value of the
+month is January, etc.
+
+   <p>The function <tt>str2time</tt> is applicable to all calendar times in
+the range 00:00:00 on January 1, 0001 to 23:59:59 on December 31, 4000
+of the Gregorian calendar.
+
+<div class="node">
+<p><hr>
+<a name="Converting-calendar-time-to-character-string"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Converting-character-string-to-calendar-time">Converting character string to calendar time</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Date-and-time-functions">Date and time functions</a>
+<br>
+</div>
+
+<h3 class="section">A.3 Converting calendar time to character string</h3>
+
+<p>The function <tt>time2str</tt>(<i>t</i>,&nbsp;<!-- /@w --><i>f</i>) converts the calendar
+time specified by its first argument <i>t</i>, which must be a numeric
+expression, to a character string (symbolic value). The conversion is
+controlled by the specified format string <i>f</i> (the second argument),
+which must be a symbolic expression.
+
+   <p>The calendar time passed to <tt>time2str</tt> has the same meaning as
+the value returned by the function <tt>gmtime</tt> (See <a href="#Obtaining-current-calendar-time">Obtaining current calendar time</a>). Note that <tt>time2str</tt> does <em>not</em> correct
+the specified calendar time for the local timezone, i.e. the calendar
+time 0 always corresponds to 00:00:00 on January 1, 1970.
+
+   <p>For example, the model statements:
+
+<pre class="example">     param s, symbolic, := time2str(gmtime(), "%FT%TZ");
+     display s;
+</pre>
+   <p class="noindent">may produce the following printout:
+
+<pre class="example">     s = '2008-12-04T00:23:45Z'
+</pre>
+   <p class="noindent">which is a timestamp in the ISO format.
+
+   <p>The format string passed to the function <tt>time2str</tt> consists of
+conversion specifiers and ordinary characters. Each conversion specifier
+begins with a `<tt>%</tt>' character followed by a letter.
+
+   <p>The following conversion specifiers may be used in the format string:
+
+     <dl>
+<dt><tt>%a</tt><dd>The abbreviated (2-character) weekday name. 
+<br><dt><tt>%A</tt><dd>The full weekday name. 
+<br><dt><tt>%b</tt><dd>The abbreviated (3-character) month name. 
+<br><dt><tt>%B</tt><dd>The full month name. 
+<br><dt><tt>%C</tt><dd>The century of the year, that is the greatest integer not greater than
+the year divided by 100. 
+<br><dt><tt>%d</tt><dd>The day of the month as a decimal number (range 01 to 31). 
+<br><dt><tt>%D</tt><dd>The date using the format <tt>%m/%d/%y</tt>. 
+<br><dt><tt>%e</tt><dd>The day of the month like with <tt>%d</tt>, but padded with blank rather
+than zero. 
+<br><dt><tt>%F</tt><dd>The date using the format <tt>%Y-%m-%d</tt>. 
+<br><dt><tt>%g</tt><dd>The year corresponding to the ISO week number, but without the century
+(range 00 to 99). This has the same format and value as <tt>%y</tt>, except
+that if the ISO week number (see <tt>%V</tt>) belongs to the previous or next
+year, that year is used instead. 
+<br><dt><tt>%G</tt><dd>The year corresponding to the ISO week number. This has the same format
+and value as <tt>%Y</tt>, except that if the ISO week number (see <tt>%V</tt>)
+belongs to the previous or next year, that year is used instead. 
+<br><dt><tt>%h</tt><dd>The same as <tt>%b</tt>. 
+<br><dt><tt>%H</tt><dd>The hour as a decimal number, using a 24-hour clock (range 00 to 23). 
+<br><dt><tt>%I</tt><dd>The hour as a decimal number, using a 12-hour clock (range 01 to 12). 
+<br><dt><tt>%j</tt><dd>The day of the year as a decimal number (range 001 to 366). 
+<br><dt><tt>%k</tt><dd>The hour as a decimal number, using a 24-hour clock like <tt>%H</tt>, but
+padded with blank rather than zero. 
+<br><dt><tt>%l</tt><dd>The hour as a decimal number, using a 12-hour clock like <tt>%I</tt>, but
+padded with blank rather than zero. 
+<br><dt><tt>%m</tt><dd>The month as a decimal number (range 01 to 12). 
+<br><dt><tt>%M</tt><dd>The minute as a decimal number (range 00 to 59). 
+<br><dt><tt>%p</tt><dd>Either `<tt>AM</tt>' or `<tt>PM</tt>', according to the given time value. 
+Midnight is treated as `<tt>AM</tt>' and noon as `<tt>PM</tt>'. 
+<br><dt><tt>%P</tt><dd>Either `<tt>am</tt>' or `<tt>pm</tt>', according to the given time value. 
+Midnight is treated as `<tt>am</tt>' and noon as `<tt>pm</tt>'. 
+<br><dt><tt>%R</tt><dd>The hour and minute in decimal numbers using the format <tt>%H:%M</tt>. 
+<br><dt><tt>%S</tt><dd>The second as a decimal number (range 00 to 59). 
+<br><dt><tt>%T</tt><dd>The time of day in decimal numbers using the format <tt>%H:%M:%S</tt>. 
+<br><dt><tt>%u</tt><dd>The day of the week as a decimal number (range 1 to 7), Monday being 1. 
+<br><dt><tt>%U</tt><dd>The week number of the current year as a decimal number (range 00 to
+53), starting with the first Sunday as the first day of the first week. 
+Days preceding the first Sunday in the year are considered to be in
+week 00. 
+<br><dt><tt>%V</tt><dd>The ISO week number as a decimal number (range 01 to 53). ISO weeks
+start with Monday and end with Sunday. Week 01 of a year is the first
+week which has the majority of its days in that year; this is equivalent
+to the week containing January 4. Week 01 of a year can contain days
+from the previous year. The week before week 01 of a year is the last
+week (52 or 53) of the previous year even if it contains days from the
+new year. In other word, if 1 January is Monday, Tuesday, Wednesday or
+Thursday, it is in week 01; if 1 January is Friday, Saturday or Sunday,
+it is in week 52 or 53 of the previous year. 
+<br><dt><tt>%w</tt><dd>The day of the week as a decimal number (range 0 to 6), Sunday being 0. 
+<br><dt><tt>%W</tt><dd>The week number of the current year as a decimal number (range 00 to
+53), starting with the first Monday as the first day of the first week. 
+Days preceding the first Monday in the year are considered to be in
+week 00. 
+<br><dt><tt>%y</tt><dd>The year without a century as a decimal number (range 00 to 99), that
+is the year modulo 100. 
+<br><dt><tt>%Y</tt><dd>The year as a decimal number, using the Gregorian calendar. 
+<br><dt><tt>%%</tt><dd>A literal `<tt>%</tt>' character. 
+</dl>
+
+   <p>All other (ordinary) characters in the format string are simply copied
+to the resultant string.
+
+   <p>The first argument (calendar time) passed to the function <tt>time2str</tt>
+must be in the range from &ndash;62135596800 to +64092211199 that corresponds
+to the period from 00:00:00 on January 1, 0001 to 23:59:59 on December
+31, 4000 of the Gregorian calendar.
+
+<div class="node">
+<p><hr>
+<a name="Solving-models-with-glpsol"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Example-model-description">Example model description</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Date-and-time-functions">Date and time functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="appendix">Appendix B Solving models with <code>glpsol</code></h2>
+
+<p>The GLPK
+package<a rel="footnote" href="#fn-7" name="fnd-7"><sup>7</sup></a>
+includes the program <tt>glpsol</tt>, which is a stand-alone LP/MIP
+solver. This program can be launched from the command line or from the
+shell to solve models written in the GNU MathProg modeling language.
+
+   <p>In order to tell the solver that the input file contains a model
+description, you should specify the option <tt>--model</tt> in the
+command line. For example:
+
+<pre class="example">     glpsol --model foo.mod
+</pre>
+   <p>Sometimes it is necessary to use the data section placed in a separate
+file, in which case you may use the following command:
+
+<pre class="example">     glpsol --model foo.mod --data foo.dat
+</pre>
+   <p class="noindent">Note that if the model file also contains the data section, that
+section is ignored.
+
+   <p>If the model description contains some display and/or print statements,
+by default the output sends to the terminal. In order to redirect the
+output to a file you may use the following command:
+
+<pre class="example">     glpsol --model foo.mod --display foo.out
+</pre>
+   <p>If you need to look at the problem which has been generated by the
+model translator, you may use the option <tt>--wcpxlp</tt> as follows:
+
+<pre class="example">     glpsol --model foo.mod --wcpxlp foo.lp
+</pre>
+   <p class="noindent">in which case the problem data is written to file <tt>foo.lp</tt> in
+CPLEX LP format suitable for visual analysis.
+
+   <p>Sometimes it is needed merely to check the model description not
+solving the generated problem. In this case you may specify the option
+<tt>--check</tt>, for example:
+
+<pre class="example">     glpsol --check --model foo.mod --wcpxlp foo.lp
+</pre>
+   <p>In order to write a numeric solution obtained by the solver you may use
+the following command:
+
+<pre class="example">     glpsol --model foo.mod --output foo.sol
+</pre>
+   <p class="noindent">in which case the solution is written to the file <tt>foo.sol</tt> in
+plain text format.
+
+   <p>Complete list of the <tt>glpsol</tt> options can be found in the
+reference manual included in the GLPK distribution.
+
+<div class="node">
+<p><hr>
+<a name="Example-model-description"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Acknowledgements">Acknowledgements</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Solving-models-with-glpsol">Solving models with glpsol</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="appendix">Appendix C Example model description</h2>
+
+<h4 class="subheading">Model description written in GNU MathProg</h4>
+
+<p>Below here is a complete example of the model description written in
+the GNU MathProg modeling language.
+
+<pre class="verbatim">
+# A TRANSPORTATION PROBLEM
+#
+# This problem finds a least cost shipping schedule that meets
+# requirements at markets and supplies at factories.
+#
+#  References:
+#              Dantzig G B, "Linear Programming and Extensions."
+#              Princeton University Press, Princeton, New Jersey, 1963,
+#              Chapter 3-3.
+
+set I;
+/* canning plants */
+
+set J;
+/* markets */
+
+param a{i in I};
+/* capacity of plant i in cases */
+
+param b{j in J};
+/* demand at market j in cases */
+
+param d{i in I, j in J};
+/* distance in thousands of miles */
+
+param f;
+/* freight in dollars per case per thousand miles */
+
+param c{i in I, j in J} := f * d[i,j] / 1000;
+/* transport cost in thousands of dollars per case */
+
+var x{i in I, j in J} >= 0;
+/* shipment quantities in cases */
+
+minimize cost: sum{i in I, j in J} c[i,j] * x[i,j];
+/* total transportation costs in thousands of dollars */
+
+s.t. supply{i in I}: sum{j in J} x[i,j] &lt;= a[i];
+/* observe supply limit at plant i */
+
+s.t. demand{j in J}: sum{i in I} x[i,j] >= b[j];
+/* satisfy demand at market j */
+
+data;
+
+set I := Seattle San-Diego;
+
+set J := New-York Chicago Topeka;
+
+param a := Seattle     350
+           San-Diego   600;
+
+param b := New-York    325
+           Chicago     300
+           Topeka      275;
+
+param d :              New-York   Chicago   Topeka :=
+           Seattle     2.5        1.7       1.8
+           San-Diego   2.5        1.8       1.4  ;
+
+param f := 90;
+
+end;
+</pre>
+
+<h4 class="subheading">Generated LP problem</h4>
+
+<p>Below here is the result of the translation of the example model
+produced by the solver <tt>glpsol</tt> and written in the CPLEX LP
+format with the option <tt>--wcpxlp</tt>.
+
+<pre class="verbatim">
+\* Problem: transp *\
+
+Minimize
+ cost: + 0.225 x(Seattle,New~York) + 0.153 x(Seattle,Chicago)
+ + 0.162 x(Seattle,Topeka) + 0.225 x(San~Diego,New~York)
+ + 0.162 x(San~Diego,Chicago) + 0.126 x(San~Diego,Topeka)
+
+Subject To
+ supply(Seattle): + x(Seattle,New~York) + x(Seattle,Chicago)
+ + x(Seattle,Topeka) &lt;= 350
+ supply(San~Diego): + x(San~Diego,New~York) + x(San~Diego,Chicago)
+ + x(San~Diego,Topeka) &lt;= 600
+ demand(New~York): + x(Seattle,New~York) + x(San~Diego,New~York) >= 325
+ demand(Chicago): + x(Seattle,Chicago) + x(San~Diego,Chicago) >= 300
+ demand(Topeka): + x(Seattle,Topeka) + x(San~Diego,Topeka) >= 275
+
+End
+</pre>
+
+<h4 class="subheading">Optimal LP solution</h4>
+
+<p>Below here is the optimal solution of the generated LP problem found by
+the solver <tt>glpsol</tt> and written in plain text format with the
+option <tt>--output</tt>.
+
+<pre class="smalldisplay"><pre class="verbatim">     
+     Problem:    transp
+     Rows:       6
+     Columns:    6
+     Non-zeros:  18
+     Status:     OPTIMAL
+     Objective:  cost = 153.675 (MINimum)
+     
+        No.   Row name   St   Activity     Lower bound   Upper bound    Marginal
+     ------ ------------ -- ------------- ------------- ------------- -------------
+          1 cost         B        153.675
+          2 supply[Seattle]
+                         B            300                         350
+          3 supply[San-Diego]
+                         NU           600                         600         &lt; eps
+          4 demand[New-York]
+                         NL           325           325                       0.225
+          5 demand[Chicago]
+                         NL           300           300                       0.153
+          6 demand[Topeka]
+                         NL           275           275                       0.126
+     
+        No. Column name  St   Activity     Lower bound   Upper bound    Marginal
+     ------ ------------ -- ------------- ------------- ------------- -------------
+          1 x[Seattle,New-York]
+                         B              0             0               
+          2 x[Seattle,Chicago]
+                         B            300             0               
+          3 x[Seattle,Topeka]
+                         NL             0             0                       0.036
+          4 x[San-Diego,New-York]
+                         B            325             0               
+          5 x[San-Diego,Chicago]
+                         NL             0             0                       0.009
+          6 x[San-Diego,Topeka]
+                         B            275             0               
+     
+     End of output
+</pre>
+</pre>
+   <div class="node">
+<p><hr>
+<a name="Acknowledgements"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Example-model-description">Example model description</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapheading">Acknowledgements</h2>
+
+<p>The author would like to thank the following people, who kindly read,
+commented, and corrected the draft of this manual:
+
+<p class="noindent">Juan Carlos Borras <tt>&lt;borras@cs.helsinki.fi></tt>
+
+<p class="noindent">Harley Mackenzie <tt>&lt;hjm@bigpond.com></tt>
+
+<p class="noindent">Robbie Morrison <tt>&lt;robbie@actrix.co.nz></tt>
+
+   <div class="footnote">
+<hr>
+<a name="texinfo-footnotes-in-document"></a><h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> The GNU MathProg language is a
+subset of the AMPL language. Its GLPK implementation is mainly based on
+the paper: <em>Robert&nbsp;<!-- /@w -->Fourer</em>, <em>David&nbsp;<!-- /@w -->M.&nbsp;<!-- /@w -->Gay</em>,
+and <em>Brian&nbsp;<!-- /@w -->W.&nbsp;<!-- /@w -->Kernighan</em>, &ldquo;A Modeling Language for
+Mathematical Programming.&rdquo; <em>Management Science</em> 36 (1990)
+pp.&nbsp;<!-- /@w -->519-54.</p>
+
+   <p class="footnote"><small>[<a name="fn-2" href="#fnd-2">2</a>]</small> For details
+See <a href="#Obtaining-current-calendar-time">Obtaining current calendar time</a>.</p>
+
+   <p class="footnote"><small>[<a name="fn-3" href="#fnd-3">3</a>]</small> For details See <a href="#Converting-character-string-to-calendar-time">Converting character string to calendar time</a>.</p>
+
+   <p class="footnote"><small>[<a name="fn-4" href="#fnd-4">4</a>]</small> For details see See <a href="#Converting-calendar-time-to-character-string">Converting calendar time to character string</a>.</p>
+
+   <p class="footnote"><small>[<a name="fn-5" href="#fnd-5">5</a>]</small> There is another way to specify
+data for a simple set along with data for parameters. This feature is
+discussed in the next section.</p>
+
+   <p class="footnote"><small>[<a name="fn-6" href="#fnd-6">6</a>]</small> <dfn>Data record</dfn> is simply a
+technical term. It <em>does not mean</em> that data records have any
+special formatting.</p>
+
+   <p class="footnote"><small>[<a name="fn-7" href="#fnd-7">7</a>]</small> &lt;<code>http://www.gnu.org/software/glpk/</code>&gt;</p>
+
+   <p><hr></div>
+
+</body></html>
+

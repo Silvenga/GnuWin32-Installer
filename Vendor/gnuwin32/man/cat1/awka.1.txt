@@ -1,0 +1,600 @@
+AWKA(1)                  USER COMMANDS                  AWKA(1)
+
+
+
+
+
+NAME
+       awka - AWK language to ANSI C translator and library
+
+SYNOPSIS
+       awka  [-c fn] [-X] [-x] [-t] [-o filename] [-a args] [-w
+       args] [-I include-dir] [-i  include-file]  [-L  lib-dir]
+       [-l  lib-file]  [-f  progname] [-d] [program] [--] [exe-
+       args]
+       awka [-version] [-help]
+
+DESCRIPTION
+       Awka is two products - a translator of AWK language pro-
+       grams  to  ANSI-C,  and a library of essential functions
+       against which the translated code must be linked.
+
+       The AWK language is useful for maniplation of datafiles,
+       text  retrieval  and processing, and for prototyping and
+       experimenting with algorithms.  Usually  AWK  is  imple-
+       mented  as  an interpretive language - there are several
+       good free interpreters available, notably gawk, mawk and
+       'The One True Awk' maintained by Brian Kernighan.
+
+       This  manpage  does not explain how AWK works - refer to
+       the SEE ALSO section at the end of this page for  refer-
+       ences.
+
+       Awka is a new awk meaning it implements the AWK language
+       as defined in Aho, Kernighan  and  Weinberger,  The  AWK
+       Programming  Language,  Addison-Wesley  Publishing 1988.
+       Awka includes features  from  the  Posix  1003.2  (draft
+       11.3)  definition of the AWK language, but does not nec-
+       essarily conform in entirety to Posix  standards.   Awka
+       also  provides a number of extensions not found in other
+       implementations of AWK.
+
+
+AWKA OPTIONS
+       -c fn          Instead of producing a  'main'  function,
+                      awka will instead generate 'fn' as a con-
+                      trolling function.  This is useful  where
+                      the  compiled  C  code is to be linked in
+                      with a larger application.  The -c  argu-
+                      ment is not compatible with the -X and -x
+                      arguments.  See the section USING awka -c
+                      below for more details on how to use this
+                      option.
+
+       -X             awka will generate  C  code,  which  will
+                      then  be  compiled  into  an  executable,
+                      using  the  C  compiler  and  intallation
+                      paths  defined  when  Awka was installed.
+                      The C code will be stored in 'awka_out.c'
+                      and   the  executable  in  'awka.out'  or
+                      'awka_out.exe'.
+
+       -x             The same as -X, except that the  compiled
+                      program will also be executed using argu-
+                      ments following the '--'  option  on  the
+                      command-line.
+
+       -t             To be used in conjunction with -x.  The C
+                      file and the executable will  be  removed
+                      following execution of the program.
+
+       -o filename    To be used in conjunction with -x and -X.
+                      The generated executable will  be  called
+                      'filename'   rather   than   the  default
+                      'awka.out'.
+
+       -a args        This embeds executable command-line argu-
+                      ments  within the translated code itself.
+                      For example, awka -X  -a  "-We"  file.awk
+                      will create an awka.out that will already
+                      have -We in its command-line when  it  is
+                      run.   To  see  what  arguments have been
+                      embedded in an executable,  use  -showarg
+                      at runtime.
+
+       -w args        Prints various warnings to stderr, useful
+                      in debugging large, complex AWK programs.
+                      None  of  these  are  errors  -  all  are
+                      acceptable  uses  of  the  AWK  language.
+                      Depending on your programming style, how-
+                      ever, they could be useful  in  narrowing
+                      down  where  problems  may  be  occuring.
+                      args can contain  the  following  charac-
+                      ters:-
+
+                      a  -  prints  a  list of all global vari-
+                      ables.
+
+                      b - warns about variables set to a  value
+                      but not referenced.
+
+                      c  - warns about variables referenced but
+                      not set to a value.
+
+                      d - reports use of global vars  within  a
+                      function.
+
+                      e  -  reports  use  of global vars within
+                      just one function.
+
+                      f - requires declaration of global  vari-
+                      ables.
+
+                      g - warns about assignments used as truth
+                      expressions.
+
+                      NOTE: As at version 0.5.8 only a, b and c
+                      are implemented.
+
+       -I include-dir Specifies  a  directory  in which include
+                      files required by awka, or defined by the
+                      user,  reside.   You  may  use as many -I
+                      options as you like.
+
+       -i include-file
+                      Specifies  an  include  filename  to   be
+                      inserted in the translated code.
+
+       -L lib-dir     Specifies    a    directory    containing
+                      libraries that may be required  by  awka,
+                      or  defined for linking by the user.  See
+                      the awka-elm manpage for more details.
+
+       -l lib-file    Specifies a library file to be linked  to
+                      the  translated code generated by awka at
+                      compile  time  (this  only  really  makes
+                      sense if using awka -x).  The lib-file is
+                      specified in the same way as C compilers,
+                      that  is,  the library libmystuff.a would
+                      be referred to as "-l mystuff".
+
+                      Again,  see  the  awka-elm  manpage   for
+                      details   on  awka  extension  libraries.
+                      Like the three previous options, you  can
+                      use  this  as often as you like on a com-
+                      mandline.
+
+       -f progname    Specifies the name  of  an  AWK  language
+                      program  to be translated to C.  Multiple
+                      -f arguments may be specified.
+
+       program        An AWK language program on  the  command-
+                      line, usually surrounded by single quotes
+                      (').
+
+       --             All  arguments  following  this  will  be
+                      passed to the compiled executable when it
+                      is executed.  This  argument  only  makes
+                      sense when -x has been specified.
+
+       exe-args       Arguments  to  be  passed directly to the
+                      executable when it is run.
+
+       -h             Prints a short  summary  of  command-line
+                      options.
+
+       -v             Prints version information then quits.
+
+
+EXECUTABLE OPTIONS
+       An  executable  formed  by compiling Awka-generated code
+       against libawka.a will also understand several  command-
+       line arguments.
+
+       -help          Prints a short summary of executable com-
+                      mand-line options, then exits.
+
+       -We            Following command-line arguments will  be
+                      stored  in the ARGV array, and not parsed
+                      as options.
+
+       -Wi            Sets unbuffered writes to stdout and line
+                      buffered reads from stdin.
+
+       -v var=value   Sets  variable  'var'  to 'value'.  'var'
+                      must be a defined scalar variable  within
+                      the  original  AWK  program else an error
+                      message will be generated.
+
+       -F value       Sets FS to value.
+
+       -showarg       Displays any embedded command-line  argu-
+                      ments, then exits.
+
+       -awkaversion   Shows which version of awka generated the
+                      .c code for the executable.
+
+
+ADDITIONAL FEATURES
+       awka contains a number of builtin functions may  or  may
+       not  presently be found in standard AWK implementations.
+       The functions have been added to  extend  functionality,
+       or  to  provide a faster method of performing tasks that
+       AWK could otherwise undertake in an inefficient way.
+
+       The new functions are:-
+
+       totitle(s)     converts a  string  to  Title  or  Proper
+                      case,  with the first letter of each word
+                      uppercased, the remainder lowercased.
+
+       abort()        Exits the AWK program immediately without
+                      running the END section.  Originally from
+                      TAWK, Gawk now supports abort() as  well.
+
+       alength(a)     returns  the number of elements stored in
+                      array variable a.
+
+       asort(src [,dest])
+                      The function introduced  in  Gawk  3.1.0.
+                      From  Gawk's  manpage,  this "returns the
+                      number of elements in  the  source  array
+                      src.   The  contents  of  src  are sorted
+                      using awka's normal rules  for  comparing
+                      values,  and  the  indexes  of the sorted
+                      values of src are replaced  with  sequen-
+                      tial  integers  starting  with  1. If the
+                      optional destination array dest is speci-
+                      fied,  then  src is first duplicated into
+                      dest, and then dest  is  sorted,  leaving
+                      the  indexes  of  the  source  array  src
+                      unchanged."
+
+       ascii(s,n)     Returns the ascii value of character n in
+                      string  s.  If n is omitted, the value of
+                      the first character will be returned.  If
+                      n  is  longer  than  the string, the last
+                      character  will  be  returned.   A   Null
+                      string  will  result in a return value of
+                      zero.
+
+       char(n)        Returns the character associated with the
+                      ascii value of n.  In effect, this is the
+                      complement of the ascii function above.
+
+       left(s,n)      Returns  the  leftmost  n  characters  of
+                      string  s.  This is more efficient than a
+                      call to substr.
+
+       right(s,n)     Returns the  rightmost  n  characters  of
+                      string s.
+
+       ltrim(s, c)    Returns a string with the preceding char-
+                      acters in c removed from the left  of  s.
+                      For  instance, ltrim(" hello", "h ") will
+                      return "ello".  If c  is  not  specified,
+                      whitespace will be trimmed.
+
+       rtrim(s, c)    Returns a string with the preceding char-
+                      acters in c removed from the right of  s.
+                      For  instance, ltrim(" hello", "ol") will
+                      return " he".  If  c  is  not  specified,
+                      whitespace will be trimmed.
+
+       trim(s, c)     Returns a string with the preceding char-
+                      acters in c removed from each end  of  s.
+                      For  instance, trim(" hello", "oh ") will
+                      return "ell".  If  c  is  not  specified,
+                      whitespace  will  be  trimmed.  The three
+                      trim  functions  are  considerably   more
+                      efficient than calls to sub or gsub.
+
+       min(x1,x2,...,xn)
+                      Returns  the  lowest number in the series
+                      x1 to xn.  A minimum of two and a maximum
+                      of 255 numbers may be passed as arguments
+                      to Min.
+
+       max(x1,x2,...,xn)
+                      Returns the highest number in the  series
+                      x1 to xn.  A minimum of two and a maximum
+                      of 255 numbers may be passed as arguments
+                      to Max.
+
+       time(year,mon,day,hour,sec)  time()
+                      returns  a number representing the date &
+                      time  in   seconds   since   the   Epoch,
+                      00:00:00GMT  1  Jan  1970.  The arguments
+                      allow specification of a date/time, while
+                      no  arguments  will  return  the  current
+                      time.
+
+       systime()      returns a number representing the current
+                      date  &  time in seconds since the Epoch,
+                      00:00:00 GMT 1 Jan 1970.   This  function
+                      was  included  to  increase compatibility
+                      with Gawk.
+
+       strftime(format, n)
+                      returns  a  string  containing  the  time
+                      indicated  by  n  formatted  according to
+                      format.  See strftime(3) for more details
+                      on  format  specification.  This function
+                      was included  to  increase  compatibility
+                      with Gawk.
+
+       gmtime(n)  gmtime()
+                      returns  a  string  containing  Greenwich
+                      Mean Time, in the form:-
+
+                          Fri Jan  8 01:23:56 1999
+
+                      n is a number specifying seconds since  1
+                      Jan  1970, while a call with no arguments
+                      will return a string containing the  cur-
+                      rent time.
+
+       localtime(n)  localtime()
+                      returns  a  string  containing the date &
+                      time adjusted  for  the  local  timezone,
+                      including  daylight savings.  Output for-
+                      mat & arguments are the same as gmtime.
+
+       mktime(str)    The same as mktime() introduced  in  Gawk
+                      3.1.0.  See Gawk's manpage for a detailed
+                      description of what this function does.
+
+       and(y,x)       Returns the output of 'y & x'.
+
+       or(y,x)        Returns the output of 'y | x'.
+
+       xor(y,x)       Returns the output of 'y ^ x'.
+
+       compl(y)       Returns the output of '~y'.
+
+       lshift(y,x)    Returns the output of 'y << x'.
+
+       rshift(y,x)    Returns the output of 'y >> x'.
+
+       argcount()     When  called  from  within  a   function,
+                      returns the number of arguments that were
+                      passed to that function.
+
+       argval(n[, arg, arg...])
+                      When  called  from  within  a   function,
+                      returns  the  value  of variable n in the
+                      argument list.  The optional arg  parame-
+                      ters  are index elements used if variable
+                      n is an array.  You may not specify  val-
+                      ues   for   n   that   are   larger  than
+                      argcount().
+
+       getawkvar(name[, arg, arg...])
+                      Returns  the  value  of  global  variable
+                      "name".  The optional arg parameters work
+                      in the same as for argval.  The  variable
+                      specified by name must actually exist.
+
+       gensub(r,s,f[,v])
+                      Implementation of Gawk's gensub function.
+                      It should perform exactly the same as  it
+                      does  in  Gawk.  See Gawk's documentation
+                      for details on how to use gensub.
+
+
+       The SORTTYPE variable controls if  and  how  arrays  are
+       sorted when accessed using 'for (i in j)'.  The value of
+       this variable is a bitmask, which may be set to a combi-
+       nation of the following values:-
+
+
+            0  No Sorting
+            1  Alphabetical Sorting
+            2  Numeric Sorting
+            4  Reverse Order
+
+       A value for SORTTYPE of 5, therefore, indicates that the
+       array is to be sorted Alphabetically, in Reverse  order.
+
+       Awka also supports the FIELDWIDTHS variable, which works
+       exactly as it does in Gawk.
+
+       If the FIELDWIDTHS variable is set to a space  separated
+       list of positive numbers, each field is expected to have
+       fixed width, and awka will split up the record using the
+       widths  specified  in  FIELDWIDTHS.   The value of FS is
+       ignored.  Assigning a value to FS overrides the  use  of
+       FIELDWIDTHS, and restores the default behaviour.
+
+       Awka  also  introduces  the  SAVEWIDTHS  variable.  This
+       applies when FIELDWIDTHS is in  use,  and  $0  is  being
+       rebuilt following a change to a $1..$n field variable.
+
+       If  the  SAVEWIDTHS variable is set to a space separated
+       list of positive numbers,  each  output  field  will  be
+       given  a  fixed width to match these numbers.  $n values
+       shorter than their specified width will be  padded  with
+       spaces;  if  they  are longer than their specified width
+       they will be  truncated.   Additional  values  to  those
+       specified in SAVEWIDTHS will be separated using OFS.
+
+       Awka   0.7.5  supports  the  inet/coprocessing  features
+       introduced in Gawk 3.1.0.  See the documentation  accom-
+       panying   the  Gawk  source,  or  visit  http://home.vr-
+       web.de/Juergen.Kahrs/gawk/gawkinet.html for  details  on
+       how these work.
+
+
+EXAMPLES
+       The command-line arguments above provide a range of ways
+       in which awka may be used, from output of C code to std-
+       out,  through  to  an  automatic translation compile and
+       execution of the AWK program.
+
+       (a) Producing C code:-
+
+
+            1. awka -f myprog.awk >myprog.c
+            2. awka -c main_one -f myprog.awk -f other.awk >myprog.c
+
+       (b) Producing C code and an executable:-
+
+
+            awka -X -f myprog.awk -f other.awk
+
+       (c) Producing the C and Executable, run the executable:-
+
+
+            awka -x -f myprog.awk -f other.awk -- input.txt
+
+       Afterwards,  you  could  run the executable directly, as
+       in:-
+
+
+            awka.out input.txt
+
+       Running the same program using an  interpreter  such  as
+       mawk would be done as follows:-
+
+
+            mawk -f myprog.awk -f other.awk input.txt
+
+       The following will run the program, passing it -v on the
+       command-line  without  it  being   interpreted   as   an
+       'option':-
+
+
+            awka.out -We -v input.txt, OR
+            awka -x -f myprog.awk -- -We -v input.txt
+
+       (d) Producing and running the executable, ensuring it
+           and the C program file are automatically removed:-
+
+
+            awka -x -t -f myprog.awk -f other.awk -- input.txt
+
+       (e)  A simplistic example of how awka might be used in a
+       Makefile:-
+
+
+            myprog:  myprog.o
+                   gcc myprog.o -lawka -lm -o myprog
+
+            myprog.o:  myprog.c
+
+            myprog.c:  myprog.awk
+                   awka -f myprog.awk >myprog.c
+
+
+LINKING AWKA-GENERATED CODE
+       The C programs produced by awka call many  functions  in
+       libawka.a.   This  library  needs to be linked with your
+       program for a workable executable to be produced.
+
+       Note that when using the -x and  -X  arguments  this  is
+       automatically  taken care of for you, so linking is only
+       an issue when you use Awka to produce C code, which  you
+       then  compile  yourself.   Many people many only wish to
+       use Awka in this way, and never use awka-generated  code
+       as  part  of  larger  applications.  If this is you, you
+       needn't worry too much about this section.
+
+       As well as linking to libawka.a, your program will  also
+       need  to  be linked to your system's math library, typi-
+       cally libm.a or libm.so.
+
+       Typical compiler commands to  link  an  awka  executable
+       might be as follows:-
+
+         gcc   myprog.c  -L/usr/local/lib  -I/usr/local/include
+       -lawka -lm -o myprog
+
+         OR
+
+         awka -c my_main -f myprog.awk >myprog.c
+         gcc -c myprog.c -I/usr/local/include -o myprog.o
+         gcc -c other.c -o other.o
+         gcc myprog.o other.o -L/usr/local/lib  -lawka  -lm  -o
+       myapp
+
+       If  you  are  not  sure  of  how your compiler works you
+       should consult the manpage for the compiler.  In release
+       0.7.5  Awka  introduced  Gawk-3.1.0's inet and coprocess
+       features.  On some platforms this  may  require  you  to
+       link  to  the socket and nsl libraries (-lsocket -lnsl).
+       To check this, look at config.h after running  the  con-
+       figure  script.   The  #define awka_SOCKET_LIBS indicate
+       what, if any, extra libraries are required on your  sys-
+       tem.
+
+
+USING awka -c
+       The  -c  option,  as  described previously, replaces the
+       main() function with a function name of  your  choosing.
+       You  may then link this code to other C or C++ code, and
+       thus add AWK functionality to a larger application.
+
+       The command line "awka -c matrix 'BEGIN { print "what is
+       the matrix?" }'" will produce in its output the function
+       "int matrix(int argc, char *argv[])".   Obviously,  this
+       replaces  the  main()  function,  and  the argc and argv
+       variables are used the same way - they handle what  awka
+       thinks  are  command-line  arguments.   Hence argv is an
+       array of pointers to char *'s, and argc is the number of
+       elements in this array.  argv[0], from the command-line,
+       holds the name of the running program.  You can populate
+       as  many argv[] elements as you like to pass as input to
+       your AWK program.  Just remember this array  is  managed
+       by your calling function, not by awka.
+
+       That's  just  about it.  You should be able to call your
+       awka function (eg matrix()) as many times as  you  like.
+       It  will grab a little bit of memory for itself, but you
+       should see no growing memory use with each call, as I've
+       taken  quite some time to eliminate any potential memory
+       leaks from awka code.
+
+       Oh, one more thing,  exit and abort statements  in  your
+       AWK  program  code  will  still  exit your program alto-
+       gether, so be careful of where & how you use them.
+
+
+GOING FURTHER
+       Awka also allows you to create your own C functions  and
+       have  them  accessible  in  your AWK programs as if they
+       were built-in to the AWK language.  See the awka-elm and
+       awka-elmref manpages for details on how this is done.
+
+
+FILES
+       libawka.a, libawka.so, awka, libawka.h, libdfa.a, dfa.h
+
+
+SEE ALSO
+       awk(1),  mawk(1),  gawk(1),  awka-elm(5) awka-elmref(5),
+       cc(1), gcc(1)
+
+       Aho, Kernighan and Weinberger, The AWK Programming  Lan-
+       guage,  Addison-Wesley Publishing, 1988, (the AWK book),
+       defines  the  language,  opening  with  a  tutorial  and
+       advancing  to  many interesting programs that delve into
+       issues of software design and analysis relevant to  pro-
+       gramming in any language.
+
+       The  GAWK Manual, The Free Software Foundation, 1991, is
+       a tutorial and language reference that does not  attempt
+       the  depth of the AWK book and assumes the reader may be
+       a novice programmer. The section on AWK arrays is excel-
+       lent.  It also discusses Posix requirements for AWK.
+
+       Like  you, I should probably buy & read these books some
+       day.
+
+
+MISSING FEATURES
+       awka does not implement gawk's internal variable IGNORE-
+       CASE.  Gawk's /dev/pid functions are also absent.
+
+       Nextfile  and  next  may  not  be used within functions.
+       This will never be supported, unlike the  previous  fea-
+       tures, which may be added to awka over time.  Well, so I
+       thought.  As of release 0.7.3 you _can_ use  these  from
+       within functions.
+
+
+AUTHOR
+       Andrew Sumner (andrewsumner@yahoo.com)
+
+       The  awka  homepage  is  at http://awka.sourceforge.net.
+       The latest  version  of  awka,  along  with  development
+       'snapshot'  releases, are available from this page.  All
+       major releases will be announced in  comp.lang.awk.   If
+       you  would  like  to be notified of new releases, please
+       send me an email to that effect.  Make sure you  preface
+       any  email messages with the word "awka" in the title so
+       I know its not spam.
+
+
+
+
+Version 0.7.x              Aug 8 2000                   AWKA(1)

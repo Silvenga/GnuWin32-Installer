@@ -1,0 +1,139 @@
+.\"{{{}}}
+.\"{{{  Title
+.TH MKSHORTCUT 1 "10 Mar 04" "mkshortcut 1.6 (cygutils)" "Cygutils"
+.\"}}}
+.\"{{{  Name
+.SH NAME
+mkshortcut \- create a Windows shortcut
+.\"}}}
+.\"{{{  Synopsis
+.SH SYNOPSIS
+.B mkshorcut
+.RB "[\-\fBa\fP \fIARGS\fP]"
+.RB "[\-\fBd\fP \fIDESC\fP]"
+.RB "[\-\fBi\fP \fIICONFILE\fP [\-\fBj\fP \fIINT\fP] ]"
+.RB "[\-\fBn\fP \fINAME\fP ]"
+.RB "[\-\fBs\fP \fInorm|min|max\fP ]"
+.RB "[\-\fBw\fP \fIPATH\fP ]"
+.RB "[\-A] [\-D|\-P] \fITARGET\fP"
+.br
+.\"}}}
+.\"{{{  Options
+.SH OPTIONS
+
+.TP 
+\fB\-a\fR, \fB\-\-arguments\fP=\fIARGS\fP
+Arguments to use (see example below).
+
+.TP 
+\fB\-d\fR, \fB\-\-desc\fR=\fI"DESC"\fP
+Text for description/tooltip (defaults to POSIX path of TARGET). Note that \fI"DESC"\fP can contain spaces, but in that case must be enclosed in quotes.
+
+.TP 
+\fB\-h\fR, \fB\-\-help\fR
+Output usage information (to stdout) and exit.
+
+.TP 
+\fB\-i\fR, \fB\-\-icon\fR=\fIICONFILE\fP
+Specify \fIICONFILE\fP containing the icon to use for the shortcut; defaults to
+\fBTARGET\fP. \fIICONFILE\fP must be a full filename, including an extension if 
+applicable.
+
+.TP 
+\fB\-j\fR, \fB\-\-iconoffset\fR=\fINUM\fP
+Requires \fB\-i\fR. Use \fINUM\fP icon in \fIICONFILE\fP, offset from 0. Defaults
+to 0.
+
+.TP 
+\fB\-n\fR, \fB\-\-name\fR=\fI"NAME"\fP
+Name to use for the shortcut file. Note that \fI"NAME"\fP can contain spaces, but in
+that case must be enclosed in quotes. The Windows extention \fB.lnk\fP is automatically
+appended to \fI"NAME"\fP if not present.
+
+.TP 
+\fB\-s\fR, \fB\-\-show\fR=\fInorm|min|max\fP
+For norm, min, and max the new window will be normal, minimized, and 
+maximized, respectively.  Note that if you use the properties dialog to
+inspect properties of shortcuts for which you request minimized windows 
+the dialog may indicate that normal windows will be displayed.  Fortunately,
+that indicator is often wrong.
+
+
+.TP 
+\fB\-w\fR, \fB\-\-workingdir\fR=\fI"PATH"\fP
+PATH to use for the working directory (defaults to directory path of TARGET).
+
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+Output version information (to stdout) and exit.
+
+.TP 
+\fB\-A\fR, \fB\-\-allusers\fR
+Requires either \fB\-D\fR or \fB\-P\fR. Instead of using the current user's \fI"Desktop"\fP 
+or \fI"Start Menu/Programs"\fP folders, use the \fI"All Users"\fP version. Has no effect on
+Win95 without multiple users.
+
+.TP 
+\fB\-D\fR, \fB\-\-desktop\fR
+Instead of creating the shortcut relative to the current directory, create it relative
+to the Windows \fI"Desktop"\fP directory. The \fB\-A\fP option can also be used to use
+the \fI"All Users/Desktop"\fP directory instead.
+
+.TP 
+\fB\-P\fR, \fB\-\-smprograms\fR
+Instead of creating the shortcut relative to the current directory, create it relative
+to the Windows \fI"Start Menu/Programs"\fP directory. The \fB\-A\fP option can also be used 
+to use the \fI"All Users/Start Menu/Programs"\fP directory instead.
+
+.\"}}}
+.SH NOTES
+All filename arguments must be in unix (POSIX) format, not in Windows (C:\\) format.
+If \fBmkshortcut\fP encounters a syntax error, it will return an exit value of 1 and 
+output usage information to stderr.
+.PP
+If you don't need any of \fBmkshortcut\fP's options and just want a simple link to a
+file or directory, you might want to just use a symbolic link with \fBln\fP.
+
+.SH EXAMPLES
+Create a shortcut to the Cygwin website in the \fI"Start Menu/Programs"\fP directory:
+.PP
+.nf
+$ mkshortcut -P http://www.cygwin.com
+.fi
+.PP
+Create a shortuct to \fBrxvt\fP on the \fI"Desktop"\fP that looks like \fI"Internet 
+Explorer"\fP but really starts up an interactive \fBbash\fP shell:
+.PP
+.nf
+$ mkshortcut -a '-rv -fn "FixedSys" -e /bin/bash --login -i' \\
+-i /c/WINNT/system32/SHELL32.DLL -j 106 -n "Internet Explorer" \\
+-D /bin/rxvt
+.fi
+
+.SH COPYRIGHT
+Copyright (C) 2002 Joshua Daniel Franklin
+.PP
+\fBmkshortcut\fP is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option) any 
+later version.
+.PP
+\fBmkshortcut\fP is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for 
+more details.
+.PP
+You should have received a copy of the GNU General Public License; 
+see the file COPYING. If not, write to the 
+Free Software Foundation, 
+59 Temple Place,
+Suite 330, Boston, MA  02111-1307, USA.
+
+.\"{{{  Author
+.SH AUTHOR
+Joshua Daniel Franklin, joshuadfranklin@yahoo.com
+.\"}}}
+.\"{{{  See also
+.SH "SEE ALSO"
+.BR ln (1)
+.\"}}}

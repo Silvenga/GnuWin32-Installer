@@ -1,0 +1,138 @@
+.\" @(#)hex2bin.man 1.0 2001/05/05; Copyright (c) 2001 - Andreas Leitgeb (AvL) 
+.TH hex2bin 1 "5 May 2001"
+.SH NAME
+hex2bin \- Create a binary from its hexdump.
+.SH SYNOPSIS
+.B hex2bin
+[\fB\-q\fP|\fB\-f\fP|\fB\-v\fP|\fB\-I\fP]
+[[\fB\-i\fP] \fIinputfile\fP] [\fB\-o\fP \fIoutputfile\fP] 
+
+.SH DESCRIPTION
+.I hex2bin
+is the counterpart to \fIhexdump\fP.
+.LP
+Together with \fIhexdump\fP it can be used for editing binary files:
+First you \fIhexdump\fP the file, then you modify the dump-file in an 
+editor, then you use \fIhex2bin\fP to produce the modified binary file.
+Because there are so many versions of \fIhexdump\fP out there, which 
+have so many different output-formats, you had better use that one 
+distributed together with \fIhex2bin\fP.
+.LP
+Also, you can use this program to produce binary data to send to a device
+or to another program. Use option \fB\-I\fP for this task.
+
+.sh OPTIONS
+.TP 5
+\fB-i\fP \fIinputfile\fP || \fIinputfile\fP
+At most one inputfile can be given. If none is, then stdin will be used
+for input. (Giving more inputfiles would make no sense.)
+.TP 5
+\fB\-o\fP \fIoutputfile\fP
+At most one outputfile can be given. If none is, then stdout will be used
+for output. On systems where textfiles and binaries are treated differently
+(such as MS-DOS) an outputfile should be given, for output-redirection may 
+be flakey with binary data.
+.TP 5
+.B "\-q"
+(quiet) hush up warnings. Errors are still printed.
+.TP 5
+.B "\-f"
+(flush) flush output after each chunk of input. 
+.TP 5
+.B "\-v"
+(verbose) print more infos. 
+.TP 5
+.B "\-I"
+(interactive) Imply \fB-f\fP and \fB-v\fP and prompt current offset.
+
+
+.SH INPUTFILE-SYNTAX
+Inputlines usually consist of an \fBaddress\fP-field terminated by a
+colon (:) followed by byte-\fBdata\fP or strings. Anything after a 
+pipe-character (|) is ignored (Comments).
+
+Each, any or all of these parts can be omitted.
+
+A special case are \fBrepetition\fP-lines, which start with an 
+asterisk (*) and may be followed by a decimal(base 10) number.
+
+The last line consists of a semicolon (;) optionally preceded
+by an Address-field.  Anything after this semicolon will be ignored. 
+If no line with semicolon is found till the end of input and option 
+\fB-q\fP is not specified, a warning is shown, but all data-fields 
+are still converted. The reason for issuing the warning at all 
+is that \fIhexdump\fP outputs a semicolon-line at the end, and thus
+the warning most likely indicates unexpected truncation. In interactive
+mode (option: \fB-I\fP), this warning is suppressed.
+
+.TP 8
+\fBAddress\fP-field: 
+A hexadecimal number, whose actual value is important ONLY before
+and after repeatition-lines. If the value does not match the internal 
+data-counting, then a warning message is printed (unless option \fB-q\fP
+is specified) and a variable is set to the difference, which will then 
+be added to all subsequent addresses.  Thus if you insert or delete data 
+(or lines) in the dump-file, there is no need to change all further 
+addresses.
+
+If the first (hex-)number of an input-line is not followed by a colon
+or semicolon, it will be interpreted as part of the data-field.
+
+.TP 8
+\fBData\fP-field:
+can be a sequence of hexadecimal values separated by spaces
+mixed with strings, which are handled c-like (escape-codes \\n,\\a,\\nnn,...).
+Thus the following is a valid Data-field:
+
+0A 7f " \\\\\\aBeep\\t" - 04 1b "\\0"
+
+which will be converted to a newline(0A), a Delete-char(7F), a space (first 
+character of string), a backslash(\\\\), a beep-code(\\a), the characters
+\'B\' \'e\' \'e\' \'p\', a tab, an EOF-code, an Esc-code and the Null-byte.
+Dashes ('-') will be ignored for compatibility with hexdump's output.
+
+.TP 8
+\fBRepetition\fP-lines:
+Lines that begin with an asterisk will cause the latest data-field
+to be repeated a certain number of times. There must have been at 
+least one line containing at least one byte of data before the 
+first repetition line, or an error message is issued and conversion 
+aborted.
+
+The actual number of repetitions can be specified in two ways:
+
+\fBexplicitly:\fP
+if a \fBdecimal\fP number follows the asterisk, this number will
+specify the number of repetitions. (Note: to get a total of e.g. 10 
+times a chunk, specify 9, because the chunk itself was already 
+output once where it appeared in the input.)
+
+\fBimplicitly:\fP
+If no explicit count is specified, the number of repetitions is 
+automatically calculated based on the address-field of the next 
+input line. In this case, an address \fBmust\fP be specified there, 
+otherwise an error occurs and conversion is aborted. Even more, if the 
+number of bytes necessary to reach the next specified address is not a 
+multiple of the byte length of the repeated chunk, this is also an
+error.
+
+.SH BUGS
+none  ;-)
+
+Report missing features (in your eyes) to author's address
+
+.SH SEE ALSO
+hexdump(1)
+.SH COPYRIGHT
+Copyright (c) 1994 by   Andreas Leitgeb (AvL) 
+.br
+(avl@logic.at)
+.sp 1
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
+provided that the above copyright notice appear in all copies and that
+both that copyright notice and this permission notice appear in
+supporting documentation. 
+
+

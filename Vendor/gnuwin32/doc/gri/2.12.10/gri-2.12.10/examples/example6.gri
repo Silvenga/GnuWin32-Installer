@@ -1,0 +1,61 @@
+# Example 6 -- Plot IR image of Gulf of Maine
+
+# Define characteristics of norda images
+# Note that the pixel to temperature conversion formula is
+#
+#   Temperature = 5C + pixel_value / 10
+#
+# where pixel_value ranges from 0 to 255.  Thus, a pixel
+# value of 0 corresponds to a temperatuer of 5C, and
+# 255 corresponds to 30.5C; this is why the limits
+# \0val and \255val, for use by the `set image
+# range' command, take on these values.
+\0val = "5"			# 0 in image
+\255val = "30.5"		# 255 in image
+.rows. = 128
+.cols. = 128
+.pixel_width. = 2
+.km. = {rpn .cols. .pixel_width. *}
+
+# get filenames
+query \filename "Name image file" ("example6image.dat")
+query \maskname "Name mask  file" ("example6mask.dat")
+
+# get data
+open \filename binary uchar
+set image range \0val \255val
+read image .rows. .cols. box 0 0 .km. .km.
+close
+open \maskname binary uchar
+read image mask .rows. .cols.
+close
+
+# find out what grayscale method to use
+query \histo "Do histogram enhancement? (yes|no)" ("no")
+query \minT  "T/deg for white on page?          " ("10")
+query \maxT  "T/deg for black on page?          " ("15")
+\incT = "1"
+
+# set up scales. 
+set x size 12.8
+set y size 12.8
+set x name "km"
+set y name "km"
+set x axis 0 .km. 32
+set y axis 0 .km. 32
+
+# plot image, grayscale, and histogram
+if {"\histo" == "yes"}
+    set image grayscale using histogram black \maxT white \minT
+else
+    set image grayscale black \maxT white \minT
+end if
+draw image
+draw image palette left \minT right \maxT increment \incT
+draw image histogram
+if {"\histo" == "yes"}
+    draw title "Example 6: grayscale histogram enhanced"
+else
+    draw title "Example 6: grayscale linear \minT to \maxT"
+end if
+

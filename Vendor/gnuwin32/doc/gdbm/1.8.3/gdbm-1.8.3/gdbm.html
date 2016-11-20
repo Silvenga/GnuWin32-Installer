@@ -1,0 +1,842 @@
+<html lang="en">
+<head>
+<title>gdbm</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="gdbm">
+<meta name="generator" content="makeinfo 4.6">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+--></style>
+</head>
+<body>
+<h1 class="settitle">gdbm</h1>
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Top">Top</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Copying">Copying</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#dir">(dir)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+<br>
+</div>
+
+<p>Introduction:
+
+<ul class="menu">
+<li><a accesskey="1" href="#Copying">Copying</a>:                     Your rights. 
+<li><a accesskey="2" href="#Intro">Intro</a>:                       Introduction to GNU dbm. 
+<li><a accesskey="3" href="#List">List</a>:                        List of functions.
+
+<p>Functions:
+
+</p><li><a accesskey="4" href="#Open">Open</a>:                        Opening the database. 
+<li><a accesskey="5" href="#Close">Close</a>:                       Closing the database. 
+<li><a accesskey="6" href="#Store">Store</a>:                       Inserting and replacing records in the database. 
+<li><a accesskey="7" href="#Fetch">Fetch</a>:                       Searching records in the database. 
+<li><a accesskey="8" href="#Delete">Delete</a>:                      Removing records from the database. 
+<li><a accesskey="9" href="#Sequential">Sequential</a>:                  Sequential access to records. 
+<li><a href="#Reorganization">Reorganization</a>:              Database reorganization. 
+<li><a href="#Sync">Sync</a>:                        Insure all writes to disk have competed. 
+<li><a href="#Errors">Errors</a>:                      Convert internal error codes into English. 
+<li><a href="#Options">Options</a>:                     Setting internal options. 
+<li><a href="#Locking">Locking</a>:                     File locking.
+
+<p>Other topics:
+
+</p><li><a href="#Variables">Variables</a>:                   Two useful variables. 
+<li><a href="#Compatibility">Compatibility</a>:               Compatibility with UNIX dbm and ndbm. 
+<li><a href="#Conversion">Conversion</a>:                  Converting dbm files to gdbm format. 
+<li><a href="#Bugs">Bugs</a>:                        Problems and bugs. 
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Copying">Copying</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Intro">Intro</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">1 Copying Conditions.</h2>
+
+<p>This library is <dfn>free</dfn>; this means that everyone is free to use
+it and free to redistribute it on a free basis.  GNU <code>dbm</code> (<code>gdbm</code>)
+is not in the public domain; it is copyrighted and there
+are restrictions on its distribution, but these restrictions are
+designed to permit everything that a good cooperating citizen would want
+to do.  What is not allowed is to try to prevent others from further
+sharing any version of <code>gdbm</code> that they might get from
+you.
+
+   <p>Specifically, we want to make sure that you have the right to give
+away copies <code>gdbm</code>, that you receive
+source code or else can get it if you want it, that you can change these
+functions or use pieces of them in new free programs, and that you know
+you can do these things.
+
+   <p>To make sure that everyone has such rights, we have to forbid you to
+deprive anyone else of these rights.  For example, if you distribute
+copies <code>gdbm</code>, you must give the recipients all
+the rights that you have.  You must make sure that they, too, receive or
+can get the source code.  And you must tell them their rights.
+
+   <p>Also, for our own protection, we must make certain that everyone finds
+out that there is no warranty for anything in the <code>gdbm</code> distribution. 
+If these functions are modified by someone else and passed on, we want
+their recipients to know that what they have is not what we distributed,
+so that any problems introduced by others will not reflect on our
+reputation.
+
+   <p><code>gdbm</code> is currently distributed under the terms of the GNU General
+Public License, Version 2.  (<em>NOT</em> under the GNU General Library
+Public License.)  A copy the GNU General Public License is included with
+the distribution of <code>gdbm</code>.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Intro">Intro</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#List">List</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Copying">Copying</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">2 Introduction to GNU <code>dbm</code>.</h2>
+
+<p>GNU <code>dbm</code> (<code>gdbm</code>)is a library of database functions that use
+extendible hashing and works similar to the standard UNIX <code>dbm</code>
+functions.  These routines are provided to a programmer needing to
+create and manipulate a hashed database. (<code>gdbm</code> is <em>NOT</em> a
+complete database package for an end user.)
+
+   <p>The basic use of <code>gdbm</code> is to store key/data pairs in a data file. 
+Each key must be unique and each key is paired with only one data item. 
+The keys can not be directly accessed in sorted order.  The basic unit
+of data in <code>gdbm</code> is the structure:
+
+<pre class="example">       typedef struct {
+                  char *dptr;
+                  int  dsize;
+               } datum;
+     </pre>
+
+   <p>This structure allows for arbitrary sized keys and data items.
+
+   <p>The key/data pairs are stored in a <code>gdbm</code> disk file, called a
+<code>gdbm</code> database.  An application must open a <code>gdbm</code> database
+to be able manipulate the keys and data contained in the database. 
+<code>gdbm</code> allows an application to have multiple databases open at the
+same time.  When an application opens a <code>gdbm</code> database, it is
+designated as a <code>reader</code> or a <code>writer</code>.  A <code>gdbm</code>
+database opened by at most one writer at a time.  However, many readers
+may open the database open simultaneously.  Readers and writers can not
+open the <code>gdbm</code> database at the same time.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="List">List</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Open">Open</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Intro">Intro</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">3 List of functions.</h2>
+
+<p>The following is a quick list of the functions contained in the <code>gdbm</code>
+library. The include file <code>gdbm.h</code>, that can be included by the user,
+contains a definition of these functions.
+
+<pre class="example">     #include &lt;gdbm.h&gt;
+     
+     GDBM_FILE gdbm_open(name, block_size, flags, mode, fatal_func);
+     void gdbm_close(dbf);
+     int gdbm_store(dbf, key, content, flag);
+     datum gdbm_fetch(dbf, key);
+     int gdbm_delete(dbf, key);
+     datum gdbm_firstkey(dbf);
+     datum gdbm_nextkey(dbf, key);
+     int gdbm_reorganize(dbf);
+     void gdbm_sync(dbf);
+     int gdbm_exists(dbf, key);
+     char *gdbm_strerror(errno);
+     int gdbm_setopt(dbf, option, value, size);
+     int gdbm_fdesc(dbf);
+     </pre>
+
+   <p>The <code>gdbm.h</code> include file is often in the <code>/usr/local/include</code>
+directory. (The actual location of <code>gdbm.h</code> depends on your local
+installation of <code>gdbm</code>.)
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Open">Open</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Close">Close</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#List">List</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">4 Opening the database.</h2>
+
+<p>Initialize <code>gdbm</code> system. If the file has a size of zero bytes, a file
+initialization procedure is performed, setting up the initial structure in the
+file.
+
+   <p>The procedure for opening a <code>gdbm</code> file is:
+
+<pre class="example">     GDBM_FILE dbf;
+     
+     dbf = gdbm_open(name, block_size, flags, mode, fatal_func);
+     </pre>
+
+   <p>The parameters are:
+
+     <dl>
+<dt>char *name
+     <dd>The name of the file (the complete name, <code>gdbm</code> does not append any
+characters to this name). 
+<br><dt>int block_size
+     <dd>It is used during initialization to determine the size of various constructs. It
+is the size of a single transfer from disk to memory. This parameter is ignored
+if the file has been previously initialized. The minimum size is 512. 
+If the value is less than 512, the file system blocksize is used, otherwise the
+value of <code>block_size</code> is used. 
+<br><dt>int flags
+     <dd>If <code>flags</code> is set to GDBM_READER, the user wants to just read the
+database and any call to <code>gdbm_store</code> or <code>gdbm_delete</code> will fail. 
+Many readers can access the database at the same time. If <code>flags</code> is
+set to GDBM_WRITER, the user wants both read and write access to the database
+and requires exclusive access. If <code>flags</code> is set to GDBM_WRCREAT, the
+user wants both read and write access to the database and if the database does
+not exist, create a new one. If <code>flags</code> is set to GDBM_NEWDB, the
+user want a new database created, regardless of whether one existed, and wants
+read and write access to the new database.  The following may also be logically
+or'd into the database flags: GDBM_SYNC, which causes all database operations
+to be synchronized to the disk, and GDBM_NOLOCK, which prevents the library
+from performing any locking on the database file.  The option GDBM_FAST is
+now obsolete, since <code>gdbm</code> defaults to no-sync mode.  Any error detected
+will cause a return value of NULL and an appropriate value will be in
+<code>gdbm_errno</code> (see Variables). If no errors occur, a pointer to the
+<code>gdbm</code> file descriptor will be returned. 
+<br><dt>int mode
+     <dd>File mode (see chmod(2) and open(2) if the file is created). 
+<br><dt>void (*fatal_func) ()
+     <dd>A function for <code>gdbm</code> to call if it detects a fatal error. The only
+parameter of this function is a string. If the value of NULL is provided,
+<code>gdbm</code> will use a default function. 
+</dl>
+
+   <p>The return value, <code>dbf</code>, is the pointer needed by all other functions to
+access that <code>gdbm</code> file. If the return is the NULL pointer,
+<code>gdbm_open</code> was not successful. The errors can be found in
+<code>gdbm_errno</code> for <code>gdbm</code> errors and in <code>errno</code> for file system
+errors (for error codes, see <code>gdbm.h</code>).
+
+   <p>In all of the following calls, the parameter <code>dbf</code> refers to the pointer
+returned from <code>gdbm_open</code>.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Close">Close</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Store">Store</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Open">Open</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">5 Closing the database.</h2>
+
+<p>It is important that every file opened is also closed. This is needed to
+update the reader/writer count on the file. This is done by:
+
+<pre class="example">     gdbm_close(dbf);
+     </pre>
+
+   <p>The parameter is:
+
+     <dl>
+<dt>GDBM_FILE dbf
+     <dd>The pointer returned by <code>gdbm_open</code>. 
+</dl>
+
+   <p>Closes the <code>gdbm</code> file and frees all memory associated with the file
+<code>dbf</code>.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Store">Store</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Fetch">Fetch</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Close">Close</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">6 Inserting and replacing records in the database.</h2>
+
+<p>The function <code>gdbm_store</code> inserts or replaces records in the database.
+
+<pre class="example">     ret = gdbm_store(dbf, key, content, flag);
+     </pre>
+
+   <p>The parameters are:
+
+     <dl>
+<dt>GDBM_FILE dbf
+     <dd>The pointer returned by <code>gdbm_open</code>. 
+<br><dt>datum key
+     <dd>The <code>key</code> data. 
+<br><dt>datum content
+     <dd>The data to be associated with the key. 
+<br><dt>int flag
+     <dd>Defines the action to take when the key is already in the database. The value
+GDBM_REPLACE (defined in <code>gdbm.h</code>) asks that the old data be replaced by
+the new <code>content</code>. The value GDBM_INSERT asks that an error be returned
+and no action taken if the <code>key</code> already exists. 
+</dl>
+
+   <p>The values returned in <code>ret</code> are:
+
+     <dl>
+<dt>-1
+     <dd>The item was not stored in the database because the caller was not an
+official writer or either <code>key</code> or <code>content</code> have a NULL dptr field. 
+Both <code>key</code> and <code>content</code> must have the dptr field be a non-NULL value. 
+Since a NULL dptr field is used by other functions to indicate an error, a NULL
+field cannot be valid data. 
+<br><dt>+1
+     <dd>The item was not stored because the argument <code>flag</code> was GDBM_INSERT and
+the <code>key</code> was already in the database. 
+<br><dt>0
+     <dd>No error. <code>content</code> is keyed by <code>key</code>. The file on disk is updated
+to reflect the structure of the new database before returning from this
+function. 
+</dl>
+
+   <p>If you store data for a <code>key</code> that is already in the data base,
+<code>gdbm</code> replaces the old data with the new data if called with
+GDBM_REPLACE. You do not get two data items for the same <code>key</code> and you do
+not get an error from <code>gdbm_store</code>.
+
+   <p>The size in <code>gdbm</code> is not restricted like <code>dbm</code> or <code>ndbm</code>. Your
+data can be as large as you want.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Fetch">Fetch</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Delete">Delete</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Store">Store</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">7 Searching for records in the database.</h2>
+
+<p>Looks up a given <code>key</code> and returns the information associated with that
+key. The pointer in the structure that is  returned is a pointer to dynamically
+allocated memory block. To search for some data:
+
+<pre class="example">     content = gdbm_fetch(dbf, key);
+     </pre>
+
+   <p>The parameters are:
+
+     <dl>
+<dt>GDBM_FILE dbf
+     <dd>The pointer returned by <code>gdbm_open</code>. 
+<br><dt>datum key
+     <dd>The <code>key</code> data. 
+</dl>
+
+   <p>The datum returned in <code>content</code> is a pointer to the data found. If the
+dptr is NULL, no data was found. If dptr is not NULL, then it points
+to data allocated by malloc. <code>gdbm</code> does not automatically free this data. 
+The user must free this storage when done using it. This eliminates the
+need to copy the result to save it for later use (you just save the pointer).
+
+   <p>You may also search for a particular key without retrieving it, using:
+
+<pre class="example">     ret = gdbm_exists(dbf, key);
+     </pre>
+
+   <p>The parameters are:
+
+     <dl>
+<dt>GDBM_FILE dbf
+     <dd>The pointer returned by <code>gdbm_open</code>. 
+<br><dt>datum key
+     <dd>The <code>key</code> data. 
+</dl>
+
+   <p>Unlike <code>gdbm_fetch</code>, this routine does not allocate any memory, and
+simply returns true or false, depending on whether the <code>key</code> exists,
+or not.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Delete">Delete</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Sequential">Sequential</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Fetch">Fetch</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">8 Removing records from the database.</h2>
+
+<p>To remove some data from the database:
+
+<pre class="example">     ret = gdbm_delete(dbf, key);
+     </pre>
+
+   <p>The parameters are:
+
+     <dl>
+<dt>GDBM_FILE dbf
+     <dd>The pointer returned by <code>gdbm_open</code>. 
+<br><dt>datum key
+     <dd>The <code>key</code> data. 
+</dl>
+
+   <p>The ret value is -1 if the item is not present or the requester is a reader. 
+The ret value is 0 if there was a successful delete.
+
+   <p><code>gdbm_delete</code> removes the keyed item and the <code>key</code> from the database
+<code>dbf</code>. The file on disk is updated to reflect the structure of the new
+database before returning from this function.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Sequential">Sequential</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Reorganization">Reorganization</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Delete">Delete</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">9 Sequential access to records.</h2>
+
+<p>The next two functions allow for accessing all items in the database. This
+access is not <code>key</code> sequential, but it is guaranteed to visit every
+<code>key</code> in the database once. The order has to do with the hash values. 
+<code>gdbm_firstkey</code> starts the visit of all keys in the database. 
+<code>gdbm_nextkey</code> finds and reads the next entry in the hash structure for
+<code>dbf</code>.
+
+<pre class="example">     key = gdbm_firstkey(dbf);
+     
+     nextkey = gdbm_nextkey(dbf, key);
+     </pre>
+
+   <p>The parameters are:
+
+     <dl>
+<dt>GDBM_FILE dbf
+     <dd>The pointer returned by <code>gdbm_open</code>. 
+<br><dt>datum <code>key</code>
+     <dd><br><dt>datum nextkey
+     <dd>The <code>key</code> data. 
+</dl>
+
+   <p>The return values are both datum. If <code>key</code>.dptr or nextkey.dptr is NULL,
+there is no first <code>key</code> or next <code>key</code>. Again notice that dptr points to
+data allocated by malloc and <code>gdbm</code> will not free it for you.
+
+   <p>These functions were intended to visit the database in read-only algorithms,
+for instance, to validate the database or similar operations.
+
+   <p>File <code>visiting</code> is based on a <code>hash table</code>. <code>gdbm_delete</code>
+re-arranges the hash table to make sure that any collisions in the table do not
+leave some item <code>un-findable</code>. The original key order is NOT guaranteed to
+remain unchanged in ALL instances. It is possible that some key will not be
+visited if a loop like the following is executed:
+
+<pre class="example">        key = gdbm_firstkey ( dbf );
+        while ( key.dptr ) {
+           nextkey = gdbm_nextkey ( dbf, key );
+           if ( some condition ) {
+              gdbm_delete ( dbf, key );
+              free ( key.dptr );
+           }
+           key = nextkey;
+        }
+     </pre>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Reorganization">Reorganization</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Sync">Sync</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Sequential">Sequential</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">10 Database reorganization.</h2>
+
+<p>The following function should be used very seldom.
+
+<pre class="example">     ret = gdbm_reorganize(dbf);
+     </pre>
+
+   <p>The parameter is:
+
+     <dl>
+<dt>GDBM_FILE dbf
+     <dd>The pointer returned by <code>gdbm_open</code>. 
+</dl>
+
+   <p>If you have had a lot of deletions and would like to shrink the space
+used by the <code>gdbm</code> file, this function will reorganize the database. 
+<code>gdbm</code> will not shorten the length of a <code>gdbm</code> file (deleted file space will be
+reused) except by using this reorganization.
+
+   <p>This reorganization requires creating a new file and inserting all the elements
+in the old file <code>dbf</code> into the new file. The new file is then renamed to
+the same name as the old file and <code>dbf</code> is updated to contain all the
+correct information about the new file. If an error is detected, the return
+value is negative. The value zero is returned after a successful
+reorganization.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Sync">Sync</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Errors">Errors</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Reorganization">Reorganization</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">11 Database Synchronization</h2>
+
+<p>Unless your database was opened with the GDBM_SYNC flag, <code>gdbm</code> does not
+wait for writes to be flushed to the disk before continuing.  This allows
+faster writing of databases at the risk of having a corrupted database if
+the application terminates in an abnormal fashion.  The following function
+allows the programmer to make sure the disk version of the
+database has been completely updated with all changes to the current time.
+
+<pre class="example">     gdbm_sync(dbf);
+     </pre>
+
+   <p>The parameter is:
+
+     <dl>
+<dt>GDBM_FILE dbf
+     <dd>The pointer returned by <code>gdbm_open</code>. 
+</dl>
+
+   <p>This would usually be called after a complete set of changes have been
+made to the database and before some long waiting time. 
+<code>gdbm_close</code> automatically calls the equivalent of <code>gdbm_sync</code>
+so no call is needed if the database is to be closed immediately after
+the set of changes have been made.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Errors">Errors</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Options">Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Sync">Sync</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">12 Error strings.</h2>
+
+<p>To convert a <code>gdbm</code> error code into English text, use this routine:
+
+<pre class="example">     ret = gdbm_strerror(errno)
+     </pre>
+
+   <p>The parameter is:
+
+     <dl>
+<dt>gdbm_error errno
+     <dd>The <code>gdbm</code> error code, usually <code>gdbm_errno</code>. 
+</dl>
+
+   <p>The appropiate phrase for reading by humans is returned.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Options">Options</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Locking">Locking</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Errors">Errors</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">13 Seting options.</h2>
+
+<p><code>Gdbm</code> supports the ability to set certain options on an already
+open database.
+
+<pre class="example">     ret = gdbm_setopt(dbf, option, value, size);
+     </pre>
+
+   <p>The parameters are:
+
+     <dl>
+<dt>GDBM_FILE dbf
+     <dd>The pointer returned by <code>gdbm_open</code>. 
+<br><dt>int option
+     <dd>The option to be set. 
+<br><dt>int *value
+     <dd>A pointer to the value to which <code>option</code> will be set. 
+<br><dt>int size
+     <dd>The length of the data pointed to by <code>value</code>. 
+</dl>
+
+   <p>The valid options are:
+
+   <p>GDBM_CACHESIZE - Set the size of the internal bucket cache.  This
+  option may only be set once on each GDBM_FILE descriptor, and
+  is set automatically to 100 upon the first access to the database.
+
+   <p>GDBM_FASTMODE - Set fast mode to either on or off.  This allows
+  fast mode to be toggled on an already open and active database. 
+  value (see below) should be set to either TRUE or FALSE. 
+  <em>This option is now obsolete.</em>
+
+   <p>GDBM_SYNCMODE - Turn on or off file system synchronization operations.  This
+  setting defaults to off; value (see below) should be set to either TRUE or
+  FALSE.
+
+   <p>GDBM_CENTFREE - Set central free block pool to either on or off. 
+  The default is off, which is how previous versions of <code>Gdbm</code>
+  handled free blocks.  If set, this option causes all subsequent free
+  blocks to be placed in the <em>global</em> pool, allowing (in theory)
+  more file space to be reused more quickly.  value (see below) should
+  be set to either TRUE or FALSE. 
+  <em>NOTICE: This feature is still under study.</em>
+
+   <p>GDBM_COALESCEBLKS - Set free block merging to either on or off. 
+  The default is off, which is how previous versions of <code>Gdbm</code>
+  handled free blocks.  If set, this option causes adjacent free blocks
+  to be merged.  This can become a CPU expensive process with time, though,
+  especially if used in conjunction with GDBM_CENTFREE.  value (see below)
+  should be set to either TRUE or FALSE. 
+  <em>NOTICE: This feature is still under study.</em>
+
+   <p>The return value will be -1 upon failure, or 0 upon success.  The global
+variable <code>gdbm_errno</code> will be set upon failure.
+
+   <p>For instance, to set a database to use a cache of 10, after opening it
+with <code>gdbm_open</code>, but prior to accessing it in any way, the following
+code could be used:
+
+<pre class="example">     int value = 10;
+     ret = gdbm_setopt(dbf, GDBM_CACHESIZE, &amp;value, sizeof(int));
+     </pre>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Locking">Locking</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Variables">Variables</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Options">Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">14 File Locking.</h2>
+
+<p>With locking disabled (if <code>gdbm_open</code> was called with GDBM_NOLOCK),
+the user may want to perform their own file locking on the database file
+in order to prevent multiple writers operating on the same file
+simultaneously.
+
+   <p>In order to support this, the <code>gdbm_fdesc</code> routine is provided.
+
+<pre class="example">     ret = gdbm_fdesc(dbf);
+     </pre>
+
+   <p>The single valid parameter is:
+
+     <dl>
+<dt>GDBM_FILE dbf
+     <dd>The pointer returned by <code>gdbm_open</code>. 
+</dl>
+
+   <p>The return value will be the file descriptor of the database.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Variables">Variables</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Compatibility">Compatibility</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Locking">Locking</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">15 Two useful variables.</h2>
+
+<p>The following two variables are variables that may need to be used:
+
+     <dl>
+<dt>gdbm_error gdbm_errno
+     <dd>The variable that contains more information about <code>gdbm</code> errors
+(<code>gdbm.h</code> has the definitions of the error values). 
+<br><dt>char * gdbm_version
+     <dd>The string containing the version information. 
+</dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Compatibility">Compatibility</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Conversion">Conversion</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Variables">Variables</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">16 Compatibility with standard <code>dbm</code> and <code>ndbm</code>.</h2>
+
+<p>GNU <code>dbm</code> files are not <code>sparse</code>. You can copy them with the UNIX
+<code>cp</code> command and they will not expand in the copying process.
+
+   <p>There is a compatibility mode for use with programs that already use UNIX
+<code>dbm</code> and UNIX <code>ndbm</code>.
+
+   <p>GNU <code>dbm</code> has compatibility functions for <code>dbm</code>. For <code>dbm</code>
+compatibility functions, you need the include file <code>dbm.h</code>.
+
+   <p>In this compatibility mode, no <code>gdbm</code> file pointer is required
+by the user, and Only one file may be opened at a time. All users in
+compatibility mode are assumed to be writers. If the <code>gdbm</code> file is a
+read only, it will fail as a writer, but will also try to open it as a reader. 
+All returned pointers in datum structures point to data that <code>gdbm</code> WILL
+free. They should be treated as static pointers (as standard UNIX <code>dbm</code>
+does). The compatibility function names are the same as the UNIX <code>dbm</code>
+function names. Their definitions follow:
+
+<pre class="example">     int dbminit(name);
+     int store(key, content);
+     datum fetch(key);
+     int delete(key);
+     datum firstkey();
+     datum nextkey(key);
+     int dbmclose();
+     </pre>
+
+   <p>Standard UNIX <code>dbm</code> and GNU <code>dbm</code> do not have the same data
+format in the file. You cannot access a standard UNIX <code>dbm</code> file with GNU
+<code>dbm</code>!  If you want to use an old database with GNU <code>dbm</code>, you must
+use the <code>conv2gdbm</code> program.
+
+   <p>Also, GNU <code>dbm</code> has compatibility functions for <code>ndbm</code>. For
+<code>ndbm</code> compatibility functions, you need the include file <code>ndbm.h</code>.
+
+   <p>Again, just like <code>ndbm</code>, any returned datum can be assumed to be static
+storage. You do not have to free that memory, the <code>ndbm</code> compatibility
+functions will do it for you.
+
+   <p>The functions are:
+
+<pre class="example">     DBM *dbm_open(name, flags, mode);
+     void dbm_close(file);
+     datum dbm_fetch(file, key);
+     int dbm_store(file, key, <code>content</code>, flags);
+     int dbm_delete(file, key);
+     datum dbm_firstkey(file);
+     datum dbm_nextkey(file);
+     int dbm_error(file);
+     int dbm_clearerr(file);
+     int dbm_dirfno(file);
+     int dbm_pagfno(file);
+     int dbm_rdonly(file);
+     </pre>
+
+   <p>If you want to compile an old C program that used UNIX <code>dbm</code> or <code>ndbm</code>
+and want to use <code>gdbm</code> files, execute the following <code>cc</code> command:
+
+<pre class="example">     cc ... -L/usr/local/lib -lgdbm -lgdbm_compat
+     </pre>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Conversion">Conversion</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Bugs">Bugs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Compatibility">Compatibility</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">17 Converting <code>dbm</code> files to <code>gdbm</code> format.</h2>
+
+<p>The program <code>conv2gdbm</code> has been provided to help you convert from <code>dbm</code>
+databases to <code>gdbm</code>. The usage is:
+
+<pre class="example">     conv2gdbm [-q] [-b block_size] dbm_file [gdbm_file]
+     </pre>
+
+   <p>The options are:
+
+     <dl>
+<dt>-q
+     <dd>Causes <code>conv2gdbm</code> to work quietly. 
+<br><dt>block_size
+     <dd>Is the same as in <code>gdbm_open</code>. 
+<br><dt>dbm_file
+     <dd>Is the name of the <code>dbm</code> file without the <code>.pag</code> or <code>.dir</code>
+extensions. 
+<br><dt>gdbm_file
+     <dd>Is the complete file name. If not included, the <code>gdbm</code> file name is the
+same as the <code>dbm</code> file name without any extensions. That is
+<code>conv2gdbm</code> <code>dbmfile</code> converts the files <code>dbmfile.pag</code> and
+<code>dbmfile.dir</code> into a <code>gdbm</code> file called <code>dbmfile</code>. 
+</dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Bugs">Bugs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Conversion">Conversion</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">18 Problems and bugs.</h2>
+
+<p>If you have problems with GNU <code>dbm</code> or think you've found a bug,
+please report it. Before reporting a bug, make sure you've actually
+found a real bug. Carefully reread the documentation and see if it
+really says you can do what you're trying to do. If it's not clear
+whether you should be able to do something or not, report that too; it's
+a bug in the documentation!
+
+   <p>Before reporting a bug or trying to fix it yourself, try to isolate it
+to the smallest possible input file that reproduces the problem. Then
+send us the input file and the exact results <code>gdbm</code> gave you. Also
+say what you expected to occur; this will help us decide whether the
+problem was really in the documentation.
+
+   <p>Once you've got a precise problem, send e-mail to:
+
+<pre class="example">     Internet: <code>bug-gnu-utils@prep.ai.mit.edu</code>.
+     UUCP: <code>mit-eddie!prep.ai.mit.edu!bug-gnu-utils</code>.
+     </pre>
+
+   <p>Please include the version number of GNU <code>dbm</code> you are using. You can get
+this information by printing the variable <code>gdbm_version</code> (see Variables).
+
+   <p>Non-bug suggestions are always welcome as well. If you have questions
+about things that are unclear in the documentation or are just obscure
+features, please report them too.
+
+   <p>You may contact the author by:
+<pre class="example">         e-mail:  phil@cs.wwu.edu
+        us-mail:  Philip A. Nelson
+                  Computer Science Department
+                  Western Washington University
+                  Bellingham, WA 98226
+     </pre>
+
+   <p>You may contact the current maintainer by:
+<pre class="example">         e-mail:  downsj@downsj.com
+     </pre>
+
+   </body></html>
+

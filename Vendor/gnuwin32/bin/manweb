@@ -1,0 +1,429 @@
+#!/usr/bin/perl -w
+
+use strict;
+use English;
+#use File::stat;
+use Errno;
+use Fcntl ':mode';
+use Getopt::Long;
+
+my $FALSE = 0;
+my $TRUE = !$FALSE;
+
+our $debug;
+    
+
+sub giveHelp() {
+
+    print("Manweb is a replacement for Man.  It gets reference \n");
+    print("documentation from the Worldwide Web or a private web. \n");
+    print("Manweb is distributed with the Netpbm package \n");
+    print("(http://netpbm.sourceforge.net).\n");
+    print("\n");
+    print("Documentation of Manweb is at \n");
+    print("\n");
+    print("        http://netpbm.sourceforge.net/doc/manweb.html\n");
+    print("\n");
+    print("Or if you have it properly installed, just use the command \n");
+    print("\n");
+    print("        manweb manweb \n");
+}
+
+
+sub debug(@) {
+    if ($debug) {
+        print(STDERR @_, "\n");
+    }
+}
+
+
+sub findUrl($@);  # findUrl() is recursive.
+
+sub findUrl($@) {
+    my ($webdir, @topicList) = @_;
+#-----------------------------------------------------------------------------
+#  Starting in the directory $webdir, find the URL for the documentation
+#  of the topic identified by @topicList.  @topicList is a main topic
+#  followed by a subtopic of that topic, and so on.
+#
+#  If @topicList is an empty list, return the url that refers to the 
+#  directory $webdir itself.
+#-----------------------------------------------------------------------------
+    my $url;
+
+    if (@topicList == 0) {
+        # He's not specifying a topic; that means he just wants the index
+        # of the specified directory -- but only if it exists.
+
+        if (-d($webdir)) {
+            $url = directoryUrl($webdir);
+        } 
+    } else {
+        my $topic0 = shift(@topicList);
+
+        # First look for a .url file 
+
+        $url = doturl($webdir, $topic0, @topicList);
+        if (!defined($url)) {
+            # No .url file.  Look for directory.
+            
+            my $subwebdir = "$webdir/$topic0";
+            if (-d($subwebdir)) {
+                $url = findUrl($subwebdir, @topicList);
+            } else {
+                # No directory.  Look for html file.
+                my $htmlfilename = "$webdir/$topic0.html";
+            
+                if (-f($htmlfilename)) {
+                    if (@topicList > 0) {
+                        print(STDERR 
+                              "Ignoring subtopic chain '@topicList' because " .
+                              "There is an html file named " .
+                              "'$htmlfilename'.\n");
+                    } 
+                    $url = "file://$htmlfilename";
+                }
+            }
+        }
+    }
+    return($url);
+}
+
+
+
+sub findUrlInPath($@) {
+    my ($webdirR, @topicList) = @_;
+
+    my @webdirLeft = @$webdirR;
+
+    my $url;
+
+    for (my $webdir = shift(@webdirLeft);
+         defined($webdir) && !defined($url);
+         $webdir = shift(@webdirLeft)) {
+
+        $url = findUrl($webdir, @topicList);
+    }
+    return $url;
+}
+
+
+
+sub directoryUrl($$) {
+    # If this directory has an index file, that's the URL.  Otherwise
+    # it's just the directory itself.  Too bad the browser doesn't do
+    # this for us, like it does for HTTP URLs.
+
+    my ($webdir) = @_;
+    my ($dev, $ino, $mode, $rest) = stat("$webdir/index.html");
+
+    my $url;
+
+    if (defined($mode) && S_ISREG($mode)) {
+        $url = "file://$webdir/index.html";
+    } else {
+        my ($dev, $ino, $mode, $rest) = stat("$webdir/index.htm");
+        if (defined($mode) && S_ISREG($mode)) {
+            $url = "file://$webdir/index.htm";
+        } else {
+            $url = "file://$webdir";
+        }
+    }
+    return($url);
+}
+
+
+
+
+sub doturl($$) {
+    my ($webdir, $topic0, @topicList) = @_;
+#-----------------------------------------------------------------------------
+#  Handle a .url file.
+#
+#  If there is a file named "$topic0.url" in the directory $webdir,
+#  return the URL that gets to the proper web page for subtopic list
+#  @topiclist with respect to the URL in that .url file.
+#
+#  If there's no such .url file, though, return an undefined value.
+#-----------------------------------------------------------------------------
+    my $url;
+
+    my $urlfilename = "$webdir/$topic0.url";
+
+    my $openworked = open(URLFILE, "<$urlfilename");
+        
+    if ($openworked) {
+        my @url = <URLFILE>;
+        if (@url == 0) {
+            die("URL file '$urlfilename' is empty.");
+        } elsif (@url > 1) {
+            die("URL file '$urlfilename' contains more than one line.");
+        } else {
+            my $topUrl = $url[0];
+            chomp($topUrl);
+            if (@topicList > 0) {
+                if ($topUrl =~ m|.*[^/]$|) {
+                    print(STDERR 
+                          "Ignoring subtopic chain '@topicList' because " .
+                          "URL '$topUrl' is not a directory URL.\n");
+                }
+                $url = $topUrl . join("/", @topicList) . ".html";
+            } else {
+                $url = $topUrl;
+            }
+        }
+    }
+    return($url);
+}
+
+
+
+sub executablePathUrl($) {
+    my ($progName) = @_;
+#-----------------------------------------------------------------------------
+#  If $progName is the name of a program that would be found in the
+#  program search path (as defined by the PATH environment variable),
+#  and the directory in which the program resides contains a file
+#  .docurl, return the first line of that file, appended with
+#  "$progName.html" as the URL.  If the line from the file doesn't end
+#  with a slash, though, just return the line itself.
+#
+#  If $progName is not such a program name, or there is no .docurl,
+#  return undefined. 
+#-----------------------------------------------------------------------------
+    my $url;
+
+    my @path = split(/:/,$ENV{"PATH"});
+    
+    my $i;
+    my $progDir;
+    for ($i = 0; $i < @path && !$progDir; ++$i) {
+        if (-x($path[$i] . "/" . $progName)) {
+            $progDir = $path[$i];
+        }
+    }
+
+    if ($progDir) {
+        debug("Found program '$progName' in directory '$progDir'");
+        my $urlfilename = "$progDir/doc.url";
+        if (-f($urlfilename)) {
+            debug("Looking at file '$urlfilename'");
+            my $openworked = open(URLFILE, "<$urlfilename");
+        
+            if ($openworked) {
+                my @url = <URLFILE>;
+                if (@url == 0) {
+                    die("URL file '$urlfilename' is empty.");
+                } elsif (@url > 1) {
+                    die("URL file '$urlfilename' contains more " .
+                        "than one line.");
+                } else {
+                    my $topUrl = $url[0];
+                    chomp($topUrl);
+                    debug("doc.url file contains URL '$topUrl'");
+                    if ($topUrl =~ m|.*[^/]$|) {
+                        $url = $topUrl;
+                    } else {
+                        $url = "$topUrl/$progName.html";
+                    }
+                }
+            } else {
+                die("Unable to open file '$urlfilename'.");
+            }
+        }
+    }
+
+    return($url);
+}
+
+
+
+sub infoTopicExists($) {
+    my ($searchtopic) = @_;
+
+    if (!defined($searchtopic)) {
+        die("no topic passed to infoTopicExists");
+    }
+    
+    my $infopath = ($ENV{"INFOPATH"} or "/usr/info");
+    
+    my @infopath = split(/:/, $infopath);
+    
+    my $found;
+    
+    $found = $FALSE;
+
+    for (my $infodir = shift(@infopath);
+         defined($infodir) && !$found; 
+         $infodir = shift(@infopath)) {
+
+        my $opened = open(my $dirfile, "<$infodir/dir");
+
+        if ($opened) {
+            while ((defined(my $dirfileline = <$dirfile>)) && !$found) {
+                if ($dirfileline =~ m{^\* (.*):}) {
+                    my $topic = $1;
+                    
+                    if (lc($topic) eq lc($searchtopic)) {
+                        $found = $TRUE;
+                    }
+                }
+            }
+            close($dirfile);
+        }
+    }
+    return $found;
+}
+
+
+sub validateWebdir($@) {
+    my ($confFile, @webdir) = @_;
+
+    foreach my $webdir (@webdir) {
+
+        if ($webdir =~ m{^[^/]}) {
+            die("webdir component '$webdir' " .
+                "in configuration file '$confFile' " .
+                "is not valid.  It must be an absolute path, and " .
+                "therefore start with a slash.");
+        } elsif ($webdir =~ m{^//}) {
+            # Two slashes would cause a unique problem when we try
+            # to make a file: URL out of it.
+            die("webdir component '$webdir' " .
+                "in configuration file '$confFile' " .
+                "is not valid.  It starts with two slashes.");
+        }
+    }
+}
+
+
+
+sub readConfFile($) {
+#-----------------------------------------------------------------------------
+#  Read the configuration file (/etc/manweb.conf or value of
+#  MANWEB_CONF_FILE or named by our argument).  Return values set in
+#  it, or defaults.
+#-----------------------------------------------------------------------------
+    my ($fileArg) = @_;
+    
+    my $confFile;
+
+    if (defined($fileArg)) {
+        $confFile = $fileArg;
+    } else {
+        my $envVblValue = $ENV{"MANWEB_CONF_FILE"};
+        if (defined($envVblValue)) {
+            $confFile = $envVblValue;
+        } else {
+            $confFile = "../etc/manweb.conf";
+        }
+    }
+
+    open(CONF, "<$confFile") or die("Can't open configuration file " .
+                                    "'$confFile'.  $ERRNO");
+    
+    my (@webdir, $browser);
+
+    while(<CONF>) {
+        chomp();
+        if (/^\s*#/) {
+            #It's comment - ignore
+        } elsif (/^\s*$/) {
+            #It's a blank line - ignore
+        } elsif (/\s*(\S+)\s*=\s*(\S+)/) {
+            #It looks like "keyword=value"
+            my ($keyword, $value) = ($1, $2);
+            if ($keyword eq "webdir") {
+                @webdir = split(/:/, $value);
+                validateWebdir($confFile, @webdir);
+            } elsif ($keyword eq "browser") {
+                $browser = $value;
+            } else {
+                die("Unrecognized keyword in configuration file '$confFile': " 
+                    . "'$keyword'");
+            }
+        } else {
+            die("Invalid syntax in configuration file line '$_'.  " .
+                "Must be keyword=value, #comment, or blank line");
+            }
+    }              
+    close(CONF);
+
+    if (!@webdir) {
+        @webdir = ("/usr/man/web");
+    }
+    if (!defined($browser)) {
+        $browser = $ENV{"BROWSER"} ? $ENV{"BROWSER"} : "lynx";
+    }
+    
+    return(\@webdir, $browser);
+}
+
+
+
+##############################################################################
+#                               MAINLINE
+##############################################################################
+
+my ($optConfig, $optHelp, $optDebug);
+
+my $validOptions = GetOptions("config=s" => \$optConfig,
+                              "help" => \$optHelp,
+                              "debug" => \$optDebug,
+                              );
+
+if (!$validOptions) { print(STDERR "Invalid syntax.\n"); exit(1); }
+
+if ($optHelp) { 
+    giveHelp(); 
+    exit(0);
+}
+
+$debug = $optDebug;
+
+my ($webdirR, $browser) = readConfFile($optConfig);
+
+my $url;
+
+my $directUrl = findUrlInPath($webdirR, @ARGV);
+
+if (defined($directUrl)) {
+    $url = $directUrl;
+    debug("Found URL in doc search path");
+} else {
+    if (@ARGV == 1) {
+        $url = executablePathUrl($ARGV[0]);
+        if (defined($url)) {debug("Found URL via executable path");}
+    }
+}
+
+if (defined($url)) {
+    print(STDERR "Browsing URL '$url'...\n");
+    system($browser, $url);
+} else {
+    if (@ARGV == 1) {
+        if (infoTopicExists($ARGV[0])) {
+            print(STDERR 
+                  "No web doc, but 'info' topic found.  Running 'info'...\n");
+            system("info", $ARGV[0]);
+        } else {
+            my $mantopic = $ARGV[0];
+            print(STDERR 
+                  "No web doc.  Running 'man' on topic '$mantopic'...\n");
+            system("man", $mantopic);
+        }
+    } elsif (@ARGV == 2 && $ARGV[0] =~ m{\d+}) {
+        my ($mansection, $mantopic) = @ARGV;
+        print(STDERR
+              "No web doc.  Running 'man ' on Section $mansection, " .
+              "Topic '$mantopic'...\n");
+        system("man", $mansection, $mantopic);
+    } else {
+        print(STDERR "No web documentation found for topic chain @ARGV " .
+              "and it isn't in the right form to try a man page\n");
+        exit(1);
+    }
+}
+
+
+

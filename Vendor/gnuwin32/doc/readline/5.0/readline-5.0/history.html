@@ -1,0 +1,1942 @@
+   <html lang="en">
+<head>
+<title>GNU History Library</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU History Library">
+<meta name="generator" content="makeinfo 4.6">
+<!--
+This document describes the GNU History library
+(version 5.0, 28 January 2004),
+a programming tool that provides a consistent user interface for
+recalling lines of previously typed input.
+
+   <p>Copyright &copy; 1988-2004 Free Software Foundation, Inc.
+
+   <p>Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+   <blockquote>
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with the Front-Cover texts being "A GNU Manual,"
+and with the Back-Cover Texts as in (a) below.  A copy of the license is
+included in the section entitled "GNU Free Documentation License."
+
+        <p>(a) The FSF's Back-Cover Text is: "You have freedom to copy and modify
+this GNU Manual, like GNU software.  Copies published by the Free
+Software Foundation raise funds for GNU development." 
+</blockquote>
+   -->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+--></style>
+</head>
+<body>
+<h1 class="settitle">GNU History Library</h1>
+
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Top" href="#Top">GNU History Library</a>
+<li><a name="toc_Using%20History%20Interactively" href="#Using%20History%20Interactively">1 Using History Interactively</a>
+<ul>
+<li><a href="#History%20Interaction">1.1 History Expansion</a>
+<ul>
+<li><a href="#Event%20Designators">1.1.1 Event Designators</a>
+<li><a href="#Word%20Designators">1.1.2 Word Designators</a>
+<li><a href="#Modifiers">1.1.3 Modifiers</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_Programming%20with%20GNU%20History" href="#Programming%20with%20GNU%20History">2 Programming with GNU History</a>
+<ul>
+<li><a href="#Introduction%20to%20History">2.1 Introduction to History</a>
+<li><a href="#History%20Storage">2.2 History Storage</a>
+<li><a href="#History%20Functions">2.3 History Functions</a>
+<ul>
+<li><a href="#Initializing%20History%20and%20State%20Management">2.3.1 Initializing History and State Management</a>
+<li><a href="#History%20List%20Management">2.3.2 History List Management</a>
+<li><a href="#Information%20About%20the%20History%20List">2.3.3 Information About the History List</a>
+<li><a href="#Moving%20Around%20the%20History%20List">2.3.4 Moving Around the History List</a>
+<li><a href="#Searching%20the%20History%20List">2.3.5 Searching the History List</a>
+<li><a href="#Managing%20the%20History%20File">2.3.6 Managing the History File</a>
+<li><a href="#History%20Expansion">2.3.7 History Expansion</a>
+</li></ul>
+<li><a href="#History%20Variables">2.4 History Variables</a>
+<li><a href="#History%20Programming%20Example">2.5 History Programming Example</a>
+</li></ul>
+<li><a name="toc_Copying%20This%20Manual" href="#Copying%20This%20Manual">Appendix A Copying This Manual</a>
+<ul>
+<li><a href="#GNU%20Free%20Documentation%20License">A.1 GNU Free Documentation License</a>
+<ul>
+<li><a href="#GNU%20Free%20Documentation%20License">A.1.1 ADDENDUM: How to use this License for your documents</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_Concept%20Index" href="#Concept%20Index">Appendix B Concept Index</a>
+<li><a name="toc_Function%20and%20Variable%20Index" href="#Function%20and%20Variable%20Index">Appendix C Function and Variable Index</a>
+</li></ul>
+</div>
+
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Top">Top</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Using%20History%20Interactively">Using History Interactively</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+<br>
+</div>
+
+<h2 class="unnumbered">GNU History Library</h2>
+
+<p>This document describes the GNU History library, a programming tool that
+provides a consistent user interface for recalling lines of previously
+typed input.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Using%20History%20Interactively">Using History Interactively</a>: 	  GNU History User's Manual. 
+<li><a accesskey="2" href="#Programming%20with%20GNU%20History">Programming with GNU History</a>:   GNU History Programmer's Manual. 
+<li><a accesskey="3" href="#Copying%20This%20Manual">Copying This Manual</a>: 		  Copying This Manual. 
+<li><a accesskey="4" href="#Concept%20Index">Concept Index</a>: 		  Index of concepts described in this manual. 
+<li><a accesskey="5" href="#Function%20and%20Variable%20Index">Function and Variable Index</a>: 	  Index of externally visible functions
+				  and variables. 
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Using%20History%20Interactively">Using History Interactively</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Programming%20with%20GNU%20History">Programming with GNU History</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">1 Using History Interactively</h2>
+
+<p>This chapter describes how to use the <small>GNU</small> History Library interactively,
+from a user's standpoint.  It should be considered a user's guide.  For
+information on using the <small>GNU</small> History Library in your own programs,
+see <a href="#Programming%20with%20GNU%20History">Programming with GNU History</a>.
+
+<ul class="menu">
+<li><a accesskey="1" href="#History%20Interaction">History Interaction</a>: 		What it feels like using History as a user. 
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="History%20Interaction">History Interaction</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Using%20History%20Interactively">Using History Interactively</a>
+<br>
+</div>
+
+<h3 class="section">1.1 History Expansion</h3>
+
+<p>The History library provides a history expansion feature that is similar
+to the history expansion provided by <code>csh</code>.  This section
+describes the syntax used to manipulate the history information.
+
+   <p>History expansions introduce words from the history list into
+the input stream, making it easy to repeat commands, insert the
+arguments to a previous command into the current input line, or
+fix errors in previous commands quickly.
+
+   <p>History expansion takes place in two parts.  The first is to determine
+which line from the history list should be used during substitution. 
+The second is to select portions of that line for inclusion into the
+current one.  The line selected from the history is called the
+<dfn>event</dfn>, and the portions of that line that are acted upon are
+called <dfn>words</dfn>.  Various <dfn>modifiers</dfn> are available to manipulate
+the selected words.  The line is broken into words in the same fashion
+that Bash does, so that several words
+surrounded by quotes are considered one word. 
+History expansions are introduced by the appearance of the
+history expansion character, which is <code>!</code> by default.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Event%20Designators">Event Designators</a>: 	How to specify which history line to use. 
+<li><a accesskey="2" href="#Word%20Designators">Word Designators</a>: 	Specifying which words are of interest. 
+<li><a accesskey="3" href="#Modifiers">Modifiers</a>: 		Modifying the results of substitution. 
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Event%20Designators">Event Designators</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Word%20Designators">Word Designators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#History%20Interaction">History Interaction</a>
+<br>
+</div>
+
+<h3 class="subsection">1.1.1 Event Designators</h4>
+
+<p>An event designator is a reference to a command line entry in the
+history list.
+
+     <dl>
+
+     <br><dt><code>!</code>
+     <dd>Start a history substitution, except when followed by a space, tab,
+the end of the line, or <code>=</code>.
+
+     <br><dt><code>!</code><var>n</var><code></code>
+     <dd>Refer to command line <var>n</var>.
+
+     <br><dt><code>!-</code><var>n</var><code></code>
+     <dd>Refer to the command <var>n</var> lines back.
+
+     <br><dt><code>!!</code>
+     <dd>Refer to the previous command.  This is a synonym for <code>!-1</code>.
+
+     <br><dt><code>!</code><var>string</var><code></code>
+     <dd>Refer to the most recent command starting with <var>string</var>.
+
+     <br><dt><code>!?</code><var>string</var><code>[?]</code>
+     <dd>Refer to the most recent command containing <var>string</var>.  The trailing
+<code>?</code> may be omitted if the <var>string</var> is followed immediately by
+a newline.
+
+     <br><dt><code>^</code><var>string1</var><code>^</code><var>string2</var><code>^</code>
+     <dd>Quick Substitution.  Repeat the last command, replacing <var>string1</var>
+with <var>string2</var>.  Equivalent to
+<code>!!:s/</code><var>string1</var><code>/</code><var>string2</var><code>/</code>.
+
+     <br><dt><code>!#</code>
+     <dd>The entire command line typed so far.
+
+   </dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Word%20Designators">Word Designators</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Modifiers">Modifiers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Event%20Designators">Event Designators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#History%20Interaction">History Interaction</a>
+<br>
+</div>
+
+<h3 class="subsection">1.1.2 Word Designators</h4>
+
+<p>Word designators are used to select desired words from the event. 
+A <code>:</code> separates the event specification from the word designator.  It
+may be omitted if the word designator begins with a <code>^</code>, <code>$</code>,
+<code>*</code>, <code>-</code>, or <code>%</code>.  Words are numbered from the beginning
+of the line, with the first word being denoted by 0 (zero).  Words are
+inserted into the current line separated by single spaces.
+
+   <p>For example,
+
+     <dl>
+<dt><code>!!</code>
+     <dd>designates the preceding command.  When you type this, the preceding
+command is repeated in toto.
+
+     <br><dt><code>!!:$</code>
+     <dd>designates the last argument of the preceding command.  This may be
+shortened to <code>!$</code>.
+
+     <br><dt><code>!fi:2</code>
+     <dd>designates the second argument of the most recent command starting with
+the letters <code>fi</code>. 
+</dl>
+
+   <p>Here are the word designators:
+
+     <dl>
+
+     <br><dt><code>0 (zero)</code>
+     <dd>The <code>0</code>th word.  For many applications, this is the command word.
+
+     <br><dt><code></code><var>n</var><code></code>
+     <dd>The <var>n</var>th word.
+
+     <br><dt><code>^</code>
+     <dd>The first argument; that is, word 1.
+
+     <br><dt><code>$</code>
+     <dd>The last argument.
+
+     <br><dt><code>%</code>
+     <dd>The word matched by the most recent <code>?</code><var>string</var><code>?</code> search.
+
+     <br><dt><code></code><var>x</var><code>-</code><var>y</var><code></code>
+     <dd>A range of words; <code>-</code><var>y</var><code></code> abbreviates <code>0-</code><var>y</var><code></code>.
+
+     <br><dt><code>*</code>
+     <dd>All of the words, except the <code>0</code>th.  This is a synonym for <code>1-$</code>. 
+It is not an error to use <code>*</code> if there is just one word in the event;
+the empty string is returned in that case.
+
+     <br><dt><code></code><var>x</var><code>*</code>
+     <dd>Abbreviates <code></code><var>x</var><code>-$</code>
+
+     <br><dt><code></code><var>x</var><code>-</code>
+     <dd>Abbreviates <code></code><var>x</var><code>-$</code> like <code></code><var>x</var><code>*</code>, but omits the last word.
+
+   </dl>
+
+   <p>If a word designator is supplied without an event specification, the
+previous command is used as the event.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Modifiers">Modifiers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Word%20Designators">Word Designators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#History%20Interaction">History Interaction</a>
+<br>
+</div>
+
+<h3 class="subsection">1.1.3 Modifiers</h4>
+
+<p>After the optional word designator, you can add a sequence of one or more
+of the following modifiers, each preceded by a <code>:</code>.
+
+     <dl>
+
+     <br><dt><code>h</code>
+     <dd>Remove a trailing pathname component, leaving only the head.
+
+     <br><dt><code>t</code>
+     <dd>Remove all leading  pathname  components, leaving the tail.
+
+     <br><dt><code>r</code>
+     <dd>Remove a trailing suffix of the form <code>.</code><var>suffix</var><code></code>, leaving
+the basename.
+
+     <br><dt><code>e</code>
+     <dd>Remove all but the trailing suffix.
+
+     <br><dt><code>p</code>
+     <dd>Print the new command but do not execute it.
+
+     <br><dt><code>s/</code><var>old</var><code>/</code><var>new</var><code>/</code>
+     <dd>Substitute <var>new</var> for the first occurrence of <var>old</var> in the
+event line.  Any delimiter may be used in place of <code>/</code>. 
+The delimiter may be quoted in <var>old</var> and <var>new</var>
+with a single backslash.  If <code>&amp;</code> appears in <var>new</var>,
+it is replaced by <var>old</var>.  A single backslash will quote
+the <code>&amp;</code>.  The final delimiter is optional if it is the last
+character on the input line.
+
+     <br><dt><code>&amp;</code>
+     <dd>Repeat the previous substitution.
+
+     <br><dt><code>g</code>
+     <dd><dt><code>a</code>
+     <dd>Cause changes to be applied over the entire event line.  Used in
+conjunction with <code>s</code>, as in <code>gs/</code><var>old</var><code>/</code><var>new</var><code>/</code>,
+or with <code>&amp;</code>.
+
+     <br><dt><code>G</code>
+     <dd>Apply the following <code>s</code> modifier once to each word in the event.
+
+   </dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Programming%20with%20GNU%20History">Programming with GNU History</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Copying%20This%20Manual">Copying This Manual</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Using%20History%20Interactively">Using History Interactively</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">2 Programming with GNU History</h2>
+
+<p>This chapter describes how to interface programs that you write
+with the <small>GNU</small> History Library. 
+It should be considered a technical guide. 
+For information on the interactive use of <small>GNU</small> History, see <a href="#Using%20History%20Interactively">Using History Interactively</a>.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Introduction%20to%20History">Introduction to History</a>: 	What is the GNU History library for? 
+<li><a accesskey="2" href="#History%20Storage">History Storage</a>: 		How information is stored. 
+<li><a accesskey="3" href="#History%20Functions">History Functions</a>: 		Functions that you can use. 
+<li><a accesskey="4" href="#History%20Variables">History Variables</a>: 		Variables that control behaviour. 
+<li><a accesskey="5" href="#History%20Programming%20Example">History Programming Example</a>: 	Example of using the GNU History Library. 
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Introduction%20to%20History">Introduction to History</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#History%20Storage">History Storage</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Programming%20with%20GNU%20History">Programming with GNU History</a>
+<br>
+</div>
+
+<h3 class="section">2.1 Introduction to History</h3>
+
+<p>Many programs read input from the user a line at a time.  The <small>GNU</small>
+History library is able to keep track of those lines, associate arbitrary
+data with each line, and utilize information from previous lines in
+composing new ones.
+
+   <p>The programmer using the History library has available functions
+for remembering lines on a history list, associating arbitrary data
+with a line, removing lines from the list, searching through the list
+for a line containing an arbitrary text string, and referencing any line
+in the list directly.  In addition, a history <dfn>expansion</dfn> function
+is available which provides for a consistent user interface across
+different programs.
+
+   <p>The user using programs written with the History library has the
+benefit of a consistent user interface with a set of well-known
+commands for manipulating the text of previous lines and using that text
+in new commands.  The basic history manipulation commands are similar to
+the history substitution provided by <code>csh</code>.
+
+   <p>If the programmer desires, he can use the Readline library, which
+includes some history manipulation by default, and has the added
+advantage of command line editing.
+
+   <p>Before declaring any functions using any functionality the History
+library provides in other code, an application writer should include
+the file <code>&lt;readline/history.h&gt;</code> in any file that uses the
+History library's features.  It supplies extern declarations for all
+of the library's public functions and variables, and declares all of
+the public data structures.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="History%20Storage">History Storage</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#History%20Functions">History Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Introduction%20to%20History">Introduction to History</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Programming%20with%20GNU%20History">Programming with GNU History</a>
+<br>
+</div>
+
+<h3 class="section">2.2 History Storage</h3>
+
+<p>The history list is an array of history entries.  A history entry is
+declared as follows:
+
+<pre class="example">     typedef void *histdata_t;
+     
+     typedef struct _hist_entry {
+       char *line;
+       char *timestamp;
+       histdata_t data;
+     } HIST_ENTRY;
+     </pre>
+
+   <p>The history list itself might therefore be declared as
+
+<pre class="example">     HIST_ENTRY **the_history_list;
+     </pre>
+
+   <p>The state of the History library is encapsulated into a single structure:
+
+<pre class="example">     /*
+      * A structure used to pass around the current state of the history.
+      */
+     typedef struct _hist_state {
+       HIST_ENTRY **entries; /* Pointer to the entries themselves. */
+       int offset;           /* The location pointer within this array. */
+       int length;           /* Number of elements within this array. */
+       int size;             /* Number of slots allocated to this array. */
+       int flags;
+     } HISTORY_STATE;
+     </pre>
+
+   <p>If the flags member includes <code>HS_STIFLED</code>, the history has been
+stifled.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="History%20Functions">History Functions</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#History%20Variables">History Variables</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#History%20Storage">History Storage</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Programming%20with%20GNU%20History">Programming with GNU History</a>
+<br>
+</div>
+
+<h3 class="section">2.3 History Functions</h3>
+
+<p>This section describes the calling sequence for the various functions
+exported by the <small>GNU</small> History library.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Initializing%20History%20and%20State%20Management">Initializing History and State Management</a>: 	Functions to call when you
+						want to use history in a
+						program. 
+<li><a accesskey="2" href="#History%20List%20Management">History List Management</a>: 		Functions used to manage the list
+					of history entries. 
+<li><a accesskey="3" href="#Information%20About%20the%20History%20List">Information About the History List</a>: 	Functions returning information about
+					the history list. 
+<li><a accesskey="4" href="#Moving%20Around%20the%20History%20List">Moving Around the History List</a>: 	Functions used to change the position
+					in the history list. 
+<li><a accesskey="5" href="#Searching%20the%20History%20List">Searching the History List</a>: 		Functions to search the history list
+					for entries containing a string. 
+<li><a accesskey="6" href="#Managing%20the%20History%20File">Managing the History File</a>: 		Functions that read and write a file
+					containing the history list. 
+<li><a accesskey="7" href="#History%20Expansion">History Expansion</a>: 			Functions to perform csh-like history
+					expansion. 
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Initializing%20History%20and%20State%20Management">Initializing History and State Management</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#History%20List%20Management">History List Management</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#History%20Functions">History Functions</a>
+<br>
+</div>
+
+<h3 class="subsection">2.3.1 Initializing History and State Management</h4>
+
+<p>This section describes functions used to initialize and manage
+the state of the History library when you want to use the history
+functions in your program.
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">void <b>using_history</b><i> </i>(<i>void</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Begin a session in which the history functions might be used.  This
+initializes the interactive variables. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">HISTORY_STATE * <b>history_get_history_state</b><i> </i>(<i>void</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Return a structure describing the current state of the input history. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">void <b>history_set_history_state</b><i> </i>(<i>HISTORY_STATE *state</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Set the state of the history list according to <var>state</var>. 
+</td></tr>
+</table>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="History%20List%20Management">History List Management</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Information%20About%20the%20History%20List">Information About the History List</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Initializing%20History%20and%20State%20Management">Initializing History and State Management</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#History%20Functions">History Functions</a>
+<br>
+</div>
+
+<h3 class="subsection">2.3.2 History List Management</h4>
+
+<p>These functions manage individual entries on the history list, or set
+parameters managing the list itself.
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">void <b>add_history</b><i> </i>(<i>const char *string</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Place <var>string</var> at the end of the history list.  The associated data
+field (if any) is set to <code>NULL</code>. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">void <b>add_history_time</b><i> </i>(<i>const char *string</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Change the time stamp associated with the most recent history entry to
+<var>string</var>. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">HIST_ENTRY * <b>remove_history</b><i> </i>(<i>int which</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Remove history entry at offset <var>which</var> from the history.  The
+removed element is returned so you can free the line, data,
+and containing structure. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">histdata_t <b>free_history_entry</b><i> </i>(<i>HIST_ENTRY *histent</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Free the history entry <var>histent</var> and any history library private
+data associated with it.  Returns the application-specific data
+so the caller can dispose of it. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">HIST_ENTRY * <b>replace_history_entry</b><i> </i>(<i>int which, const char *line, histdata_t data</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Make the history entry at offset <var>which</var> have <var>line</var> and <var>data</var>. 
+This returns the old entry so the caller can dispose of any
+application-specific data.  In the case
+of an invalid <var>which</var>, a <code>NULL</code> pointer is returned. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">void <b>clear_history</b><i> </i>(<i>void</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Clear the history list by deleting all the entries. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">void <b>stifle_history</b><i> </i>(<i>int max</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Stifle the history list, remembering only the last <var>max</var> entries. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>unstifle_history</b><i> </i>(<i>void</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Stop stifling the history.  This returns the previously-set
+maximum number of history entries (as set by <code>stifle_history()</code>). 
+The value is positive if the history was
+stifled, negative if it wasn't. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_is_stifled</b><i> </i>(<i>void</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Returns non-zero if the history is stifled, zero if it is not. 
+</td></tr>
+</table>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Information%20About%20the%20History%20List">Information About the History List</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Moving%20Around%20the%20History%20List">Moving Around the History List</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#History%20List%20Management">History List Management</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#History%20Functions">History Functions</a>
+<br>
+</div>
+
+<h3 class="subsection">2.3.3 Information About the History List</h4>
+
+<p>These functions return information about the entire history list or
+individual list entries.
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">HIST_ENTRY ** <b>history_list</b><i> </i>(<i>void</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Return a <code>NULL</code> terminated array of <code>HIST_ENTRY *</code> which is the
+current input history.  Element 0 of this list is the beginning of time. 
+If there is no history, return <code>NULL</code>. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>where_history</b><i> </i>(<i>void</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Returns the offset of the current history element. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">HIST_ENTRY * <b>current_history</b><i> </i>(<i>void</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Return the history entry at the current position, as determined by
+<code>where_history()</code>.  If there is no entry there, return a <code>NULL</code>
+pointer. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">HIST_ENTRY * <b>history_get</b><i> </i>(<i>int offset</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Return the history entry at position <var>offset</var>, starting from
+<code>history_base</code> (see <a href="#History%20Variables">History Variables</a>). 
+If there is no entry there, or if <var>offset</var>
+is greater than the history length, return a <code>NULL</code> pointer. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">time_t <b>history_get_time</b><i> </i>(<i>HIST_ENTRY *entry</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Return the time stamp associated with the history entry <var>entry</var>. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_total_bytes</b><i> </i>(<i>void</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Return the number of bytes that the primary history entries are using. 
+This function returns the sum of the lengths of all the lines in the
+history. 
+</td></tr>
+</table>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Moving%20Around%20the%20History%20List">Moving Around the History List</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Searching%20the%20History%20List">Searching the History List</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Information%20About%20the%20History%20List">Information About the History List</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#History%20Functions">History Functions</a>
+<br>
+</div>
+
+<h3 class="subsection">2.3.4 Moving Around the History List</h4>
+
+<p>These functions allow the current index into the history list to be
+set or changed.
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_set_pos</b><i> </i>(<i>int pos</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Set the current history offset to <var>pos</var>, an absolute index
+into the list. 
+Returns 1 on success, 0 if <var>pos</var> is less than zero or greater
+than the number of history entries. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">HIST_ENTRY * <b>previous_history</b><i> </i>(<i>void</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Back up the current history offset to the previous history entry, and
+return a pointer to that entry.  If there is no previous entry, return
+a <code>NULL</code> pointer. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">HIST_ENTRY * <b>next_history</b><i> </i>(<i>void</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Move the current history offset forward to the next history entry, and
+return the a pointer to that entry.  If there is no next entry, return
+a <code>NULL</code> pointer. 
+</td></tr>
+</table>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Searching%20the%20History%20List">Searching the History List</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Managing%20the%20History%20File">Managing the History File</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Moving%20Around%20the%20History%20List">Moving Around the History List</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#History%20Functions">History Functions</a>
+<br>
+</div>
+
+<h3 class="subsection">2.3.5 Searching the History List</h4>
+
+<p>These functions allow searching of the history list for entries containing
+a specific string.  Searching may be performed both forward and backward
+from the current history position.  The search may be <dfn>anchored</dfn>,
+meaning that the string must match at the beginning of the history entry.
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_search</b><i> </i>(<i>const char *string, int direction</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Search the history for <var>string</var>, starting at the current history offset. 
+If <var>direction</var> is less than 0, then the search is through
+previous entries, otherwise through subsequent entries. 
+If <var>string</var> is found, then
+the current history index is set to that history entry, and the value
+returned is the offset in the line of the entry where
+<var>string</var> was found.  Otherwise, nothing is changed, and a -1 is
+returned. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_search_prefix</b><i> </i>(<i>const char *string, int direction</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Search the history for <var>string</var>, starting at the current history
+offset.  The search is anchored: matching lines must begin with
+<var>string</var>.  If <var>direction</var> is less than 0, then the search is
+through previous entries, otherwise through subsequent entries. 
+If <var>string</var> is found, then the
+current history index is set to that entry, and the return value is 0. 
+Otherwise, nothing is changed, and a -1 is returned. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_search_pos</b><i> </i>(<i>const char *string, int direction, int pos</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Search for <var>string</var> in the history list, starting at <var>pos</var>, an
+absolute index into the list.  If <var>direction</var> is negative, the search
+proceeds backward from <var>pos</var>, otherwise forward.  Returns the absolute
+index of the history element where <var>string</var> was found, or -1 otherwise. 
+</td></tr>
+</table>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Managing%20the%20History%20File">Managing the History File</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#History%20Expansion">History Expansion</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Searching%20the%20History%20List">Searching the History List</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#History%20Functions">History Functions</a>
+<br>
+</div>
+
+<h3 class="subsection">2.3.6 Managing the History File</h4>
+
+<p>The History library can read the history from and write it to a file. 
+This section documents the functions for managing a history file.
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>read_history</b><i> </i>(<i>const char *filename</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Add the contents of <var>filename</var> to the history list, a line at a time. 
+If <var>filename</var> is <code>NULL</code>, then read from <code>~/.history</code>. 
+Returns 0 if successful, or <code>errno</code> if not. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>read_history_range</b><i> </i>(<i>const char *filename, int from, int to</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Read a range of lines from <var>filename</var>, adding them to the history list. 
+Start reading at line <var>from</var> and end at <var>to</var>. 
+If <var>from</var> is zero, start at the beginning.  If <var>to</var> is less than
+<var>from</var>, then read until the end of the file.  If <var>filename</var> is
+<code>NULL</code>, then read from <code>~/.history</code>.  Returns 0 if successful,
+or <code>errno</code> if not. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>write_history</b><i> </i>(<i>const char *filename</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Write the current history to <var>filename</var>, overwriting <var>filename</var>
+if necessary. 
+If <var>filename</var> is <code>NULL</code>, then write the history list to
+<code>~/.history</code>. 
+Returns 0 on success, or <code>errno</code> on a read or write error. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>append_history</b><i> </i>(<i>int nelements, const char *filename</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Append the last <var>nelements</var> of the history list to <var>filename</var>. 
+If <var>filename</var> is <code>NULL</code>, then append to <code>~/.history</code>. 
+Returns 0 on success, or <code>errno</code> on a read or write error. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_truncate_file</b><i> </i>(<i>const char *filename, int nlines</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Truncate the history file <var>filename</var>, leaving only the last
+<var>nlines</var> lines. 
+If <var>filename</var> is <code>NULL</code>, then <code>~/.history</code> is truncated. 
+Returns 0 on success, or <code>errno</code> on failure. 
+</td></tr>
+</table>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="History%20Expansion">History Expansion</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Managing%20the%20History%20File">Managing the History File</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#History%20Functions">History Functions</a>
+<br>
+</div>
+
+<h3 class="subsection">2.3.7 History Expansion</h4>
+
+<p>These functions implement history expansion.
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_expand</b><i> </i>(<i>char *string, char **output</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Expand <var>string</var>, placing the result into <var>output</var>, a pointer
+to a string (see <a href="#History%20Interaction">History Interaction</a>).  Returns:
+          <dl>
+<dt><code>0</code>
+          <dd>If no expansions took place (or, if the only change in
+the text was the removal of escape characters preceding the history expansion
+character);
+<br><dt><code>1</code>
+          <dd>if expansions did take place;
+<br><dt><code>-1</code>
+          <dd>if there was an error in expansion;
+<br><dt><code>2</code>
+          <dd>if the returned line should be displayed, but not executed,
+as with the <code>:p</code> modifier (see <a href="#Modifiers">Modifiers</a>). 
+</dl>
+
+     <p>If an error ocurred in expansion, then <var>output</var> contains a descriptive
+error message. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">char * <b>get_history_event</b><i> </i>(<i>const char *string, int *cindex, int qchar</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Returns the text of the history event beginning at <var>string</var> +
+<var>*cindex</var>.  <var>*cindex</var> is modified to point to after the event
+specifier.  At function entry, <var>cindex</var> points to the index into
+<var>string</var> where the history event specification begins.  <var>qchar</var>
+is a character that is allowed to end the event specification in addition
+to the "normal" terminating characters. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">char ** <b>history_tokenize</b><i> </i>(<i>const char *string</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Return an array of tokens parsed out of <var>string</var>, much as the
+shell might.  The tokens are split on the characters in the
+<var>history_word_delimiters</var> variable,
+and shell quoting conventions are obeyed. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">char * <b>history_arg_extract</b><i> </i>(<i>int first, int last, const char *string</i>)<i>
+     </i></td>
+<td align="right">Functie</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+Extract a string segment consisting of the <var>first</var> through <var>last</var>
+arguments present in <var>string</var>.  Arguments are split using
+<code>history_tokenize</code>. 
+</td></tr>
+</table>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="History%20Variables">History Variables</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#History%20Programming%20Example">History Programming Example</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#History%20Functions">History Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Programming%20with%20GNU%20History">Programming with GNU History</a>
+<br>
+</div>
+
+<h3 class="section">2.4 History Variables</h3>
+
+<p>This section describes the externally-visible variables exported by
+the <small>GNU</small> History Library.
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_base</b><i>
+     </i></td>
+<td align="right">Variabele</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+The logical offset of the first entry in the history list. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_length</b><i>
+     </i></td>
+<td align="right">Variabele</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+The number of entries currently stored in the history list. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_max_entries</b><i>
+     </i></td>
+<td align="right">Variabele</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+The maximum number of history entries.  This must be changed using
+<code>stifle_history()</code>. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_write_timestamps</b><i>
+     </i></td>
+<td align="right">Variabele</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+If non-zero, timestamps are written to the history file, so they can be
+preserved between sessions.  The default value is 0, meaning that
+timestamps are not saved. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">char <b>history_expansion_char</b><i>
+     </i></td>
+<td align="right">Variabele</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+The character that introduces a history event.  The default is <code>!</code>. 
+Setting this to 0 inhibits history expansion. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">char <b>history_subst_char</b><i>
+     </i></td>
+<td align="right">Variabele</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+The character that invokes word substitution if found at the start of
+a line.  The default is <code>^</code>. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">char <b>history_comment_char</b><i>
+     </i></td>
+<td align="right">Variabele</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+During tokenization, if this character is seen as the first character
+of a word, then it and all subsequent characters up to a newline are
+ignored, suppressing history expansion for the remainder of the line. 
+This is disabled by default. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">char * <b>history_word_delimiters</b><i>
+     </i></td>
+<td align="right">Variabele</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+The characters that separate tokens for <code>history_tokenize()</code>. 
+The default value is <code>" \t\n()&lt;&gt;;&amp;|"</code>. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">char * <b>history_search_delimiter_chars</b><i>
+     </i></td>
+<td align="right">Variabele</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+The list of additional characters which can delimit a history search
+string, in addition to space, TAB, <code>:</code> and <code>?</code> in the case of
+a substring search.  The default is empty. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">char * <b>history_no_expand_chars</b><i>
+     </i></td>
+<td align="right">Variabele</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+The list of characters which inhibit history expansion if found immediately
+following <var>history_expansion_char</var>.  The default is space, tab, newline,
+carriage return, and <code>=</code>. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">int <b>history_quotes_inhibit_expansion</b><i>
+     </i></td>
+<td align="right">Variabele</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+If non-zero, single-quoted words are not scanned for the history expansion
+character.  The default value is 0. 
+</td></tr>
+</table>
+
+<p>
+<table width="100%">
+<tr>
+<td align="left">rl_linebuf_func_t * <b>history_inhibit_expansion_function</b><i>
+     </i></td>
+<td align="right">Variabele</td>
+</tr>
+</table>
+<table width="95%" align="center">
+<tr><td>
+This should be set to the address of a function that takes two arguments:
+a <code>char *</code> (<var>string</var>)
+and an <code>int</code> index into that string (<var>i</var>). 
+It should return a non-zero value if the history expansion starting at
+<var>string[i]</var> should not be performed; zero if the expansion should
+be done. 
+It is intended for use by applications like Bash that use the history
+expansion character for additional purposes. 
+By default, this variable is set to <code>NULL</code>. 
+</td></tr>
+</table>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="History%20Programming%20Example">History Programming Example</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#History%20Variables">History Variables</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Programming%20with%20GNU%20History">Programming with GNU History</a>
+<br>
+</div>
+
+<h3 class="section">2.5 History Programming Example</h3>
+
+<p>The following program demonstrates simple use of the <small>GNU</small> History Library.
+
+<pre class="smallexample">     #include &lt;stdio.h&gt;
+     #include &lt;readline/history.h&gt;
+     
+     main (argc, argv)
+          int argc;
+          char **argv;
+     {
+       char line[1024], *t;
+       int len, done = 0;
+     
+       line[0] = 0;
+     
+       using_history ();
+       while (!done)
+         {
+           printf ("history$ ");
+           fflush (stdout);
+           t = fgets (line, sizeof (line) - 1, stdin);
+           if (t &amp;&amp; *t)
+             {
+               len = strlen (t);
+               if (t[len - 1] == '\n')
+                 t[len - 1] = '\0';
+             }
+     
+           if (!t)
+             strcpy (line, "quit");
+     
+           if (line[0])
+             {
+               char *expansion;
+               int result;
+     
+               result = history_expand (line, &amp;expansion);
+               if (result)
+                 fprintf (stderr, "%s\n", expansion);
+     
+               if (result &lt; 0 || result == 2)
+                 {
+                   free (expansion);
+                   continue;
+                 }
+     
+               add_history (expansion);
+               strncpy (line, expansion, sizeof (line) - 1);
+               free (expansion);
+             }
+     
+           if (strcmp (line, "quit") == 0)
+             done = 1;
+           else if (strcmp (line, "save") == 0)
+             write_history ("history_file");
+           else if (strcmp (line, "read") == 0)
+             read_history ("history_file");
+           else if (strcmp (line, "list") == 0)
+             {
+               register HIST_ENTRY **the_list;
+               register int i;
+     
+               the_list = history_list ();
+               if (the_list)
+                 for (i = 0; the_list[i]; i++)
+                   printf ("%d: %s\n", i + history_base, the_list[i]-&gt;line);
+             }
+           else if (strncmp (line, "delete", 6) == 0)
+             {
+               int which;
+               if ((sscanf (line + 6, "%d", &amp;which)) == 1)
+                 {
+                   HIST_ENTRY *entry = remove_history (which);
+                   if (!entry)
+                     fprintf (stderr, "No such entry %d\n", which);
+                   else
+                     {
+                       free (entry-&gt;line);
+                       free (entry);
+                     }
+                 }
+               else
+                 {
+                   fprintf (stderr, "non-numeric arg given to `delete'\n");
+                 }
+             }
+         }
+     }
+     </pre>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Copying%20This%20Manual">Copying This Manual</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Concept%20Index">Concept Index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Programming%20with%20GNU%20History">Programming with GNU History</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="appendix">Appendix A Copying This Manual</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#GNU%20Free%20Documentation%20License">GNU Free Documentation License</a>: 	License for copying this manual. 
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="GNU%20Free%20Documentation%20License">GNU Free Documentation License</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Copying%20This%20Manual">Copying This Manual</a>
+<br>
+</div>
+
+<h3 class="appendixsec">A.1 GNU Free Documentation License</h3>
+
+<div align="center">Version 1.2, November 2002</div>
+<pre class="display">     Copyright &copy; 2000,2001,2002 Free Software Foundation, Inc.
+     59 Temple Place, Suite 330, Boston, MA  02111-1307, USA
+     
+     Everyone is permitted to copy and distribute verbatim copies
+     of this license document, but changing it is not allowed.
+     </pre>
+
+     <ol type=1 start=0>
+<li>PREAMBLE
+
+     <p>The purpose of this License is to make a manual, textbook, or other
+functional and useful document <dfn>free</dfn> in the sense of freedom: to
+assure everyone the effective freedom to copy and redistribute it,
+with or without modifying it, either commercially or noncommercially. 
+Secondarily, this License preserves for the author and publisher a way
+to get credit for their work, while not being considered responsible
+for modifications made by others.
+
+     <p>This License is a kind of "copyleft", which means that derivative
+works of the document must themselves be free in the same sense.  It
+complements the GNU General Public License, which is a copyleft
+license designed for free software.
+
+     <p>We have designed this License in order to use it for manuals for free
+software, because free software needs free documentation: a free
+program should come with manuals providing the same freedoms that the
+software does.  But this License is not limited to software manuals;
+it can be used for any textual work, regardless of subject matter or
+whether it is published as a printed book.  We recommend this License
+principally for works whose purpose is instruction or reference.
+
+     </p><li>APPLICABILITY AND DEFINITIONS
+
+     <p>This License applies to any manual or other work, in any medium, that
+contains a notice placed by the copyright holder saying it can be
+distributed under the terms of this License.  Such a notice grants a
+world-wide, royalty-free license, unlimited in duration, to use that
+work under the conditions stated herein.  The "Document", below,
+refers to any such manual or work.  Any member of the public is a
+licensee, and is addressed as "you".  You accept the license if you
+copy, modify or distribute the work in a way requiring permission
+under copyright law.
+
+     <p>A "Modified Version" of the Document means any work containing the
+Document or a portion of it, either copied verbatim, or with
+modifications and/or translated into another language.
+
+     <p>A "Secondary Section" is a named appendix or a front-matter section
+of the Document that deals exclusively with the relationship of the
+publishers or authors of the Document to the Document's overall
+subject (or to related matters) and contains nothing that could fall
+directly within that overall subject.  (Thus, if the Document is in
+part a textbook of mathematics, a Secondary Section may not explain
+any mathematics.)  The relationship could be a matter of historical
+connection with the subject or with related matters, or of legal,
+commercial, philosophical, ethical or political position regarding
+them.
+
+     <p>The "Invariant Sections" are certain Secondary Sections whose titles
+are designated, as being those of Invariant Sections, in the notice
+that says that the Document is released under this License.  If a
+section does not fit the above definition of Secondary then it is not
+allowed to be designated as Invariant.  The Document may contain zero
+Invariant Sections.  If the Document does not identify any Invariant
+Sections then there are none.
+
+     <p>The "Cover Texts" are certain short passages of text that are listed,
+as Front-Cover Texts or Back-Cover Texts, in the notice that says that
+the Document is released under this License.  A Front-Cover Text may
+be at most 5 words, and a Back-Cover Text may be at most 25 words.
+
+     <p>A "Transparent" copy of the Document means a machine-readable copy,
+represented in a format whose specification is available to the
+general public, that is suitable for revising the document
+straightforwardly with generic text editors or (for images composed of
+pixels) generic paint programs or (for drawings) some widely available
+drawing editor, and that is suitable for input to text formatters or
+for automatic translation to a variety of formats suitable for input
+to text formatters.  A copy made in an otherwise Transparent file
+format whose markup, or absence of markup, has been arranged to thwart
+or discourage subsequent modification by readers is not Transparent. 
+An image format is not Transparent if used for any substantial amount
+of text.  A copy that is not "Transparent" is called "Opaque".
+
+     <p>Examples of suitable formats for Transparent copies include plain
+<small>ASCII</small> without markup, Texinfo input format, LaTeX input
+format, <small>SGML</small> or <small>XML</small> using a publicly available
+<small>DTD</small>, and standard-conforming simple <small>HTML</small>,
+PostScript or <small>PDF</small> designed for human modification.  Examples
+of transparent image formats include <small>PNG</small>, <small>XCF</small> and
+<small>JPG</small>.  Opaque formats include proprietary formats that can be
+read and edited only by proprietary word processors, <small>SGML</small> or
+<small>XML</small> for which the <small>DTD</small> and/or processing tools are
+not generally available, and the machine-generated <small>HTML</small>,
+PostScript or <small>PDF</small> produced by some word processors for
+output purposes only.
+
+     <p>The "Title Page" means, for a printed book, the title page itself,
+plus such following pages as are needed to hold, legibly, the material
+this License requires to appear in the title page.  For works in
+formats which do not have any title page as such, "Title Page" means
+the text near the most prominent appearance of the work's title,
+preceding the beginning of the body of the text.
+
+     <p>A section "Entitled XYZ" means a named subunit of the Document whose
+title either is precisely XYZ or contains XYZ in parentheses following
+text that translates XYZ in another language.  (Here XYZ stands for a
+specific section name mentioned below, such as "Acknowledgements",
+"Dedications", "Endorsements", or "History".)  To "Preserve the Title"
+of such a section when you modify the Document means that it remains a
+section "Entitled XYZ" according to this definition.
+
+     <p>The Document may include Warranty Disclaimers next to the notice which
+states that this License applies to the Document.  These Warranty
+Disclaimers are considered to be included by reference in this
+License, but only as regards disclaiming warranties: any other
+implication that these Warranty Disclaimers may have is void and has
+no effect on the meaning of this License.
+
+     </p><li>VERBATIM COPYING
+
+     <p>You may copy and distribute the Document in any medium, either
+commercially or noncommercially, provided that this License, the
+copyright notices, and the license notice saying this License applies
+to the Document are reproduced in all copies, and that you add no other
+conditions whatsoever to those of this License.  You may not use
+technical measures to obstruct or control the reading or further
+copying of the copies you make or distribute.  However, you may accept
+compensation in exchange for copies.  If you distribute a large enough
+number of copies you must also follow the conditions in section 3.
+
+     <p>You may also lend copies, under the same conditions stated above, and
+you may publicly display copies.
+
+     </p><li>COPYING IN QUANTITY
+
+     <p>If you publish printed copies (or copies in media that commonly have
+printed covers) of the Document, numbering more than 100, and the
+Document's license notice requires Cover Texts, you must enclose the
+copies in covers that carry, clearly and legibly, all these Cover
+Texts: Front-Cover Texts on the front cover, and Back-Cover Texts on
+the back cover.  Both covers must also clearly and legibly identify
+you as the publisher of these copies.  The front cover must present
+the full title with all words of the title equally prominent and
+visible.  You may add other material on the covers in addition. 
+Copying with changes limited to the covers, as long as they preserve
+the title of the Document and satisfy these conditions, can be treated
+as verbatim copying in other respects.
+
+     <p>If the required texts for either cover are too voluminous to fit
+legibly, you should put the first ones listed (as many as fit
+reasonably) on the actual cover, and continue the rest onto adjacent
+pages.
+
+     <p>If you publish or distribute Opaque copies of the Document numbering
+more than 100, you must either include a machine-readable Transparent
+copy along with each Opaque copy, or state in or with each Opaque copy
+a computer-network location from which the general network-using
+public has access to download using public-standard network protocols
+a complete Transparent copy of the Document, free of added material. 
+If you use the latter option, you must take reasonably prudent steps,
+when you begin distribution of Opaque copies in quantity, to ensure
+that this Transparent copy will remain thus accessible at the stated
+location until at least one year after the last time you distribute an
+Opaque copy (directly or through your agents or retailers) of that
+edition to the public.
+
+     <p>It is requested, but not required, that you contact the authors of the
+Document well before redistributing any large number of copies, to give
+them a chance to provide you with an updated version of the Document.
+
+     </p><li>MODIFICATIONS
+
+     <p>You may copy and distribute a Modified Version of the Document under
+the conditions of sections 2 and 3 above, provided that you release
+the Modified Version under precisely this License, with the Modified
+Version filling the role of the Document, thus licensing distribution
+and modification of the Modified Version to whoever possesses a copy
+of it.  In addition, you must do these things in the Modified Version:
+
+          <ol type=A start=1>
+<li>Use in the Title Page (and on the covers, if any) a title distinct
+from that of the Document, and from those of previous versions
+(which should, if there were any, be listed in the History section
+of the Document).  You may use the same title as a previous version
+if the original publisher of that version gives permission.
+
+          <li>List on the Title Page, as authors, one or more persons or entities
+responsible for authorship of the modifications in the Modified
+Version, together with at least five of the principal authors of the
+Document (all of its principal authors, if it has fewer than five),
+unless they release you from this requirement.
+
+          <li>State on the Title page the name of the publisher of the
+Modified Version, as the publisher.
+
+          <li>Preserve all the copyright notices of the Document.
+
+          <li>Add an appropriate copyright notice for your modifications
+adjacent to the other copyright notices.
+
+          <li>Include, immediately after the copyright notices, a license notice
+giving the public permission to use the Modified Version under the
+terms of this License, in the form shown in the Addendum below.
+
+          <li>Preserve in that license notice the full lists of Invariant Sections
+and required Cover Texts given in the Document's license notice.
+
+          <li>Include an unaltered copy of this License.
+
+          <li>Preserve the section Entitled "History", Preserve its Title, and add
+to it an item stating at least the title, year, new authors, and
+publisher of the Modified Version as given on the Title Page.  If
+there is no section Entitled "History" in the Document, create one
+stating the title, year, authors, and publisher of the Document as
+given on its Title Page, then add an item describing the Modified
+Version as stated in the previous sentence.
+
+          <li>Preserve the network location, if any, given in the Document for
+public access to a Transparent copy of the Document, and likewise
+the network locations given in the Document for previous versions
+it was based on.  These may be placed in the "History" section. 
+You may omit a network location for a work that was published at
+least four years before the Document itself, or if the original
+publisher of the version it refers to gives permission.
+
+          <li>For any section Entitled "Acknowledgements" or "Dedications", Preserve
+the Title of the section, and preserve in the section all the
+substance and tone of each of the contributor acknowledgements and/or
+dedications given therein.
+
+          <li>Preserve all the Invariant Sections of the Document,
+unaltered in their text and in their titles.  Section numbers
+or the equivalent are not considered part of the section titles.
+
+          <li>Delete any section Entitled "Endorsements".  Such a section
+may not be included in the Modified Version.
+
+          <li>Do not retitle any existing section to be Entitled "Endorsements" or
+to conflict in title with any Invariant Section.
+
+          <li>Preserve any Warranty Disclaimers.
+          </ol>
+
+     <p>If the Modified Version includes new front-matter sections or
+appendices that qualify as Secondary Sections and contain no material
+copied from the Document, you may at your option designate some or all
+of these sections as invariant.  To do this, add their titles to the
+list of Invariant Sections in the Modified Version's license notice. 
+These titles must be distinct from any other section titles.
+
+     <p>You may add a section Entitled "Endorsements", provided it contains
+nothing but endorsements of your Modified Version by various
+parties--for example, statements of peer review or that the text has
+been approved by an organization as the authoritative definition of a
+standard.
+
+     <p>You may add a passage of up to five words as a Front-Cover Text, and a
+passage of up to 25 words as a Back-Cover Text, to the end of the list
+of Cover Texts in the Modified Version.  Only one passage of
+Front-Cover Text and one of Back-Cover Text may be added by (or
+through arrangements made by) any one entity.  If the Document already
+includes a cover text for the same cover, previously added by you or
+by arrangement made by the same entity you are acting on behalf of,
+you may not add another; but you may replace the old one, on explicit
+permission from the previous publisher that added the old one.
+
+     <p>The author(s) and publisher(s) of the Document do not by this License
+give permission to use their names for publicity for or to assert or
+imply endorsement of any Modified Version.
+
+     </p><li>COMBINING DOCUMENTS
+
+     <p>You may combine the Document with other documents released under this
+License, under the terms defined in section 4 above for modified
+versions, provided that you include in the combination all of the
+Invariant Sections of all of the original documents, unmodified, and
+list them all as Invariant Sections of your combined work in its
+license notice, and that you preserve all their Warranty Disclaimers.
+
+     <p>The combined work need only contain one copy of this License, and
+multiple identical Invariant Sections may be replaced with a single
+copy.  If there are multiple Invariant Sections with the same name but
+different contents, make the title of each such section unique by
+adding at the end of it, in parentheses, the name of the original
+author or publisher of that section if known, or else a unique number. 
+Make the same adjustment to the section titles in the list of
+Invariant Sections in the license notice of the combined work.
+
+     <p>In the combination, you must combine any sections Entitled "History"
+in the various original documents, forming one section Entitled
+"History"; likewise combine any sections Entitled "Acknowledgements",
+and any sections Entitled "Dedications".  You must delete all
+sections Entitled "Endorsements."
+
+     </p><li>COLLECTIONS OF DOCUMENTS
+
+     <p>You may make a collection consisting of the Document and other documents
+released under this License, and replace the individual copies of this
+License in the various documents with a single copy that is included in
+the collection, provided that you follow the rules of this License for
+verbatim copying of each of the documents in all other respects.
+
+     <p>You may extract a single document from such a collection, and distribute
+it individually under this License, provided you insert a copy of this
+License into the extracted document, and follow this License in all
+other respects regarding verbatim copying of that document.
+
+     </p><li>AGGREGATION WITH INDEPENDENT WORKS
+
+     <p>A compilation of the Document or its derivatives with other separate
+and independent documents or works, in or on a volume of a storage or
+distribution medium, is called an "aggregate" if the copyright
+resulting from the compilation is not used to limit the legal rights
+of the compilation's users beyond what the individual works permit. 
+When the Document is included an aggregate, this License does not
+apply to the other works in the aggregate which are not themselves
+derivative works of the Document.
+
+     <p>If the Cover Text requirement of section 3 is applicable to these
+copies of the Document, then if the Document is less than one half of
+the entire aggregate, the Document's Cover Texts may be placed on
+covers that bracket the Document within the aggregate, or the
+electronic equivalent of covers if the Document is in electronic form. 
+Otherwise they must appear on printed covers that bracket the whole
+aggregate.
+
+     </p><li>TRANSLATION
+
+     <p>Translation is considered a kind of modification, so you may
+distribute translations of the Document under the terms of section 4. 
+Replacing Invariant Sections with translations requires special
+permission from their copyright holders, but you may include
+translations of some or all Invariant Sections in addition to the
+original versions of these Invariant Sections.  You may include a
+translation of this License, and all the license notices in the
+Document, and any Warranty Disclaimers, provided that you also include
+the original English version of this License and the original versions
+of those notices and disclaimers.  In case of a disagreement between
+the translation and the original version of this License or a notice
+or disclaimer, the original version will prevail.
+
+     <p>If a section in the Document is Entitled "Acknowledgements",
+"Dedications", or "History", the requirement (section 4) to Preserve
+its Title (section 1) will typically require changing the actual
+title.
+
+     </p><li>TERMINATION
+
+     <p>You may not copy, modify, sublicense, or distribute the Document except
+as expressly provided for under this License.  Any other attempt to
+copy, modify, sublicense or distribute the Document is void, and will
+automatically terminate your rights under this License.  However,
+parties who have received copies, or rights, from you under this
+License will not have their licenses terminated so long as such
+parties remain in full compliance.
+
+     </p><li>FUTURE REVISIONS OF THIS LICENSE
+
+     <p>The Free Software Foundation may publish new, revised versions
+of the GNU Free Documentation License from time to time.  Such new
+versions will be similar in spirit to the present version, but may
+differ in detail to address new problems or concerns.  See
+<a href="http://www.gnu.org/copyleft/">http://www.gnu.org/copyleft/</a>.
+
+     <p>Each version of the License is given a distinguishing version number. 
+If the Document specifies that a particular numbered version of this
+License "or any later version" applies to it, you have the option of
+following the terms and conditions either of that specified version or
+of any later version that has been published (not as a draft) by the
+Free Software Foundation.  If the Document does not specify a version
+number of this License, you may choose any version ever published (not
+as a draft) by the Free Software Foundation.
+        </ol>
+
+<h3 class="appendixsubsec">A.1.1 ADDENDUM: How to use this License for your documents</h4>
+
+<p>To use this License in a document you have written, include a copy of
+the License in the document and put the following copyright and
+license notices just after the title page:
+
+<pre class="smallexample">       Copyright (C)  <var>year</var>  <var>your name</var>.
+       Permission is granted to copy, distribute and/or modify this document
+       under the terms of the GNU Free Documentation License, Version 1.2
+       or any later version published by the Free Software Foundation;
+       with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+       A copy of the license is included in the section entitled ``GNU
+       Free Documentation License''.
+     </pre>
+
+   <p>If you have Invariant Sections, Front-Cover Texts and Back-Cover Texts,
+replace the "with...Texts." line with this:
+
+<pre class="smallexample">         with the Invariant Sections being <var>list their titles</var>, with
+         the Front-Cover Texts being <var>list</var>, and with the Back-Cover Texts
+         being <var>list</var>.
+     </pre>
+
+   <p>If you have Invariant Sections without Cover Texts, or some other
+combination of the three, merge those two alternatives to suit the
+situation.
+
+   <p>If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of
+free software license, such as the GNU General Public License,
+to permit their use in free software.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Concept%20Index">Concept Index</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Function%20and%20Variable%20Index">Function and Variable Index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Copying%20This%20Manual">Copying This Manual</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="appendix">Appendix B Concept Index</h2>
+
+<ul class="index-cp" compact>
+<li>anchored search: <a href="#Searching%20the%20History%20List">Searching the History List</a>
+<li>event designators: <a href="#Event%20Designators">Event Designators</a>
+<li>FDL, GNU Free Documentation License: <a href="#GNU%20Free%20Documentation%20License">GNU Free Documentation License</a>
+<li>history events: <a href="#Event%20Designators">Event Designators</a>
+<li>history expansion: <a href="#History%20Interaction">History Interaction</a>
+<li>History Searching: <a href="#Searching%20the%20History%20List">Searching the History List</a>
+</ul>
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Function%20and%20Variable%20Index">Function and Variable Index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Concept%20Index">Concept Index</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="appendix">Appendix C Function and Variable Index</h2>
+
+<ul class="index-vr" compact>
+<li><code>add_history</code>: <a href="#History%20List%20Management">History List Management</a>
+<li><code>add_history_time</code>: <a href="#History%20List%20Management">History List Management</a>
+<li><code>append_history</code>: <a href="#Managing%20the%20History%20File">Managing the History File</a>
+<li><code>clear_history</code>: <a href="#History%20List%20Management">History List Management</a>
+<li><code>current_history</code>: <a href="#Information%20About%20the%20History%20List">Information About the History List</a>
+<li><code>free_history_entry</code>: <a href="#History%20List%20Management">History List Management</a>
+<li><code>get_history_event</code>: <a href="#History%20Expansion">History Expansion</a>
+<li><code>history_arg_extract</code>: <a href="#History%20Expansion">History Expansion</a>
+<li><code>history_base</code>: <a href="#History%20Variables">History Variables</a>
+<li><code>history_comment_char</code>: <a href="#History%20Variables">History Variables</a>
+<li><code>history_expand</code>: <a href="#History%20Expansion">History Expansion</a>
+<li><code>history_expansion_char</code>: <a href="#History%20Variables">History Variables</a>
+<li><code>history_get</code>: <a href="#Information%20About%20the%20History%20List">Information About the History List</a>
+<li><code>history_get_history_state</code>: <a href="#Initializing%20History%20and%20State%20Management">Initializing History and State Management</a>
+<li><code>history_get_time</code>: <a href="#Information%20About%20the%20History%20List">Information About the History List</a>
+<li><code>history_inhibit_expansion_function</code>: <a href="#History%20Variables">History Variables</a>
+<li><code>history_is_stifled</code>: <a href="#History%20List%20Management">History List Management</a>
+<li><code>history_length</code>: <a href="#History%20Variables">History Variables</a>
+<li><code>history_list</code>: <a href="#Information%20About%20the%20History%20List">Information About the History List</a>
+<li><code>history_max_entries</code>: <a href="#History%20Variables">History Variables</a>
+<li><code>history_no_expand_chars</code>: <a href="#History%20Variables">History Variables</a>
+<li><code>history_quotes_inhibit_expansion</code>: <a href="#History%20Variables">History Variables</a>
+<li><code>history_search</code>: <a href="#Searching%20the%20History%20List">Searching the History List</a>
+<li><code>history_search_delimiter_chars</code>: <a href="#History%20Variables">History Variables</a>
+<li><code>history_search_pos</code>: <a href="#Searching%20the%20History%20List">Searching the History List</a>
+<li><code>history_search_prefix</code>: <a href="#Searching%20the%20History%20List">Searching the History List</a>
+<li><code>history_set_history_state</code>: <a href="#Initializing%20History%20and%20State%20Management">Initializing History and State Management</a>
+<li><code>history_set_pos</code>: <a href="#Moving%20Around%20the%20History%20List">Moving Around the History List</a>
+<li><code>history_subst_char</code>: <a href="#History%20Variables">History Variables</a>
+<li><code>history_tokenize</code>: <a href="#History%20Expansion">History Expansion</a>
+<li><code>history_total_bytes</code>: <a href="#Information%20About%20the%20History%20List">Information About the History List</a>
+<li><code>history_truncate_file</code>: <a href="#Managing%20the%20History%20File">Managing the History File</a>
+<li><code>history_word_delimiters</code>: <a href="#History%20Variables">History Variables</a>
+<li><code>history_write_timestamps</code>: <a href="#History%20Variables">History Variables</a>
+<li><code>next_history</code>: <a href="#Moving%20Around%20the%20History%20List">Moving Around the History List</a>
+<li><code>previous_history</code>: <a href="#Moving%20Around%20the%20History%20List">Moving Around the History List</a>
+<li><code>read_history</code>: <a href="#Managing%20the%20History%20File">Managing the History File</a>
+<li><code>read_history_range</code>: <a href="#Managing%20the%20History%20File">Managing the History File</a>
+<li><code>remove_history</code>: <a href="#History%20List%20Management">History List Management</a>
+<li><code>replace_history_entry</code>: <a href="#History%20List%20Management">History List Management</a>
+<li><code>stifle_history</code>: <a href="#History%20List%20Management">History List Management</a>
+<li><code>unstifle_history</code>: <a href="#History%20List%20Management">History List Management</a>
+<li><code>using_history</code>: <a href="#Initializing%20History%20and%20State%20Management">Initializing History and State Management</a>
+<li><code>where_history</code>: <a href="#Information%20About%20the%20History%20List">Information About the History List</a>
+<li><code>write_history</code>: <a href="#Managing%20the%20History%20File">Managing the History File</a>
+</ul>
+
+
+   </body></html>
+

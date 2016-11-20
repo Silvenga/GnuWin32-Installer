@@ -1,0 +1,313 @@
+The entire ppmtojpeg directory was adapted by Bryan from the package
+mpeg_encode-1.5b-src (subdirectory mpeg_encode) on March 30, 1999.  The 
+program was called mpeg_encode in that package.  It was dated August 16,
+1995 and came from ftp://mm-ftp.cs.berkeley.edu/pub/multimedia/mpeg/
+encode/mpeg_encode-1.5b-src.tar.gz
+
+Changes for Netpbm include:
+
+  - mpeg_encode recognizes two input formats:  "PPM" and "PNM".  For
+    PPM, mpeg_encode parses it itself.  For PNM, it uses the Netpbm
+    PNM library routines.
+    
+    In the Netpbm version, PPM is gone and "PPM" is accepted as a 
+    synonym for "PNM".  For PNM, it uses the PPM (not PNM) Netpbm
+    library routines.
+
+  - mpeg_encode PNM code is broken for maxval != 255 (divides by zero
+    if maxval < 255 and overly quantize if > 255 because PNMtoYUV()
+    uses an integer divisor = maxval/256).
+
+In November 2004, Bryan rewrote large portions of the code so that he
+could read it easily enough to debug some problems.  He eliminated
+long subroutines, global variables, gotos, and the like.
+
+See the file LOGIC for some documentation on how the code works.
+
+
+The following is the README from the aforementioned mpeg_encode subdirectory.
+
+
+                 MPEG-1 Video Software Encoder
+                (Version 1.5; February 1, 1995)
+
+     Lawrence A. Rowe, Kevin Gong, Eugene Hung, Ketan Patel, Steve Smoot
+       and Dan Wallach
+    Computer Science Division-EECS, Univ. of Calif. at Berkeley
+
+This directory contains the freely distributed Berkeley MPEG-1 Video 
+Encoder.  The encoder implements the standard described in the ISO/IEC
+International Standard 11172-2.  The code has been compiled and tested 
+on the following platforms:
+
+ DECstation 5000 and Alpha
+ HP PA-RISC (HP/UX 9.X) (i.e., HP 9000/7XX and 9000/3XX)
+ SGI Indigo running IRIX 5.0.1
+ Sun Sparc (SunOS 4.X)
+
+In addition, Rainer Menes from the Technical University of Munich has
+ported the encoder and decoder to the Macintosh.  You can get that code
+directly from him (menes@statistik.tu-muenchen.de), or from the 
+Berkeley FTP archive (mm-ftp.CS.Berkeley.EDU).  If you decide to port 
+the code to a new architecture, please let us know so that we can 
+incorporate the changes into our sources.
+
+This directory contains everything required to build the encoder
+and run it.  We have included source code, makefiles, binaries
+for selected platforms, documentation, and test data.  Installation 
+instructions are given in the file named src/mpeg_encode/INSTALL.  A man 
+page is given in the file doc/mpeg_encode.1.  A detailed user 
+manual is provided in postscript format in the file doc/user-manual.ps.
+
+The encoder will accept any input file format as long as you provide 
+a script to convert the images to PPM, YUV, JPEG, or JMOVIE format.  Input 
+file processing is described in the file doc/INPUT.FORMAT.  Options to 
+control input file processing and compression parameters are specified in 
+a parameter file.  Very little error processing is done when reading 
+this file.  We suggest you start with the sample parameter file 
+examples/template.param and modify it.  See also examples/default.param.
+
+The convert directory of Mpeg-Tools contains utilities you might find 
+useful including: 
+
+programs to do PPM/YUV conversion and programs to convert Parallax
+XVideo JPEG files into PPM, YUV, or JPEG frames.
+
+The motion vector search window can be specified, including half-pixel
+block matching, in the parameter file.  We have implemented several 
+search algorithms for P-frames including: 1) exhaustive search, 
+2) subsampled search, and 3) logarithmic search.  We have also implemented
+several alternatives for B-frame block matching including: 1) interpolate
+best forward and best backward block, 2) find backward block for best
+forward or vice-versa (called CROSS2), and 3) exhaustive cross product
+(i.e., go out for coffee and a donut!). The search algorithms are controlled
+by options in the parameters file.  For tips on choosing the right search
+technique, see the user manual.
+
+The encoder can be run on one computer (i.e., sequential) or on several
+computers (i.e., parallel).  Our goal is to produce a portable, easy-to-use
+encoder that we can use to encode large volumes of video material for
+the Berkeley VOD system (see paper VodsProp93.ps.Z on the FTP archive).
+The parallelism is done on a sequence of pictures.  In other words, you 
+can spawn one or more children to encode continuous runs pictures. The 
+uncompressed data can be accessed either through NFS or TCP sockets.  
+The goal is to allow you to encode using multiple processors, think 
+spare cycles on workstations, to speed up the encoding time.  Although
+performance depends on the speed of individual processors, the file system
+and network, and the P/B frame search methods, we have encoded 3.75
+frames/second on 8 HP Snakes running in parallel as compared with 0.6
+frames/second on 1 Snake.  These are preliminary results. We are continuing 
+to experiment with and tune the code.  Instructions to run the parallel system 
+are given in the man page and the parallel.param example parameter file.
+
+We have done some tuning to produce a reasonable encoder, but there are
+many more optimizations that we would like to incorporate.  These 
+extensions are listed in the file doc/EXTENSIONS.  If you succeed in 
+implementing any of them, please let us know! 
+
+Send bug reports to:
+
+mpeg-bugs@CS.Berkeley.EDU
+   Problems, questions, or patches should be sent to this address.
+
+Anyone interested in providing financial support for this research or 
+discussing other aspects of this project should contact Larry Rowe at 
+Rowe@CS.Berkeley.EDU (+1 510-642-5117).
+
+This software is freely distributed.  That means, you may use it for 
+any non-commercial purpose.  However, patents are held by several companies 
+on various aspects of the MPEG video standard.  Companies or individuals
+who want to develop commercial products that include this code must
+acquire licenses from these companies.  For information on licensing, see
+Appendix F in the standard.
+
+ACKNOWLEDGEMENTS:
+
+We gratefully thank Hewlett-Packard and Fujitsu who provided financial
+support for this work.  We also want to thank the following people and
+organizations for their help:
+
+    Jef Poskanzer who developed the pbmplus package.
+    ---------
+    Copyright (C) 1989, 1991 by Jef Poskanzer.
+
+    Permission to use, copy, modify, and distribute this software and its
+    documentation for any purpose and without fee is hereby granted, provided
+    that the above copyright notice appear in all copies and that both that
+    copyright notice and this permission notice appear in supporting
+    documentation.  This software is provided "as is" without express or
+    implied warranty.
+    ---------
+
+    Eiichi Kowashi of Intel and Avideh Zakhor of U.C. Berkeley who
+    provided valuable suggestions on motion vector searching.
+
+    Chad Fogg of the University of Washington who has helped us 
+    understand many issues in MPEG coding and decoding.
+
+    Rainer Menes of the Technical University of Munich who has ported the
+    the Berkeley MPEG encoder and decoder to the Macintosh, and he has 
+    provided us with many suggestions to improve the code.
+
+    Robert Safranek of ATT for comments, suggestions, and most of the
+    code for custom quantization tables.
+
+    Jim Boucher of Boston University for jmovie2jpeg.
+
+    The San Diego SuperComputing Center for providing facilities to 
+    develop some of the code contained within.
+
+
+This is the TODO file from the original Berkeley package:
+
+
+TODO list for next release
+--------------------------
+
+Add option to do searches in Cr/Cb as well as Lum blocks
+jpeg5! (below)
+last-frame must be P/I error, and pattern interact badly
+add gnuconfigure so the Makefile is cake
+YUV correct (cf mail below)
+fix the "ifdef BUGGY_CODE" code in bframe.c
+Change sizing stuff so it works with non multiples of 16
+Does "RESIZE WxH" work?  Seems to for PPm but not JPG.  Fix it.  Document it
+mpeg_encode in parallel generates a "zero size warning"  It should 
+    exit(1) here, when not in parallel, and not warn when in parallel.
+     sometimes it generates a 0x0 MPEG!
+Give time estimates for parallel encoding
+Verify YUV file sizes with stat() call (when not STDIN)
+
+--------------------
+
+YUV mail:
+Please have a look on these few lines extracted from the ISO
+mpeg2encode/readpic.c/read_ppm() available on 
+ftp.netcom.com:/pub/cf/cfogg/mpeg2 :
+
+    .........
+
+     /* convert to YUV */
+
+     y = cr*r +cg*g +cb*b;
+     u = cu*(b-y);
+     v = cv*(r-y);
+     yp[j] = (219.0/256.0)*y + 16.5;  /* nominal range : 16..235 */
+     up[j] = (224.0/256.0)*u + 128.5; /* nominal range : 16..240 */
+     vp[j] = (224.0/256.0)*v + 128.5; /* nominal range : 16..240 */
+    ...........
+
+I think there is a slight misunderstanding in the Berkeley's mpeg1 codec about
+what the YUV format looks like, exactly about how to translate from PPM to YUV 
+and vice versa : the dynamic of YUV format has to be reduced as described
+above. Otherwise, on a full color display a Berkeley's MPEG bitstream has not 
+exactly the right colors if played by an ISO compliant player.
+
+Best regards
+
+
+                            Thierry GODIN
+
+--------------------
+And just for fun, kevin's list:
+To-do list	(in no particular order)
+----------
+	- should delete decoded frame files when done with them
+		(need to make sure no one else needs it)
+	- port to CM5
+	- try on Snake cluster, and other clusters (FDDI -- 100Mb/s)
+	- fix bug on snakes (look at header file for queue length)
+	- look at 24-bit display
+	- try having I/O server getting things in order, and asking Master
+		where to send them
+	- bug:  closing connections at end (on DEC 5000)
+	- GOP on space in input list
+	- pnm convolve
+	- telescopic search
+	- include system layer
+	- update documentation
+	- show error images
+	- graphical interface (showing motion vectors, etc.)
+	- use DCT-space when computing error terms
+	- vary the q-scale according to the error term
+	- modify the program to have a finer-grained parallelism option -- we
+	  can probably encode slices in parallel (this will only be useful if
+	  we want to do a few B-frames using exhaustive search)
+	- make search technique stop at x.5, not x.0
+	- pel aspect ratio in parameter file (2.4.3.2)
+	- skipped blocks options?
+	- recover from parallel machine errors?
+	- subsample B-search
+	- bug:  decoded with 1 machine can freeze
+	- malloc bug:  hello.param, with DECODED frames only
+	- portability:
+		times() function
+		popen/pclose
+
+Oh yes, I liked the concept of a spiral for your full search algorithm,
+however I thought this code a little difficult to read.  What about
+using a look up table (pre generated at compile time) to generate
+the coord offsets that would then spiral around the location in question?
+
+	+ change MAXPATHLEN to something else
+	+ put ./ in test in Makefile
+
+Currently, the IPPBPBB sequence is fixed for the entire sequence.  A later
+version should probably either test for scene changes or allow the user to
+specify them.
+
+	+ check all << and >> to make sure they are used properly
+		(note truncation of >>)
+	+ allow variable bit rate
+	+ allow size of video sequences to be set
+	+ make REMOTE usage more clear
+	+ fix bug:  when I-frame only, and decoded, does a lot of extra work
+	+ replace ZAG[i] with a pointer? (in quantization)
+		(and speed up by using 31 times the space (one for each
+		 q-value)
+	+ add interrupt handler to parallel encoder
+	+ should pad black instead of truncating
+	- graph histogram of motion vectors
+	- allow new PATTERN statements inside of file listing
+	- put in run-time checks for size of int32, int16, etc.
+	- replace pnm crap with ppm.dwallach
+	- add option to allow different p-search in b-search
+	- allow -frames option along with parallel option (shouldn't be
+		too difficult)
+	- incorrect compression rates given if do -frames option
+
+	- enforce:  >Hmmm...I will have to look at the standard.  I did find something earlier --
+>"forced updating" makes it illegal to have more than 132 P-frames without an
+>I-frame.  But "forced updating" does not disallow any number of consecutive
+>B-frames.  I'll have to check on limits for GOP lengths...
+
+	- rectangular search windows
+
+	- make parallel stats to 4 digits
+
+One of my friend just fixed the problem.....she 
+retype the whole parameter file and it is working
+now.  I think the problem was there were some 
+spacing problem......for example, if there
+are some space is the line, when the 
+program read in....it just mess everything up.
+
+It really become a problem if there is space after the image name...
+or even after the path name.
+
+	Subject: may not want to >> 4	in postdct.c
+
+------------------------------------------------------------------------
+P.S. In the future versions (is one already been released), you could add
+option for encoder to remove picture after encoding it & therefore saving
+space on disk + option to sleep while picture it's waiting for is not done.
+I've hacked this: (in readframe.c)
+
+        while ((tempfile = fopen(fullFileName, "r")) == NULL) {
+            fprintf(stderr, "Cannot open '%s', retrying...\n", fullFileName);
+            sleep(120);
+        }
+
+        fclose(tempfile);
+
+arijan@kette.fer.uni-lj.si

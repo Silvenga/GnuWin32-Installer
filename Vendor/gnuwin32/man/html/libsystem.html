@@ -1,0 +1,304 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html> 
+<head>
+<title>Netpbm subroutine library: pm_system() subroutine</title>
+<meta name="manual_section" content="3">
+</head>
+
+<body>
+<h1>pm_system()</h1>
+Updated: 22 July 2004
+<br>
+
+<h2>Name</h2>
+pm_system - run a Netpbm program with program input and output
+
+<h2>Synopsis</h2>
+
+<pre>
+#include &lt;netpbm/pm_system.h&gt;
+
+pm_system(void                  stdinFeeder(int, void *),
+          void *          const feederParm,
+          void                  stdoutAccepter(int, void *),
+          void *          const accepterParm,
+          const char *    const shellCommand);
+</pre>
+
+<h2>Example</h2>
+
+<p>This simple example converts a PNM image on Standard Input to a
+JFIF (JPEG) image on Standard Output.  In this case,
+<b>pm_system()</b> is doing no more than <b>system()</b> would do.
+
+<pre>
+    pm_system(NULL, NULL, NULL, NULL, "pnmtojpeg");
+</pre>
+
+
+<p>This example does the same thing, but moves the data through memory
+buffers to illustrate use with memory buffers, and we throw in a stage
+to shrink the image too:
+<pre>
+#include &lt;netpbm/pm_system.h&gt;
+
+char              pnmData[100*1024];   /* Input file better be &lt; 100K */
+char              jfifData[100*1024];
+struct bufferDesc pnmBuffer;
+struct bufferDesc jfifBuffer;
+unsigned int      jfifSize;
+
+pnmBuffer.size = fread(pnmData, 1, sizeof(pnmData), stdin);
+pnmBuffer.buffer = pnmData;
+pnmBuffer.bytesTransferredP = NULL;
+
+jfifBuffer.size = sizeof(jfifData);
+jfifBuffer.buffer = jfifData;
+jfifBuffer.bytesTransferredP = &amp;jfifSize; 
+
+pm_system(&amp;pm_feed_from_memory, &amp;pnmBuffer,
+          &amp;pm_accept_to_memory, &amp;jfifBuffer,
+          "pamscale .5 | pnmtojpeg");
+
+fwrite(jfifData, 1, jfifSize, stdout);
+
+</pre>
+
+
+<p>This example reads an image into libnetpbm PAM structures, then
+brightens it, then writes it out, to illustrate use of <b>pm_system</b>
+with PAM structures.
+<pre>
+#include &lt;netpbm/pam.h&gt;
+#include &lt;netpbm/pm_system.h&gt;
+
+struct pam       inpam;
+struct pam       outpam;
+tuples **        inTuples;
+tuples **        outTuples;
+struct pamtuples inPamtuples;
+struct pamtuples outPamtuples;
+
+inTuples = pnm_readpam(stdin, &amp;inpam, sizeof(inpam));
+
+outpam = inpam;
+
+inPamtuples.pamP = &amp;inpam;
+inPamtuples.tuplesP = &amp;inTuples;
+outPamtuples.pamP = &amp;outpam;
+outPamtuples.tuplesP = &amp;outTuples;
+
+pm_system(&amp;pm_feed_from_pamtuples, &amp;inPamtuples,
+          &amp;pm_accept_to_pamtuples, &amp;outPamtuples,
+          "ppmbrighten -v 100");
+
+outpam.file = stdout;
+pnm_writepam(&amp;outpam, outTuples);
+
+</pre>
+
+
+
+<h2>DESCRIPTION</H2>
+
+<p>This library function is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pm_system()</b> is a lot like the standard C library
+<b>system()</b> subroutine.  It runs a shell and has that shell
+execute a shell command that you specify.  But <b>pm_system()</b>
+gives you more control over the Standard Input and Standard Output of
+that shell command than <b>system()</b>.  <b>system()</b> passes to the
+shell command as Standard Input and Output whatever is the Standard Input
+and Output of the process that calls <b>system()</b>.  But with
+<b>pm_system()</b>, you specify as arguments subroutines to execute to
+generate the shell command's Standard Input stream and to process the
+shell command's Standard Output stream.
+
+<p>Your Standard Input feeder subroutine can generate the stream in
+limitless ways.  <b>pm_system()</b> gives it a file descriptor of a
+pipe to which to write the stream it generates.  <b>pm_system()</b>
+hooks up the other end of that pipe to the shell command's Standard
+Input.
+
+<p>Likewise, your Standard Output accepter subroutine can do anything
+it wants with the stream it gets.  <b>pm_system()</b> gives it a file
+descriptor of a pipe from which to read the stream.
+<b>pm_system()</b> hooks up the other end of that pipe to the shell
+command's Standard Output.
+
+<p>The argument <i>stdinFeeder</i> is a function pointer that
+identifies your Standard Input feeder subroutine.  <b>pm_system()</b>
+runs it in a child process and waits for that process to terminate (and
+accepts its completion status) before returning.  <i>feederParm</i> is
+the argument that <b>pm_system()</b> passes to the subroutine; it is
+opaque to <b>pm_system()</b>.
+
+<p>If you pass <i>stdinFeeder</i> = NULL, <b>pm_system()</b> simply
+passes your current Standard Input stream to the shell command (as
+<b>system()</b> would do), and does not create a child process.
+
+<p>The argument <i>stdoutAccepter</i> is a function pointer that
+identifies your Standard Output accepter subroutine.
+<b>pm_system()</b> calls it in the current process.
+<i>accepterParm</i> is an argument analogous to <i>feederParm</i>.
+
+<p>If you pass <i>stdoutAccepter</i> = NULL, <b>pm_system()</b> simply
+passes your current Standard Output stream to the shell command (as
+<b>system()</b> would do.
+
+<p>The argument <i>shellCommand</i> is a null-terminated string
+containing the shell command that the shell is to execute.  It can be
+any command that means something to the shell and can take a pipe for
+Standard Input and Output.  Example:
+
+<pre>
+ppmbrighten -v 100 | pnmdepth 255 | pamscale .5
+</pre>
+
+<b>pm_system()</b> creates a child process to run the shell and waits
+for that process to terminate (and accepts its completion status)
+before returning.
+
+
+<h2>Applications</h2>
+
+<p>The point of <b>pm_system()</b> is to allow you write a C program that
+uses other programs internally, as a shell script would.  This is particularly
+desirable with Netpbm, because Netpbm consists of a lot of programs that
+perform basic graphic manipulations and you'd like to be able to build a
+program that does a more sophisticated graphic manipulation by calling the
+more basic Netpbm programs.  These building block programs typically take
+input from Standard Input and write output to Standard Output.
+
+<p>The obvious alternative is to use a higher level language -- Bourne Shell
+or Perl, for example.  But often you want your program to do manipulations
+of your graphical data that are easier and more efficient in C.  Or you want
+to use the Netpbm subroutine library in your program.  The Netpbm subroutine
+library is a C-linkage library; the subroutines in it are not usable from a
+Bourne Shell or Perl program.
+
+<p>A typical use of <b>pm_system()</b> is to place the contents of
+some graphical image file in memory, run a Netpbm program against it,
+and have what would ordinarily go into an output file in memory too,
+for further processing.  To do that, you can use the memory buffer
+Standard Input feeder and Standard Output accepter described below.
+
+<p>If your program uses the Netpbm subroutine library to read, write, and
+manipulate images, you may have an image in an array of PAM tuples.  If you
+want to manipulate that image with a Netpbm program (perhaps remap the
+colors using <b>pnmremap</b>), you can use the pamtuple Standard Input
+feeder and Standard Output acceptor described below.
+
+<h2>Broken Pipe Behavior</h2>
+
+<p>When you set up a shell command to take input from a pipe, as
+you do with <b>pm_system()</b>, you need to understand how pipes work with
+respect to the programs at either end of the pipe agreeing to how much
+data is to be transferred.  Here are some notes on that.
+
+<p>It is normal to read a pipe before the process on the other end has
+written the data you hope to read, and it is normal to write to a pipe
+before the process on the other end has tried to read your data.
+Writes to a pipe can be buffered until the reading end requests the
+data.  A process reading or writing a pipe can block until the other
+end is ready.  Or a read or write can complete with an indication that
+the other end is not ready at the moment and therefore no data, or
+less data than was requested, was transferred.
+
+<p>The pipe is normally controlled by the writing end.  When you read
+from a pipe, you keep reading until the program on the other end of
+the pipe closes it, and then you get an end-of-file indication.  You then
+normally close the reading end of the pipe, since it is no longer useful.
+
+<p>When you close the reading end of a pipe before getting the
+end-of-file indication and the writer subsequently tries to write to
+the pipe, that is an error condition for the writer.  In a typical
+default Unix environment, that error causes the writer to receive a
+SIGPIP signal and that signal causes the writer process to terminate
+abnormally.  But if, alternatively, the writer has ordered that SIGPIPE
+be blocked, ignored, or handled, the signal does not cause the death of
+the writer.  Instead, the write operation simply completes with an error
+indication.
+
+
+<h2>Standard Feeders And Acceptors</h2>
+
+<p>You can supply anything you like as a Standard Input feeder or
+Standard Output acceptor, but the Netpbm subroutine library comes with
+a few that perform commonly needed functions.
+
+<h3>Memory Buffer</h3>
+
+<p>These routines are for when you just want to treat an area of
+memory as a file.  If the shell command would ordinarily read a 513
+byte regular file from its Standard Input, you want it to take 513 bytes
+from a certain address in your process' memory.  Whatever bytes the
+shell command wants to write to its output file you want it to store at
+another address in your process' memory.
+
+<p>The Standard Input feeder for this is called <b>pm_feed_from_memory</b>.
+The Standard Output accepter is <b>pm_accept_to_memory</b>.
+
+<p>For both of these, the argument is the address of a <b>struct
+bufferDesc</b>, which is defined as follows:
+
+<pre>
+struct bufferDesc {
+    unsigned int    size;
+    unsigned char * buffer;
+    unsigned int *  bytesTransferredP;
+};
+</pre>
+
+<i>size</i> is the size of the memory buffer and <i>buffer</i> is its
+location in memory (address).  The Standard Input feeder will attempt
+to feed the entire buffer to the shell command's Standard Input; the
+Standard Output accepter will not accept any more data from the shell
+command's Standard Output than will fit in the buffer.  Both return
+the actual amount of data read or written, in bytes, at the location
+identified by <i>bytesTransferredP</i>.  Unless
+<b>bytesTransferredP</b> is NULL.
+
+<p>Because a process typically terminates abnormally when it is not
+able to write everything to a pipe that it wanted to,
+<i>bytesTransferredP</i> is not usually useful in the Standard Input feeder
+case.
+
+
+<h3>Pamtuple</h3>
+
+<p>These routines are for when you have images in memory in the data
+structures used by the PAM family of subroutines in the Netpbm library --
+i.e. struct PAM and an array of struct tuple.  With these routines, you
+can run a Netpbm program against such an image just as you would against
+the same image in a regular file.
+
+<p>The Standard Input feeder for this is called
+<b>pm_feed_from_pamtuples</b>.  The Standard Output accepter is
+<b>pm_accept_to_pamtuples</b>.
+
+<p>For both of these, the argument is the address of a <b>struct
+pamtuples</b>, which is defined as follows:
+
+<pre>
+struct pamtuples {
+    struct pam * pamP;
+    tuple ***    tuplesP;
+};
+</pre>
+
+<p>For the Standard Input feeder, you supply a fully valid struct pam
+(except it doesn't matter what the <i>file</i> field is) and array of
+tuples.
+
+<p>For the Standard Output Accepter, you supply only space in
+memory for the struct pam and the address of the tuple array.  The
+routine fills in the struct pam (except leaves the <i>file</i> field
+undefined) and allocates space for the tuple array with malloc().  You
+are responsible for freeing that memory.
+
+<h2>HISTORY</h2>
+<b>pm_system()</b> was introduced in Netpbm 10.13 (January 2003).
+
+</body>
+</html>

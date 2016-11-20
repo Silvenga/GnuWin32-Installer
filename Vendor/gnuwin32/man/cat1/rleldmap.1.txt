@@ -1,0 +1,161 @@
+RLELDMAP(1)                                         RLELDMAP(1)
+
+
+
+
+
+NAME
+       rleldmap - Load a new color map into an RLE file
+
+SYNOPSIS
+       rleldmap  [ -{ab} ] [ -n nchan length ] [ -s bits ] [ -l
+       [ factor ] ] [ -g gamma ] [ -{tf} file ] [ -m files  ...
+       ] [ -r rlefile ] [ -o outfile ] [ infile ]
+
+DESCRIPTION
+       The  program  will  load  a  specified color map into an
+       RLE(5) file.  The color map may be computed by  rleldmap
+       or  loaded  from  a file in one of several formats.  The
+       input is read from infile or stdin if no file is  given,
+       and the result is written to outfile or stdout.
+
+       The  following  terms are used in the description of the
+       program and its options:
+
+       input map:
+              A color map already in the input RLE file.
+
+       applied map:
+              The color  map  specified  by  the  arguments  to
+              rleldmap.   This  map  will be applied to or will
+              replace the input map to produce the output  map.
+
+       output map:
+              Unless  -a  or  -b is specified, this is equal to
+              the applied map.  Otherwise it will be the compo-
+              sition of the input and applied maps.
+
+       map composition:
+              If  the  applied  map is composed after the input
+              map,  then  the  output  map  will   be   applied
+              map[input map].  Composing the applied map before
+              the input map produces an  output  map  equal  to
+              input  map[applied map].  The maps being composed
+              must either have the same number of channels,  or
+              one  of  them  must have only one channel.  If an
+              entry in the map being used  as  a  subscript  is
+              larger  than  the  length  of  the map being sub-
+              scripted, the output value is equal to  the  sub-
+              script  value.   The  output map will be the same
+              length as the subscript map  and  will  have  the
+              number of channels that is the larger of the two.
+              If the input map is used as a subscript, it  will
+              be  downshifted  the  correct  number  of bits to
+              serve as a subscript for the applied  map  (since
+              the  color map in an RLE(5) file is always stored
+              left justified  in  16  bit  words).   This  also
+              applies to the applied map if it is taken from an
+              RLE(5) file (-r  option  below).   Note  that  if
+              there  is no input map, that the result of compo-
+              sition will be exactly the applied map.
+
+       nchan: The number of separate lookup  tables  (channels)
+              making up the color map.  This defaults to 3.
+
+       length:
+              The  number  of  entries  in  each channel of the
+              color map.  The default is 256.
+
+       bits:  The size of each color map entry  in  bits.   The
+              default value is the log base 2 of the length.
+
+       range: The  maximum value of a color map entry, equal to
+              2**bits - 1.
+
+OPTIONS
+       -a     Compose the applied map after the input map.
+
+       -b     Compose the applied map  before  the  input  map.
+              Only one of -a or -b may be specified.
+
+       -n nchan length
+              Specify  the size of the applied map if it is not
+              3x256.  The length should be a power of two,  and
+              will be rounded up if necessary.  If applying the
+              map nchan must be either 1 or equal to the number
+              of  channels  in  the input map.  It may have any
+              value if the input map has one channel or is  not
+              present.
+
+       -s bits
+              Specify  the  size  in  bits  of  the  color  map
+              entries.  I.e., only the top bits  bits  of  each
+              color map entry will be set.
+
+              Exactly one of the options -l, -g, -t, -f, -m, or
+              -r, must be specified.
+
+       -l factor
+              Generate a linear applied map with the nth  entry
+              equal to
+                        range       *       min(1.0,       fac-
+              tor*(n/(length-1))).
+              Factor defaults to 1.0 if not  specified.   Nega-
+              tive  values  of  factor will generate a map with
+              values equal to
+                        range   *   max(0.0,   1.0    -    fac-
+              tor*(n/(length-1))).
+
+       -g gamma
+              Generate  an applied map to compensate for a dis-
+              play with the given  gamma.   The  nth  entry  is
+              equal to
+                        range * (n/(length-1))**(1/gamma).
+
+       -t file
+              Read  color  map  entries  from a table in a text
+              file.  The values for each channel of a  particu-
+              lar  entry  follow each other in the file.  Thus,
+              for an RGB color map, the file would look like:
+                        red0 green0    blue0
+                        red1 green1    blue1
+                        ...  ...  ...
+              Line breaks in the input file are irrelevant.
+
+       -f file
+              Reads the applied map from a text file, with  all
+              the  entries  for  each  channel  following  each
+              other.  Thus, the input file above  would  appear
+              as
+                        red0 red1 red2 ... (length values)
+                        green0  green1  green2 ... (length val-
+              ues)
+                        blue0 blue1 blue2 ... (length values)
+              As above, line breaks are irrelevant.
+
+       -m files ...
+              Read the color map for each channel from a  sepa-
+              rate  file.   The  number of files specified must
+              equal the number of channels in the applied  map.
+              (Note:  the  list  of  files  must be followed by
+              another flag argument or by the null flag  --  to
+              separate it from the infile specification.
+
+       -o outfile
+              The output will be written to the file outfile if
+              this option is specified.  Otherwise  the  output
+              will go to stdout.
+
+       infile The  input will be taken from this file if speci-
+              fied.  Otherwise, the input  will  be  read  from
+              stdin.
+
+SEE ALSO
+       applymap(1), urt(1), RLE(5).
+
+AUTHOR
+       Spencer W. Thomas, University of Utah
+
+
+
+1                         Nov 12, 1986              RLELDMAP(1)

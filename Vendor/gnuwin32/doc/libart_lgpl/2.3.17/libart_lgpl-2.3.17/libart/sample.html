@@ -1,0 +1,479 @@
+<HTML
+><HEAD
+><TITLE
+>Sample code</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="The libart library"
+HREF="libart.html"><LINK
+REL="PREVIOUS"
+TITLE="LibArt's overall architecture"
+HREF="x31.html"><LINK
+REL="NEXT"
+TITLE="A displaying application"
+HREF="sample-display.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The libart library</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="x31.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libart.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&nbsp;</B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="sample-display.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="SAMPLE"
+>Sample code</A
+></H1
+><DIV
+CLASS="TOC"
+><DL
+><DT
+><B
+>Table of Contents</B
+></DT
+><DT
+><A
+HREF="sample.html#SAMPLE-NON-DISPLAY"
+>A non-displaying application</A
+></DT
+><DT
+><A
+HREF="sample-display.html"
+>A displaying application</A
+></DT
+></DL
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SAMPLE-NON-DISPLAY"
+>A non-displaying application</A
+></H1
+><P
+>	To get a good idea on how to use libart 
+	in your own application, here is a simple example which does
+	nothing but render in a pixel buffer a small square. The full 
+	source for this example is available for download:
+	<A
+HREF="./art-non-diplay.tar.gz"
+TARGET="_top"
+>art-non-diplay.tar.gz</A
+>
+	(includes a simple Makefile to build it).
+      </P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>int main (int argc, char *argv[])
+{
+  ArtSVP *path;
+  char *buffer;
+
+  path = make_path ();
+
+  buffer = render_path (path);
+
+  save_buffer (buffer, "foo.png");
+
+  return 0;
+}
+      </PRE
+></TD
+></TR
+></TABLE
+><P
+>	As shown above, we begin by creating an SVP, then we render it in a pixel buffer and
+	last we save it to a file.
+	Creating the SVP is very easy:
+      </P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>static ArtSVP *
+make_path (void)
+{
+  ArtVpath *vec = NULL;
+  ArtSVP *svp = NULL;
+  
+  vec = art_new (ArtVpath, 10);
+  vec[0].code = ART_MOVETO;
+  vec[0].x = 0;
+  vec[0].y = 0;
+  vec[1].code = ART_LINETO;
+  vec[1].x = 0;
+  vec[1].y = 10;
+  vec[2].code = ART_LINETO;
+  vec[2].x = 10;
+  vec[2].y = 10;
+  vec[3].code = ART_LINETO;
+  vec[3].x = 10;
+  vec[3].y = 0;
+  vec[4].code = ART_END;
+
+  svp = art_svp_from_vpath (vec);
+
+  return svp;
+}</PRE
+></TD
+></TR
+></TABLE
+><P
+>	The above VPath is a list of drawing commands. There are 5 different drawing commands:
+	<TT
+CLASS="FUNCTION"
+>ART_MOVETO</TT
+>, <TT
+CLASS="FUNCTION"
+>ART_MOVETO_OPEN</TT
+>,
+	<TT
+CLASS="FUNCTION"
+>ART_LINETO</TT
+>, <TT
+CLASS="FUNCTION"
+>ART_CURVETO</TT
+> an <TT
+CLASS="FUNCTION"
+>ART_END</TT
+>.
+	<P
+></P
+><UL
+><LI
+><P
+>	      <TT
+CLASS="FUNCTION"
+>ART_MOVETO</TT
+> and <TT
+CLASS="FUNCTION"
+>ART_MOVETO_OPEN</TT
+> describe where the
+	      pen of the painter starts to draw the vectors. <TT
+CLASS="FUNCTION"
+>ART_MOVETO</TT
+> starts
+	      a closed vector path (the last point of the vector path will be connected to the first one).
+	    </P
+></LI
+><LI
+><P
+>	      <TT
+CLASS="FUNCTION"
+>ART_END</TT
+> ends a vector path.
+	    </P
+></LI
+><LI
+><P
+>	      <TT
+CLASS="FUNCTION"
+>ART_LINETO</TT
+> and <TT
+CLASS="FUNCTION"
+>ART_CURVETO</TT
+> describe
+	      the following point in the vector path.
+	      <TT
+CLASS="FUNCTION"
+>ART_CURVETO</TT
+> is reserved for use with <TT
+CLASS="FUNCTION"
+>BPath</TT
+>s and
+	      cannot be used with a <TT
+CLASS="FUNCTION"
+>Vpath</TT
+>.
+	    </P
+></LI
+></UL
+>
+      </P
+><P
+>	The following figure summarizes the behaviour of these drawing commands:
+	<DIV
+CLASS="FIGURE"
+><A
+NAME="AEN90"
+></A
+><P
+><B
+>Figure 1. Drawing commands</B
+></P
+><P
+><IMG
+SRC="art-drawing-commands.png"></P
+></DIV
+>
+	Once the SVP is built, we render it and save it to a file:
+      </P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>static unsigned char *
+render_path (const ArtSVP *path)
+{
+  art_u8 *buffer = NULL;
+  art_u32 color = (0xFF &#60;&#60; 24) | (0x00 &#60;&#60;16) | (0x00&#60;&#60;8) | (0xFF) ; /* RRGGBBAA */
+    
+
+  buffer = art_new (art_u8, WIDTH*HEIGHT*BYTES_PER_PIXEL);
+  art_rgb_run_alpha (buffer, 0xFF, 0xFF, 0xFF, 0xFF, WIDTH*HEIGHT);
+  art_rgb_svp_alpha (path, 0, 0, WIDTH, HEIGHT, 
+		     color, buffer, ROWSTRIDE, NULL);
+
+  return (unsigned char *) buffer;
+}
+
+static void
+save_buffer (const unsigned char *buffer, const char *filename)
+{
+  GdkPixbuf *pixbuf;
+
+  pixbuf = gdk_pixbuf_new_from_data (buffer,
+				     GDK_COLORSPACE_RGB, 
+				     FALSE, 8,
+				     WIDTH, HEIGHT,
+				     ROWSTRIDE,
+				     NULL, NULL);
+
+  pixbuf_save_to_file (pixbuf, filename);
+ 
+  gdk_pixbuf_unref (pixbuf);
+}</PRE
+></TD
+></TR
+></TABLE
+><P
+>	The rendering is itself pretty simple: we first fill the buffer with the 0xFFFFFFFF rgba color
+	(that is, 0xFFFFFF rgb color with a transparency of 0xFF which means no transparency at all. It
+	should be called opacity actually ;) with the <TT
+CLASS="FUNCTION"
+>art_rgb_run_alpha</TT
+> function.
+	Then, we fill the svp in the buffer with the 0xFF0000FF rgba color with the 
+	<TT
+CLASS="FUNCTION"
+>art_rgb_svp_alpha</TT
+> function.
+      </P
+><P
+>	Last, to save the pixel buffer, we just instantiate a <TT
+CLASS="FUNCTION"
+>GdkPixbuf</TT
+>
+	and save it with the <TT
+CLASS="FUNCTION"
+>pixbuf_save_to_file</TT
+> function we stole 
+	from random pieces of code (namely, nautilus and gnome-iconedit).
+      </P
+><P
+>	Easy, was it not ?
+      </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="x31.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libart.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&nbsp;</B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="sample-display.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>LibArt's overall architecture</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>A displaying application</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: `filter' command</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile Filter.html "Gri: `filter' command" "Gri Commands" --> 
+
+<!-- @node   Filter, Flip, Expecting, List Of Gri Commands -->
+<a name="Filter" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="ListOfGriCommands.html#ListOfGriCommands" shape="rect" coords="516,2,532,24" href="ListOfGriCommands.html#ListOfGriCommands">
+<area alt="Gri: `expecting' command" shape="rect" coords="557,2,573,24" href="Expecting.html">
+<area alt="Gri: `flip' command" shape="rect" coords="581,2,599,24" href="Flip.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: `flip' command" shape="rect" coords="581,2,599,24" href="Flip.html">
+</map>
+<h3>9.3.11: `<font color="#82140F"><code>filter</code></font>'</h3>
+
+
+<!-- latex: \index{filter} -->
+
+<ul>
+<p>
+<li> `<font color="#82140F"><code>filter column x|y|z|u|v|weight recursively a[0] a[1] ... b[0] b[1] ...</code></font>'
+Filter indicated column, using a two-pass recursive filter.  The first
+pass runs from the start to the end, while the second pass runs from the
+end to the start; in this way, the phase shift inherent in this type of
+filter is removed entirely.  The coefficients are used in the following
+formula (demonstrated on the `<font color="#82140F"><code>x</code></font>' column):
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+x_new[i] = b[0] * x[i] \
+  + b[1] * x[i-1] \
+  + b[2] * x[i-2] \
+  + ... \
+  - a[1] * x_new[i-1] \
+  - a[2] * x_new[i-2] \
+  - ...
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Thus, for example, setting `<font color="#82140F"><code>a[i]</code></font>' = 0 results in a simple
+backwards-looking moving-average filter applied in two passes.  The real
+power of this type of filter, however, comes when non-zero `<font color="#82140F"><code>a[i]</code></font>'
+coefficients are given, thus adding recursion (i.e., `<font color="#82140F"><code>x_new[i]</code></font>'
+depends on `<font color="#82140F"><code>x_new[i-...]</code></font>').  See any standard reference on digital
+filters for an explanation.  You might find that the Matlab command
+`<font color="#82140F"><code>butter</code></font>' an easy way to design filter coefficients.  Here are some
+examples:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+# Filter x column with simple 2-point moving
+# average.  (This slurs into a 3-point moving
+# average, in effect, since the filter is run
+# forwards and then backwards.)
+filter column x recursively 0 0 0.5 0.5
+<p>
+# Use filter designed with the Matlab 
+# command butter(2,0.1), which creates a 
+# 2nd order lowpass butterworth filter
+# with a cutoff frequency of 0.1 
+# (in units which have a frequency 
+# of 1 corresponding to one-half the
+# sampling rate).
+filter column x recursively \
+    1     -1.561  0.6414 \
+    0.0201 0.0402 0.0201
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li> `<font color="#82140F"><code>filter grid rows|columns recursively a[0] a[1] ... b[0] b[1] ...</code></font>'
+<p>
+Apply recursive filter (see `<font color="#82140F"><code>filter column ... recursively</code></font>' for
+meaning of this filter operation) to the individual rows or columns of
+the grid data.  For example, the command 
+`<font color="#82140F"><code>filter grid columns recursively 0 0 0.5 0.5</code></font>' 
+applies a 2-point moving average filter across the columns,
+smoothing the grid in the x-direction.
+<p>
+<li> `<font color="#82140F"><code>filter image highpass</code></font>'
+Remove low-wavenumber components from image (ie, sharpen edges).  Do
+this by subtracting a Laplacian smoothed version of the image.
+<p>
+<li> `<font color="#82140F"><code>filter image lowpass</code></font>'
+Remove high-wavenumber components from image (ie, smooth shapes).  Do
+this by Laplacian smoothing.
+</ul>
+<p>
+<b>See also</b> see <a href="Smooth.html#Smooth">Smooth</a>.
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

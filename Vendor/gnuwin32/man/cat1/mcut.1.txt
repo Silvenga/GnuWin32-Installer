@@ -1,0 +1,66 @@
+MCUT(1)                                                 MCUT(1)
+
+
+
+
+
+NAME
+       mcut  - Quantize colors in an image using the median cut
+       algorithm
+
+SYNOPSIS
+       mcut [ -n colors ] [ -d ] [ -o outfile ] infile
+
+DESCRIPTION
+       Mcut reads an RLE file and tries to  choose  the  "best"
+       subset  of colors to represent the colors present in the
+       original image.  A common use for this is to  display  a
+       24  bit image on a frame buffer with only eight bits per
+       pixel using a 24 bit color map.   Mcut  first  quantizes
+       intensity  values from eight bits to five bits, and then
+       chooses the colors from this space.
+
+       Mcut runs in two passes; the first pass scans the  image
+       to  find  the  color  distributions, and the second pass
+       maps the original colors into color  map  indices.   The
+       output  file  has a color map containing the colors mcut
+       has  chosen.   Mcut  also  sets  the   picture   comment
+       "color_map_length"  equal to the number of colors it has
+       chosen.  The getx11 program (among others) will use this
+       color map instead of dithering.
+
+OPTIONS
+       -n ncolors
+              Limit  the  number  of  colors chosen to ncolors.
+              The default is 200.
+
+       -d     Uses Floyd/Steinberg dither to  hide  contouring.
+              Greatly  improves images that have a small number
+              of colors.
+
+       infile The input will be read from this file.  If it  is
+              a  multi-image file, each image will be quantized
+              to its own colormap.  Piped input is not allowed.
+
+       -o outfile
+              If  specified,  output  will  be  written to this
+              file, otherwise it will go to stdout.
+
+SEE ALSO
+       getx11(1), rlequant(1), urt(1), RLE(5),
+       "Color Image Quantization for Frame Buffer Display",  by
+       Paul Heckbert, Procedings of SIGGRAPH '82, July 1982, p.
+       297.
+
+AUTHOR
+       Robert Mecklenburg,  John  W.  Peterson,  University  of
+       Utah.
+
+BUGS
+       The  initial  quantization  is  hardwired  to five bits.
+       This should be an option.
+
+
+
+
+1                         Nov 8, 1987                   MCUT(1)

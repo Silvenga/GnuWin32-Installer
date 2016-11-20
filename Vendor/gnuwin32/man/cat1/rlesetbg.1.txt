@@ -1,0 +1,64 @@
+RLESETBG(1)                                         RLESETBG(1)
+
+
+
+
+
+NAME
+       rlesetbg - Set the background value in the RLE header.
+
+SYNOPSIS
+       rlesetbg  [ -{DO} ] [ -c bgcolor ...  ] [ -o outfile ] [
+       infile ]
+
+DESCRIPTION
+       rlesetbg sets the background color field  in  the  image
+       header of an RLE(5) image (none of the actual pixels are
+       changed).  If infile isn't specified, the image is  read
+       from stdin.
+
+       The background color in the header is used to save space
+       in the run-length encoded file.  Runs of background-col-
+       ored  pixels  longer than 2 pixels are simply not saved.
+       (Doing this for runs of 1 or  2  background  pixels  can
+       make  the  saved  image  larger than if no encoding were
+       done.)  Therefore, changing the  background  color  with
+       rlesetbg may still leave some pixels saved in the origi-
+       nal background color.  The -D  option  will  delete  the
+       background color altogether from the header; this can be
+       useful in certain circumstances, but can  also  lead  to
+       very strange results.
+
+OPTIONS
+       -D     Delete any background specification that might be
+              present.
+
+       -O     Specifies that the image has  no  background,  it
+              overlays existing images.
+
+       -c bgcolor ...
+              Specifies  the color values to set the background
+              to.  There should be at least as many  values  as
+              there are color channels in the image.  Use -- or
+              another option to separate  the  list  of  colors
+              from infile.
+
+       -o outfile
+              If  specified, the output will be written to this
+              file.  If outfile is "-", or if it is not  speci-
+              fied,  the output will be written to the standard
+              output stream.
+
+AUTHORS
+       John W. Peterson and Rod Bogart
+
+SEE ALSO
+       repos(1), urt(1), RLE(5).
+
+BUGS
+       This should really be part of a single program that does
+       all header munging...
+
+
+
+1                      December 20, 1986            RLESETBG(1)

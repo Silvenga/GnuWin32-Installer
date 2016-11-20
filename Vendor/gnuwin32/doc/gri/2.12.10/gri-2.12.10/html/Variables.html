@@ -1,0 +1,569 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: variables</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile Variables.html "Gri: variables" "Programming Gri" --> 
+
+<!-- @node   Variables, About Variables, Long Command Lines, Programming -->
+<a name="Variables" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Programming.html#Programming" shape="rect" coords="516,2,532,24" href="Programming.html#Programming">
+<area alt="Gri: long command lines" shape="rect" coords="557,2,573,24" href="LongCommandLines.html">
+<area alt="Gri: synonyms" shape="rect" coords="581,2,599,24" href="Synonyms.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: synonyms" shape="rect" coords="581,2,599,24" href="Synonyms.html">
+</map>
+<h2>10.4: Variables</h2>
+
+
+<UL>
+<LI><a href="Variables.html#AboutVariables">About Variables</a>: What variables are used for, and how
+<LI><a href="Variables.html#UserVariables">User Variables</a>: Defining your own variables
+<LI><a href="Variables.html#Built-inVariables">Built-in Variables</a>: Variables pre-defined by Gri
+</UL>
+
+<!-- @node   About Variables, User Variables, Variables, Variables -->
+<a name="AboutVariables" ></a>
+<h3>10.4.1: About variables</h3>
+
+Variables store numbers.  As it reads your program, Gri 
+substitutes variable values any place a variable appears where a number
+normally would.  For example, in the code below `<font color="#82140F"><code>.number.</code></font>' is a
+variable storing the value 10, so the two `<font color="#82140F"><code>read</code></font>' statements have
+the same effect:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.number. = 10
+read columns .number. x y
+read columns 10 x y
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Variable names begin and end with a single period (example:
+`<font color="#82140F"><code>.num.</code></font>').  (Gri uses this odd notation to distinguish variable
+names from ``normal'' words, which is necessary because Gri does not
+have a limited list of keywords as other languages do.  Thus, the C
+programming language is happy to let you use a variable name like
+`<font color="#82140F"><code>latitude</code></font>', since it is not a keyword, but Gri is not, since it
+might like to use that word itself in a new command.)
+<p>
+You should not use names beginning and ending with double periods,
+because Gri uses names like that to store built-in variables for its own
+use (e.g., `<font color="#82140F"><code>..xsize..</code></font>' saves the width of the plot).
+<p>
+To store a number into a variable, use a command like
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.time. = 10
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+or
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.time. = {rpn 10 sin}
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Storage is automatically set aside when you assign into a nonexistent
+variable; no ``declaration'' statements are required as in the C
+language.
+<p>
+The Gri command, `<font color="82140F"><code>new</code></font>' (see <a href="New.html#New">New</a>), allows you to have several
+``versions'' of a variable.  This is useful for local storage in new
+commands, inside `<font color="#82140F"><code>if</code></font>' statements, etc, since it lets you use
+temporary variables without worrying about overwriting values outside
+the local block of code.  The syntax is `<font color="#82140F"><code>new .variable. = value</code></font>'
+(where, as usual, `<font color="#82140F"><code>value</code></font>' may be an rpn expression 
+(see <a href="ReversePolishMath.html#rpnMathematics">rpn Mathematics</a>).  Here is an example:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`foo bar'
+{
+  new .a.         # Get storage
+  .a. = 10        # Store a local value
+  show "Locally, .a.=" .a. " (expect 10)"
+  delete .a.      # Delete this local one
+}
+.a. = 1
+show "Global version has .a.=" .a. " (expect 1)"
+foo bar
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+To see if a given named variable (or synonym) exists, use the RPN
+operator `<font color="82140F"><code>defined</code></font>' (see <a href="ReversePolishMath.html#rpnMathematics">rpn Mathematics</a>).
+<p>
+
+<!-- @node   User Variables, Built-in Variables, About Variables, Variables -->
+<a name="UserVariables" ></a>
+<h3>10.4.2: User variables</h3>
+
+You can get Gri to read values for variables from your file.  Here's how
+to read a number from a header line and then read that many lines of
+columnar data:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open file.dat
+read .num.
+read columns .num. x y
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+You can define variables within the Gri program:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.num. = 10
+read columns .num. x y
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+You can get variables interactively from the user, using the
+`<font color="#82140F"><code>query</code></font>' command.  (If the user types carriage-return, or if the
+command-line flag `<font color="#82140F"><code>-y</code></font>' was specified when invoking Gri, the value
+100 will be assigned to `<font color="#82140F"><code>.num.</code></font>').
+For example, 
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+query .num. "Number of rows to read?" (100)
+read columns .num. x y
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Gri allows you to use a previous value of the variable in the default
+string, as in this example:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.start. = 8                             # default
+.stop. = 2                              # default
+query .start. "Start time? " (.start.)
+query .stop.  "Stop time?  " (.stop.)
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Variables can be manipulated using reverse polish notation (RPN)
+mathematical operations (see <a href="ReversePolishMath.html#rpnMathematics">rpn Mathematics</a>).
+<p>
+Variables are often useful in `<font color="#82140F"><code>if</code></font>' statements.  Here are some
+examples:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+read .num_pts.
+if .num_pts.
+  show "There are some data"
+  read columns .num_pts. x y
+else
+  show "There are no data"
+end if
+# ...
+read .latitude.
+if {rpn .latitude. 10 &lt;}
+  read .num.
+  read .num. x y
+  draw curve
+else
+  show "Skipping data North of 10deg N"
+  read .num.
+  skip .num.
+end if  
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+<!-- @node   Built-in Variables, Synonyms, User Variables, Variables -->
+<a name="Built-inVariables" ></a>
+<h3>10.4.3: Built-in variables</h3>
+
+Built-in variables (see <a href="BuiltinIndex.html#IndexofBuiltins">Index of Builtins</a>) have names which begin and
+end with <b>two</b> periods.  For example, `<font color="#82140F"><code>..xsize..</code></font>' is the width
+of the x-axis in centimetres.  You may use these variables as you wish
+(example: `<font color="#82140F"><code>..xsize.. = 4</code></font>' is an alternative to 
+`<font color="#82140F"><code>set x size 4</code></font>'), but you must be aware that these are not ``free''
+variables for you to use for arbitrary purposes.  You can find out what
+the built-in variables are by the command `<font color="#82140F"><code>show variables</code></font>'.
+<p>
+There are two types of variables
+<ul>
+<li>
+<b>Startup</b> variables, which are created by Gri at startup time.
+These variables can be relied upon to exist (barring changes in Gri
+itself), unless you `<font color="#82140F"><code>delete</code></font>' them.
+<li>
+<b>Spontaneous</b> variables (which are created by certain Gri commands,
+and only exist if these commands have been executed).  For example, the
+`<font color="#82140F"><code>regress</code></font>' command defines `<font color="#82140F"><code>..coeff0..</code></font>' (the intercept of the
+fitted line), `<font color="#82140F"><code>..coeff1..</code></font>' (the slope of the fitted line),
+`<font color="#82140F"><code>..R2..</code></font>' (the correlation coefficient).
+</ul>
+<p>
+To see the values of the built-in variables (along with the user
+variables), use `<font color="#82140F"><code>show variables</code></font>'.  Here are some useful builtin
+variables: 
+<p>
+<ul>
+<p>
+<li> `<font color="#82140F"><code>..arrowsize..</code></font>'
+<!-- latex: \index{@code{..arrowsize..}, size of arrows} -->
+Stores either a positive number representing the halfwidth of arrowheads
+measured in centimetres, or a negative number giving the negative of the
+ratio of arrowhead halfwidth to arrow length (see <a href="Set.html#SetArrowSize">Set Arrow Size</a>).
+<p>
+<li> `<font color="#82140F"><code>..batch..</code></font>'
+<!-- latex: \index{@code{..batch..}, flag used for batch mode} -->
+Flag used for batch mode.
+<p>
+<li> `<font color="#82140F"><code>..debug..</code></font>'
+<!-- latex: \index{@code{..debug..}, flag used for debugging} -->
+Equal to 1 if the `<font color="#82140F"><code>-debug</code></font>' command-line flag was set.  Flag used
+for debugging (see <a href="InvokingGri.html#InvokingGri">Invoking Gri</a>).  The `<font color="82140F"><code>..debug..</code></font>'
+built-in variable is useful in isolating code to use only in test runs.
+For example, you might use
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+if ..debug..
+  show "Following are the column data"
+  show columns 
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+When you run the program with command-line `<font color="#82140F"><code>gri -debug file.gri</code></font>'
+the code in the `<font color="#82140F"><code>if</code></font>' block will print out the columnar data, but
+when you run it with `<font color="#82140F"><code>gri file.gri</code></font>' these lines are not printed.
+<p>
+<li> `<font color="#82140F"><code>..eof..</code></font>'
+<!-- latex: \index{@code{..eof..}, flag indicating end-of-file} -->
+Flag indicating whether an end-of-file was encountered on the last
+`<font color="#82140F"><code>read columns</code></font>'.
+<p>
+<li> `<font color="#82140F"><code>..words_in_dataline..</code></font>'
+<!-- latex: \index{@code{..words_in_dataline..}} -->
+Number of words on last dataline.  This is useful in constructs like
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open tmp.dat
+.num. = 0
+while 1
+  read .a. .b.
+  if !..words_in_dataline..
+    show "Got empty line or EOF, so break loop"
+    break
+  end if
+  show "a=" .a. "b=" .b.
+  show "; words in line=" ..words_in_dataline..
+  .num. += 1
+end while
+show "Got " .num. "data lines."
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+<li> `<font color="#82140F"><code>..fontsize..</code></font>'
+<!-- latex: \index{@code{..fontsize..}, size of letters} -->
+Size of letters, measured in points; there are 72.27 points in an inch
+and 28.45 points in a centimetre.  The mathematical operators
+`<font color="#82140F"><code>pttocm</code></font>' and `<font color="#82140F"><code>cmtopt</code></font>', which do conversion between points and
+centimetres, are often useful in labelling data curves 
+(see <a href="ReversePolishMath.html#rpnMathematics">rpn Mathematics</a>).
+<p>
+<li> `<font color="#82140F"><code>..graylevel..</code></font>'
+<!-- latex: \index{@code{..graylevel..}, graylevel (0=black)} -->
+Graylevel to use in drawing lines, text, etc.  Black ink is 0; white
+paper is 1.  <b>See also</b> `<font color="#82140F"><code>..red..</code></font>' etc.
+<p>
+<li> `<font color="#82140F"><code>..image_height..</code></font>'
+<!-- latex: \index{@code{..image_height..}, height of image} -->
+Height of image, or 0 if no image defined yet.
+<p>
+<li> `<font color="#82140F"><code>..image_width..</code></font>'
+<!-- latex: \index{@code{..image_width..}, width of image} -->
+Width of image, or 0 if no image defined yet.
+<p>
+<li> `<font color="#82140F"><code>..length_dash..</code></font>'
+<!-- latex: \index{@code{..length_dash..}, length/cm of dashes} -->
+Length in cm of dashes in dashed lines.
+<p>
+<li> `<font color="#82140F"><code>..length_blank..</code></font>'
+<!-- latex: \index{@code{..length_blank..}, length/cm of blanks} -->
+Length in cm of blanks in dashed lines.
+<p>
+<li> `<font color="#82140F"><code>..linewidth..</code></font>'
+<!-- latex: \index{@code{..linewidth..}, width of lines} -->
+Width of lines for data curves (see <a href="Set.html#SetLineWidth">Set Line Width</a>).
+<p>
+<li> `<font color="#82140F"><code>..linewidthaxis..</code></font>'
+<!-- latex: \index{@code{..linewidthaxis..}, width of lines on axis} -->
+Width of lines on axes (see <a href="Set.html#SetLineWidth">Set Line Width</a>).
+<p>
+<li> `<font color="#82140F"><code>..linewidthsymbol..</code></font>'
+<!-- latex: \index{@code{..linewidthsymbol..}, width of lines in symbols} -->
+Width of lines in symbols (see <a href="Set.html#SetLineWidth">Set Line Width</a>).
+<p>
+<li> `<font color="#82140F"><code>..missingvalue..</code></font>'
+<!-- latex: \index{@code{..missingvalue..}, missing value code} -->
+Missing value code, also stored in the synonym `<font color="#82140F"><code>\.missingvalue.</code></font>';
+(see <a href="Set.html#SetMissingValue">Set Missing Value</a>).
+<p>
+<li> `<font color="#82140F"><code>..num_col_data..</code></font>'
+<!-- latex: \index{@code{..num_col_data..}, number column data} -->
+Number of column data that exist.  You might want to use this after
+`<font color="#82140F"><code>read columns</code></font>' to see if a data file actually had any data in it,
+or use it in accessing individual elements of columns 
+(see <a href="ReversePolishMath.html#rpnMathematics">rpn Mathematics</a>).
+<p>
+<li> `<font color="#82140F"><code>..publication..</code></font>'
+<!-- latex: \index{@code{..publication..}, flag for final copy of plot} -->
+Flag for final copy of plot.  The command-line option `<font color="#82140F"><code>-p</code></font>' sets the
+value of `<font color="#82140F"><code>..publication..</code></font>' to 1.  A typical, and highly
+recommended, code fragment is
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+if !..publication..
+  draw time stamp
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+<li> `<font color="#82140F"><code>..red..</code></font>', `<font color="#82140F"><code>..green..</code></font>', `<font color="#82140F"><code>..blue..</code></font>'
+<!-- latex: \index{@code{..blue..}} -->
+Description of present color.  The values are between 0 and 1, with
+(0,0,0) being black and (1,1,1) being white.  If color is gray, all
+these will be equal.  You may assign to these, but it will <b>not</b>
+change the color.
+<p>
+<li> `<font color="#82140F"><code>..symbolsize..</code></font>'
+<!-- latex: \index{@code{..symbolsize..}, size of symbols} -->
+Size of symbols in centimetres.
+<p>
+<li> `<font color="#82140F"><code>..superuser..</code></font>'
+<!-- latex: \index{@code{..superuser..}, was -superuser flag set?} -->
+Equal to 0 if the flag was not set, or equal to the flag if it was.
+<p>
+<li> `<font color="#82140F"><code>..tic_direction..</code></font>'
+<!-- latex: \index{@code{..tic_direction..}, direction of axis tics} -->
+Direction of axis tics, 1 for inside or 0 for outside.
+<p>
+<li> `<font color="#82140F"><code>..tic_size..</code></font>'
+<!-- latex: \index{@code{..tic_size..}, size/cm of axis tics} -->
+Size of axis tics in centimetres.
+<p>
+<li> `<font color="#82140F"><code>..trace..</code></font>'
+<!-- latex: \index{@code{..trace..}, for tracing program execution} -->
+Equal to 1 if the `<font color="#82140F"><code>-trace</code></font>' command-line flag was set.  Used for
+tracing program execution.
+<p>
+<li> `<font color="#82140F"><code>..xinc..</code></font>'
+<!-- latex: \index{@code{..xinc..}, x increment on axes} -->
+x increment on axes.
+<p>
+<li> `<font color="#82140F"><code>..xleft..</code></font>'
+<!-- latex: \index{@code{..xleft..}, x value at left of plot} -->
+x value at left of plot.
+<p>
+<li> `<font color="#82140F"><code>..xmargin..</code></font>'
+<!-- latex: \index{@code{..xmargin..}, left margin} -->
+Left margin, in centimetres.
+<p>
+<li> `<font color="#82140F"><code>..xright..</code></font>'
+<!-- latex: \index{@code{..xright..}, x value at right of plot} -->
+x value at right of plot.
+<p>
+<li> `<font color="#82140F"><code>..xsize..</code></font>'
+<!-- latex: \index{@code{..xsize..}, x-axis length} -->
+x-axis length in centimetres.
+<p>
+<li> `<font color="#82140F"><code>..ybottom..</code></font>'
+<!-- latex: \index{@code{..ybottom..}, y value at bottom of plot} -->
+y value at bottom of plot.
+<p>
+<li> `<font color="#82140F"><code>..yinc..</code></font>'
+<!-- latex: \index{@code{..yinc..}, y increment on axes} -->
+y increment on axes.
+<p>
+<li> `<font color="#82140F"><code>..ymargin..</code></font>'
+<!-- latex: \index{@code{..ymargin..}, bottom margin} -->
+Bottom margin in centimetres.
+<p>
+<li> `<font color="#82140F"><code>..ysize..</code></font>'
+<!-- latex: \index{@code{..ysize..}, y-axis length} -->
+y-axis length in centimetres.
+<p>
+<li> `<font color="#82140F"><code>..ytop..</code></font>'
+<!-- latex: \index{@code{..ytop..}, y value at top of plot} -->
+y value at top of plot
+<p>
+<li> `<font color="#82140F"><code>..exit_status..</code></font>'
+<!-- latex: \index{@code{..exit_status..}, exit status from @code{system} call} -->
+The exit status from the most recent `<font color="#82140F"><code>system</code></font>' call (or 0 if no
+system calls have been done yet).
+</ul>
+<p>
+
+
+
+
+You may use any of these built-in variables anywhere.  For example,
+here's how to stack 3 graphs vertically on the page:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.offset. = {rpn ..ysize.. 3 + }
+open file1
+read columns x y
+close
+draw axes
+draw curve 
+<p>
+..ymargin.. += .offset.
+open file2
+read columns x y
+draw axes 
+draw curve 
+close
+<p>
+..ymargin.. += .offset.  
+open file3 
+read columns x y 
+draw axes 
+draw curve 
+close
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+The first line needs a bit of explanation. It is a reverse-polish
+expression.  The format is `<font color="#82140F"><code>{</code></font>' followed by `<font color="#82140F"><code>rpn</code></font>' followed by
+an expression followed by `<font color="#82140F"><code>}</code></font>'.  Within the expression, spaces must
+separate operands.  This makes `<font color="#82140F"><code>.offset.</code></font>' equal to the height of
+y-axis plus 3 cm, so plots are separated by 3 cm.  To learn more about
+`<font color="82140F"><code>{rpn ... }</code></font>' (see <a href="ReversePolishMath.html#rpnMathematics">rpn Mathematics</a>).
+<p>
+Another possibly unfamiliar thing is the code `<font color="#82140F"><code>+=</code></font>'.  It means take
+the thing on the left hand side, and add to it the thing on the right
+hand side.  (In this case, it is used to increase the y margin by the
+value of `<font color="#82140F"><code>.offset.</code></font>'.)
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

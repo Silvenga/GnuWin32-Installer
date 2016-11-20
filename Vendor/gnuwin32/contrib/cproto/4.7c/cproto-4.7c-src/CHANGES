@@ -1,0 +1,635 @@
+-- $Id: CHANGES,v 4.8.1.7 2004/03/26 00:20:24 tom Exp tom $
+
+Version 4.7c
+2004/3/25
+- fix a couple of places where valgrind reported a sscanf's result was not
+  always initialized.
+- modify behavior of "-X" option so it does not cause preprocessor lines to
+  be written to the output.  Preprocessor lines are needed for lint-library
+  text, but are inconsistent with other uses of cproto (patch by Kenneth
+  Pronovici).
+- add configure option "--enable-llib", which allows one to configure cproto
+  without support for lint-library "llib" files.  Since the "-X" option shares
+  the include-file tracking, this option can also be enabled (or disabled)
+  (discussion with Kenneth Pronovici, Bob Van der Poel).
+- require an ANSI C compiler for building.
+- update configure script, using autoconf 2.52 + patch, along with macros from
+  vile/lynx/etc.
+
+Version 4.7b
+
+2004/3/9
+- added new -X option to limit the levels of include-files from which an
+  extern can come (Debian #235824).
+- added new -i option to support inline function prototypes (Debian #228801,
+  patch by Kenneth Pronovici).
+
+Version 4.7a
+
+2003/4/5
+
+- add definition of YYFLAG, to enable the error-reporting code with bison 1.875
+- add definition of YYSTYPE, to allow this to build with recent (aka "broken")
+  versions of bison (Debian #166140, Lukas Geyer <lukas@debian.org>).
+- add gcc-specific __builtin_va_arg keyword (Debian #175862, Kenneth Pronovici
+  <pronovic@debian.org>).
+- modify syntax.c to change token after "#endif" to a comment, thereby avoiding
+  deprecation warning from gcc 3.2, which would cause "make check" to show
+  unexpected results.
+- resync with version 4.7 at http://cproto.sourceforge.net/
+
+2003/1/5
+- add gcc-specific __builtin_va_list keyword.
+
+Version 4.6e
+
+2002/2/25
+- correct length allocated for filename in include_file(), which was not big
+  enough if the $CPROTO environment variable was corrupted.  From report by
+  <Sweasel18@aol.com>, using sharefuzz:
+	http://www.atstake.com/research/tools/sharefuzz1.0.tar.gz
+- update configure.in to generate config.h directly using autoconf patch from
+	http://invisible-island.net/autoconf/
+- remove makefile rules that attempt to recreate the configure script.  As
+  demonstrated in numerous packages, it always reflects poor design.
+- remove makefile rules to make shar files (comp.sources.misc is long gone).
+- stop using changequote(), workaround for bugs in autoconf 2.5x
+
+Version 4.7
+
+2000/11/9
+- Report source file and line number in error messages in gcc-style format.
+
+Version 4.6d
+
+2000/8/10
+- use newer versions of mkdirs.sh and install.sh
+- regenerate configure script with autoconf 2.13
+- restructure aclocal.m4
+- modify Makefile.in to allow $(bindir) and $(mandir) to be altered
+  independently of $(prefix) and $(exec_prefix) (patch by Carsten Leonhardt
+  <leo@debian.org>).
+
+Version 4.6c
+
+2000/7/8
+- add a clause to handle "__extension__" before extern declarations.
+  (report by Bob van der Poel <bvdpoel@uniserve.com>)
+
+Version 4.6b
+
+1999/12/27
+- correct check for size of vec[] array in yaccExpected(), broken in 4.6a
+  changes.
+  (report by Wolfgang Wander)
+1999/12/19
+- add keywords "restrict", "_Bool", "_Complex", "_Imaginary" based on c9x
+  draft.
+- add keywords "__restrict__" and "__restrict", for gcc.
+  (report by Wolfgang Wander <wwc@rentec.com>)
+
+Version 4.6a
+
+1999/12/14
+- change vec[] array in yaccExpected() to be dynamically allocated.  It was a
+  fixed-size (10 entries) array before.  Also fix problem reported by Wolfgang
+  Wander <wwc@rentec.com>, which is that if the array were empty, it was passed
+  to qsort() with a zero-size, causing a core dump.
+- add to syntax.c & corresponding test-cases the typedef/identifier example.
+1999/10/21
+- allow identifiers to be the same as typedef names, handle this case:
+  typedef int badStyle; 
+  void badFunc(int *badStyle) { } 
+  (reported by Paul Haas <paulh@iware.com>)
+1999/1/3
+- add '__extension__' keyword
+
+Version 4.6
+
+- Since cproto is no longer being distributed on USENET in shar file format,
+  the patchlev.h and MANIFEST files have been removed.
+  The patchlevel number has been removed from the version number.
+
+- Moved files out of the porting directory into separate platform specific
+  directories.  The emx directory has files used to compile using EMX.
+  The os2 directory has files used to compile on OS/2 using Watcom C/C++.
+  The win32 directory has files to compile on Windows 95 and Windows NT
+  using Watcom C/C++.
+
+- correct order of include-path to keep standard include (e.g., /usr/include)
+  at the end of the search list.
+
+- modified lint-library include-stack recovery to work on OSF/1.
+
+- supply default initializer for lint-library const data
+
+- corrected reset of __attribute__((noreturn))
+
+- added '__volatile', '__const__', '__inline' keywords to grammar to
+  accommodate gcc.
+
+- modified configure script to add several development/debugging options (i.e.,
+  --with-trace, --with-dbmalloc, --with-dmalloc).
+
+- modified ifdefs to avoid using predefined 'unix' (not defined on AIX or CLIX)
+
+Patchlevel 5 (April 1996)
+
+- corrected instance of fclose on a file pointer after pclose was done (found
+  with Electric Fence).
+
+- corrected script make_bat.sh to prevent expansion of \n in argument-string.
+
+- Modified handling of lint library option to allow generation of lint libraries
+  for ANSI compilers (set -a -l).
+
+- corrected a missing 'void' in parameter list
+
+- modified to allow compile/test with 'dmalloc' library in addition to
+  'dbmalloc'.
+
+- corrected memory leak in yyerror.c, and allocation-size for cpp command.
+
+- added keywords to work with gcc 2.7.0
+
+- corrected unresolved references to flush_varargs() when OPT_LINTLIBRARY
+  is not defined                                                         
+
+Patchlevel 4 (August 1995)
+
+- Added -S option to only output static declarations.
+
+- Fix: The configure script didn't replace @CFLAGS@, @CPPFLAGS@ and @LDFLAGS@
+  in the makefile generated from makefile.in.
+
+- Fix: The -a option generated incorrect function definitions.
+
+- update test-cases for the -f2 fix in patch 3.
+
+- remove dependency on GNU-make from makefile.in
+
+- corrected configuration script that tests whether yyerror can be extended
+  (had cached wrong flag, preventing some configurations from being
+  recognized).
+
+- added calls for 'flush_varargs()' to correct situation in lint-library output
+  where VARARGS comments were not reset properly when a function
+  was skipped.
+
+- improved the logic of 'strip_name()' (used to compute include-directives for
+  the lint-library option) so that it recognizes the conventional include
+  directory created by a GCC install.
+
+Patchlevel 3 (January 1995)
+
+- check for a special case in lint-library generation, i.e., prototype
+  arguments of the form "*()", which need more parentheses for SunOS's lint.
+
+- modified configure.in, aclocal.m4, makefile.in to work with autoconf 2.1
+  (also added install.sh - note that "install-sh" is not an MS-DOS-compatible
+  filename).
+
+- derive the program name from the argv[0] entry, in case it's installed
+  under a different name.
+
+- Fix: The -f2 option generated incorrect prototypes for functions that
+  take a variable argument list.
+
+- use 'sed' rather than 'flip' to apply trailing CR's to MS-DOS scripts.
+
+Patchlevel 2 (October 1994)
+
+- modified grammar to recognize C++ ref-variables (i.e., '&' as a prefix to
+  identifiers at the top lexical level).  Lint libraries are formatted without
+  this '&', since lint doesn't grok C++.  This corrects an error in cproto 4.0
+  which caused '&' characters to be suppressed altogether, e.g., when filtering
+  with the "-t" option.
+
+- modified rules that generate MANIFEST to put auto-generated scripts there
+  also, if they've been created (e.g., cd testing; make scripts).
+
+- modified makefile.in to have shar target for both GNU shar and Rick Salz's
+  cshar utility.
+
+- use 'const' in yyerror.c, otherwise the error-reporting auto-configuration
+  does not work.
+
+- don't use "#elif" preprocessor control; not all systems support it.
+
+Patchlevel 1 (October 1994)
+
+- Added testing scripts for MS-DOS and VMS.
+
+- Added makefile for Borland C++ for OS/2.
+
+- Fix: When the -a, -t or -b options were used, '&' characters were stripped
+  from the output files.
+
+- Fix: The system.h file should define EXIT_SUCCESS and EXIT_FAILURE
+  regardless of the presence of <stdlib.h>.
+
+Patchlevel 0 (dickey, September 1994)
+
+- corrected two malloc-defects in lint library generation (one place where
+  generated parameter name was copied rather than allocated, and another memory
+  leak).
+
+- corrected generation of lint library function body, to handle function
+  pointers.
+
+- changed the implicit lint library function type from "" to "void", to avoid
+  special-cases in the function-body generation.
+
+- added logic using 'NestedParams' to suppress prototype-arguments in lint
+  library function-pointer arguments.
+
+- corrected lint-library function parameter derived from prototype "char [2]"
+  (parameter name wasn't supplied).
+
+- added PRINTFLIKE and SCANFLIKE to the comments interpreted for the lint
+  library translation.
+
+- modified "LINT_PREPRO" comment to pass-thru all comment text if no count is
+  given.
+
+- added new comment keyword "LINT_SHADOWED" to generate "#undef symbol" before
+  each function template in lint libraries (useful for processing files that
+  define both macros and functions with the same names).
+
+- interpret GCC's __attribute__ noreturn and format for lint-library text
+  (GCC 2.5.8 preprocessor passes these macros through, GCC 2.6 apparently does
+  not).
+
+- treat carriage-return (^M) as whitespace where appropriate.
+
+- added configuration-test to avoid conflict with prototype for 'popen()'
+
+- added several function-pointer regression test-cases
+
+Version 3
+
+Patchlevel 9 (dickey, August 1994)
+
+- use 'autoconf' to make a UNIX configure-script.
+
+- recognize GCC extensions '__inline' and '__attribute__'
+
+- added ifdef OPT_LINTLIBRARY to allow compiling without the lint library
+  code (saves about 4kb).
+
+- corrected some logic that made incorrect commenting for options -c -f1
+  (e.g., "void (*Sigdisp(int sig, void (*func)(int sig)))(int sig)").
+
+- corrected logic that macroizes (e.g., with P_) functions like 'Sigdisp'
+  (it wasn't doing anything about the trailing "(int sig)").
+
+- corrected handling of K&R conversion of mixed-mode functions (K&R style
+  with prototypes in arguments) to avoid losing comments.
+
+- modified logic for options -c -f2 so that cproto inserts a space before
+  the beginning of a comment when it immediately follows an '*'.
+
+- enhanced error reporting with new module yyerror.c which (attempts to)
+  report the expected token type/name when a syntax error is encountered.
+
+- modified the grammar.y file to try to recover from errors at the next
+  semicolon (as well as the next right curly bracket).
+
+- modified to process lex/yacc files with gcc as C-preprocessor.
+
+- Added option "-O" to force redirection of errors without shell operations
+  (useful for VAX/VMS and MS-DOS in particular).
+
+- added "\s" as a synonym for space in the format options (-P, -F, -C)
+
+- tested on Solaris with lex/yacc and flex 2.4.6 / bison 1.22
+  (SunOS explorer 5.3 Generic_101318-42 sun4m sparc; gcc 2.6.0)
+
+- tested on SunOS 4.1.1 with lex/yacc and flex 2.4.6 / bison 1.22
+  (SunOS calvin 4.1.1 1 sun4c)
+
+- tested on IRIX with lex/yacc
+  (IRIX dbs3 5.2 02282015 IP19 mips)
+
+- tested on Linux 0.99.15 with lex/yacc and flex 2.4.6 / bison 1.22 / byacc 1.9
+
+- tested on MS-DOS with flex 2.37 / byacc 1.9 (built with turboc.mak).
+  (Bison uses too much stack space).
+
+- tested on VAX/VMS 6.1 with VAX-C 3.2 and flex 2.4.6 / bison 1.22.
+
+- moved non-UNIX files into 'porting' subdirectory.
+
+- added 'testing' subdirectory, for simple regression tests.
+
+- tested for memory leaks with dbmalloc (on Linux).
+
+Patchlevel 8 (internal: dickey/cthuang, June 1993)
+
+- added files 'lintlibs.c' and 'strkey.c'
+
+- Allow dollar signs in identifiers
+
+- Defined FAIL, SUCCESS to use in 'exit()' calls (VMS is approximately the
+  reverse of UNIX).
+
+- Added option "-o" to force redirection without shell operations (useful for
+  VAX/VMS in particular).
+
+- Added options "-l" (lintlibrary format), "-T" (typedefs), "-x" (externs
+  in include-files).
+
+- Added "-C" option to cpp-invocation (to support VARARGS-decoding for -l
+  option).
+
+- Modified grammar.y so that if -T option is turned on, instances of untagged
+  struct, union or enum are shown with the contents of the curly braces.
+
+- Modified lex.l so that it sets 'return_val' iff at least one return statement
+  within curly braces returns an expression.  Use this to support -l option.
+
+- Modified semantic.c (for -l option) to put tabs after short names for better
+  readability.  Also (only -l option), put a blank line before function
+  definitions and typedefs.
+
+- Corrected lex.l so that it recognizes preprocessor lines within curly braces.
+
+- Modified 'gen_prototype()' to trim 'extern' and 'auto' keywords from the text
+  (so that 'extern' is emitted in this function only if the -e option is
+  specified).  Do this to support -l option (and to correct normal usage, which
+  implies that -e option is needed to put an 'extern' before declaration).
+
+- Corrected test in 'put_decl_spec()' by using 'strkey()' (which tests for a
+  name, not simply a substring).
+
+- Modified semantic.c to use 'put_string()' and related procedures to simplify
+  pretty-printing of lint-library text (mainly to control blank lines).  (See
+  'fmt_library()').
+
+- linted some xmalloc calls using ALLOC macro.
+
+Patchlevel 7
+
+- Fix: The processing of string literals is now more robust.
+
+- Removed the -f4 option which generated prototypes like
+
+	int main P_((int argc, char **argv));
+
+  Use the -m option now to put a guard macro around the prototype
+  parameter list.  Use the -m option together with -f3 (which is the
+  default) to produce the same output as the old -f4 option.  The option
+  to set the guard macro name is now -M.
+
+- Comments in prototype parameter lists are now disabled by default.
+  Use the -c option now to output these comments.
+
+- Can now process #include directives in which the file is specified with
+  a #define macro.
+
+- Now does not convert function definitions that take the formal
+  parameter va_alist from <varargs.h>.
+
+- Now recognizes the GNU C modifiers __const and __inline__.
+
+Patchlevel 6
+
+- Fix: A function in lex.l exploited the ANSI C feature of concatenating
+  string literals.  This prevented the module from being compiled with
+  pre-ANSI C compilers.
+
+Patchlevel 5
+
+- Fix: The -v option did not output declarations for function pointers.
+
+- Fix: String literals continued over more than one line messed up the
+  line number count.
+
+- Fix: The program generated incorrect prototypes for functions that
+  take a variable argument list using <varargs.h>.
+
+- Fix: When converting functions from the standard input, cproto
+  generated no output if no functions needed to be converted.
+
+- Fix: Now does not output a warning if an untagged struct is found in a
+  typedef declaration.
+
+- Added the -b option which rewrites function definition heads to
+  include both old style and new style declarations separated by a
+  conditional compilation directive.  For example, the program can
+  generate
+
+	#ifdef ANSI_FUNC
+
+	int
+	main (int argc, char *argv[])
+	#else
+
+	int
+	main (argc, argv)
+	int argc;
+	char *argv[]
+	#endif
+	{
+	}
+
+  Added the -B option to set the preprocessor directive that appears at
+  the beginning of such definitions.
+
+- Added the keyword "interrupt" to the set of type qualifiers when
+  compiled on a UNIX system.
+
+- The MS-DOS version now recognizes the type modifiers introduced by
+  Microsoft C/C++ 7.00.
+
+- Now recognizes ANSI C trigraphs (yuck!).
+
+- Now use "#if __STDC__" instead of "#if defined(__STDC__)".
+
+- GNU bison orders the y.tab.c sections differently than yacc, which
+  resulted in references to variables before they were declared.  The
+  grammar specification was modified to also be compatible with bison.
+
+Patchlevel 4
+
+- Fix: A typedef name defined as a pointer to char, short or float was
+  incorrectly promoted if it was used to specify a formal parameter.
+  For example, for the definition
+
+	typedef char *caddr_t;
+
+	int strlen (s)
+	caddr_t s;
+	{
+	}
+
+  cproto generated the incorrect prototype
+
+	int strlen(int s);
+
+- Added implementation of the ANSI function tmpfile() for systems that
+  don't have it.
+- If compiled with Microsoft C, cproto preprocesses its input by running
+  the command "cl /E".  To eliminate the error messages when the file
+  <malloc.h> is included, the program now recognizes the specifier
+  _based(void).
+
+Patchlevel 3
+
+- Fix: The program didn't generate prototypes for functions defined with
+  the extern specifier.
+- Fix: The -c option didn't output a space before parameter names in
+  generated prototypes.
+- Added the -E option to specify a particular C preprocessor to run or
+  to stop the program from running the C preprocessor.
+- Added the -q option to stop the program from outputting error messages
+  when it cannot read the file specified in an #include directive.
+- Made the yacc specification compatible with UNIX SYSVR4 yacc.
+  
+Patchlevel 2
+
+- Fix: The function definition conversion may produce a mangled function
+  definition if an #include directive appears before the function and
+  no comments appear between the directive and the function.
+- Fix: The size of the buffer allocated for the C preprocessor command
+  string did not include enough space for options set in the environment
+  variable CPROTO.
+- Replaced the -n option with -c which disables all comments in the
+  generated prototypes.
+- Replaced the enum's with #define constants to accommodate C compilers
+  that don't like enumerators in constant expressions.
+
+Patchlevel 1
+
+- Fix: The program was calling ftell() on an invalid FILE pointer.
+
+Patchlevel 0
+
+- Added options to convert function definitions between the old style
+  and ANSI C style.
+- Options can be specified from the environment variable CPROTO.
+- The MS-DOS version recognizes more Microsoft C and Borland C++ type
+  modifiers (such as _cdecl, _far, _near).
+- Fix: Formal parameters specified with typedef names were not promoted.
+  For example, for the definition
+
+	typedef unsigned short ushort;
+
+	void test (x)
+	ushort x;
+	{
+	}
+
+  cproto generated the incorrect prototype
+
+	void test(ushort x);
+
+  while the correct one is
+
+	void test(int x);
+
+- Fix: Incorrect prototypes were generated for functions that returned
+  function pointers.  For example, cproto generated an incorrect
+  prototype for the function definition
+
+	void (*signal(int x, void (*func)(int y)))(int z)
+	{
+	}
+
+- Fix: Changed calls to memory allocation functions to abort the program
+  if they fail.
+
+Version 2
+
+Patchlevel 3
+
+- Made cproto compatible with GNU flex.
+- After compiling with the preprocessor symbol TURBO_CPP defined, on
+  MS-DOS systems, cproto will pipe its input through the Turbo C
+  preprocessor.
+- Fix: Typedef names may now be omitted from typedef declarations.
+  For example, every C compiler I tried accepts
+
+	typedef int;
+
+  and some even give warnings when encountering this statement.
+
+Patchlevel 2
+
+- Cproto is now able to generate prototypes for functions defined in lex
+  and yacc source files named on the command line.  Lex and yacc source
+  files are recognized by the .l or .y extension.
+- Fix: The memory allocated to the typedef symbol table was not being
+  freed after scanning each source file.
+- Fix: Failure to reset a variable during error recovery caused
+  segmentation faults.
+
+Patchlevel 1
+
+- Fix: Cproto incorrectly generated the parameter "int ..." in
+  prototypes of functions taking variable parameters.
+- Fix: Function definitions can now be followed by an optional
+  semicolon.  I found this feature in every C compiler I tried.
+
+Patchlevel 0
+
+- Added formal parameter promotion.
+- Added prototype style that surrounds prototypes with a guard macro.
+- Handles C++ style comment //.
+- Nifty new way to set prototype output format.
+- Got rid of the shell wrapper used to pipe the input through the C
+  preprocessor (cpp).
+- For the port to MS-DOS, I modified cproto to run without cpp, but
+  since I didn't want to reimplement cpp, the program processes only the
+  #include and #define directives and ignores all others.  Macro names
+  defined by the #define directive are treated like typedef names if
+  they appear in declaration specifiers.
+
+Version 1
+
+Patchlevel 3
+
+- Fix: identical typedef names and struct tags should be allowed.
+  For example:
+
+	typedef struct egg_salad egg_salad;
+
+	struct egg_salad {
+	    int mayo;
+	};
+
+	void dine(egg_salad l)
+	{
+	}
+
+Patchlevel 2
+
+- Fix: A typedef statement should allow a list of typedefs to be declared.
+  Example:
+
+	typedef int a, *b;
+
+- Fix: When run with the -v option on this input, cproto did not output
+  a declaration for variable "b":
+
+	char *a="one"; char *b="two";
+
+- The options were renamed.  Added new options that change the output
+  format of the prototypes.
+
+Patchlevel 1
+
+- Fix: Incorrect prototypes were produced for functions that take
+  function pointer parameters or return a function pointer.  For example,
+  cproto produced an erroneous prototype for this function definition:
+
+	void
+	(*signal (sig, func))()
+	int sig;
+	void (*func)();
+	{
+	    /* stuff */
+	}
+
+- The lexical analyser now uses LEX.  It should still be compatible with
+  FLEX.

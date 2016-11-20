@@ -1,0 +1,75 @@
+# Example 12 -- Linegraph with key inside plot
+
+set font size 10		# points (1in = 72pt)
+set x size 10			# cm
+set y size 10			# cm
+set x name "Height"
+set y name "Total Energy"
+
+# Following axis setups not necessary; will autoscale if you
+# remove these.
+set x margin 3
+set x axis 800 960 20
+set y margin 3
+set y axis -0.4 1 0.2
+
+# Read data.  Format is columns (x, y1, y2, y3, y4)
+open example12.dat
+read columns x y
+draw curve
+draw label for last curve "1"
+
+rewind
+set line width {rpn ..linewidth.. 1.5 *}
+read columns x * y
+draw curve
+draw label for last curve "2"
+
+rewind
+set line width {rpn ..linewidth.. 1.5 *}
+read columns x * * y
+draw curve
+draw label for last curve "3"
+
+rewind
+set line width {rpn ..linewidth.. 1.5 *}
+read columns x * * * y
+draw curve
+draw label for last curve "4"
+
+# Draw the key.  
+# NOTES:
+# (1) This key is inside the plot; it's location was chosen 
+#     after looking at the data.  To put the key in a different 
+#     location, alter the .key_topleft_x. and .key_topleft_y. 
+#     variables.  For example, you could put the key to the 
+#     right of the plot by changing the next line to:
+#     `.key_topleft_x. = {rpn ..xsize.. 0.5 +}'
+# (2) The variable .dy_inc. is the spacing between lines in
+#     the key.  It should be OK even if you change the
+#     font size above.
+.key_topleft_x. = 0.5		# cm right of left axis
+.key_topleft_y. = 0.5		# cm below top axis
+.dy_inc. = {rpn ..fontsize.. pttocm 1.5 *}
+
+draw label "1 = Model 1A" at    \
+    {rpn ..xleft.. xusertocm .key_topleft_x. +} \
+    {rpn ..ytop.. yusertocm .key_topleft_y. -} cm
+
+.key_topleft_y. += .dy_inc.
+draw label "2 = Model 2A" at    \
+    {rpn ..xleft.. xusertocm .key_topleft_x. +} \
+    {rpn ..ytop.. yusertocm .key_topleft_y. -} cm
+
+.key_topleft_y. += .dy_inc.
+draw label "3 = Model 1B" at    \
+    {rpn ..xleft.. xusertocm .key_topleft_x. +} \
+    {rpn ..ytop.. yusertocm .key_topleft_y. -} cm
+
+.key_topleft_y. += .dy_inc.
+draw label "4 = Model 2B" at    \
+    {rpn ..xleft.. xusertocm .key_topleft_x. +} \
+    {rpn ..ytop.. yusertocm .key_topleft_y. -} cm
+
+draw title "Example 12 -- Total heating vs height of boundary layer"
+

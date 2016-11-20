@@ -1,0 +1,482 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html> <head>
+<title>Libnetbpm Utility Functions</title>
+<meta name="manual_section" content="3">
+</head>
+<body>
+<h1>Libnetpbm Utility Functions</h1>
+Updated: 22 July 2004
+<BR>
+<p><A HREF="libpm.html#toc">Table Of Contents</A>
+
+<H2>NAME</H2>
+libpm - netpbm utility functions
+<H2>DESCRIPTION</H2>
+
+<p>These library functions are part of <a href="index.html">Netpbm</a>.
+
+<p>This page documents functions in the Netpbm subroutine library that
+are not directly related to image data.
+
+<p>For introductory and general information using <b>libnetpbm</b>, see
+<a href="libnetpbm_ug.html">Libnetpbm User's Guide</a>.
+
+<p>The most commonly used <b>libnetpbm</b> functions are those that
+read and write and process Netpbm images.  Those are documented in <a
+href="libnetpbm_image.html">Libnetpbm Netpbm Image Processing
+Manual</a>
+
+<p>To use these services, #include <b>pam.h</b>.
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>Functions</H2>
+
+<a name="initialization"></a>
+<h3>Initialization</h3>
+
+<h4>Entry Points</h4>
+<B>void pm_init(</B>
+<B>int *</B><I>argcP</I><B>,</B>
+<B>char *</B><I>argv</I><B>[]</B>
+<B>);</B>
+
+<h4>Description</h4>
+
+<p>All Netpbm programs must call <b>pm_init()</b> just after
+startup, before they process their arguments.  <b>pm_init()</b>,
+among other things, processes Netpbm universal arguments and removes
+them from the argument list.
+
+<p>A program that isn't a Netpbm program, but just uses <b>libnetpbm</b>
+services, need not invoke <b>pm_init</b>.
+
+<a name="file"></a>
+<h3>File Or Image Stream Access</h3>
+<h4>Entry Points</h4>
+<P>
+<B>FILE *pm_openr(</b>
+<b>char *</B> <I>name</I><B>)</B>
+
+<P>
+<B>FILE *pm_openw(</b>
+<b>char *</B> <I>name</I>
+<B>);</B>
+
+<P>
+<B>FILE *pm_openr_seekable(</b>
+<b>const char *</B> <I>name</I>
+<B>);</B>
+
+<P>
+<B>FILE *pm_close(</b>
+<b>FILE *</B> <I>fp</I>
+<B>);</B>
+
+<P>
+<B>void pm_tell2(</b>
+<b>FILE * </B> <I>fileP</I><B>,</b>
+<b>pm_filepos *</B> <I>fileposP</I><B>,</b>
+<b>unsigned int</b> <i>fileposSize</i>
+<B>);</B>
+
+<P>
+<B>unsigned int pm_tell(</b>
+<b>FILE *</B> <I>fileP</I>
+<B>);</B>
+
+<P>
+<B>void pm_seek2(</b>
+<b>FILE * </B> <I>fileP</I><B>,</b>
+<b>const pm_filepos *</B> <I>fileposP</I><B>,</b>
+<b>unsigned int</b> <i>fileposSize</i>
+<B>);</B>
+
+<P>
+<B>void pm_seek(</b>
+<b>FILE * </B> <I>fileP</I><B>,</b>
+<b>unsigned long</B> <I>filepos</I>
+<B>);</B>
+
+<P>
+<B>char *pm_read_unknown_size(</b>
+<b>FILE *</B> <I>fp</I><B>,</b>
+<b>long *</B> <I>nread</I>
+<B>);</B>
+
+
+<h4>Description</h4>
+
+<p>An image stream is just a file stream (represented in the standard C
+library as type <b>FILE *</b>).
+
+<p>These routines work on files &gt; 2 GiB if the underlying system does,
+using the standard large file interface.  Before Netpbm 10.15 (April 2003),
+though, they would fail to open any file that large or process any offset
+in a file that could not be represented in 32 bits.
+
+<p><B>pm_openr()</B> opens the given file for reading, with
+appropriate error checking.  A filename of <B>-</B> is taken to mean
+Standard Input.  <B>pm_openw()</B> opens the given file for writing,
+with appropriate error checking.  <B>pm_close()</B> closes the file
+descriptor, with appropriate error checking.
+
+<P><B>pm_openr_seekable()</B> appears to open the file just like
+<B>pm_openr()</B>, but the file thus opened is guaranteed to be
+seekable (you can use ftell() and fseek() on it).
+<B>pm_openr_seekable()</B> pulls this off by copying the entire file
+to a temporary file and giving you the handle of the temporary file,
+if it has to.  If the file you name is a regular file, it's already
+seekable so <B>pm_openr_seekable()</B> just does the same thing as
+<B>pm_openr()</B>.
+
+But if it is, say, a pipe, it isn't seekable.  So
+<B>pm_openr_seekable()</B> reads the pipe until EOF into a temporary
+file, then opens that temporary file and returns the handle of the
+temporary file.  The temporary file is seekable.  <P> The file
+<B>pm_openr_seekable()</B> creates is one that the operating system
+recognizes as temporary, so when you close the file, by any means, it
+gets deleted.
+
+<P>
+You need a seekable file if you intend to make multiple passes through
+the file.  The only alternative is to read the entire image into
+memory and work from that copy.  That may use too much memory.  Note
+that the image takes less space in the file cache than in a buffer in
+memory.  As much as 96 times less space!  Each sample is an integer in
+the buffer, which is usually 96 bits.  In the file, a sample may be as
+small as 1 bit and rarely more than 8 bits.
+
+<P><B>pm_tell2()</B> returns a handle for the current position of the
+image stream (file), whether it be the header or a row of the raster.
+Use the handle as an argument to <B>pm_seek2()</B> to reposition the
+file there later.  The file must be seekable (which you can ensure by
+opening it with <B>pm_openr_seekable()</B>) or this may fail.
+
+<p>The file position handle is of type <b>pm_filepos</b>, which is
+intended to be opaque, i.e. used only with these two functions.  In
+practice, it is a file offset and is 32 bits or 64 bits depending upon
+the capability of the underlying system.  For maximum backward and
+forward compatibility, the functions that take or return a
+<b>pm_filepos</b> have a <i>fileposSize</i> argument for the size of
+the data structure.  In C, simply code <b>sizeof(pm_filepos)</b> for
+that.
+
+<p><b>pm_seek()</b> and <b>pm_tell</b> are for backward compatibility
+only.  Do not use them in new code.  These functions are not capable of
+handle positions in files whose byte offset cannot be represented in 32
+bits.
+
+<p><b>pm_tell2()</b> and <b>pm_seek2()</b> replaced <b>pm_tell()</b> and
+<b>pm_seek()</b> in Netpbm 10.15 (April 2003).
+
+<P><B>pm_read_unknown_size()</B> reads an entire file or input stream
+of unknown size to a buffer.  It allocates more memory as needed.  The
+calling routine has to free the allocated buffer with <B>free()</B>.
+
+<P><B>pm_read_unknown_size()</B> returns a pointer to the allocated
+buffer.  The <B>nread</B> argument returns the number of bytes read.
+
+
+<a name="endian"></a>
+<h3>Endian I/O</h3>
+
+<h4>Entry Points</h4>
+
+<P>
+<B>void pm_readchar(</b>
+<b>FILE *</B> <I>in</I><B>,</b>
+<b>char *</B> <I>sP</I>
+<B>);</B>
+
+<P>
+<B>void pm_writechar(</b>
+<b>FILE *</B> <I>out</I><B>,</b>
+<b>char</B> <I>s</I>
+<B>);</B>
+
+<P>
+<B>int pm_readbigshort(</b>
+<b>FILE *</B> <I>in</I><B>,</b>
+<b>short *</B> <I>sP</I>
+<B>);</B>
+
+<P>
+<B>int pm_writebigshort(</b>
+<b>FILE *</B> <I>out</I><B>,</b>
+<b>short</B> <I>s</I>
+<B>);</B>
+
+<P>
+<B>int pm_readbiglong(</b>
+<b>FILE *</B> <I>in</I><B>,</b>
+<b>long *</B> <I>lP</I>
+<B>);</B>
+
+<P>
+<B>int pm_writebiglong(</b>
+<b>FILE *</B> <I>out</I><B>,</b>
+<b>long</B> <I>l</I>
+<B>);</B>
+
+<P>
+<B>int pm_readlittleshort(</b>
+<b>FILE *</B> <I>in</I><B>,</b>
+<b>short *</B> <I>sP</I>
+<B>);</B>
+
+<P>
+<B>int pm_writelittleshort(</b>
+<b>FILE *</B> <I>out</I><B>,</b>
+<b>short</B> <I>s</I>
+<B>);</B>
+
+<P>
+<B>int pm_readlittlelong(</b>
+<b>FILE *</B> <I>in</I><B>,</b>
+<b>long *</B> <I>lP</I>
+<B>);</B>
+
+<P>
+<B>int pm_writelittlelong(</b>
+<b>FILE *</B> <I>out</I><B>,</b>
+<b>long</B> <I>l</I>
+<B>);</B>
+
+<P>
+<B>void pm_readcharu(</b>
+<b>FILE *</B> <I>in</I><B>,</b>
+<b>char *</B> <I>sP</I>
+<B>);</B>
+
+<P>
+<B>void pm_writecharu(</b>
+<b>FILE *</B> <I>out</I><B>,</b>
+<b>char</B> <I>s</I>
+<B>);</B>
+
+<P>
+<B>int pm_readbigshortu(</b>
+<b>FILE *</B> <I>in</I><B>,</b>
+<b>short *</B> <I>sP</I>
+<B>);</B>
+
+<P>
+<B>int pm_writebigshortu(</b>
+<b>FILE *</B> <I>out</I><B>,</b>
+<b>short</B> <I>s</I>
+<B>);</B>
+
+<P>
+<B>int pm_readbiglongu(</b>
+<b>FILE *</B> <I>in</I><B>,</b>
+<b>long *</B> <I>lP</I>
+<B>);</B>
+
+<P>
+<B>int pm_writebiglongu(</b>
+<b>FILE *</B> <I>out</I><B>,</b>
+<b>long</B> <I>l</I>
+<B>);</B>
+
+<P>
+<B>int pm_readlittleshortu(</b>
+<b>FILE *</B> <I>in</I><B>,</b>
+<b>short *</B> <I>sP</I>
+<B>);</B>
+
+<P>
+<B>int pm_writelittleshortu(</b>
+<b>FILE *</B> <I>out</I><B>,</b>
+<b>short</B> <I>s</I>
+<B>);</B>
+
+<P>
+<B>int pm_readlittlelongu(</b>
+<b>FILE *</B> <I>in</I><B>,</b>
+<b>long *</B> <I>lP</I>
+<B>);</B>
+
+<P>
+<B>int pm_writelittlelongu(</b>
+<b>FILE *</B> <I>out</I><B>,</b>
+<b>long</B> <I>l</I>
+<B>);</B>
+
+<h4>Description</h4>
+
+<B>pm_readchar()</B>, <B>pm_writechar()</B>, <B>pm_readbigshort()</B>,
+<B>pm_writebigshort()</B>, <B>pm_readbiglong()</B>,
+<B>pm_writebiglong()</B>, <B>pm_readlittleshort()</B>,
+<B>pm_writelittleshort()</B>, <B>pm_readlittlelong()</B>, and
+<B>pm_writelittlelong()</B> are routines to read and write 1-byte,
+2-byte, and 4-byte pure binary integers in either big- or
+little-endian byte order.  Note that a &quot;long int&quot; C type might
+be wider than 4 bytes, but the &quot;long&quot; routines still read and
+write 4 bytes.
+
+<p><b>pm_readbiglongu()</b>, etc. (names ending in <b>u</b>) are the same
+except they work on unsigned versions of the type.
+
+<P>The routines with declared return values always return 0.  Before
+Netpbm 10.27 (March 2005), they returned -1 on failure, including EOF.
+Now, they issue an error message to Standard Error and abort the program
+if the I/O fails or encounters EOF.
+
+<p>The 1-byte routines were new in Netpbm 10.27 (March 2005).
+The unsigned versions were new somewhere around Netpbm 10.21 (2004).
+
+<A NAME="maxval">&nbsp;</A>
+<H3>Maxval Arithmetic</H3>
+
+<h4>Entry Points</h4>
+<P>
+<B>int pm_maxvaltobits(</b>
+<b>int</B> <I>maxval</I>
+<B>);</B>
+
+<P>
+<B>int pm_bitstomaxval(</b>
+<b>int</B> <I>bits</I>
+<B>);</B>
+
+<P>
+<B>unsigned int pm_lcm(</b>
+<b>unsigned int</B> <I>x</I><B>,</B>
+<B>unsigned int</B> <I>y</I><B>,</B>
+<B>unsigned int</B> <I>z</I><B>,</B>
+<B>unsigned int</B> <I>limit</I>
+<B>);</B>
+
+<h4>Description</h4>
+
+<p><B>pm_maxvaltobits()</B> and <B>pm_bitstomaxval()</B> convert
+between a maxval and the minimum number of bits required to hold it.
+
+<P><B>pm_lcm()</B> computes the least common multiple of 3 integers.
+You also specify a limit and if the LCM would be higher than that
+limit, <B>pm_lcm()</B> just returns that limit.
+
+<H3 id="gamma">Gamma Arithmetic</H3>
+
+<h4>Entry Points</h4>
+<P>
+<B>float pm_gamma(</b>
+<b>float</B> <I>intensity</I>
+<B>);</B>
+
+<P>
+<B>float pm_ungamma(</b>
+<b>float</B> <I>brightness</I>
+<B>);</B>
+
+
+<h4>Description</h4>
+
+<p>In graphics processing, there are two common ways of representing
+numerically the intensity of a pixel, or a component of a pixel.
+
+<p>The obvious way is with a number that is directly proportional to
+the light intensity (e.g. 10 means twice as many milliwatts per square
+centimeter as 5).  There are two problems with this:
+
+<ul>
+  <li>To the human eye, a 1 milliwatt per square centimeter difference
+       in a bright image is much less apparent than a 1 milliwatt per
+       square centimeter difference in a dark image.  So if you have
+       a fixed number of bits in which to store the intensity value,
+       you're wasting resolution at the bright end skimping on it at
+       the dark end.
+  <li>Monitor inputs and camera outputs aren't directly proportional to
+       the light intensity they project or detect.
+</ul>
+
+<p>For these reasons, light intensities are often represented in
+graphics processing by an exponential scale.  The transfer function is
+called a gamma function and the resulting numbers are called
+gamma-corrected or gamma-adjusted.  There are various gamma functions.
+The Netpbm formats specify that intensities are represented by
+gamma-adjusted numbers of a particular gamma transfer function.
+
+<p>These functions let you convert back and forth between these two
+scales, using the same gamma transfer function that is specified in the
+Netpbm format specifications.
+
+<p><b>pm_gamma709</b> converts from an intensity-proportional intensity
+value to a gamma-adjusted intensity value (roughly proportional to
+brightness, which is the human subjective perception of intensity),
+using the CIE Rec. 709 gamma transfer function.
+
+<P><B>pm_ungamma709</b> is the inverse of <b>pm_gamma709</b>.
+
+<A NAME="message"></A>
+<H3>Messages</H3>
+
+<h4>Entry Points</h4>
+
+<P>
+<B>void pm_message(</b>
+<b>char *</B> <I>fmt</I><B>,</B>
+<B>... );</B>
+
+<h4>Description</h4>
+<p><B>pm_message()</B> is a <B>printf()</B> style routine to write an
+informational message to the Standard Error file stream.
+<B>pm_message()</B> suppresses the message, however, if the user
+specified the <B>-quiet</B> option on the command line.  See the
+initialization functions, e.g. <B>pnm_init()</B>, for information on
+the <B>-quiet</B> option.  Note that Netpbm programs are often used
+interactively, but also often used by programs.  In the interactive
+case, it is nice to issue messages about what the program is doing,
+but in the program case, such messages are usually undesirable.  By
+using <B>pm_message()</B> for all your messages, you make your program
+usable in both cases.  Without any effort on your part, program users
+of your program can avoid the messages by specifying the <B>-quiet</B>
+option.
+
+<p>If you're just issuing an error message and plan to abort the
+program, <a href="error.html#pm_error"></a><b>pm_error()</b> may be
+more convenient for you.
+
+
+<a name="system"></a>
+<h3>System Utilities</h3>
+
+<ul>
+<li><a href="libsystem.html">pm_system</a>
+<li><a href="libtmpfile.html">pm_tmpfile</a>
+</ul>
+
+<A NAME="keyword"></A>
+<H3>Keyword Matching</H3>
+<h4>Entry Points</h4>
+
+<h4>Description</h4>
+
+<p>This subroutine is obsolete.  It used to be used for command line
+option processing.  Today, you can do better option processing more
+easily with the shhopt facility.  See any recent program in the Netpbm
+package for an example.
+
+<B>pm_keymatch()</B> does a case-insensitive match of <B>str</B>
+against <B>keyword</B>.  <B>str</B> can be a leading substring of
+<B>keyword</B>, but at least <B>minchars</B> must be present.
+
+
+<HR>
+<A NAME="toc">&nbsp;</A>
+<H2>Table Of Contents</H2>
+
+<ul>
+  <li><a href="libpm.html#functions">Functions</a>
+  <ul>
+    <li><a href="libpm.html#initialization">Initialization</a>
+    <li><a href="libpm.html#file">File Or Image Stream Access</a>
+    <li><a href="libpm.html#endian">Endian I/O</a>
+    <li><a href="libpm.html#maxval">Maxval Arithmetic</a>
+    <li><a href="libpm.html#message">Messages And Errors</a>
+    <li><a href="libpm.html#keyword">Keyword</a>
+    </ul>
+  </ul>
+
+
+</body> </html>

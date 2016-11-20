@@ -1,0 +1,104 @@
+DITHER(3)                                             DITHER(3)
+
+
+
+
+
+NAME
+       dithermap,  bwdithermap, make_square, dithergb, ditherbw
+              - functions for  dithering  color  or  black  and
+              white images.
+
+SYNOPSIS
+       dithermap( levels, gamma, rgbmap, divN, modN, magic )
+       int levels;
+       double gamma;
+       int rgbmap[][3], divN[256], modN[256], magic[16][16];
+
+       bwdithermap( levels, gamma, bwmap, divN, modN, magic )
+       int levels;
+       double gamma;
+       int bwmap[], int divN[256], modN[256], magic[16][16];
+
+       make_square( N, divN, modN, magic )
+       double N;
+       int divN[256], modN[256], magic[16][16];
+
+       dithergb( x, y, r, g, b, levels, divN, modN, magic )
+       int x, y, r, g, b, levels;
+       int divN[256], modN[256], magic[16][16];
+
+       ditherbw( x, y, val, divN, modN, magic )
+       int x, y, val, divN[256], modN[256], magic[16][16];
+
+DESCRIPTION
+       These  functions  provide  a  common set of routines for
+       dithering a full color or gray scale image into a  lower
+       resolution color map.
+
+       Dithermap computes a color map and some auxiliary param-
+       eters for dithering a full color (24 bit) image to fewer
+       bits.   The  argument  levels  tells  how many different
+       intensity levels per primary color should  be  computed.
+       To  get  maximum  use of a 256 entry color map, use lev-
+       els=6.  The computed map  uses  levels^3  entries.   The
+       gamma  argument  provides  for gamma compensation of the
+       generated color map (that is, the values in the map will
+       be  adjusted  to  give a linear intensity variation on a
+       display with the given gamma).  The computed  color  map
+       will be returned in the array rgbmap.  divN and modN are
+       auxiliary arrays for  computing  the  dithering  pattern
+       (see  below),  and magic is the magic square dither pat-
+       tern.
+
+       To compute a color map for dithering a black  and  white
+       image  to  fewer intensity levels, use bwdithermap.  The
+       arguments are as for dithermap, but only a single  chan-
+       nel  color  map is computed.  The value of levels can be
+       larger than for dithermap, as the computed map only  has
+       levels entries.
+
+       To just build the magic square and other parameters, use
+       make_square.  The argument N should be  equal  to  255.0
+       divided  by  the desired number of intensity levels less
+       one (i.e., N = 255.0 / (levels - 1)).  The  other  argu-
+       ments are filled in as above.
+
+       The  color  map index for a dithered full color pixel is
+       computed by dithergb.  Since the pattern depends on  the
+       screen  location, the first two arguments x and y, spec-
+       ify that location.  The true color of the pixel at  that
+       location is given by the triple r, g, and b.  The number
+       of intensity levels and the dithering parameter matrices
+       computed by dithermap are also passed to dithergb.
+
+       The  color  map index for a dithered gray scale pixel is
+       computed by ditherbw.  Again,  the  screen  position  is
+       specified,  and the intensity value of the pixel is sup-
+       plied in val.  The dithering  parameters  must  also  be
+       supplied.
+
+       Alternatively, the dithering may be done in line instead
+       of incurring the extra  overhead  of  a  function  call,
+       which  can be significant when repeated a million times.
+       The computation is as follows:
+                 row = y % 16;
+                 col = x % 16;
+            #define DMAP(v,col,row) (divN[v] + (modN[v]>magic[col][row] ? 1 : 0))
+                 pix = DMAP(r,col,row) + DMAP(g,col,row)*levels +
+                      DMAP(b,col,row)*levels*levels;
+       For a gray scale image, it is a little simpler:
+                 pix = DMAP(val,row,col);
+       And on a single bit display (assuming a 1 means white):
+                 pix = divN[val] > magic[col][row] ? 1 : 0
+
+SEE ALSO
+       rgb_to_bw(3), librle(3), RLE(5).
+
+AUTHOR
+       Spencer W. Thomas
+       University of Utah
+
+
+
+3                            2/2/87                   DITHER(3)

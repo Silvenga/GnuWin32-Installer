@@ -1,0 +1,77 @@
+PGMFRACT(1)                                         PGMFRACT(1)
+
+
+
+
+
+NAME
+       pgmfract - generate fractal as PGM picture
+
+SYNOPSIS
+       pgmfract [-s size] [-d depth] [-p xpos:ypos:distance]
+
+DESCRIPTION
+       pgmfract  computes  a fractal and outputs it to standard
+       output as PGM file.  Each x,y pixel of the picture  cor-
+       responds  to  the  complex  number c=x+yi in the formula
+       z'=z2+c.  The first iteration begins with  z=x+iy,  fol-
+       lowing iterations use the previously calculated value of
+       z'.  As soon as the absolute value of z  becomes  larger
+       than  2,  it  is  known that the iteration will converge
+       against infinity and the pixel is coloured depending  on
+       the  number of iterations.  Some values of c never cause
+       z to become larger than 2, so the iteration depth has to
+       be limited.  If this limit is reached, the pixel will be
+       black.  The Mandelbrot set is the set of values  for  c,
+       which  never  cause  z  to converge against infinity, so
+       limiting the depth causes a small error.  Using a  large
+       enough depth minimizes this error.
+
+OPTIONS
+       -s size
+              Change  the  picture size from the default of 600
+              pixel in each direction to size pixels.
+
+       -d depth
+              Change  the  maximum  iteration  depth  from  the
+              default of 600 iterations to depth iterations.
+
+       -p xpos:ypos:distance
+              Change  the  interval of the complex start values
+              from 0.0:0.0:2.0 to the new center xpos  an  ypos
+              with an interval of distance in each direction.
+
+       -j cr:ci
+              Compute  a  julia set instead of a mandelbrot set
+              by specifying a  fixed  value  c  for  iterations
+              instead  of a pixel dependent value x+iy.  Inter-
+              esting subsections from the mandelbrot set  yield
+              interesting julia sets.
+
+EXAMPLES
+       Beautiful sections are:
+
+              pgmfract -p -0.5:0.0:1.5 >fractal.pgm
+              pgmfract -p -0.7660315:0.100861:0.0003 >fractal.pgm
+              pgmfract -p -1.252758:0.342541:0.007629 >fractal.pgm
+              pgmfract -p -0.368056:0.645833:0.097222 >fractal.pgm
+              pgmfract -p -0.17596915:1.08649105:0.0000004 >fractal.pgm
+              pgmfract -j -0.17596915:1.08649105 -p 0.0:0.0:0.01 >fractal.pgm
+              pgmfract -d 2000 -p -0.74567846:0.09998153:0.00012307 >fractal.pgm
+              pgmfract -d 2000 -j -0.74567846:0.09998153 -p 0.0:0.0:0.1 >fractal.pgm
+
+AUTHOR
+       Michael Haardt <michael@moria.de>.
+
+HISTORY
+       The original version of this program has been written in
+       6502 Assembler for an  Acorn  Electron  in  1985.   From
+       there,  it  went  to Small-C for the Z80 on a PCW8256 in
+       1986 to ANSI-C and Linux in 1998.
+
+SEE ALSO
+       pgm(5)
+
+
+
+                       September 26, 1999           PGMFRACT(1)

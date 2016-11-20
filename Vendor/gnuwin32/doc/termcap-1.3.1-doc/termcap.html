@@ -1,0 +1,3809 @@
+<html lang="en">
+<head>
+<title>The Termcap Library</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name=description content="The Termcap Library">
+<meta name=generator content="makeinfo 4.1">
+<link href="http://texinfo.org/" rel=generator-home>
+</head>
+<body>
+<h1>The Termcap Library</h1>
+<p><hr>
+Node:<a name="Top">Top</a>,
+Next:<a rel=next href="#Introduction">Introduction</a>,
+Previous:<a rel=previous href="#dir">(dir)</a>,
+Up:<a rel=up href="#dir">(dir)</a>
+<br>
+
+<ul>
+<li><a href="#Introduction">Introduction</a>:   What is termcap?  Why this manual? 
+<li><a href="#Library">Library</a>:      The termcap library functions. 
+<li><a href="#Data%20Base">Data Base</a>:    What terminal descriptions in <code>/etc/termcap</code> look like. 
+<li><a href="#Capabilities">Capabilities</a>:   Definitions of the individual terminal capabilities:
+                 how to write them in descriptions, and how to use
+                 their values to do display updating. 
+<li><a href="#Summary">Summary</a>:      Brief table of capability names and their meanings. 
+<li><a href="#Var%20Index">Var Index</a>:    Index of C functions and variables. 
+<li><a href="#Cap%20Index">Cap Index</a>:    Index of termcap capabilities. 
+<li><a href="#Index">Index</a>:        Concept index.
+
+<p>--- The Detailed Node Listing ---
+
+<p>The Termcap Library
+
+</p><li><a href="#Preparation">Preparation</a>:   Preparing to use the termcap library. 
+<li><a href="#Find">Find</a>:         Finding the description of the terminal being used. 
+<li><a href="#Interrogate">Interrogate</a>:   Interrogating the description for particular capabilities. 
+<li><a href="#Initialize">Initialize</a>:   Initialization for output using termcap. 
+<li><a href="#Padding">Padding</a>:      Outputting padding. 
+<li><a href="#Parameters">Parameters</a>:   Encoding parameters such as cursor positions.
+
+<p>Padding
+
+</p><li><a href="#Why%20Pad">Why Pad</a>:      Explanation of padding. 
+<li><a href="#Not%20Enough">Not Enough</a>:   When there is not enough padding. 
+<li><a href="#Describe%20Padding">Describe Padding</a>:   The data base says how much padding a terminal needs. 
+<li><a href="#Output%20Padding">Output Padding</a>:     Using <code>tputs</code> to output the needed padding.
+
+<p>Filling In Parameters
+
+</p><li><a href="#Encode%20Parameters">Encode Parameters</a>:   The language for encoding parameters. 
+<li><a href="#Using%20Parameters">Using Parameters</a>:    Outputting a string command with parameters.
+
+<p>Sending Display Commands with Parameters
+
+</p><li><a href="#tparam">tparam</a>:       The general case, for GNU termcap only. 
+<li><a href="#tgoto">tgoto</a>:        The special case of cursor motion.
+
+<p>The Format of the Data Base
+
+</p><li><a href="#Format">Format</a>:       Overall format of a terminal description. 
+<li><a href="#Capability%20Format">Capability Format</a>:   Format of capabilities within a description. 
+<li><a href="#Naming">Naming</a>:       Naming conventions for terminal types. 
+<li><a href="#Inheriting">Inheriting</a>:   Inheriting part of a description from
+a related terminal type. 
+<li><a href="#Changing">Changing</a>:     When changes in the data base take effect.
+
+<p>Definitions of the Terminal Capabilities
+
+</p><li><a href="#Basic">Basic</a>:        Basic characteristics. 
+<li><a href="#Screen%20Size">Screen Size</a>:   Screen size, and what happens when it changes. 
+<li><a href="#Cursor%20Motion">Cursor Motion</a>:   Various ways to move the cursor. 
+<li><a href="#Wrapping">Wrapping</a>:     What happens if you write a character in the last column. 
+<li><a href="#Scrolling">Scrolling</a>:    Pushing text up and down on the screen. 
+<li><a href="#Windows">Windows</a>:      Limiting the part of the window that output affects. 
+<li><a href="#Clearing">Clearing</a>:     Erasing one or many lines. 
+<li><a href="#Insdel%20Line">Insdel Line</a>:   Making new blank lines in mid-screen; deleting lines. 
+<li><a href="#Insdel%20Char">Insdel Char</a>:   Inserting and deleting characters within a line. 
+<li><a href="#Standout">Standout</a>:     Highlighting some of the text. 
+<li><a href="#Underlining">Underlining</a>:   Underlining some of the text. 
+<li><a href="#Cursor%20Visibility">Cursor Visibility</a>:   Making the cursor more or less easy to spot. 
+<li><a href="#Bell">Bell</a>:         Attracts user's attention; not localized on the screen. 
+<li><a href="#Keypad">Keypad</a>:       Recognizing when function keys or arrows are typed. 
+<li><a href="#Meta%20Key">Meta Key</a>:     &lt;META&gt; acts like an extra shift key. 
+<li><a href="#Initialization">Initialization</a>:   Commands used to initialize or reset the terminal. 
+<li><a href="#Pad%20Specs">Pad Specs</a>:    Info for the kernel on how much padding is needed. 
+<li><a href="#Status%20Line">Status Line</a>:   A status line displays ``background'' information. 
+<li><a href="#Half-Line">Half-Line</a>:    Moving by half-lines, for superscripts and subscripts. 
+<li><a href="#Printer">Printer</a>:      Controlling auxiliary printers of display terminals. 
+</ul>
+
+<p><hr>
+Node:<a name="Introduction">Introduction</a>,
+Next:<a rel=next href="#Library">Library</a>,
+Previous:<a rel=previous href="#Top">Top</a>,
+Up:<a rel=up href="#Top">Top</a>
+<br>
+
+<h2>Introduction</h2>
+
+<p><dfn>Termcap</dfn> is a library and data base that enables programs to use
+display terminals in a terminal-independent manner.  It originated in
+Berkeley Unix.
+
+<p>The termcap data base describes the capabilities of hundreds of different
+display terminals in great detail.  Some examples of the information
+recorded for a terminal could include how many columns wide it is, what
+string to send to move the cursor to an arbitrary position (including how
+to encode the row and column numbers), how to scroll the screen up one or
+several lines, and how much padding is needed for such a scrolling
+operation.
+
+<p>The termcap library is provided for easy access this data base in programs
+that want to do terminal-independent character-based display output.
+
+<p>This manual describes the GNU version of the termcap library, which has
+some extensions over the Unix version.  All the extensions are identified
+as such, so this manual also tells you how to use the Unix termcap.
+
+<p>The GNU version of the termcap library is available free as source code,
+for use in free programs, and runs on Unix and VMS systems (at least).  You
+can find it in the GNU Emacs distribution in the files <code>termcap.c</code> and
+<code>tparam.c</code>.
+
+<p>This manual was written for the GNU project, whose goal is to develop a
+complete free operating system upward-compatible with Unix for user
+programs.  The project is approximately two thirds complete.  For more
+information on the GNU project, including the GNU Emacs editor and the
+mostly-portable optimizing C compiler, send one dollar to
+
+<br><pre>Free Software Foundation
+675 Mass Ave
+Cambridge, MA 02139
+</pre>
+
+<p><hr>
+Node:<a name="Library">Library</a>,
+Next:<a rel=next href="#Data%20Base">Data Base</a>,
+Previous:<a rel=previous href="#Introduction">Introduction</a>,
+Up:<a rel=up href="#Top">Top</a>
+<br>
+
+<h2>1 The Termcap Library</h2>
+
+<p>The termcap library is the application programmer's interface to the
+termcap data base.  It contains functions for the following purposes:
+
+<ul>
+<li>Finding the description of the user's terminal type (<code>tgetent</code>).
+
+<li>Interrogating the description for information on various topics
+(<code>tgetnum</code>, <code>tgetflag</code>, <code>tgetstr</code>).
+
+<li>Computing and performing padding (<code>tputs</code>).
+
+<li>Encoding numeric parameters such as cursor positions into the
+terminal-specific form required for display commands (<code>tparam</code>,
+<code>tgoto</code>). 
+</ul>
+
+<ul>
+<li><a href="#Preparation">Preparation</a>:   Preparing to use the termcap library. 
+<li><a href="#Find">Find</a>:         Finding the description of the terminal being used. 
+<li><a href="#Interrogate">Interrogate</a>:   Interrogating the description for particular capabilities. 
+<li><a href="#Initialize">Initialize</a>:   Initialization for output using termcap. 
+<li><a href="#Padding">Padding</a>:      Outputting padding. 
+<li><a href="#Parameters">Parameters</a>:   Encoding parameters such as cursor positions. 
+</ul>
+
+<p><hr>
+Node:<a name="Preparation">Preparation</a>,
+Next:<a rel=next href="#Find">Find</a>,
+Up:<a rel=up href="#Library">Library</a>
+<br>
+
+<h3>1.1 Preparing to Use the Termcap Library</h3>
+
+<p>To use the termcap library in a program, you need two kinds of preparation:
+
+<ul>
+<li>The compiler needs declarations of the functions and variables in the
+library.
+
+<p>On GNU systems, it suffices to include the header file
+<code>termcap.h</code> in each source file that uses these functions and
+variables.
+
+<p>On Unix systems, there is often no such header file.  Then you must
+explictly declare the variables as external.  You can do likewise for
+the functions, or let them be implicitly declared and cast their
+values from type <code>int</code> to the appropriate type.
+
+<p>We illustrate the declarations of the individual termcap library
+functions with ANSI C prototypes because they show how to pass the
+arguments.  If you are not using the GNU C compiler, you probably
+cannot use function prototypes, so omit the argument types and names
+from your declarations.
+
+</p><li>The linker needs to search the library.  Usually either
+<code>-ltermcap</code> or <code>-ltermlib</code> as an argument when linking will
+do this. 
+</ul>
+
+<p><hr>
+Node:<a name="Find">Find</a>,
+Next:<a rel=next href="#Interrogate">Interrogate</a>,
+Previous:<a rel=previous href="#Preparation">Preparation</a>,
+Up:<a rel=up href="#Library">Library</a>
+<br>
+
+<h3>1.2 Finding a Terminal Description: <code>tgetent</code></h3>
+
+<p>An application program that is going to use termcap must first look up the
+description of the terminal type in use.  This is done by calling
+<code>tgetent</code>, whose declaration in ANSI Standard C looks like:
+
+<br><pre>int tgetent (char *<var>buffer</var>, char *<var>termtype</var>);
+</pre>
+
+<p>This function finds the description and remembers it internally so that
+you can interrogate it about specific terminal capabilities
+(see <a href="#Interrogate">Interrogate</a>).
+
+<p>The argument <var>termtype</var> is a string which is the name for the type of
+terminal to look up.  Usually you would obtain this from the environment
+variable <code>TERM</code> using <code>getenv ("TERM")</code>.
+
+<p>If you are using the GNU version of termcap, you can alternatively ask
+<code>tgetent</code> to allocate enough space.  Pass a null pointer for
+<var>buffer</var>, and <code>tgetent</code> itself allocates the storage using
+<code>malloc</code>.  There is no way to get the address that was allocated,
+and you shouldn't try to free the storage.
+
+<p>With the Unix version of termcap, you must allocate space for the
+description yourself and pass the address of the space as the argument
+<var>buffer</var>.  There is no way you can tell how much space is needed, so
+the convention is to allocate a buffer 2048 characters long and assume that
+is enough.  (Formerly the convention was to allocate 1024 characters and
+assume that was enough.  But one day, for one kind of terminal, that was
+not enough.)
+
+<p>No matter how the space to store the description has been obtained,
+termcap records its address internally for use when you later interrogate
+the description with <code>tgetnum</code>, <code>tgetstr</code> or <code>tgetflag</code>.  If
+the buffer was allocated by termcap, it will be freed by termcap too if you
+call <code>tgetent</code> again.  If the buffer was provided by you, you must
+make sure that its contents remain unchanged for as long as you still plan
+to interrogate the description.
+
+<p>The return value of <code>tgetent</code> is -1 if there is some difficulty
+accessing the data base of terminal types, 0 if the data base is accessible
+but the specified type is not defined in it, and some other value
+otherwise.
+
+<p>Here is how you might use the function <code>tgetent</code>:
+
+<br><pre>#ifdef unix
+static char term_buffer[2048];
+#else
+#define term_buffer 0
+#endif
+
+init_terminal_data ()
+{
+  char *termtype = getenv ("TERM");
+  int success;
+
+  if (termtype == 0)
+    fatal ("Specify a terminal type with `setenv TERM &lt;yourtype&gt;'.\n");
+
+  success = tgetent (term_buffer, termtype);
+  if (success &lt; 0)
+    fatal ("Could not access the termcap data base.\n");
+  if (success == 0)
+    fatal ("Terminal type `%s' is not defined.\n", termtype);
+}
+</pre>
+
+<p>Here we assume the function <code>fatal</code> prints an error message and exits.
+
+<p>If the environment variable <code>TERMCAP</code> is defined, its value is used to
+override the terminal type data base.  The function <code>tgetent</code> checks
+the value of <code>TERMCAP</code> automatically.  If the value starts with
+<code>/</code> then it is taken as a file name to use as the data base file,
+instead of <code>/etc/termcap</code> which is the standard data base.  If the
+value does not start with <code>/</code> then it is itself used as the terminal
+description, provided that the terminal type <var>termtype</var> is among the
+types it claims to apply to.  See <a href="#Data%20Base">Data Base</a>, for information on the
+format of a terminal description.
+
+<p><hr>
+Node:<a name="Interrogate">Interrogate</a>,
+Next:<a rel=next href="#Initialize">Initialize</a>,
+Previous:<a rel=previous href="#Find">Find</a>,
+Up:<a rel=up href="#Library">Library</a>
+<br>
+
+<h3>1.3 Interrogating the Terminal Description</h3>
+
+<p>Each piece of information recorded in a terminal description is called a
+<dfn>capability</dfn>.  Each defined terminal capability has a two-letter code
+name and a specific meaning.  For example, the number of columns is named
+<code>co</code>.  See <a href="#Capabilities">Capabilities</a>, for definitions of all the standard
+capability names.
+
+<p>Once you have found the proper terminal description with <code>tgetent</code>
+(see <a href="#Find">Find</a>), your application program must <dfn>interrogate</dfn> it for
+various terminal capabilities.  You must specify the two-letter code of
+the capability whose value you seek.
+
+<p>Capability values can be numeric, boolean (capability is either present or
+absent) or strings.  Any particular capability always has the same value
+type; for example, <code>co</code> always has a numeric value, while <code>am</code>
+(automatic wrap at margin) is always a flag, and <code>cm</code> (cursor motion
+command) always has a string value.  The documentation of each capability
+says which type of value it has.
+
+<p>There are three functions to use to get the value of a capability,
+depending on the type of value the capability has.  Here are their
+declarations in ANSI C:
+
+<br><pre>int tgetnum (char *<var>name</var>);
+int tgetflag (char *<var>name</var>);
+char *tgetstr (char *<var>name</var>, char **<var>area</var>);
+</pre>
+
+<dl>
+<dt><code>tgetnum</code>
+<dd>Use <code>tgetnum</code> to get a capability value that is numeric.  The
+argument <var>name</var> is the two-letter code name of the capability.  If
+the capability is present, <code>tgetnum</code> returns the numeric value
+(which is nonnegative).  If the capability is not mentioned in the
+terminal description, <code>tgetnum</code> returns -1.
+
+<br><dt><code>tgetflag</code>
+<dd>Use <code>tgetflag</code> to get a boolean value.  If the capability
+<var>name</var> is present in the terminal description, <code>tgetflag</code>
+returns 1; otherwise, it returns 0.
+
+<br><dt><code>tgetstr</code>
+<dd>Use <code>tgetstr</code> to get a string value.  It returns a pointer to a
+string which is the capability value, or a null pointer if the
+capability is not present in the terminal description.
+
+<p>There are two ways <code>tgetstr</code> can find space to store the string value:
+
+<ul>
+<li>You can ask <code>tgetstr</code> to allocate the space.  Pass a null
+pointer for the argument <var>area</var>, and <code>tgetstr</code> will use
+<code>malloc</code> to allocate storage big enough for the value. 
+Termcap will never free this storage or refer to it again; you
+should free it when you are finished with it.
+
+<p>This method is more robust, since there is no need to guess how
+much space is needed.  But it is supported only by the GNU
+termcap library.
+
+</p><li>You can provide the space.  Provide for the argument <var>area</var> the
+address of a pointer variable of type <code>char *</code>.  Before calling
+<code>tgetstr</code>, initialize the variable to point at available space. 
+Then <code>tgetstr</code> will store the string value in that space and will
+increment the pointer variable to point after the space that has been
+used.  You can use the same pointer variable for many calls to
+<code>tgetstr</code>.
+
+<p>There is no way to determine how much space is needed for a single
+string, and no way for you to prevent or handle overflow of the area
+you have provided.  However, you can be sure that the total size of
+all the string values you will obtain from the terminal description is
+no greater than the size of the description (unless you get the same
+capability twice).  You can determine that size with <code>strlen</code> on
+the buffer you provided to <code>tgetent</code>.  See below for an example.
+
+<p>Providing the space yourself is the only method supported by the Unix
+version of termcap. 
+</ul>
+</dl>
+
+<p>Note that you do not have to specify a terminal type or terminal
+description for the interrogation functions.  They automatically use the
+description found by the most recent call to <code>tgetent</code>.
+
+<p>Here is an example of interrogating a terminal description for various
+capabilities, with conditionals to select between the Unix and GNU methods
+of providing buffer space.
+
+<br><pre>char *tgetstr ();
+
+char *cl_string, *cm_string;
+int height;
+int width;
+int auto_wrap;
+
+char PC;   /* For tputs.  */
+char *BC;  /* For tgoto.  */
+char *UP;
+
+interrogate_terminal ()
+{
+#ifdef UNIX
+  /* Here we assume that an explicit term_buffer
+     was provided to tgetent.  */
+  char *buffer
+    = (char *) malloc (strlen (term_buffer));
+#define BUFFADDR &amp;buffer
+#else
+#define BUFFADDR 0
+#endif
+
+  char *temp;
+
+  /* Extract information we will use.  */
+  cl_string = tgetstr ("cl", BUFFADDR);
+  cm_string = tgetstr ("cm", BUFFADDR);
+  auto_wrap = tgetflag ("am");
+  height = tgetnum ("li");
+  width = tgetnum ("co");
+
+  /* Extract information that termcap functions use.  */
+  temp = tgetstr ("pc", BUFFADDR);
+  PC = temp ? *temp : 0;
+  BC = tgetstr ("le", BUFFADDR);
+  UP = tgetstr ("up", BUFFADDR);
+}
+</pre>
+
+<p>See <a href="#Padding">Padding</a>, for information on the variable <code>PC</code>.  See <a href="#Using%20Parameters">Using Parameters</a>, for information on <code>UP</code> and <code>BC</code>.
+
+<p><hr>
+Node:<a name="Initialize">Initialize</a>,
+Next:<a rel=next href="#Padding">Padding</a>,
+Previous:<a rel=previous href="#Interrogate">Interrogate</a>,
+Up:<a rel=up href="#Library">Library</a>
+<br>
+
+<h3>1.4 Initialization for Use of Termcap</h3>
+
+<p>Before starting to output commands to a terminal using termcap,
+an application program should do two things:
+
+<ul>
+<li>Initialize various global variables which termcap library output
+functions refer to.  These include <code>PC</code> and <code>ospeed</code> for
+padding (see <a href="#Output%20Padding">Output Padding</a>) and <code>UP</code> and <code>BC</code> for
+cursor motion (see <a href="#tgoto">tgoto</a>).
+
+<li>Tell the kernel to turn off alteration and padding of horizontal-tab
+characters sent to the terminal. 
+</ul>
+
+<p>To turn off output processing in Berkeley Unix you would use <code>ioctl</code>
+with code <code>TIOCLSET</code> to set the bit named <code>LLITOUT</code>, and clear
+the bits <code>ANYDELAY</code> using <code>TIOCSETN</code>.  In POSIX or System V, you
+must clear the bit named <code>OPOST</code>.  Refer to the system documentation
+for details.
+
+<p>If you do not set the terminal flags properly, some older terminals will
+not work.  This is because their commands may contain the characters that
+normally signify newline, carriage return and horizontal tab--characters
+which the kernel thinks it ought to modify before output.
+
+<p>When you change the kernel's terminal flags, you must arrange to restore
+them to their normal state when your program exits.  This implies that the
+program must catch fatal signals such as <code>SIGQUIT</code> and <code>SIGINT</code>
+and restore the old terminal flags before actually terminating.
+
+<p>Modern terminals' commands do not use these special characters, so if you
+do not care about problems with old terminals, you can leave the kernel's
+terminal flags unaltered.
+
+<p><hr>
+Node:<a name="Padding">Padding</a>,
+Next:<a rel=next href="#Parameters">Parameters</a>,
+Previous:<a rel=previous href="#Initialize">Initialize</a>,
+Up:<a rel=up href="#Library">Library</a>
+<br>
+
+<h3>1.5 Padding</h3>
+
+<p><dfn>Padding</dfn> means outputting null characters following a terminal display
+command that takes a long time to execute.  The terminal description says
+which commands require padding and how much; the function <code>tputs</code>,
+described below, outputs a terminal command while extracting from it the
+padding information, and then outputs the padding that is necessary.
+
+<ul>
+<li><a href="#Why%20Pad">Why Pad</a>:      Explanation of padding. 
+<li><a href="#Not%20Enough">Not Enough</a>:   When there is not enough padding. 
+<li><a href="#Describe%20Padding">Describe Padding</a>:   The data base says how much padding a terminal needs. 
+<li><a href="#Output%20Padding">Output Padding</a>:   Using <code>tputs</code> to output the needed padding. 
+</ul>
+
+<p><hr>
+Node:<a name="Why%20Pad">Why Pad</a>,
+Next:<a rel=next href="#Not%20Enough">Not Enough</a>,
+Up:<a rel=up href="#Padding">Padding</a>
+<br>
+
+<h4>1.5.1 Why Pad, and How</h4>
+
+<p>Most types of terminal have commands that take longer to execute than they
+do to send over a high-speed line.  For example, clearing the screen may
+take 20msec once the entire command is received.  During that time, on a
+9600 bps line, the terminal could receive about 20 additional output
+characters while still busy clearing the screen.  Every terminal has a
+certain amount of buffering capacity to remember output characters that
+cannot be processed yet, but too many slow commands in a row can cause the
+buffer to fill up.  Then any additional output that cannot be processed
+immediately will be lost.
+
+<p>To avoid this problem, we normally follow each display command with enough
+useless charaters (usually null characters) to fill up the time that the
+display command needs to execute.  This does the job if the terminal throws
+away null characters without using up space in the buffer (which most
+terminals do).  If enough padding is used, no output can ever be lost.  The
+right amount of padding avoids loss of output without slowing down
+operation, since the time used to transmit padding is time that nothing
+else could be done.
+
+<p>The number of padding characters needed for an operation depends on the
+line speed.  In fact, it is proportional to the line speed.  A 9600 baud
+line transmits about one character per msec, so the clear screen command in
+the example above would need about 20 characters of padding.  At 1200 baud,
+however, only about 3 characters of padding are needed to fill up 20msec.
+
+<p><hr>
+Node:<a name="Not%20Enough">Not Enough</a>,
+Next:<a rel=next href="#Describe%20Padding">Describe Padding</a>,
+Previous:<a rel=previous href="#Why%20Pad">Why Pad</a>,
+Up:<a rel=up href="#Padding">Padding</a>
+<br>
+
+<h4>1.5.2 When There Is Not Enough Padding</h4>
+
+<p>There are several common manifestations of insufficient padding.
+
+<ul>
+<li>Emacs displays <code>I-search: ^Q-</code> at the bottom of the screen.
+
+<p>This means that the terminal thought its buffer was getting full of
+display commands, so it tried to tell the computer to stop sending
+any.
+
+</p><li>The screen is garbled intermittently, or the details of garbling vary
+when you repeat the action.  (A garbled screen could be due to a
+command which is simply incorrect, or to user option in the terminal
+which doesn't match the assumptions of the terminal description, but
+this usually leads to reproducible failure.)
+
+<p>This means that the buffer did get full, and some commands were lost. 
+Many changeable factors can change which ones are lost.
+
+</p><li>Screen is garbled at high output speeds but not at low speeds. 
+Padding problems nearly always go away at low speeds, usually even at
+1200 baud.
+
+<p>This means that a high enough speed permits commands to arrive faster
+than they can be executed. 
+</ul>
+
+<p>Although any obscure command on an obscure terminal might lack padding,
+in practice problems arise most often from the clearing commands
+<code>cl</code> and <code>cd</code> (see <a href="#Clearing">Clearing</a>), the scrolling commands
+<code>sf</code> and <code>sr</code> (see <a href="#Scrolling">Scrolling</a>), and the line insert/delete
+commands <code>al</code> and <code>dl</code> (see <a href="#Insdel%20Line">Insdel Line</a>).
+
+<p>Occasionally the terminal description fails to define <code>sf</code> and some
+programs will use <code>do</code> instead, so you may get a problem with
+<code>do</code>.  If so, first define <code>sf</code> just like <code>do</code>, then
+add some padding to <code>sf</code>.
+
+<p>The best strategy is to add a lot of padding at first, perhaps 200 msec. 
+This is much more than enough; in fact, it should cause a visible slowdown. 
+(If you don't see a slowdown, the change has not taken effect;
+see <a href="#Changing">Changing</a>.)  If this makes the problem go away, you have found the
+right place to add padding; now reduce the amount until the problem comes
+back, then increase it again.  If the problem remains, either it is in some
+other capability or it is not a matter of padding at all.
+
+<p>Keep in mind that on many terminals the correct padding for insert/delete
+line or for scrolling is cursor-position dependent.  If you get problems
+from scrolling a large region of the screen but not from scrolling a small
+part (just a few lines moving), it may mean that fixed padding should be
+replaced with position-dependent padding.
+
+<p><hr>
+Node:<a name="Describe%20Padding">Describe Padding</a>,
+Next:<a rel=next href="#Output%20Padding">Output Padding</a>,
+Previous:<a rel=previous href="#Not%20Enough">Not Enough</a>,
+Up:<a rel=up href="#Padding">Padding</a>
+<br>
+
+<h4>1.5.3 Specifying Padding in a Terminal Description</h4>
+
+<p>In the terminal description, the amount of padding required by each display
+command is recorded as a sequence of digits at the front of the command. 
+These digits specify the padding time in milliseconds (msec).  They can be
+followed optionally by a decimal point and one more digit, which is a
+number of tenths of msec.
+
+<p>Sometimes the padding needed by a command depends on the cursor position. 
+For example, the time taken by an "insert line" command is usually
+proportional to the number of lines that need to be moved down or cleared. 
+An asterisk (<code>*</code>) following the padding time says that the time
+should be multiplied by the number of screen lines affected by the command.
+
+<br><pre>:al=1.3*\E[L:
+</pre>
+
+<p>is used to describe the "insert line" command for a certain terminal. 
+The padding required is 1.3 msec per line affected.  The command itself is
+<code>&lt;ESC&gt; [ L</code>.
+
+<p>The padding time specified in this way tells <code>tputs</code> how many pad
+characters to output.  See <a href="#Output%20Padding">Output Padding</a>.
+
+<p>Two special capability values affect padding for all commands.  These are
+the <code>pc</code> and <code>pb</code>.  The variable <code>pc</code> specifies the
+character to pad with, and <code>pb</code> the speed below which no padding is
+needed.  The defaults for these variables, a null character and 0,
+are correct for most terminals.  See <a href="#Pad%20Specs">Pad Specs</a>.
+
+<p><hr>
+Node:<a name="Output%20Padding">Output Padding</a>,
+Previous:<a rel=previous href="#Describe%20Padding">Describe Padding</a>,
+Up:<a rel=up href="#Padding">Padding</a>
+<br>
+
+<h4>1.5.4 Performing Padding with <code>tputs</code></h4>
+
+<p>Use the termcap function <code>tputs</code> to output a string containing an
+optional padding spec of the form described above (see <a href="#Describe%20Padding">Describe Padding</a>).  The function <code>tputs</code> strips off and decodes the padding
+spec, outputs the rest of the string, and then outputs the appropriate
+padding.  Here is its declaration in ANSI C:
+
+<br><pre>char PC;
+short ospeed;
+
+int tputs (char *<var>string</var>, int <var>nlines</var>, int (*<var>outfun</var>) ());
+</pre>
+
+<p>Here <var>string</var> is the string (including padding spec) to be output;
+<var>nlines</var> is the number of lines affected by the operation, which is
+used to multiply the amount of padding if the padding spec ends with a
+<code>*</code>.  Finally, <var>outfun</var> is a function (such as <code>fputchar</code>)
+that is called to output each character.  When actually called,
+<var>outfun</var> should expect one argument, a character.
+
+<p>The operation of <code>tputs</code> is controlled by two global variables,
+<code>ospeed</code> and <code>PC</code>.  The value of <code>ospeed</code> is supposed to be
+the terminal output speed, encoded as in the <code>ioctl</code> system call which
+gets the speed information.  This is needed to compute the number of
+padding characters.  The value of <code>PC</code> is the character used for
+padding.
+
+<p>You are responsible for storing suitable values into these variables before
+using <code>tputs</code>.  The value stored into the <code>PC</code> variable should be
+taken from the <code>pc</code> capability in the terminal description (see <a href="#Pad%20Specs">Pad Specs</a>).  Store zero in <code>PC</code> if there is no <code>pc</code>
+capability.
+
+<p>The argument <var>nlines</var> requires some thought.  Normally, it should be
+the number of lines whose contents will be cleared or moved by the command. 
+For cursor motion commands, or commands that do editing within one line,
+use the value 1.  For most commands that affect multiple lines, such as
+<code>al</code> (insert a line) and <code>cd</code> (clear from the cursor to the end
+of the screen), <var>nlines</var> should be the screen height minus the current
+vertical position (origin 0).  For multiple insert and scroll commands such
+as <code>AL</code> (insert multiple lines), that same value for <var>nlines</var> is
+correct; the number of lines being inserted is <i>not</i> correct.
+
+<p>If a "scroll window" feature is used to reduce the number of lines
+affected by a command, the value of <var>nlines</var> should take this into
+account.  This is because the delay time required depends on how much work
+the terminal has to do, and the scroll window feature reduces the work. 
+See <a href="#Scrolling">Scrolling</a>.
+
+<p>Commands such as <code>ic</code> and <code>dc</code> (insert or delete characters) are
+problematical because the padding needed by these commands is proportional
+to the number of characters affected, which is the number of columns from
+the cursor to the end of the line.  It would be nice to have a way to
+specify such a dependence, and there is no need for dependence on vertical
+position in these commands, so it is an obvious idea to say that for these
+commands <var>nlines</var> should really be the number of columns affected. 
+However, the definition of termcap clearly says that <var>nlines</var> is always
+the number of lines affected, even in this case, where it is always 1.  It
+is not easy to change this rule now, because too many programs and terminal
+descriptions have been written to follow it.
+
+<p>Because <var>nlines</var> is always 1 for the <code>ic</code> and <code>dc</code> strings,
+there is no reason for them to use <code>*</code>, but some of them do.  These
+should be corrected by deleting the <code>*</code>.  If, some day, such entries
+have disappeared, it may be possible to change to a more useful convention
+for the <var>nlines</var> argument for these operations without breaking any
+programs.
+
+<p><hr>
+Node:<a name="Parameters">Parameters</a>,
+Previous:<a rel=previous href="#Padding">Padding</a>,
+Up:<a rel=up href="#Library">Library</a>
+<br>
+
+<h3>1.6 Filling In Parameters</h3>
+
+<p>Some terminal control strings require numeric <dfn>parameters</dfn>.  For
+example, when you move the cursor, you need to say what horizontal and
+vertical positions to move it to.  The value of the terminal's <code>cm</code>
+capability, which says how to move the cursor, cannot simply be a string of
+characters; it must say how to express the cursor position numbers and
+where to put them within the command.
+
+<p>The specifications of termcap include conventions as to which string-valued
+capabilities require parameters, how many parameters, and what the
+parameters mean; for example, it defines the <code>cm</code> string to take
+two parameters, the vertical and horizontal positions, with 0,0 being the
+upper left corner.  These conventions are described where the individual
+commands are documented.
+
+<p>Termcap also defines a language used within the capability definition for
+specifying how and where to encode the parameters for output.  This language
+uses character sequences starting with <code>%</code>.  (This is the same idea as
+<code>printf</code>, but the details are different.)  The language for parameter
+encoding is described in this section.
+
+<p>A program that is doing display output calls the functions <code>tparam</code> or
+<code>tgoto</code> to encode parameters according to the specifications.  These
+functions produce a string containing the actual commands to be output (as
+well a padding spec which must be processed with <code>tputs</code>;
+see <a href="#Padding">Padding</a>).
+
+<ul>
+<li><a href="#Encode%20Parameters">Encode Parameters</a>:   The language for encoding parameters. 
+<li><a href="#Using%20Parameters">Using Parameters</a>:   Outputting a string command with parameters. 
+</ul>
+
+<p><hr>
+Node:<a name="Encode%20Parameters">Encode Parameters</a>,
+Next:<a rel=next href="#Using%20Parameters">Using Parameters</a>,
+Up:<a rel=up href="#Parameters">Parameters</a>
+<br>
+
+<h4>1.6.1 Describing the Encoding</h4>
+
+<p>A terminal command string that requires parameters contains special
+character sequences starting with <code>%</code> to say how to encode the
+parameters.  These sequences control the actions of <code>tparam</code> and
+<code>tgoto</code>.
+
+<p>The parameters values passed to <code>tparam</code> or <code>tgoto</code> are
+considered to form a vector.  A pointer into this vector determines
+the next parameter to be processed.  Some of the <code>%</code>-sequences
+encode one parameter and advance the pointer to the next parameter. 
+Other <code>%</code>-sequences alter the pointer or alter the parameter
+values without generating output.
+
+<p>For example, the <code>cm</code> string for a standard ANSI terminal is written
+as <code>\E[%i%d;%dH</code>.  (<code>\E</code> stands for &lt;ESC&gt;.)  <code>cm</code> by
+convention always requires two parameters, the vertical and horizontal goal
+positions, so this string specifies the encoding of two parameters.  Here
+<code>%i</code> increments the two values supplied, and each <code>%d</code> encodes
+one of the values in decimal.  If the cursor position values 20,58 are
+encoded with this string, the result is <code>\E[21;59H</code>.
+
+<p>First, here are the <code>%</code>-sequences that generate output.  Except for
+<code>%%</code>, each of them encodes one parameter and advances the pointer
+to the following parameter.
+
+<dl>
+<dt><code>%%</code>
+<dd>Output a single <code>%</code>.  This is the only way to represent a literal
+<code>%</code> in a terminal command with parameters.  <code>%%</code> does not
+use up a parameter.
+
+<br><dt><code>%d</code>
+<dd>As in <code>printf</code>, output the next parameter in decimal.
+
+<br><dt><code>%2</code>
+<dd>Like <code>%02d</code> in <code>printf</code>: output the next parameter in
+decimal, and always use at least two digits.
+
+<br><dt><code>%3</code>
+<dd>Like <code>%03d</code> in <code>printf</code>: output the next parameter in
+decimal, and always use at least three digits.  Note that <code>%4</code>
+and so on are <em>not</em> defined.
+
+<br><dt><code>%.</code>
+<dd>Output the next parameter as a single character whose ASCII code is
+the parameter value.  Like <code>%c</code> in <code>printf</code>.
+
+<br><dt><code>%+<var>char</var></code>
+<dd>Add the next parameter to the character <var>char</var>, and output the
+resulting character.  For example, <code>%+ </code> represents 0 as a space,
+1 as <code>!</code>, etc. 
+</dl>
+
+<p>The following <code>%</code>-sequences specify alteration of the parameters
+(their values, or their order) rather than encoding a parameter for output. 
+They generate no output; they are used only for their side effects
+on the parameters.  Also, they do not advance the "next parameter" pointer
+except as explicitly stated.  Only <code>%i</code>, <code>%r</code> and <code>%&gt;</code> are
+defined in standard Unix termcap.  The others are GNU extensions.
+
+<dl>
+<dt><code>%i</code>
+<dd>Increment the next two parameters.  This is used for terminals that
+expect cursor positions in origin 1.  For example, <code>%i%d,%d</code> would
+output two parameters with <code>1</code> for 0, <code>2</code> for 1, etc.
+
+<br><dt><code>%r</code>
+<dd>Interchange the next two parameters.  This is used for terminals whose
+cursor positioning command expects the horizontal position first.
+
+<br><dt><code>%s</code>
+<dd>Skip the next parameter.  Do not output anything.
+
+<br><dt><code>%b</code>
+<dd>Back up one parameter.  The last parameter used will become once again
+the next parameter to be output, and the next output command will use
+it.  Using <code>%b</code> more than once, you can back up any number of
+parameters, and you can refer to each parameter any number of times.
+
+<br><dt><code>%&gt;<var>c1</var><var>c2</var></code>
+<dd>Conditionally increment the next parameter.  Here <var>c1</var> and
+<var>c2</var> are characters which stand for their ASCII codes as numbers. 
+If the next parameter is greater than the ASCII code of <var>c1</var>, the
+ASCII code of <var>c2</var> is added to it.
+
+<br><dt><code>%a <var>op</var> <var>type</var> <var>pos</var></code>
+<dd>Perform arithmetic on the next parameter, do not use it up, and do not
+output anything.  Here <var>op</var> specifies the arithmetic operation,
+while <var>type</var> and <var>pos</var> together specify the other operand.
+
+<p>Spaces are used above to separate the operands for clarity; the spaces
+don't appear in the data base, where this sequence is exactly five
+characters long.
+
+<p>The character <var>op</var> says what kind of arithmetic operation to
+perform.  It can be any of these characters:
+
+<dl>
+<dt><code>=</code>
+<dd>assign a value to the next parameter, ignoring its old value. 
+The new value comes from the other operand.
+
+<br><dt><code>+</code>
+<dd>add the other operand to the next parameter.
+
+<br><dt><code>-</code>
+<dd>subtract the other operand from the next parameter.
+
+<br><dt><code>*</code>
+<dd>multiply the next parameter by the other operand.
+
+<br><dt><code>/</code>
+<dd>divide the next parameter by the other operand. 
+</dl>
+
+<p>The "other operand" may be another parameter's value or a constant;
+the character <var>type</var> says which.  It can be:
+
+<dl>
+<dt><code>p</code>
+<dd>Use another parameter.  The character <var>pos</var> says which
+parameter to use.  Subtract 64 from its ASCII code to get the
+position of the desired parameter relative to this one.  Thus,
+the character <code>A</code> as <var>pos</var> means the parameter after the
+next one; the character <code>?</code> means the parameter before the
+next one.
+
+<br><dt><code>c</code>
+<dd>Use a constant value.  The character <var>pos</var> specifies the
+value of the constant.  The 0200 bit is cleared out, so that 0200
+can be used to represent zero. 
+</dl>
+</dl>
+
+<p>The following <code>%</code>-sequences are special purpose hacks to compensate
+for the weird designs of obscure terminals.  They modify the next parameter
+or the next two parameters but do not generate output and do not use up any
+parameters.  <code>%m</code> is a GNU extension; the others are defined in
+standard Unix termcap.
+
+<dl>
+<dt><code>%n</code>
+<dd>Exclusive-or the next parameter with 0140, and likewise the parameter
+after next.
+
+<br><dt><code>%m</code>
+<dd>Complement all the bits of the next parameter and the parameter after next.
+
+<br><dt><code>%B</code>
+<dd>Encode the next parameter in BCD.  It alters the value of the
+parameter by adding six times the quotient of the parameter by ten. 
+Here is a C statement that shows how the new value is computed:
+
+<br><pre><var>parm</var> = (<var>parm</var> / 10) * 16 + <var>parm</var> % 10;
+</pre>
+
+<br><dt><code>%D</code>
+<dd>Transform the next parameter as needed by Delta Data terminals. 
+This involves subtracting twice the remainder of the parameter by 16.
+
+<br><pre><var>parm</var> -= 2 * (<var>parm</var> % 16);
+</pre>
+</dl>
+
+<p><hr>
+Node:<a name="Using%20Parameters">Using Parameters</a>,
+Previous:<a rel=previous href="#Encode%20Parameters">Encode Parameters</a>,
+Up:<a rel=up href="#Parameters">Parameters</a>
+<br>
+
+<h4>1.6.2 Sending Display Commands with Parameters</h4>
+
+<p>The termcap library functions <code>tparam</code> and <code>tgoto</code> serve as the
+analog of <code>printf</code> for terminal string parameters.  The newer function
+<code>tparam</code> is a GNU extension, more general but missing from Unix
+termcap.  The original parameter-encoding function is <code>tgoto</code>, which
+is preferable for cursor motion.
+
+<ul>
+<li><a href="#tparam">tparam</a>:       The general case, for GNU termcap only. 
+<li><a href="#tgoto">tgoto</a>:        The special case of cursor motion. 
+</ul>
+
+<p><hr>
+Node:<a name="tparam">tparam</a>,
+Next:<a rel=next href="#tgoto">tgoto</a>,
+Up:<a rel=up href="#Using%20Parameters">Using Parameters</a>
+<br>
+
+<h5>1.6.2.1 <code>tparam</code></h5>
+
+<p>The function <code>tparam</code> can encode display commands with any number of
+parameters and allows you to specify the buffer space.  It is the preferred
+function for encoding parameters for all but the <code>cm</code> capability.  Its
+ANSI C declaration is as follows:
+
+<br><pre>char *tparam (char *<var>ctlstring</var>, char *<var>buffer</var>, int <var>size</var>, int <var>parm1</var>,...)
+</pre>
+
+<p>The arguments are a control string <var>ctlstring</var> (the value of a terminal
+capability, presumably), an output buffer <var>buffer</var> and <var>size</var>, and
+any number of integer parameters to be encoded.  The effect of
+<code>tparam</code> is to copy the control string into the buffer, encoding
+parameters according to the <code>%</code> sequences in the control string.
+
+<p>You describe the output buffer by its address, <var>buffer</var>, and its size
+in bytes, <var>size</var>.  If the buffer is not big enough for the data to be
+stored in it, <code>tparam</code> calls <code>malloc</code> to get a larger buffer.  In
+either case, <code>tparam</code> returns the address of the buffer it ultimately
+uses.  If the value equals <var>buffer</var>, your original buffer was used. 
+Otherwise, a new buffer was allocated, and you must free it after you are
+done with printing the results.  If you pass zero for <var>size</var> and
+<var>buffer</var>, <code>tparam</code> always allocates the space with <code>malloc</code>.
+
+<p>All capabilities that require parameters also have the ability to specify
+padding, so you should use <code>tputs</code> to output the string produced by
+<code>tparam</code>.  See <a href="#Padding">Padding</a>.  Here is an example.
+
+<br><pre>{
+char *buf;
+char buffer[40];
+
+buf = tparam (command, buffer, 40, parm);
+tputs (buf, 1, fputchar);
+if (buf != buffer)
+free (buf);
+}
+</pre>
+
+<p>If a parameter whose value is zero is encoded with <code>%.</code>-style
+encoding, the result is a null character, which will confuse <code>tputs</code>. 
+This would be a serious problem, but luckily <code>%.</code> encoding is used
+only by a few old models of terminal, and only for the <code>cm</code>
+capability.  To solve the problem, use <code>tgoto</code> rather than
+<code>tparam</code> to encode the <code>cm</code> capability.
+
+<p><hr>
+Node:<a name="tgoto">tgoto</a>,
+Previous:<a rel=previous href="#tparam">tparam</a>,
+Up:<a rel=up href="#Using%20Parameters">Using Parameters</a>
+<br>
+
+<h5>1.6.2.2 <code>tgoto</code></h5>
+
+<p>The special case of cursor motion is handled by <code>tgoto</code>.  There
+are two reasons why you might choose to use <code>tgoto</code>:
+
+<ul>
+<li>For Unix compatibility, because Unix termcap does not have <code>tparam</code>.
+
+<li>For the <code>cm</code> capability, since <code>tgoto</code> has a special feature
+to avoid problems with null characters, tabs and newlines on certain old
+terminal types that use <code>%.</code> encoding for that capability. 
+</ul>
+
+<p>Here is how <code>tgoto</code> might be declared in ANSI C:
+
+<br><pre>char *tgoto (char *<var>cstring</var>, int <var>hpos</var>, int <var>vpos</var>)
+</pre>
+
+<p>There are three arguments, the terminal description's <code>cm</code> string and
+the two cursor position numbers; <code>tgoto</code> computes the parametrized
+string in an internal static buffer and returns the address of that buffer. 
+The next time you use <code>tgoto</code> the same buffer will be reused.
+
+<p>Parameters encoded with <code>%.</code> encoding can generate null characters,
+tabs or newlines.  These might cause trouble: the null character because
+<code>tputs</code> would think that was the end of the string, the tab because
+the kernel or other software might expand it into spaces, and the newline
+becaue the kernel might add a carriage-return, or padding characters
+normally used for a newline.  To prevent such problems, <code>tgoto</code> is
+careful to avoid these characters.  Here is how this works: if the target
+cursor position value is such as to cause a problem (that is to say, zero,
+nine or ten), <code>tgoto</code> increments it by one, then compensates by
+appending a string to move the cursor back or up one position.
+
+<p>The compensation strings to use for moving back or up are found in global
+variables named <code>BC</code> and <code>UP</code>.  These are actual external C
+variables with upper case names; they are declared <code>char *</code>.  It is up
+to you to store suitable values in them, normally obtained from the
+<code>le</code> and <code>up</code> terminal capabilities in the terminal description
+with <code>tgetstr</code>.  Alternatively, if these two variables are both zero,
+the feature of avoiding nulls, tabs and newlines is turned off.
+
+<p>It is safe to use <code>tgoto</code> for commands other than <code>cm</code> only if
+you have stored zero in <code>BC</code> and <code>UP</code>.
+
+<p>Note that <code>tgoto</code> reverses the order of its operands: the horizontal
+position comes before the vertical position in the arguments to
+<code>tgoto</code>, even though the vertical position comes before the horizontal
+in the parameters of the <code>cm</code> string.  If you use <code>tgoto</code> with a
+command such as <code>AL</code> that takes one parameter, you must pass the
+parameter to <code>tgoto</code> as the "vertical position".
+
+<p><hr>
+Node:<a name="Data%20Base">Data Base</a>,
+Next:<a rel=next href="#Capabilities">Capabilities</a>,
+Previous:<a rel=previous href="#Library">Library</a>,
+Up:<a rel=up href="#Top">Top</a>
+<br>
+
+<h2>2 The Format of the Data Base</h2>
+
+<p>The termcap data base of terminal descriptions is stored in the file
+<code>/etc/termcap</code>.  It contains terminal descriptions, blank lines, and
+comments.
+
+<p>A terminal description starts with one or more names for the terminal type. 
+The information in the description is a series of <dfn>capability names</dfn>
+and values.  The capability names have standard meanings
+(see <a href="#Capabilities">Capabilities</a>) and their values describe the terminal.
+
+<ul>
+<li><a href="#Format">Format</a>:       Overall format of a terminal description. 
+<li><a href="#Capability%20Format">Capability Format</a>:   Format of capabilities within a description. 
+<li><a href="#Naming">Naming</a>:       Naming conventions for terminal types. 
+<li><a href="#Inheriting">Inheriting</a>:   Inheriting part of a description from
+a related terminal type. 
+<li><a href="#Changing">Changing</a>:     When changes in the data base take effect. 
+</ul>
+
+<p><hr>
+Node:<a name="Format">Format</a>,
+Next:<a rel=next href="#Capability%20Format">Capability Format</a>,
+Up:<a rel=up href="#Data%20Base">Data Base</a>
+<br>
+
+<h3>2.1 Terminal Description Format</h3>
+
+<p>Aside from comments (lines starting with <code>#</code>, which are ignored), each
+nonblank line in the termcap data base is a terminal description. 
+A terminal description is nominally a single line, but it can be split
+into multiple lines by inserting the two characters <code>\ newline</code>. 
+This sequence is ignored wherever it appears in a description.
+
+<p>The preferred way to split the description is between capabilities: insert
+the four characters <code>: \ newline tab</code> immediately before any colon. 
+This allows each sub-line to start with some indentation.  This works
+because, after the <code>\ newline</code> are ignored, the result is <code>: tab
+:</code>; the first colon ends the preceding capability and the second colon
+starts the next capability.  If you split with <code>\ newline</code> alone, you
+may not add any indentation after them.
+
+<p>Here is a real example of a terminal description:
+
+<br><pre>dw|vt52|DEC vt52:\
+        :cr=^M:do=^J:nl=^J:bl=^G:\
+        :le=^H:bs:cd=\EJ:ce=\EK:cl=\EH\EJ:\
+        :cm=\EY%+ %+ :co#80:li#24:\
+        :nd=\EC:ta=^I:pt:sr=\EI:up=\EA:\
+        :ku=\EA:kd=\EB:kr=\EC:kl=\ED:kb=^H:
+</pre>
+
+<p>Each terminal description begins with several names for the terminal type. 
+The names are separated by <code>|</code> characters, and a colon ends the last
+name.  The first name should be two characters long; it exists only for the
+sake of very old Unix systems and is never used in modern systems.  The
+last name should be a fully verbose name such as "DEC vt52" or "Ann
+Arbor Ambassador with 48 lines".  The other names should include whatever
+the user ought to be able to specify to get this terminal type, such as
+<code>vt52</code> or <code>aaa-48</code>.  See <a href="#Naming">Naming</a>, for information on how to
+choose terminal type names.
+
+<p>After the terminal type names come the terminal capabilities, separated by
+colons and with a colon after the last one.  Each capability has a
+two-letter name, such as <code>cm</code> for "cursor motion string" or <code>li</code>
+for "number of display lines".
+
+<p><hr>
+Node:<a name="Capability%20Format">Capability Format</a>,
+Next:<a rel=next href="#Naming">Naming</a>,
+Previous:<a rel=previous href="#Format">Format</a>,
+Up:<a rel=up href="#Data%20Base">Data Base</a>
+<br>
+
+<h3>2.2 Writing the Capabilities</h3>
+
+<p>There are three kinds of capabilities: flags, numbers, and strings.  Each
+kind has its own way of being written in the description.  Each defined
+capability has by convention a particular kind of value; for example,
+<code>li</code> always has a numeric value and <code>cm</code> always a string value.
+
+<p>A flag capability is thought of as having a boolean value: the value is
+true if the capability is present, false if not.  When the capability is
+present, just write its name between two colons.
+
+<p>A numeric capability has a value which is a nonnegative number.  Write the
+capability name, a <code>#</code>, and the number, between two colons.  For
+example, <code><small>...</small>:li#48:<small>...</small></code> is how you specify the <code>li</code>
+capability for 48 lines.
+
+<p>A string-valued capability has a value which is a sequence of characters. 
+Usually these are the characters used to perform some display operation. 
+Write the capability name, a <code>=</code>, and the characters of the value,
+between two colons.  For example, <code><small>...</small>:cm=\E[%i%d;%dH:<small>...</small></code> is
+how the cursor motion command for a standard ANSI terminal would be
+specified.
+
+<p>Special characters in the string value can be expressed using
+<code>\</code>-escape sequences as in C; in addition, <code>\E</code> stands for
+&lt;ESC&gt;.  <code>^</code> is also a kind of escape character; <code>^</code> followed
+by <var>char</var> stands for the control-equivalent of <var>char</var>.  Thus,
+<code>^a</code> stands for the character control-a, just like <code>\001</code>. 
+<code>\</code> and <code>^</code> themselves can be represented as <code>\\</code> and
+<code>\^</code>.
+
+<p>To include a colon in the string, you must write <code>\072</code>.  You might
+ask, "Why can't <code>\:</code> be used to represent a colon?"  The reason is
+that the interrogation functions do not count slashes while looking for a
+capability.  Even if <code>:ce=ab\:cd:</code> were interpreted as giving the
+<code>ce</code> capability the value <code>ab:cd</code>, it would also appear to define
+<code>cd</code> as a flag.
+
+<p>The string value will often contain digits at the front to specify padding
+(see <a href="#Padding">Padding</a>) and/or <code>%</code>-sequences within to specify how to encode
+parameters (see <a href="#Parameters">Parameters</a>).  Although these things are not to be
+output literally to the terminal, they are considered part of the value of
+the capability.  They are special only when the string value is processed
+by <code>tputs</code>, <code>tparam</code> or <code>tgoto</code>.  By contrast, <code>\</code> and
+<code>^</code> are considered part of the syntax for specifying the characters
+in the string.
+
+<p>Let's look at the VT52 example again:
+
+<br><pre>dw|vt52|DEC vt52:\
+        :cr=^M:do=^J:nl=^J:bl=^G:\
+        :le=^H:bs:cd=\EJ:ce=\EK:cl=\EH\EJ:\
+        :cm=\EY%+ %+ :co#80:li#24:\
+        :nd=\EC:ta=^I:pt:sr=\EI:up=\EA:\
+        :ku=\EA:kd=\EB:kr=\EC:kl=\ED:kb=^H:
+</pre>
+
+<p>Here we see the numeric-valued capabilities <code>co</code> and <code>li</code>, the
+flags <code>bs</code> and <code>pt</code>, and many string-valued capabilities.  Most
+of the strings start with &lt;ESC&gt; represented as <code>\E</code>.  The rest
+contain control characters represented using <code>^</code>.  The meanings of the
+individual capabilities are defined elsewhere (see <a href="#Capabilities">Capabilities</a>).
+
+<p><hr>
+Node:<a name="Naming">Naming</a>,
+Next:<a rel=next href="#Inheriting">Inheriting</a>,
+Previous:<a rel=previous href="#Capability%20Format">Capability Format</a>,
+Up:<a rel=up href="#Data%20Base">Data Base</a>
+<br>
+
+<h3>2.3 Terminal Type Name Conventions</h3>
+
+<p>There are conventions for choosing names of terminal types.  For one thing,
+all letters should be in lower case.  The terminal type for a terminal in
+its most usual or most fundamental mode of operation should not have a
+hyphen in it.
+
+<p>If the same terminal has other modes of operation which require
+different terminal descriptions, these variant descriptions are given
+names made by adding suffixes with hyphens.  Such alternate descriptions
+are used for two reasons:
+
+<ul>
+<li>When the terminal has a switch that changes its behavior.  Since the
+computer cannot tell how the switch is set, the user must tell the
+computer by choosing the appropriate terminal type name.
+
+<p>For example, the VT-100 has a setup flag that controls whether the
+cursor wraps at the right margin.  If this flag is set to "wrap",
+you must use the terminal type <code>vt100-am</code>.  Otherwise you must
+use <code>vt100-nam</code>.  Plain <code>vt100</code> is defined as a synonym for
+either <code>vt100-am</code> or <code>vt100-nam</code> depending on the
+preferences of the local site.
+
+<p>The standard suffix <code>-am</code> stands for "automatic margins".
+
+</p><li>To give the user a choice in how to use the terminal.  This is done
+when the terminal has a switch that the computer normally controls.
+
+<p>For example, the Ann Arbor Ambassador can be configured with many
+screen sizes ranging from 20 to 60 lines.  Fewer lines make bigger
+characters but more lines let you see more of what you are editing. 
+As a result, users have different preferences.  Therefore, termcap
+provides terminal types for many screen sizes.  If you choose type
+<code>aaa-30</code>, the terminal will be configured to use 30 lines; if you
+choose <code>aaa-48</code>, 48 lines will be used, and so on. 
+</ul>
+
+<p>Here is a list of standard suffixes and their conventional meanings:
+
+<dl>
+<dt><code>-w</code>
+<dd>Short for "wide".  This is a mode that gives the terminal more
+columns than usual.  This is normally a user option.
+
+<br><dt><code>-am</code>
+<dd>"Automatic margins".  This is an alternate description for use when
+the terminal's margin-wrap switch is on; it contains the <code>am</code>
+flag.  The implication is that normally the switch is off and the
+usual description for the terminal says that the switch is off.
+
+<br><dt><code>-nam</code>
+<dd>"No automatic margins".  The opposite of <code>-am</code>, this names an
+alternative description which lacks the <code>am</code> flag.  This implies
+that the terminal is normally operated with the margin-wrap switch
+turned on, and the normal description of the terminal says so.
+
+<br><dt><code>-na</code>
+<dd>"No arrows".  This terminal description initializes the terminal to
+keep its arrow keys in local mode.  This is a user option.
+
+<br><dt><code>-rv</code>
+<dd>"Reverse video".  This terminal description causes text output for
+normal video to appear as reverse, and text output for reverse video
+to come out as normal.  Often this description differs from the usual
+one by interchanging the two strings which turn reverse video on and
+off.
+
+<p>This is a user option; you can choose either the "reverse video"
+variant terminal type or the normal terminal type, and termcap will
+obey.
+
+<br><dt><code>-s</code>
+<dd>"Status".  Says to enable use of a status line which ordinary output
+does not touch (see <a href="#Status%20Line">Status Line</a>).
+
+<p>Some terminals have a special line that is used only as a status line. 
+For these terminals, there is no need for an <code>-s</code> variant; the
+status line commands should be defined by default.  On other
+terminals, enabling a status line means removing one screen line from
+ordinary use and reducing the effective screen height.  For these
+terminals, the user can choose the <code>-s</code> variant type to request
+use of a status line.
+
+<br><dt><code>-<var>nlines</var></code>
+<dd>Says to operate with <var>nlines</var> lines on the screen, for terminals
+such as the Ambassador which provide this as an option.  Normally this
+is a user option; by choosing the terminal type, you control how many
+lines termcap will use.
+
+<br><dt><code>-<var>npages</var>p</code>
+<dd>Says that the terminal has <var>npages</var> pages worth of screen memory,
+for terminals where this is a hardware option.
+
+<br><dt><code>-unk</code>
+<dd>Says that description is not for direct use, but only for reference in
+<code>tc</code> capabilities.  Such a description is a kind of subroutine,
+because it describes the common characteristics of several variant
+descriptions that would use other suffixes in place of <code>-unk</code>. 
+</dl>
+
+<p><hr>
+Node:<a name="Inheriting">Inheriting</a>,
+Next:<a rel=next href="#Changing">Changing</a>,
+Previous:<a rel=previous href="#Naming">Naming</a>,
+Up:<a rel=up href="#Data%20Base">Data Base</a>
+<br>
+
+<h3>2.4 Inheriting from Related Descriptions</h3>
+
+<p>When two terminal descriptions are similar, their identical parts do not
+need to be given twice.  Instead, one of the two can be defined in terms of
+the other, using the <code>tc</code> capability.  We say that one description
+<dfn>refers to</dfn> the other, or <dfn>inherits from</dfn> the other.
+
+<p>The <code>tc</code> capability must be the last one in the terminal description,
+and its value is a string which is the name of another terminal type which
+is referred to.  For example,
+
+<br><pre>N9|aaa|ambassador|aaa-30|ann arbor ambassador/30 lines:\
+        :ti=\E[2J\E[30;0;0;30p:\
+        :te=\E[60;0;0;30p\E[30;1H\E[J:\
+        :li#30:tc=aaa-unk:
+</pre>
+
+<p>defines the terminal type <code>aaa-30</code> (also known as plain <code>aaa</code>) in
+terms of <code>aaa-unk</code>, which defines everything about the Ambassador that
+is independent of screen height.  The types <code>aaa-36</code>, <code>aaa-48</code>
+and so on for other screen heights are likewise defined to inherit from
+<code>aaa-unk</code>.
+
+<p>The capabilities overridden by <code>aaa-30</code> include <code>li</code>, which says
+how many lines there are, and <code>ti</code> and <code>te</code>, which configure the
+terminal to use that many lines.
+
+<p>The effective terminal description for type <code>aaa</code> consists of the text
+shown above followed by the text of the description of <code>aaa-unk</code>.  The
+<code>tc</code> capability is handled automatically by <code>tgetent</code>, which
+finds the description thus referenced and combines the two descriptions
+(see <a href="#Find">Find</a>).  Therefore, only the implementor of the terminal
+descriptions needs to think about using <code>tc</code>.  Users and application
+programmers do not need to be concerned with it.
+
+<p>Since the reference terminal description is used last, capabilities
+specified in the referring description override any specifications of the
+same capabilities in the reference description.
+
+<p>The referring description can cancel out a capability without specifying
+any new value for it by means of a special trick.  Write the capability in
+the referring description, with the character <code>@</code> after the capability
+name, as follows:
+
+<br><pre>NZ|aaa-30-nam|ann arbor ambassador/30 lines/no automatic-margins:\
+        :am@:tc=aaa-30:
+</pre>
+
+<p><hr>
+Node:<a name="Changing">Changing</a>,
+Previous:<a rel=previous href="#Inheriting">Inheriting</a>,
+Up:<a rel=up href="#Data%20Base">Data Base</a>
+<br>
+
+<h3>2.5 When Changes in the Data Base Take Effect</h3>
+
+<p>Each application program must read the terminal description from the
+data base, so a change in the data base is effective for all jobs started
+after the change is made.
+
+<p>The change will usually have no effect on a job that have been in existence
+since before the change. The program probably read the terminal description
+once, when it was started, and is continuing to use what it read then. 
+If the program does not have a feature for reexamining the data base, then
+you will need to run it again (probably killing the old job).
+
+<p>If the description in use is coming from the <code>TERMCAP</code> environment
+variable, then the data base file is effectively overridden, and changes in
+it will have no effect until you change the <code>TERMCAP</code> variable as
+well.  For example, some users' <code>.login</code> files automatically copy the
+terminal description into <code>TERMCAP</code> to speed startup of applications. 
+If you have done this, you will need to change the <code>TERMCAP</code> variable
+to make the changed data base take effect.
+
+<p><hr>
+Node:<a name="Capabilities">Capabilities</a>,
+Next:<a rel=next href="#Summary">Summary</a>,
+Previous:<a rel=previous href="#Data%20Base">Data Base</a>,
+Up:<a rel=up href="#Top">Top</a>
+<br>
+
+<h2>3 Definitions of the Terminal Capabilities</h2>
+
+<p>This section is divided into many subsections, each for one aspect of
+use of display terminals.  For writing a display program, you usually need
+only check the subsections for the operations you want to use.  For writing
+a terminal description, you must read each subsection and fill in the
+capabilities described there.
+
+<p>String capabilities that are display commands may require numeric
+parameters (see <a href="#Parameters">Parameters</a>).  Most such capabilities do not use
+parameters.  When a capability requires parameters, this is explicitly
+stated at the beginning of its definition.  In simple cases, the first or
+second sentence of the definition mentions all the parameters, in the order
+they should be given, using a name
+for each one.  For example, the <code>rp</code> capability is a command that
+requires two parameters; its definition begins as follows:
+
+<blockquote>
+String of commands to output a graphic character <var>c</var>, repeated <var>n</var>
+times. 
+</blockquote>
+
+<p>In complex cases or when there are many parameters, they are described
+explicitly.
+
+<p>When a capability is described as obsolete, this means that programs should
+not be written to look for it, but terminal descriptions should still be
+written to provide it.
+
+<p>When a capability is described as very obsolete, this means that it should
+be omitted from terminal descriptions as well.
+
+<ul>
+<li><a href="#Basic">Basic</a>:        Basic characteristics. 
+<li><a href="#Screen%20Size">Screen Size</a>:   Screen size, and what happens when it changes. 
+<li><a href="#Cursor%20Motion">Cursor Motion</a>:   Various ways to move the cursor. 
+<li><a href="#Wrapping">Wrapping</a>:     What happens if you write a character in the last column. 
+<li><a href="#Scrolling">Scrolling</a>:    Pushing text up and down on the screen. 
+<li><a href="#Windows">Windows</a>:      Limiting the part of the window that output affects. 
+<li><a href="#Clearing">Clearing</a>:     Erasing one or many lines. 
+<li><a href="#Insdel%20Line">Insdel Line</a>:   Making new blank lines in mid-screen; deleting lines. 
+<li><a href="#Insdel%20Char">Insdel Char</a>:   Inserting and deleting characters within a line. 
+<li><a href="#Standout">Standout</a>:     Highlighting some of the text. 
+<li><a href="#Underlining">Underlining</a>:   Underlining some of the text. 
+<li><a href="#Cursor%20Visibility">Cursor Visibility</a>:   Making the cursor more or less easy to spot. 
+<li><a href="#Bell">Bell</a>:         Attracts user's attention; not localized on the screen. 
+<li><a href="#Keypad">Keypad</a>:       Recognizing when function keys or arrows are typed. 
+<li><a href="#Meta%20Key">Meta Key</a>:     &lt;META&gt; acts like an extra shift key. 
+<li><a href="#Initialization">Initialization</a>:   Commands used to initialize or reset the terminal. 
+<li><a href="#Pad%20Specs">Pad Specs</a>:    Info for the kernel on how much padding is needed. 
+<li><a href="#Status%20Line">Status Line</a>:   A status line displays ``background'' information. 
+<li><a href="#Half-Line">Half-Line</a>:    Moving by half-lines, for superscripts and subscripts. 
+<li><a href="#Printer">Printer</a>:      Controlling auxiliary printers of display terminals. 
+</ul>
+
+<p><hr>
+Node:<a name="Basic">Basic</a>,
+Next:<a rel=next href="#Screen%20Size">Screen Size</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.1 Basic Characteristics</h3>
+
+<p>This section documents the capabilities that describe the basic and
+nature of the terminal, and also those that are relevant to the output
+of graphic characters.
+
+<dl>
+<dt><code>os</code>
+<dd>Flag whose presence means that the terminal can overstrike.  This
+means that outputting a graphic character does not erase whatever was
+present in the same character position before.  The terminals that can
+overstrike include printing terminals, storage tubes (all obsolete
+nowadays), and many bit-map displays.
+
+<br><dt><code>eo</code>
+<dd>Flag whose presence means that outputting a space erases a character
+position even if the terminal supports overstriking.  If this flag is
+not present and overstriking is supported, output of a space has no
+effect except to move the cursor.
+
+<p>(On terminals that do not support overstriking, you can always assume
+that outputting a space at a position erases whatever character was
+previously displayed there.)
+
+<br><dt><code>gn</code>
+<dd>Flag whose presence means that this terminal type is a generic type
+which does not really describe any particular terminal.  Generic types
+are intended for use as the default type assigned when the user
+connects to the system, with the intention that the user should
+specify what type he really has.  One example of a generic type
+is the type <code>network</code>.
+
+<p>Since the generic type cannot say how to do anything interesting with
+the terminal, termcap-using programs will always find that the
+terminal is too weak to be supported if the user has failed to specify
+a real terminal type in place of the generic one.  The <code>gn</code> flag
+directs these programs to use a different error message: "You have
+not specified your real terminal type", rather than "Your terminal
+is not powerful enough to be used".
+
+<br><dt><code>hc</code>
+<dd>Flag whose presence means this is a hardcopy terminal.
+
+<br><dt><code>rp</code>
+<dd>String of commands to output a graphic character <var>c</var>, repeated <var>n</var>
+times.  The first parameter value is the ASCII code for the desired
+character, and the second parameter is the number of times to repeat the
+character.  Often this command requires padding proportional to the
+number of times the character is repeated.  This effect can be had by
+using parameter arithmetic with <code>%</code>-sequences to compute the
+amount of padding, then generating the result as a number at the front
+of the string so that <code>tputs</code> will treat it as padding.
+
+<br><dt><code>hz</code>
+<dd>Flag whose presence means that the ASCII character <code>~</code> cannot be
+output on this terminal because it is used for display commands.
+
+<p>Programs handle this flag by checking all text to be output and
+replacing each <code>~</code> with some other character(s).  If this is not
+done, the screen will be thoroughly garbled.
+
+<p>The old Hazeltine terminals that required such treatment are probably
+very rare today, so you might as well not bother to support this flag.
+
+<br><dt><code>CC</code>
+<dd>String whose presence means the terminal has a settable command
+character.  The value of the string is the default command character
+(which is usually &lt;ESC&gt;).
+
+<p>All the strings of commands in the terminal description should be
+written to use the default command character.  If you are writing an
+application program that changes the command character, use the
+<code>CC</code> capability to figure out how to translate all the display
+commands to work with the new command character.
+
+<p>Most programs have no reason to look at the <code>CC</code> capability.
+
+<br><dt><code>xb</code>
+<dd>Flag whose presence identifies Superbee terminals which are unable to
+transmit the characters &lt;ESC&gt; and <kbd>Control-C</kbd>.  Programs which
+support this flag are supposed to check the input for the code sequences
+sent by the &lt;F1&gt; and &lt;F2&gt; keys, and pretend that &lt;ESC&gt;
+or <kbd>Control-C</kbd> (respectively) had been read.  But this flag is
+obsolete, and not worth supporting. 
+</dl>
+
+<p><hr>
+Node:<a name="Screen%20Size">Screen Size</a>,
+Next:<a rel=next href="#Cursor%20Motion">Cursor Motion</a>,
+Previous:<a rel=previous href="#Basic">Basic</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.2 Screen Size</h3>
+
+<p>A terminal description has two capabilities, <code>co</code> and <code>li</code>,
+that describe the screen size in columns and lines.  But there is more
+to the question of screen size than this.
+
+<p>On some operating systems the "screen" is really a window and the
+effective width can vary.  On some of these systems, <code>tgetnum</code>
+uses the actual width of the window to decide what value to return for
+the <code>co</code> capability, overriding what is actually written in the
+terminal description.  On other systems, it is up to the application
+program to check the actual window width using a system call.  For
+example, on BSD 4.3 systems, the system call <code>ioctl</code> with code
+<code>TIOCGWINSZ</code> will tell you the current screen size.
+
+<p>On all window systems, termcap is powerless to advise the application
+program if the user resizes the window.  Application programs must
+deal with this possibility in a system-dependent fashion.  On some
+systems the C shell handles part of the problem by detecting changes
+in window size and setting the <code>TERMCAP</code> environment variable
+appropriately.  This takes care of application programs that are
+started subsequently.  It does not help application programs already
+running.
+
+<p>On some systems, including BSD 4.3, all programs using a terminal get
+a signal named <code>SIGWINCH</code> whenever the screen size changes. 
+Programs that use termcap should handle this signal by using
+<code>ioctl TIOCGWINSZ</code> to learn the new screen size.
+
+<dl>
+<dt><code>co</code>
+<dd>Numeric value, the width of the screen in character positions.  Even
+hardcopy terminals normally have a <code>co</code> capability.
+
+<br><dt><code>li</code>
+<dd>Numeric value, the height of the screen in lines. 
+</dl>
+
+<p><hr>
+Node:<a name="Cursor%20Motion">Cursor Motion</a>,
+Next:<a rel=next href="#Wrapping">Wrapping</a>,
+Previous:<a rel=previous href="#Screen%20Size">Screen Size</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.3 Cursor Motion</h3>
+
+<p>Termcap assumes that the terminal has a <dfn>cursor</dfn>, a spot on the screen
+where a visible mark is displayed, and that most display commands take
+effect at the position of the cursor.  It follows that moving the cursor
+to a specified location is very important.
+
+<p>There are many terminal capabilities for different cursor motion
+operations.  A terminal description should define as many as possible, but
+most programs do not need to use most of them.  One capability, <code>cm</code>,
+moves the cursor to an arbitrary place on the screen; this by itself is
+sufficient for any application as long as there is no need to support
+hardcopy terminals or certain old, weak displays that have only relative
+motion commands.  Use of other cursor motion capabilities is an
+optimization, enabling the program to output fewer characters in some
+common cases.
+
+<p>If you plan to use the relative cursor motion commands in an application
+program, you must know what the starting cursor position is.  To do this,
+you must keep track of the cursor position and update the records each
+time anything is output to the terminal, including graphic characters. 
+In addition, it is necessary to know whether the terminal wraps after
+writing in the rightmost column.  See <a href="#Wrapping">Wrapping</a>.
+
+<p>One other motion capability needs special mention: <code>nw</code> moves the
+cursor to the beginning of the following line, perhaps clearing all the
+starting line after the cursor, or perhaps not clearing at all.  This
+capability is a least common denominator that is probably supported even by
+terminals that cannot do most other things such as <code>cm</code> or <code>do</code>. 
+Even hardcopy terminals can support <code>nw</code>.
+
+<dl>
+<dt><code>cm</code>
+<dd>String of commands to position the cursor at line <var>l</var>, column <var>c</var>. 
+Both parameters are origin-zero, and are defined relative to the
+screen, not relative to display memory.
+
+<p>All display terminals except a few very obsolete ones support <code>cm</code>,
+so it is acceptable for an application program to refuse to operate on
+terminals lacking <code>cm</code>.
+
+<br><dt><code>ho</code>
+<dd>String of commands to move the cursor to the upper left corner of the
+screen (this position is called the <dfn>home position</dfn>).  In
+terminals where the upper left corner of the screen is not the same as
+the beginning of display memory, this command must go to the upper
+left corner of the screen, not the beginning of display memory.
+
+<p>Every display terminal supports this capability, and many application
+programs refuse to operate if the <code>ho</code> capability is missing.
+
+<br><dt><code>ll</code>
+<dd>String of commands to move the cursor to the lower left corner of the
+screen.  On some terminals, moving up from home position does this,
+but programs should never assume that will work.  Just output the
+<code>ll</code> string (if it is provided); if moving to home position and
+then moving up is the best way to get there, the <code>ll</code> command
+will do that.
+
+<br><dt><code>cr</code>
+<dd>String of commands to move the cursor to the beginning of the line it
+is on.  If this capability is not specified, many programs assume
+they can use the ASCII carriage return character for this.
+
+<br><dt><code>le</code>
+<dd>String of commands to move the cursor left one column.  Unless the
+<code>bw</code> flag capability is specified, the effect is undefined if the
+cursor is at the left margin; do not use this command there.  If
+<code>bw</code> is present, this command may be used at the left margin, and
+it wraps the cursor to the last column of the preceding line.
+
+<br><dt><code>nd</code>
+<dd>String of commands to move the cursor right one column.  The effect is
+undefined if the cursor is at the right margin; do not use this
+command there, not even if <code>am</code> is present.
+
+<br><dt><code>up</code>
+<dd>String of commands to move the cursor vertically up one line.  The
+effect of sending this string when on the top line is undefined;
+programs should never use it that way.
+
+<br><dt><code>do</code>
+<dd>String of commands to move the cursor vertically down one line.  The
+effect of sending this string when on the bottom line is undefined;
+programs should never use it that way.
+
+<p>Some programs do use <code>do</code> to scroll up one line if used at the
+bottom line, if <code>sf</code> is not defined but <code>sr</code> is.  This is
+only to compensate for certain old, incorrect terminal descriptions. 
+(In principle this might actually lead to incorrect behavior on other
+terminals, but that seems to happen rarely if ever.)  But the proper
+solution is that the terminal description should define <code>sf</code> as
+well as <code>do</code> if the command is suitable for scrolling.
+
+<p>The original idea was that this string would not contain a newline
+character and therefore could be used without disabling the kernel's
+usual habit of converting of newline into a carriage-return newline
+sequence.  But many terminal descriptions do use newline in the
+<code>do</code> string, so this is not possible; a program which sends the
+<code>do</code> string must disable output conversion in the kernel
+(see <a href="#Initialize">Initialize</a>).
+
+<br><dt><code>bw</code>
+<dd>Flag whose presence says that <code>le</code> may be used in column zero
+to move to the last column of the preceding line.  If this flag
+is not present, <code>le</code> should not be used in column zero.
+
+<br><dt><code>nw</code>
+<dd>String of commands to move the cursor to start of next line, possibly
+clearing rest of line (following the cursor) before moving.
+
+<br><dt><code>DO</code>, <code>UP</code>, <code>LE</code>, <code>RI</code>
+<dd>Strings of commands to move the cursor <var>n</var> lines down vertically,
+up vertically, or <var>n</var> columns left or right.  Do not attempt to
+move past any edge of the screen with these commands; the effect of
+trying that is undefined.  Only a few terminal descriptions provide
+these commands, and most programs do not use them.
+
+<br><dt><code>CM</code>
+<dd>String of commands to position the cursor at line <var>l</var>, column
+<var>c</var>, relative to display memory.  Both parameters are origin-zero. 
+This capability is present only in terminals where there is a
+difference between screen-relative and memory-relative addressing, and
+not even in all such terminals.
+
+<br><dt><code>ch</code>
+<dd>String of commands to position the cursor at column <var>c</var> in the
+same line it is on.  This is a special case of <code>cm</code> in which the
+vertical position is not changed.  The <code>ch</code> capability is
+provided only when it is faster to output than <code>cm</code> would be in
+this special case.  Programs should not assume most display terminals
+have <code>ch</code>.
+
+<br><dt><code>cv</code>
+<dd>String of commands to position the cursor at line <var>l</var> in the same
+column.  This is a special case of <code>cm</code> in which the horizontal
+position is not changed.  The <code>cv</code> capability is provided only
+when it is faster to output than <code>cm</code> would be in this special
+case.  Programs should not assume most display terminals have
+<code>cv</code>.
+
+<br><dt><code>sc</code>
+<dd>String of commands to make the terminal save the current cursor
+position.  Only the last saved position can be used.  If this
+capability is present, <code>rc</code> should be provided also.  Most
+terminals have neither.
+
+<br><dt><code>rc</code>
+<dd>String of commands to make the terminal restore the last saved cursor
+position.  If this capability is present, <code>sc</code> should be provided
+also.  Most terminals have neither.
+
+<br><dt><code>ff</code>
+<dd>String of commands to advance to the next page, for a hardcopy
+terminal.
+
+<br><dt><code>ta</code>
+<dd>String of commands to move the cursor right to the next hardware tab
+stop column.  Missing if the terminal does not have any kind of
+hardware tabs.  Do not send this command if the kernel's terminal
+modes say that the kernel is expanding tabs into spaces.
+
+<br><dt><code>bt</code>
+<dd>String of commands to move the cursor left to the previous hardware
+tab stop column.  Missing if the terminal has no such ability; many
+terminals do not.  Do not send this command if the kernel's terminal
+modes say that the kernel is expanding tabs into spaces. 
+</dl>
+
+<p>The following obsolete capabilities should be included in terminal
+descriptions when appropriate, but should not be looked at by new programs.
+
+<dl>
+<dt><code>nc</code>
+<dd>Flag whose presence means the terminal does not support the ASCII
+carriage return character as <code>cr</code>.  This flag is needed because
+old programs assume, when the <code>cr</code> capability is missing, that
+ASCII carriage return can be used for the purpose.  We use <code>nc</code>
+to tell the old programs that carriage return may not be used.
+
+<p>New programs should not assume any default for <code>cr</code>, so they need
+not look at <code>nc</code>.  However, descriptions should contain <code>nc</code>
+whenever they do not contain <code>cr</code>.
+
+<br><dt><code>xt</code>
+<dd>Flag whose presence means that the ASCII tab character may not be used
+for cursor motion.  This flag exists because old programs assume, when
+the <code>ta</code> capability is missing, that ASCII tab can be used for
+the purpose.  We use <code>xt</code> to tell the old programs not to use tab.
+
+<p>New programs should not assume any default for <code>ta</code>, so they need
+not look at <code>xt</code> in connection with cursor motion.  Note that
+<code>xt</code> also has implications for standout mode (see <a href="#Standout">Standout</a>). 
+It is obsolete in regard to cursor motion but not in regard to
+standout.
+
+<p>In fact, <code>xt</code> means that the terminal is a Teleray 1061.
+
+<br><dt><code>bc</code>
+<dd>Very obsolete alternative name for the <code>le</code> capability.
+
+<br><dt><code>bs</code>
+<dd>Flag whose presence means that the ASCII character backspace may be
+used to move the cursor left.  Obsolete; look at <code>le</code> instead.
+
+<br><dt><code>nl</code>
+<dd>Obsolete capability which is a string that can either be used to move
+the cursor down or to scroll.  The same string must scroll when used
+on the bottom line and move the cursor when used on any other line. 
+New programs should use <code>do</code> or <code>sf</code>, and ignore <code>nl</code>.
+
+<p>If there is no <code>nl</code> capability, some old programs assume they can
+use the newline character for this purpose.  These programs follow a
+bad practice, but because they exist, it is still desirable to define
+the <code>nl</code> capability in a terminal description if the best way to
+move down is <em>not</em> a newline. 
+</dl>
+
+<p><hr>
+Node:<a name="Wrapping">Wrapping</a>,
+Next:<a rel=next href="#Scrolling">Scrolling</a>,
+Previous:<a rel=previous href="#Cursor%20Motion">Cursor Motion</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.4 Wrapping</h3>
+
+<p><dfn>Wrapping</dfn> means moving the cursor from the right margin to the left
+margin of the following line.  Some terminals wrap automatically when a
+graphic character is output in the last column, while others do not.  Most
+application programs that use termcap need to know whether the terminal
+wraps.  There are two special flag capabilities to describe what the
+terminal does when a graphic character is output in the last column.
+
+<dl>
+<dt><code>am</code>
+<dd>Flag whose presence means that writing a character in the last column
+causes the cursor to wrap to the beginning of the next line.
+
+<p>If <code>am</code> is not present, writing in the last column leaves the
+cursor at the place where the character was written.
+
+<p>Writing in the last column of the last line should be avoided on
+terminals with <code>am</code>, as it may or may not cause scrolling to
+occur (see <a href="#Scrolling">Scrolling</a>).  Scrolling is surely not what you would
+intend.
+
+<p>If your program needs to check the <code>am</code> flag, then it also needs
+to check the <code>xn</code> flag which indicates that wrapping happens in a
+strange way.  Many common terminals have the <code>xn</code> flag.
+
+<br><dt><code>xn</code>
+<dd>Flag whose presence means that the cursor wraps in a strange way.  At
+least two distinct kinds of strange behavior are known; the termcap
+data base does not contain anything to distinguish the two.
+
+<p>On Concept-100 terminals, output in the last column wraps the cursor
+almost like an ordinary <code>am</code> terminal.  But if the next thing
+output is a newline, it is ignored.
+
+<p>DEC VT-100 terminals (when the wrap switch is on) do a different
+strange thing: the cursor wraps only if the next thing output is
+another graphic character.  In fact, the wrap occurs when the
+following graphic character is received by the terminal, before the
+character is placed on the screen.
+
+<p>On both of these terminals, after writing in the last column a
+following graphic character will be displayed in the first column of
+the following line.  But the effect of relative cursor motion
+characters such as newline or backspace at such a time depends on the
+terminal.  The effect of erase or scrolling commands also depends on
+the terminal.  You can't assume anything about what they will do on a
+terminal that has <code>xn</code>.  So, to be safe, you should never do
+these things at such a time on such a terminal.
+
+<p>To be sure of reliable results on a terminal which has the <code>xn</code>
+flag, output a <code>cm</code> absolute positioning command after writing in
+the last column.  Another safe thing to do is to output carriage-return
+newline, which will leave the cursor at the beginning of the following
+line.
+
+<br><dt><code>LP</code>
+<dd>Flag whose presence means that it is safe to write in the last column of
+the last line without worrying about undesired scrolling.  <code>LP</code>
+indicates the DEC flavor of <code>xn</code> strangeness. 
+</dl>
+
+<p><hr>
+Node:<a name="Scrolling">Scrolling</a>,
+Next:<a rel=next href="#Windows">Windows</a>,
+Previous:<a rel=previous href="#Wrapping">Wrapping</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.5 Scrolling</h3>
+
+<p><dfn>Scrolling</dfn> means moving the contents of the screen up or down one or
+more lines.  Moving the contents up is <dfn>forward scrolling</dfn>; moving them
+down is <dfn>reverse scrolling</dfn>.
+
+<p>Scrolling happens after each line of output during ordinary output on most
+display terminals.  But in an application program that uses termcap for
+random-access output, scrolling happens only when explicitly requested with
+the commands in this section.
+
+<p>Some terminals have a <dfn>scroll region</dfn> feature.  This lets you limit
+the effect of scrolling to a specified range of lines.  Lines outside the
+range are unaffected when scrolling happens.  The scroll region feature
+is available if either <code>cs</code> or <code>cS</code> is present.
+
+<dl>
+<dt><code>sf</code>
+<dd>String of commands to scroll the screen one line up, assuming it is
+output with the cursor at the beginning of the bottom line.
+
+<br><dt><code>sr</code>
+<dd>String of commands to scroll the screen one line down, assuming it is
+output with the cursor at the beginning of the top line.
+
+<br><dt><code>do</code>
+<dd>A few programs will try to use <code>do</code> to do the work of <code>sf</code>. 
+This is not really correct--it is an attempt to compensate for the
+absence of a <code>sf</code> command in some old terminal descriptions.
+
+<p>Since these terminal descriptions do define <code>sr</code>, perhaps at one
+time the definition of <code>do</code> was different and it could be used
+for scrolling as well.  But it isn't desirable to combine these two
+functions in one capability, since scrolling often requires more
+padding than simply moving the cursor down.  Defining <code>sf</code> and
+<code>do</code> separately allows you to specify the padding properly. 
+Also, all sources agree that <code>do</code> should not be relied on to do
+scrolling.
+
+<p>So the best approach is to add <code>sf</code> capabilities to the
+descriptions of these terminals, copying the definition of <code>do</code>
+if that does scroll.
+
+<br><dt><code>SF</code>
+<dd>String of commands to scroll the screen <var>n</var> lines up, assuming it
+is output with the cursor at the beginning of the bottom line.
+
+<br><dt><code>SR</code>
+<dd>String of commands to scroll the screen <var>n</var> lines down, assuming it
+is output with the cursor at the beginning of the top line.
+
+<br><dt><code>cs</code>
+<dd>String of commands to set the scroll region.  This command takes two
+parameters, <var>start</var> and <var>end</var>, which are the line numbers
+(origin-zero) of the first line to include in the scroll region and of
+the last line to include in it.  When a scroll region is set,
+scrolling is limited to the specified range of lines; lines outside
+the range are not affected by scroll commands.
+
+<p>Do not try to move the cursor outside the scroll region.  The region
+remains set until explicitly removed.  To remove the scroll region,
+use another <code>cs</code> command specifying the full height of the
+screen.
+
+<p>The cursor position is undefined after the <code>cs</code> command is set,
+so position the cursor with <code>cm</code> immediately afterward.
+
+<br><dt><code>cS</code>
+<dd>String of commands to set the scroll region using parameters in
+different form.  The effect is the same as if <code>cs</code> were used. 
+Four parameters are required:
+
+<ol type=1 start=1>
+</p><li>Total number of lines on the screen. 
+<li>Number of lines above desired scroll region. 
+<li>Number of lines below (outside of) desired scroll region. 
+<li>Total number of lines on the screen, the same as the first parameter.
+</ol>
+
+<p>This capability is a GNU extension that was invented to allow the Ann
+Arbor Ambassador's scroll-region command to be described; it could
+also be done by putting non-Unix <code>%</code>-sequences into a <code>cs</code>
+string, but that would have confused Unix programs that used the
+<code>cs</code> capability with the Unix termcap.  Currently only GNU Emacs
+uses the <code>cS</code> capability.
+
+<br><dt><code>ns</code>
+<dd>Flag which means that the terminal does not normally scroll for
+ordinary sequential output.  For modern terminals, this means that
+outputting a newline in ordinary sequential output with the cursor on
+the bottom line wraps to the top line.  For some obsolete terminals,
+other things may happen.
+
+<p>The terminal may be able to scroll even if it does not normally do so. 
+If the <code>sf</code> capability is provided, it can be used for scrolling
+regardless of <code>ns</code>.
+
+<br><dt><code>da</code>
+<dd>Flag whose presence means that lines scrolled up off the top of the
+screen may come back if scrolling down is done subsequently.
+
+<p>The <code>da</code> and <code>db</code> flags do not, strictly speaking, affect
+how to scroll.  But programs that scroll usually need to clear the
+lines scrolled onto the screen, if these flags are present.
+
+<br><dt><code>db</code>
+<dd>Flag whose presence means that lines scrolled down off the bottom of
+the screen may come back if scrolling up is done subsequently.
+
+<br><dt><code>lm</code>
+<dd>Numeric value, the number of lines of display memory that the terminal
+has.  A value of zero means that the terminal has more display memory
+than can fit on the screen, but no fixed number of lines.  (The number
+of lines may depend on the amount of text in each line.) 
+</dl>
+
+<p>Any terminal description that defines <code>SF</code> should also define <code>sf</code>;
+likewise for <code>SR</code> and <code>sr</code>.  However, many terminals can only
+scroll by one line at a time, so it is common to find <code>sf</code> and not
+<code>SF</code>, or <code>sr</code> without <code>SR</code>.
+
+<p>Therefore, all programs that use the scrolling facilities should be
+prepared to work with <code>sf</code> in the case that <code>SF</code> is absent, and
+likewise with <code>sr</code>.  On the other hand, an application program that
+uses only <code>sf</code> and not <code>SF</code> is acceptable, though slow on some
+terminals.
+
+<p>When outputting a scroll command with <code>tputs</code>, the <var>nlines</var>
+argument should be the total number of lines in the portion of the screen
+being scrolled.  Very often these commands require padding proportional to
+this number of lines.  See <a href="#Padding">Padding</a>.
+
+<p><hr>
+Node:<a name="Windows">Windows</a>,
+Next:<a rel=next href="#Clearing">Clearing</a>,
+Previous:<a rel=previous href="#Scrolling">Scrolling</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.6 Windows</h3>
+
+<p>A <dfn>window</dfn>, in termcap, is a rectangular portion of the screen to which
+all display operations are restricted.  Wrapping, clearing, scrolling,
+insertion and deletion all operate as if the specified window were all the
+screen there was.
+
+<dl>
+<dt><code>wi</code>
+<dd>String of commands to set the terminal output screen window. 
+This string requires four parameters, all origin-zero:
+<ol type=1 start=1>
+</p><li>The first line to include in the window. 
+<li>The last line to include in the window. 
+<li>The first column to include in the window. 
+<li>The last column to include in the window.
+</ol>
+</dl>
+
+<p>Most terminals do not support windows.
+
+<p><hr>
+Node:<a name="Clearing">Clearing</a>,
+Next:<a rel=next href="#Insdel%20Line">Insdel Line</a>,
+Previous:<a rel=previous href="#Windows">Windows</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.7 Clearing Parts of the Screen</h3>
+
+<p>There are several terminal capabilities for clearing parts of the screen
+to blank.  All display terminals support the <code>cl</code> string, and most
+display terminals support all of these capabilities.
+
+<dl>
+<dt><code>cl</code>
+<dd>String of commands to clear the entire screen and position the cursor
+at the upper left corner.
+
+<br><dt><code>cd</code>
+<dd>String of commands to clear the line the cursor is on, and all the
+lines below it, down to the bottom of the screen.  This command string
+should be used only with the cursor in column zero; their effect is
+undefined if the cursor is elsewhere.
+
+<br><dt><code>ce</code>
+<dd>String of commands to clear from the cursor to the end of the current
+line.
+
+<br><dt><code>ec</code>
+<dd>String of commands to clear <var>n</var> characters, starting with the
+character that the cursor is on.  This command string is expected to
+leave the cursor position unchanged.  The parameter <var>n</var> should never
+be large enough to reach past the right margin; the effect of such a
+large parameter would be undefined. 
+</dl>
+
+<p>Clear to end of line (<code>ce</code>) is extremely important in programs that
+maintain an updating display.  Nearly all display terminals support this
+operation, so it is acceptable for a an application program to refuse to
+work if <code>ce</code> is not present.  However, if you do not want this
+limitation, you can accomplish clearing to end of line by outputting spaces
+until you reach the right margin.  In order to do this, you must know the
+current horizontal position.  Also, this technique assumes that writing a
+space will erase.  But this happens to be true on all the display terminals
+that fail to support <code>ce</code>.
+
+<p><hr>
+Node:<a name="Insdel%20Line">Insdel Line</a>,
+Next:<a rel=next href="#Insdel%20Char">Insdel Char</a>,
+Previous:<a rel=previous href="#Clearing">Clearing</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.8 Insert/Delete Line</h3>
+
+<p><dfn>Inserting a line</dfn> means creating a blank line in the middle
+of the screen, and pushing the existing lines of text apart.  In fact,
+the lines above the insertion point do not change, while the lines below
+move down, and one is normally lost at the bottom of the screen.
+
+<p><dfn>Deleting a line</dfn> means causing the line to disappear from the screen,
+closing up the gap by moving the lines below it upward.  A new line
+appears at the bottom of the screen.  Usually this line is blank, but
+on terminals with the <code>db</code> flag it may be a line previously moved
+off the screen bottom by scrolling or line insertion.
+
+<p>Insertion and deletion of lines is useful in programs that maintain an
+updating display some parts of which may get longer or shorter.  They are
+also useful in editors for scrolling parts of the screen, and for
+redisplaying after lines of text are killed or inserted.
+
+<p>Many terminals provide commands to insert or delete a single line at the
+cursor position.  Some provide the ability to insert or delete several
+lines with one command, using the number of lines to insert or delete as a
+parameter.  Always move the cursor to column zero before using any of
+these commands.
+
+<dl>
+<dt><code>al</code>
+<dd>String of commands to insert a blank line before the line the cursor
+is on.  The existing line, and all lines below it, are moved down. 
+The last line in the screen (or in the scroll region, if one is set)
+disappears and in most circumstances is discarded.  It may not be
+discarded if the <code>db</code> is present (see <a href="#Scrolling">Scrolling</a>).
+
+<p>The cursor must be at the left margin before this command is used. 
+This command does not move the cursor.
+
+<br><dt><code>dl</code>
+<dd>String of commands to delete the line the cursor is on.  The following
+lines move up, and a blank line appears at the bottom of the screen
+(or bottom of the scroll region).  If the terminal has the <code>db</code>
+flag, a nonblank line previously pushed off the screen bottom may
+reappear at the bottom.
+
+<p>The cursor must be at the left margin before this command is used. 
+This command does not move the cursor.
+
+<br><dt><code>AL</code>
+<dd>String of commands to insert <var>n</var> blank lines before the line that
+the cursor is on.  It is like <code>al</code> repeated <var>n</var> times, except
+that it is as fast as one <code>al</code>.
+
+<br><dt><code>DL</code>
+<dd>String of commands to delete <var>n</var> lines starting with the line that
+the cursor is on.  It is like <code>dl</code> repeated <var>n</var> times, except
+that it is as fast as one <code>dl</code>. 
+</dl>
+
+<p>Any terminal description that defines <code>AL</code> should also define
+<code>al</code>; likewise for <code>DL</code> and <code>dl</code>.  However, many terminals
+can only insert or delete one line at a time, so it is common to find
+<code>al</code> and not <code>AL</code>, or <code>dl</code> without <code>DL</code>.
+
+<p>Therefore, all programs that use the insert and delete facilities should be
+prepared to work with <code>al</code> in the case that <code>AL</code> is absent, and
+likewise with <code>dl</code>.  On the other hand, it is acceptable to write
+an application that uses only <code>al</code> and <code>dl</code> and does not look
+for <code>AL</code> or <code>DL</code> at all.
+
+<p>If a terminal does not support line insertion and deletion directly,
+but does support a scroll region, the effect of insertion and deletion
+can be obtained with scrolling.  However, it is up to the individual
+user program to check for this possibility and use the scrolling
+commands to get the desired result.  It is fairly important to implement
+this alternate strategy, since it is the only way to get the effect of
+line insertion and deletion on the popular VT100 terminal.
+
+<p>Insertion and deletion of lines is affected by the scroll region on
+terminals that have a settable scroll region.  This is useful when it is
+desirable to move any few consecutive lines up or down by a few lines. 
+See <a href="#Scrolling">Scrolling</a>.
+
+<p>The line pushed off the bottom of the screen is not lost if the terminal
+has the <code>db</code> flag capability; instead, it is pushed into display
+memory that does not appear on the screen.  This is the same thing that
+happens when scrolling pushes a line off the bottom of the screen. 
+Either reverse scrolling or deletion of a line can bring the apparently
+lost line back onto the bottom of the screen.  If the terminal has the
+scroll region feature as well as <code>db</code>, the pushed-out line really
+is lost if a scroll region is in effect.
+
+<p>When outputting an insert or delete command with <code>tputs</code>, the
+<var>nlines</var> argument should be the total number of lines from the cursor
+to the bottom of the screen (or scroll region).  Very often these commands
+require padding proportional to this number of lines.  See <a href="#Padding">Padding</a>.
+
+<p>For <code>AL</code> and <code>DL</code> the <var>nlines</var> argument should <em>not</em>
+depend on the number of lines inserted or deleted; only the total number of
+lines affected.  This is because it is just as fast to insert two or
+<var>n</var> lines with <code>AL</code> as to insert one line with <code>al</code>.
+
+<p><hr>
+Node:<a name="Insdel%20Char">Insdel Char</a>,
+Next:<a rel=next href="#Standout">Standout</a>,
+Previous:<a rel=previous href="#Insdel%20Line">Insdel Line</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.9 Insert/Delete Character</h3>
+
+<p><dfn>Inserting a character</dfn> means creating a blank space in the middle of a
+line, and pushing the rest of the line rightward.  The character in the
+rightmost column is lost.
+
+<p><dfn>Deleting a character</dfn> means causing the character to disappear from
+the screen, closing up the gap by moving the rest of the line leftward.  A
+blank space appears in the rightmost column.
+
+<p>Insertion and deletion of characters is useful in programs that maintain an
+updating display some parts of which may get longer or shorter.  It is also
+useful in editors for redisplaying the results of editing within a line.
+
+<p>Many terminals provide commands to insert or delete a single character at
+the cursor position.  Some provide the ability to insert or delete several
+characters with one command, using the number of characters to insert or
+delete as a parameter.
+
+<p>Many terminals provide an insert mode in which outputting a graphic
+character has the added effect of inserting a position for that character. 
+A special command string is used to enter insert mode and another is used
+to exit it.  The reason for designing a terminal with an insert mode rather
+than an insert command is that inserting character positions is usually
+followed by writing characters into them.  With insert mode, this is as
+fast as simply writing the characters, except for the fixed overhead of
+entering and leaving insert mode.  However, when the line speed is great
+enough, padding may be required for the graphic characters output in insert
+mode.
+
+<p>Some terminals require you to enter insert mode and then output a special
+command for each position to be inserted.  Or they may require special
+commands to be output before or after each graphic character to be
+inserted.
+
+<p>Deletion of characters is usually accomplished by a straightforward command
+to delete one or several positions; but on some terminals, it is necessary
+to enter a special delete mode before using the delete command, and leave
+delete mode afterward.  Sometimes delete mode and insert mode are the same
+mode.
+
+<p>Some terminals make a distinction between character positions in which a
+space character has been output and positions which have been cleared.  On
+these terminals, the effect of insert or delete character runs to the first
+cleared position rather than to the end of the line.  In fact, the effect
+may run to more than one line if there is no cleared position to stop the
+shift on the first line.  These terminals are identified by the <code>in</code>
+flag capability.
+
+<p>On terminals with the <code>in</code> flag, the technique of skipping over
+characters that you know were cleared, and then outputting text later on in
+the same line, causes later insert and delete character operations on that
+line to do nonstandard things.  A program that has any chance of doing this
+must check for the <code>in</code> flag and must be careful to write explicit
+space characters into the intermediate columns when <code>in</code> is present.
+
+<p>A plethora of terminal capabilities are needed to describe all of this
+complexity.  Here is a list of them all.  Following the list, we present
+an algorithm for programs to use to take proper account of all of these
+capabilities.
+
+<dl>
+<dt><code>im</code>
+<dd>String of commands to enter insert mode.
+
+<p>If the terminal has no special insert mode, but it can insert
+characters with a special command, <code>im</code> should be defined with a
+null value, because the <code>vi</code> editor assumes that insertion of a
+character is impossible if <code>im</code> is not provided.
+
+<p>New programs should not act like <code>vi</code>.  They should pay attention
+to <code>im</code> only if it is defined.
+
+<br><dt><code>ei</code>
+<dd>String of commands to leave insert mode.  This capability must be
+present if <code>im</code> is.
+
+<p>On a few old terminals the same string is used to enter and exit
+insert mode.  This string turns insert mode on if it was off, and off
+it it was on.  You can tell these terminals because the <code>ei</code>
+string equals the <code>im</code> string.  If you want to support these
+terminals, you must always remember accurately whether insert mode is
+in effect.  However, these terminals are obsolete, and it is
+reasonable to refuse to support them.  On all modern terminals, you
+can safely output <code>ei</code> at any time to ensure that insert mode is
+turned off.
+
+<br><dt><code>ic</code>
+<dd>String of commands to insert one character position at the cursor. 
+The cursor does not move.
+
+<p>If outputting a graphic character while in insert mode is sufficient
+to insert the character, then the <code>ic</code> capability should be
+defined with a null value.
+
+<p>If your terminal offers a choice of ways to insert--either use insert
+mode or use a special command--then define <code>im</code> and do not define
+<code>ic</code>, since this gives the most efficient operation when several
+characters are to be inserted.  <em>Do not</em> define both strings, for
+that means that <em>both</em> must be used each time insertion is done.
+
+<br><dt><code>ip</code>
+<dd>String of commands to output following an inserted graphic character
+in insert mode.  Often it is used just for a padding spec, when padding
+is needed after an inserted character (see <a href="#Padding">Padding</a>).
+
+<br><dt><code>IC</code>
+<dd>String of commands to insert <var>n</var> character positions at and after
+the cursor.  It has the same effect as repeating the <code>ic</code> string
+and a space, <var>n</var> times.
+
+<p>If <code>IC</code> is provided, application programs may use it without first
+entering insert mode.
+
+<br><dt><code>mi</code>
+<dd>Flag whose presence means it is safe to move the cursor while in insert
+mode and assume the terminal remains in insert mode.
+
+<br><dt><code>in</code>
+<dd>Flag whose presence means that the terminal distinguishes between
+character positions in which space characters have been output and
+positions which have been cleared. 
+</dl>
+
+<p>An application program can assume that the terminal can do character
+insertion if <em>any one of</em> the capabilities <code>IC</code>, <code>im</code>,
+<code>ic</code> or <code>ip</code> is provided.
+
+<p>To insert <var>n</var> blank character positions, move the cursor to the place
+to insert them and follow this algorithm:
+
+<ol type=1 start=1>
+</p><li>If an <code>IC</code> string is provided, output it with parameter <var>n</var>
+and you are finished.  Otherwise (or if you don't want to bother to
+look for an <code>IC</code> string) follow the remaining steps.
+
+<li>Output the <code>im</code> string, if there is one, unless the terminal is
+already in insert mode.
+
+<li>Repeat steps 4 through 6, <var>n</var> times.
+
+<li>Output the <code>ic</code> string if any.
+
+<li>Output a space.
+
+<li>Output the <code>ip</code> string if any.
+
+<li>Output the <code>ei</code> string, eventually, to exit insert mode.  There
+is no need to do this right away.  If the <code>mi</code> flag is present,
+you can move the cursor and the cursor will remain in insert mode;
+then you can do more insertion elsewhere without reentering insert
+mode.
+</ol>
+
+<p>To insert <var>n</var> graphic characters, position the cursor and follow this
+algorithm:
+
+<ol type=1 start=1>
+</p><li>If an <code>IC</code> string is provided, output it with parameter <var>n</var>,
+then output the graphic characters, and you are finished.  Otherwise
+(or if you don't want to bother to look for an <code>IC</code> string)
+follow the remaining steps.
+
+<li>Output the <code>im</code> string, if there is one, unless the terminal is
+already in insert mode.
+
+<li>For each character to be output, repeat steps 4 through 6.
+
+<li>Output the <code>ic</code> string if any.
+
+<li>Output the next graphic character.
+
+<li>Output the <code>ip</code> string if any.
+
+<li>Output the <code>ei</code> string, eventually, to exit insert mode.  There
+is no need to do this right away.  If the <code>mi</code> flag is present,
+you can move the cursor and the cursor will remain in insert mode;
+then you can do more insertion elsewhere without reentering insert
+mode.
+</ol>
+
+<p>Note that this is not the same as the original Unix termcap specifications
+in one respect: it assumes that the <code>IC</code> string can be used without
+entering insert mode.  This is true as far as I know, and it allows you be
+able to avoid entering and leaving insert mode, and also to be able to
+avoid the inserted-character padding after the characters that go into the
+inserted positions.
+
+<p>Deletion of characters is less complicated; deleting one column is done by
+outputting the <code>dc</code> string.  However, there may be a delete mode that
+must be entered with <code>dm</code> in order to make <code>dc</code> work.
+
+<dl>
+<dt><code>dc</code>
+<dd>String of commands to delete one character position at the cursor.  If
+<code>dc</code> is not present, the terminal cannot delete characters.
+
+<br><dt><code>DC</code>
+<dd>String of commands to delete <var>n</var> characters starting at the cursor. 
+It has the same effect as repeating the <code>dc</code> string <var>n</var> times. 
+Any terminal description that has <code>DC</code> also has <code>dc</code>.
+
+<br><dt><code>dm</code>
+<dd>String of commands to enter delete mode.  If not present, there is no
+delete mode, and <code>dc</code> can be used at any time (assuming there is
+a <code>dc</code>).
+
+<br><dt><code>ed</code>
+<dd>String of commands to exit delete mode.  This must be present if
+<code>dm</code> is. 
+</dl>
+
+<p>To delete <var>n</var> character positions, position the cursor and follow these
+steps:
+
+<ol type=1 start=1>
+</p><li>If the <code>DC</code> string is present, output it with parameter <var>n</var>
+and you are finished.  Otherwise, follow the remaining steps.
+
+<li>Output the <code>dm</code> string, unless you know the terminal is already
+in delete mode.
+
+<li>Output the <code>dc</code> string <var>n</var> times.
+
+<li>Output the <code>ed</code> string eventually.  If the flag capability
+<code>mi</code> is present, you can move the cursor and do more deletion
+without leaving and reentering delete mode.
+</ol>
+
+<p>As with the <code>IC</code> string, we have departed from the original termcap
+specifications by assuming that <code>DC</code> works without entering delete
+mode even though <code>dc</code> would not.
+
+<p>If the <code>dm</code> and <code>im</code> capabilities are both present and have the
+same value, it means that the terminal has one mode for both insertion and
+deletion.  It is useful for a program to know this, because then it can do
+insertions after deletions, or vice versa, without leaving insert/delete
+mode and reentering it.
+
+<p><hr>
+Node:<a name="Standout">Standout</a>,
+Next:<a rel=next href="#Underlining">Underlining</a>,
+Previous:<a rel=previous href="#Insdel%20Char">Insdel Char</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.10 Standout and Appearance Modes</h3>
+
+<p><dfn>Appearance modes</dfn> are modifications to the ways characters are
+displayed.  Typical appearance modes include reverse video, dim, bright,
+blinking, underlined, invisible, and alternate character set.  Each kind of
+terminal supports various among these, or perhaps none.
+
+<p>For each type of terminal, one appearance mode or combination of them that
+looks good for highlighted text is chosen as the <dfn>standout mode</dfn>.  The
+capabilities <code>so</code> and <code>se</code> say how to enter and leave standout
+mode.  Programs that use appearance modes only to highlight some text
+generally use the standout mode so that they can work on as many terminals
+as possible.  Use of specific appearance modes other than "underlined"
+and "alternate character set" is rare.
+
+<p>Terminals that implement appearance modes fall into two general classes as
+to how they do it.
+
+<p>In some terminals, the presence or absence of any appearance mode is
+recorded separately for each character position.  In these terminals, each
+graphic character written is given the appearance modes current at the time
+it is written, and keeps those modes until it is erased or overwritten. 
+There are special commands to turn the appearance modes on or off for
+characters to be written in the future.
+
+<p>In other terminals, the change of appearance modes is represented by a
+marker that belongs to a certain screen position but affects all following
+screen positions until the next marker.  These markers are traditionally
+called <dfn>magic cookies</dfn>.
+
+<p>The same capabilities (<code>so</code>, <code>se</code>, <code>mb</code> and so on) for
+turning appearance modes on and off are used for both magic-cookie
+terminals and per-character terminals.  On magic cookie terminals, these
+give the commands to write the magic cookies.  On per-character terminals,
+they change the current modes that affect future output and erasure.  Some
+simple applications can use these commands without knowing whether or not
+they work by means of cookies.
+
+<p>However, a program that maintains and updates a display needs to know
+whether the terminal uses magic cookies, and exactly what their effect is. 
+This information comes from the <code>sg</code> capability.
+
+<p>The <code>sg</code> capability is a numeric capability whose presence indicates
+that the terminal uses magic cookies for appearance modes.  Its value is
+the number of character positions that a magic cookie occupies.  Usually
+the cookie occupies one or more character positions on the screen, and these
+character positions are displayed as blank, but in some terminals the
+cookie has zero width.
+
+<p>The <code>sg</code> capability describes both the magic cookie to turn standout
+on and the cookie to turn it off.  This makes the assumption that both
+kinds of cookie have the same width on the screen.  If that is not true,
+the narrower cookie must be "widened" with spaces until it has the same
+width as the other.
+
+<p>On some magic cookie terminals, each line always starts with normal
+display; in other words, the scope of a magic cookie never extends over
+more than one line.  But on other terminals, one magic cookie affects all
+the lines below it unless explicitly canceled.  Termcap does not define any
+way to distinguish these two ways magic cookies can work.  To be safe, it
+is best to put a cookie at the beginning of each line.
+
+<p>On some per-character terminals, standout mode or other appearance modes
+may be canceled by moving the cursor.  On others, moving the cursor has no
+effect on the state of the appearance modes.  The latter class of terminals
+are given the flag capability <code>ms</code> ("can move in standout").  All
+programs that might have occasion to move the cursor while appearance modes
+are turned on must check for this flag; if it is not present, they should
+reset appearance modes to normal before doing cursor motion.
+
+<p>A program that has turned on only standout mode should use <code>se</code> to
+reset the standout mode to normal.  A program that has turned on only
+alternate character set mode should use <code>ae</code> to return it to normal. 
+If it is possible that any other appearance modes are turned on, use the
+<code>me</code> capability to return them to normal.
+
+<p>Note that the commands to turn on one appearance mode, including <code>so</code>
+and <code>mb</code> <small>...</small> <code>mr</code>, if used while some other appearance modes
+are turned on, may combine the two modes on some terminals but may turn off
+the mode previously enabled on other terminals.  This is because some
+terminals do not have a command to set or clear one appearance mode without
+changing the others.  Programs should not attempt to use appearance modes
+in combination except with <code>sa</code>, and when switching from one single
+mode to another should always turn off the previously enabled mode and then
+turn on the new desired mode.
+
+<p>On some old terminals, the <code>so</code> and <code>se</code> commands may be the same
+command, which has the effect of turning standout on if it is off, or off
+it is on.  It is therefore risky for a program to output extra <code>se</code>
+commands for good measure.  Fortunately, all these terminals are obsolete.
+
+<p>Programs that update displays in which standout-text may be replaced with
+non-standout text must check for the <code>xs</code> flag.  In a per-character
+terminal, this flag says that the only way to remove standout once written is
+to clear that portion of the line with the <code>ce</code> string or something
+even more powerful (see <a href="#Clearing">Clearing</a>); just writing new characters at those
+screen positions will not change the modes in effect there.  In a magic
+cookie terminal, <code>xs</code> says that the only way to remove a cookie is to
+clear a portion of the line that includes the cookie; writing a different
+cookie at the same position does not work.
+
+<p>Such programs must also check for the <code>xt</code> flag, which means that the
+terminal is a Teleray 1061.  On this terminal it is impossible to position
+the cursor at the front of a magic cookie, so the only two ways to remove a
+cookie are (1) to delete the line it is on or (2) to position the cursor at
+least one character before it (possibly on a previous line) and output the
+<code>se</code> string, which on these terminals finds and removes the next
+<code>so</code> magic cookie on the screen.  (It may also be possible to remove a
+cookie which is not at the beginning of a line by clearing that line.)  The
+<code>xt</code> capability also has implications for the use of tab characters,
+but in that regard it is obsolete (See <a href="#Cursor%20Motion">Cursor Motion</a>).
+
+<dl>
+<dt><code>so</code>
+<dd>String of commands to enter standout mode.
+
+<br><dt><code>se</code>
+<dd>String of commands to leave standout mode.
+
+<br><dt><code>sg</code>
+<dd>Numeric capability, the width on the screen of the magic cookie.  This
+capability is absent in terminals that record appearance modes
+character by character.
+
+<br><dt><code>ms</code>
+<dd>Flag whose presence means that it is safe to move the cursor while the
+appearance modes are not in the normal state.  If this flag is absent,
+programs should always reset the appearance modes to normal before
+moving the cursor.
+
+<br><dt><code>xs</code>
+<dd>Flag whose presence means that the only way to reset appearance modes
+already on the screen is to clear to end of line.  On a per-character
+terminal, you must clear the area where the modes are set.  On a magic
+cookie terminal, you must clear an area containing the cookie. 
+See the discussion above.
+
+<br><dt><code>xt</code>
+<dd>Flag whose presence means that the cursor cannot be positioned right
+in front of a magic cookie, and that <code>se</code> is a command to delete
+the next magic cookie following the cursor.  See discussion above.
+
+<br><dt><code>mb</code>
+<dd>String of commands to enter blinking mode.
+
+<br><dt><code>md</code>
+<dd>String of commands to enter double-bright mode.
+
+<br><dt><code>mh</code>
+<dd>String of commands to enter half-bright mode.
+
+<br><dt><code>mk</code>
+<dd>String of commands to enter invisible mode.
+
+<br><dt><code>mp</code>
+<dd>String of commands to enter protected mode.
+
+<br><dt><code>mr</code>
+<dd>String of commands to enter reverse-video mode.
+
+<br><dt><code>me</code>
+<dd>String of commands to turn off all appearance modes, including
+standout mode and underline mode.  On some terminals it also turns off
+alternate character set mode; on others, it may not.  This capability
+must be present if any of <code>mb</code> <small>...</small> <code>mr</code> is present.
+
+<br><dt><code>as</code>
+<dd>String of commands to turn on alternate character set mode.  This mode
+assigns some or all graphic characters an alternate picture on the
+screen.  There is no standard as to what the alternate pictures look
+like.
+
+<br><dt><code>ae</code>
+<dd>String of commands to turn off alternate character set mode.
+
+<br><dt><code>sa</code>
+<dd>String of commands to turn on an arbitrary combination of appearance
+modes.  It accepts 9 parameters, each of which controls a particular
+kind of appearance mode.  A parameter should be 1 to turn its appearance
+mode on, or zero to turn that mode off.  Most terminals do not support
+the <code>sa</code> capability, even among those that do have various
+appearance modes.
+
+<p>The nine parameters are, in order, <var>standout</var>, <var>underline</var>,
+<var>reverse</var>, <var>blink</var>, <var>half-bright</var>, <var>double-bright</var>,
+<var>blank</var>, <var>protect</var>, <var>alt char set</var>. 
+</dl>
+
+<p><hr>
+Node:<a name="Underlining">Underlining</a>,
+Next:<a rel=next href="#Cursor%20Visibility">Cursor Visibility</a>,
+Previous:<a rel=previous href="#Standout">Standout</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.11 Underlining</h3>
+
+<p>Underlining on most terminals is a kind of appearance mode, much like
+standout mode.  Therefore, it may be implemented using magic cookies or as
+a flag in the terminal whose current state affects each character that is
+output.  See <a href="#Standout">Standout</a>, for a full explanation.
+
+<p>The <code>ug</code> capability is a numeric capability whose presence indicates
+that the terminal uses magic cookies for underlining.  Its value is the
+number of character positions that a magic cookie for underlining occupies;
+it is used for underlining just as <code>sg</code> is used for standout.  Aside
+from the simplest applications, it is impossible to use underlining
+correctly without paying attention to the value of <code>ug</code>.
+
+<dl>
+<dt><code>us</code>
+<dd>String of commands to turn on underline mode or to output a magic cookie
+to start underlining.
+
+<br><dt><code>ue</code>
+<dd>String of commands to turn off underline mode or to output a magic
+cookie to stop underlining.
+
+<br><dt><code>ug</code>
+<dd>Width of magic cookie that represents a change of underline mode;
+or missing, if the terminal does not use a magic cookie for this.
+
+<br><dt><code>ms</code>
+<dd>Flag whose presence means that it is safe to move the cursor while the
+appearance modes are not in the normal state.  Underlining is an
+appearance mode.  If this flag is absent, programs should always turn
+off underlining before moving the cursor. 
+</dl>
+
+<p>There are two other, older ways of doing underlining: there can be a
+command to underline a single character, or the output of <code>_</code>, the
+ASCII underscore character, as an overstrike could cause a character to be
+underlined.  New programs need not bother to handle these capabilities
+unless the author cares strongly about the obscure terminals which support
+them.  However, terminal descriptions should provide these capabilities
+when appropriate.
+
+<dl>
+<dt><code>uc</code>
+<dd>String of commands to underline the character under the cursor, and
+move the cursor right.
+
+<br><dt><code>ul</code>
+<dd>Flag whose presence means that the terminal can underline by
+overstriking an underscore character (<code>_</code>); some terminals can do
+this even though they do not support overstriking in general.  An
+implication of this flag is that when outputting new text to overwrite
+old text, underscore characters must be treated specially lest they
+underline the old text instead. 
+</dl>
+
+<p><hr>
+Node:<a name="Cursor%20Visibility">Cursor Visibility</a>,
+Next:<a rel=next href="#Bell">Bell</a>,
+Previous:<a rel=previous href="#Underlining">Underlining</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.12 Cursor Visibility</h3>
+
+<p>Some terminals have the ability to make the cursor invisible, or to enhance
+it.  Enhancing the cursor is often done by programs that plan to use the
+cursor to indicate to the user a position of interest that may be anywhere
+on the screen--for example, the Emacs editor enhances the cursor on entry. 
+Such programs should always restore the cursor to normal on exit.
+
+<dl>
+<dt><code>vs</code>
+<dd>String of commands to enhance the cursor.
+
+<br><dt><code>vi</code>
+<dd>String of commands to make the cursor invisible.
+
+<br><dt><code>ve</code>
+<dd>String of commands to return the cursor to normal. 
+</dl>
+
+<p>If you define either <code>vs</code> or <code>vi</code>, you must also define <code>ve</code>.
+
+<p><hr>
+Node:<a name="Bell">Bell</a>,
+Next:<a rel=next href="#Keypad">Keypad</a>,
+Previous:<a rel=previous href="#Cursor%20Visibility">Cursor Visibility</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.13 Bell</h3>
+
+<p>Here we describe commands to make the terminal ask for the user to pay
+attention to it.
+
+<dl>
+<dt><code>bl</code>
+<dd>String of commands to cause the terminal to make an audible sound.  If
+this capability is absent, the terminal has no way to make a suitable
+sound.
+
+<br><dt><code>vb</code>
+<dd>String of commands to cause the screen to flash to attract attention
+("visible bell").  If this capability is absent, the terminal has no
+way to do such a thing. 
+</dl>
+
+<p><hr>
+Node:<a name="Keypad">Keypad</a>,
+Next:<a rel=next href="#Meta%20Key">Meta Key</a>,
+Previous:<a rel=previous href="#Bell">Bell</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.14 Keypad and Function Keys</h3>
+
+<p>Many terminals have arrow and function keys that transmit specific
+character sequences to the computer.  Since the precise sequences used
+depend on the terminal, termcap defines capabilities used to say what the
+sequences are.  Unlike most termcap string-valued capabilities, these are
+not strings of commands to be sent to the terminal, rather strings that
+are received from the terminal.
+
+<p>Programs that expect to use keypad keys should check, initially, for a
+<code>ks</code> capability and send it, to make the keypad actually transmit. 
+Such programs should also send the <code>ke</code> string when exiting.
+
+<dl>
+<dt><code>ks</code>
+<dd>String of commands to make the keypad keys transmit.  If this
+capability is not provided, but the others in this section are,
+programs may assume that the keypad keys always transmit.
+
+<br><dt><code>ke</code>
+<dd>String of commands to make the keypad keys work locally.  This
+capability is provided only if <code>ks</code> is.
+
+<br><dt><code>kl</code>
+<dd>String of input characters sent by typing the left-arrow key.  If this
+capability is missing, you cannot expect the terminal to have a
+left-arrow key that transmits anything to the computer.
+
+<br><dt><code>kr</code>
+<dd>String of input characters sent by typing the right-arrow key.
+
+<br><dt><code>ku</code>
+<dd>String of input characters sent by typing the up-arrow key.
+
+<br><dt><code>kd</code>
+<dd>String of input characters sent by typing the down-arrow key.
+
+<br><dt><code>kh</code>
+<dd>String of input characters sent by typing the "home-position" key.
+
+<br><dt><code>K1</code> <small>...</small> <code>K5</code>
+<dd>Strings of input characters sent by the five other keys in a 3-by-3
+array that includes the arrow keys, if the keyboard has such a 3-by-3
+array.  Note that one of these keys may be the "home-position" key,
+in which case one of these capabilities will have the same value as
+the <code>kh</code> key.
+
+<br><dt><code>k0</code>
+<dd>String of input characters sent by function key 10 (or 0, if the terminal
+has one labeled 0).
+
+<br><dt><code>k1</code> <small>...</small> <code>k9</code>
+<dd>Strings of input characters sent by function keys 1 through 9,
+provided for those function keys that exist.
+
+<br><dt><code>kn</code>
+<dd>Number: the number of numbered function keys, if there are more than
+10.
+
+<br><dt><code>l0</code> <small>...</small> <code>l9</code>
+<dd>Strings which are the labels appearing on the keyboard on the keys
+described by the capabilities <code>k0</code> <small>...</small> <code>l9</code>.  These
+capabilities should be left undefined if the labels are <code>f0</code> or
+<code>f10</code> and <code>f1</code> <small>...</small> <code>f9</code>.
+
+<br><dt><code>kH</code>
+<dd>String of input characters sent by the "home down" key, if there is
+one.
+
+<br><dt><code>kb</code>
+<dd>String of input characters sent by the "backspace" key, if there is
+one.
+
+<br><dt><code>ka</code>
+<dd>String of input characters sent by the "clear all tabs" key, if there
+is one.
+
+<br><dt><code>kt</code>
+<dd>String of input characters sent by the "clear tab stop this column"
+key, if there is one.
+
+<br><dt><code>kC</code>
+<dd>String of input characters sent by the "clear screen" key, if there is
+one.
+
+<br><dt><code>kD</code>
+<dd>String of input characters sent by the "delete character" key, if
+there is one.
+
+<br><dt><code>kL</code>
+<dd>String of input characters sent by the "delete line" key, if there is
+one.
+
+<br><dt><code>kM</code>
+<dd>String of input characters sent by the "exit insert mode" key, if
+there is one.
+
+<br><dt><code>kE</code>
+<dd>String of input characters sent by the "clear to end of line" key, if
+there is one.
+
+<br><dt><code>kS</code>
+<dd>String of input characters sent by the "clear to end of screen" key,
+if there is one.
+
+<br><dt><code>kI</code>
+<dd>String of input characters sent by the "insert character" or "enter
+insert mode" key, if there is one.
+
+<br><dt><code>kA</code>
+<dd>String of input characters sent by the "insert line" key, if there is
+one.
+
+<br><dt><code>kN</code>
+<dd>String of input characters sent by the "next page" key, if there is
+one.
+
+<br><dt><code>kP</code>
+<dd>String of input characters sent by the "previous page" key, if there is
+one.
+
+<br><dt><code>kF</code>
+<dd>String of input characters sent by the "scroll forward" key, if there
+is one.
+
+<br><dt><code>kR</code>
+<dd>String of input characters sent by the "scroll reverse" key, if there
+is one.
+
+<br><dt><code>kT</code>
+<dd>String of input characters sent by the "set tab stop in this column"
+key, if there is one.
+
+<br><dt><code>ko</code>
+<dd>String listing the other function keys the terminal has.  This is a
+very obsolete way of describing the same information found in the
+<code>kH</code> <small>...</small> <code>kT</code> keys.  The string contains a list of
+two-character termcap capability names, separated by commas.  The
+meaning is that for each capability name listed, the terminal has a
+key which sends the string which is the value of that capability.  For
+example, the value <code>:ko=cl,ll,sf,sr:</code> says that the terminal has
+four function keys which mean "clear screen", "home down",
+"scroll forward" and "scroll reverse". 
+</dl>
+
+<p><hr>
+Node:<a name="Meta%20Key">Meta Key</a>,
+Next:<a rel=next href="#Initialization">Initialization</a>,
+Previous:<a rel=previous href="#Keypad">Keypad</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.15 Meta Key</h3>
+
+<p>A Meta key is a key on the keyboard that modifies each character you type
+by controlling the 0200 bit.  This bit is on if and only if the Meta key is
+held down when the character is typed.  Characters typed using the Meta key
+are called Meta characters.  Emacs uses Meta characters as editing
+commands.
+
+<dl>
+<dt><code>km</code>
+<dd>Flag whose presence means that the terminal has a Meta key.
+
+<br><dt><code>mm</code>
+<dd>String of commands to enable the functioning of the Meta key.
+
+<br><dt><code>mo</code>
+<dd>String of commands to disable the functioning of the Meta key. 
+</dl>
+
+<p>If the terminal has <code>km</code> but does not have <code>mm</code> and <code>mo</code>, it
+means that the Meta key always functions.  If it has <code>mm</code> and
+<code>mo</code>, it means that the Meta key can be turned on or off.  Send the
+<code>mm</code> string to turn it on, and the <code>mo</code> string to turn it off. 
+I do not know why one would ever not want it to be on.
+
+<p><hr>
+Node:<a name="Initialization">Initialization</a>,
+Next:<a rel=next href="#Pad%20Specs">Pad Specs</a>,
+Previous:<a rel=previous href="#Meta%20Key">Meta Key</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.16 Initialization</h3>
+
+<dl>
+<dt><code>ti</code>
+<dd>String of commands to put the terminal into whatever special modes are
+needed or appropriate for programs that move the cursor
+nonsequentially around the screen.  Programs that use termcap to do
+full-screen display should output this string when they start up.
+
+<br><dt><code>te</code>
+<dd>String of commands to undo what is done by the <code>ti</code> string. 
+Programs that output the <code>ti</code> string on entry should output this
+string when they exit.
+
+<br><dt><code>is</code>
+<dd>String of commands to initialize the terminal for each login session.
+
+<br><dt><code>if</code>
+<dd>String which is the name of a file containing the string of commands
+to initialize the terminal for each session of use.  Normally <code>is</code>
+and <code>if</code> are not both used.
+
+<br><dt><code>i1</code>
+<dt><code>i3</code>
+<dd>Two more strings of commands to initialize the terminal for each login
+session.  The <code>i1</code> string (if defined) is output before <code>is</code>
+or <code>if</code>, and the <code>i3</code> string (if defined) is output after.
+
+<p>The reason for having three separate initialization strings is to make
+it easier to define a group of related terminal types with slightly
+different initializations.  Define two or three of the strings in the
+basic type; then the other types can override one or two of the
+strings.
+
+<br><dt><code>rs</code>
+<dd>String of commands to reset the terminal from any strange mode it may
+be in.  Normally this includes the <code>is</code> string (or other commands
+with the same effects) and more.  What would go in the <code>rs</code>
+string but not in the <code>is</code> string are annoying or slow commands
+to bring the terminal back from strange modes that nobody would
+normally use.
+
+<br><dt><code>it</code>
+<dd>Numeric value, the initial spacing between hardware tab stop columns
+when the terminal is powered up.  Programs to initialize the terminal
+can use this to decide whether there is a need to set the tab stops. 
+If the initial width is 8, well and good; if it is not 8, then the
+tab stops should be set; if they cannot be set, the kernel is told
+to convert tabs to spaces, and other programs will observe this and do
+likewise.
+
+<br><dt><code>ct</code>
+<dd>String of commands to clear all tab stops.
+
+<br><dt><code>st</code>
+<dd>String of commands to set tab stop at current cursor column on all
+lines.
+
+<br><dt><code>NF</code>
+<dd>Flag whose presence means that the terminal does not support XON/XOFF
+flow control.  Programs should not send XON (<kbd>C-q</kbd>) or XOFF
+(<kbd>C-s</kbd>) characters to the terminal. 
+</dl>
+
+<p><hr>
+Node:<a name="Pad%20Specs">Pad Specs</a>,
+Next:<a rel=next href="#Status%20Line">Status Line</a>,
+Previous:<a rel=previous href="#Initialization">Initialization</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.17 Padding Capabilities</h3>
+
+<p>There are two terminal capabilities that exist just to explain the proper
+way to obey the padding specifications in all the command string
+capabilities.  One, <code>pc</code>, must be obeyed by all termcap-using
+programs.
+
+<dl>
+<dt><code>pb</code>
+<dd>Numeric value, the lowest baud rate at which padding is actually
+needed.  Programs may check this and refrain from doing any padding at
+lower speeds.
+
+<br><dt><code>pc</code>
+<dd>String of commands for padding.  The first character of this string is
+to be used as the pad character, instead of using null characters for
+padding.  If <code>pc</code> is not provided, use null characters.  Every
+program that uses termcap must look up this capability and use it to
+set the variable <code>PC</code> that is used by <code>tputs</code>. 
+See <a href="#Padding">Padding</a>. 
+</dl>
+
+<p>Some termcap capabilities exist just to specify the amount of padding that
+the kernel should give to cursor motion commands used in ordinary
+sequential output.
+
+<dl>
+<dt><code>dC</code>
+<dd>Numeric value, the number of msec of padding needed for the
+carriage-return character.
+
+<br><dt><code>dN</code>
+<dd>Numeric value, the number of msec of padding needed for the newline
+(linefeed) character.
+
+<br><dt><code>dB</code>
+<dd>Numeric value, the number of msec of padding needed for the backspace
+character.
+
+<br><dt><code>dF</code>
+<dd>Numeric value, the number of msec of padding needed for the formfeed
+character.
+
+<br><dt><code>dT</code>
+<dd>Numeric value, the number of msec of padding needed for the tab
+character. 
+</dl>
+
+<p>In some systems, the kernel uses the above capabilities; in other systems,
+the kernel uses the paddings specified in the string capabilities
+<code>cr</code>, <code>sf</code>, <code>le</code>, <code>ff</code> and <code>ta</code>.  Descriptions of
+terminals which require such padding should contain the <code>dC</code> <small>...</small>
+<code>dT</code> capabilities and also specify the appropriate padding in the
+corresponding string capabilities.  Since no modern terminals require
+padding for ordinary sequential output, you probably won't need to do
+either of these things.
+
+<p><hr>
+Node:<a name="Status%20Line">Status Line</a>,
+Next:<a rel=next href="#Half-Line">Half-Line</a>,
+Previous:<a rel=previous href="#Pad%20Specs">Pad Specs</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.18 Status Line</h3>
+
+<p>A <dfn>status line</dfn> is a line on the terminal that is not used for ordinary
+display output but instead used for a special message.  The intended use is
+for a continuously updated description of what the user's program is doing,
+and that is where the name "status line" comes from, but in fact it could
+be used for anything.  The distinguishing characteristic of a status line
+is that ordinary output to the terminal does not affect it; it changes only
+if the special status line commands of this section are used.
+
+<dl>
+<dt><code>hs</code>
+<dd>Flag whose presence means that the terminal has a status line.  If a
+terminal description specifies that there is a status line, it must
+provide the <code>ts</code> and <code>fs</code> capabilities.
+
+<br><dt><code>ts</code>
+<dd>String of commands to move the terminal cursor into the status line. 
+Usually these commands must specifically record the old cursor
+position for the sake of the <code>fs</code> string.
+
+<br><dt><code>fs</code>
+<dd>String of commands to move the cursor back from the status line to its
+previous position (outside the status line).
+
+<br><dt><code>es</code>
+<dd>Flag whose presence means that other display commands work while
+writing the status line.  In other words, one can clear parts of it,
+insert or delete characters, move the cursor within it using <code>ch</code>
+if there is a <code>ch</code> capability, enter and leave standout mode, and
+so on.
+
+<br><dt><code>ds</code>
+<dd>String of commands to disable the display of the status line.  This
+may be absent, if there is no way to disable the status line display.
+
+<br><dt><code>ws</code>
+<dd>Numeric value, the width of the status line.  If this capability is
+absent in a terminal that has a status line, it means the status line
+is the same width as the other lines.
+
+<p>Note that the value of <code>ws</code> is sometimes as small as 8. 
+</dl>
+
+<p><hr>
+Node:<a name="Half-Line">Half-Line</a>,
+Next:<a rel=next href="#Printer">Printer</a>,
+Previous:<a rel=previous href="#Status%20Line">Status Line</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.19 Half-Line Motion</h3>
+
+<p>Some terminals have commands for moving the cursor vertically by half-lines,
+useful for outputting subscripts and superscripts.  Mostly it is hardcopy
+terminals that have such features.
+
+<dl>
+<dt><code>hu</code>
+<dd>String of commands to move the cursor up half a line.  If the terminal
+is a display, it is your responsibility to avoid moving up past the
+top line; however, most likely the terminal that supports this is a
+hardcopy terminal and there is nothing to be concerned about.
+
+<br><dt><code>hd</code>
+<dd>String of commands to move the cursor down half a line.  If the
+terminal is a display, it is your responsibility to avoid moving down
+past the bottom line, etc. 
+</dl>
+
+<p><hr>
+Node:<a name="Printer">Printer</a>,
+Previous:<a rel=previous href="#Half-Line">Half-Line</a>,
+Up:<a rel=up href="#Capabilities">Capabilities</a>
+<br>
+
+<h3>3.20 Controlling Printers Attached to Terminals</h3>
+
+<p>Some terminals have attached hardcopy printer ports.  They may be able to
+copy the screen contents to the printer; they may also be able to redirect
+output to the printer.  Termcap does not have anything to tell the program
+whether the redirected output appears also on the screen; it does on some
+terminals but not all.
+
+<dl>
+<dt><code>ps</code>
+<dd>String of commands to cause the contents of the screen to be printed. 
+If it is absent, the screen contents cannot be printed.
+
+<br><dt><code>po</code>
+<dd>String of commands to redirect further output to the printer.
+
+<br><dt><code>pf</code>
+<dd>String of commands to terminate redirection of output to the printer. 
+This capability must be present in the description if <code>po</code> is.
+
+<br><dt><code>pO</code>
+<dd>String of commands to redirect output to the printer for next <var>n</var>
+characters of output, regardless of what they are.  Redirection will
+end automatically after <var>n</var> characters of further output.  Until
+then, nothing that is output can end redirection, not even the
+<code>pf</code> string if there is one.  The number <var>n</var> should not be
+more than 255.
+
+<p>One use of this capability is to send non-text byte sequences (such as
+bit-maps) to the printer. 
+</dl>
+
+<p>Most terminals with printers do not support all of <code>ps</code>, <code>po</code> and
+<code>pO</code>; any one or two of them may be supported.  To make a program that
+can send output to all kinds of printers, it is necessary to check for all
+three of these capabilities, choose the most convenient of the ones that
+are provided, and use it in its own appropriate fashion.
+
+<p><hr>
+Node:<a name="Summary">Summary</a>,
+Next:<a rel=next href="#Var%20Index">Var Index</a>,
+Previous:<a rel=previous href="#Capabilities">Capabilities</a>,
+Up:<a rel=up href="#Top">Top</a>
+<br>
+
+<h2>4 Summary of Capability Names</h2>
+
+<p>Here are all the terminal capability names in alphabetical order
+with a brief description of each.  For cross references to their definitions,
+see the index of capability names (see <a href="#Cap%20Index">Cap Index</a>).
+
+<dl>
+<dt><code>ae</code>
+<dd>String to turn off alternate character set mode. 
+<br><dt><code>al</code>
+<dd>String to insert a blank line before the cursor. 
+<br><dt><code>AL</code>
+<dd>String to insert <var>n</var> blank lines before the cursor. 
+<br><dt><code>am</code>
+<dd>Flag: output to last column wraps cursor to next line. 
+<br><dt><code>as</code>
+<dd>String to turn on alternate character set mode.like. 
+<br><dt><code>bc</code>
+<dd>Very obsolete alternative name for the <code>le</code> capability. 
+<br><dt><code>bl</code>
+<dd>String to sound the bell. 
+<br><dt><code>bs</code>
+<dd>Obsolete flag: ASCII backspace may be used for leftward motion. 
+<br><dt><code>bt</code>
+<dd>String to move the cursor left to the previous hardware tab stop column. 
+<br><dt><code>bw</code>
+<dd>Flag: <code>le</code> at left margin wraps to end of previous line. 
+<br><dt><code>CC</code>
+<dd>String to change terminal's command character. 
+<br><dt><code>cd</code>
+<dd>String to clear the line the cursor is on, and following lines. 
+<br><dt><code>ce</code>
+<dd>String to clear from the cursor to the end of the line. 
+<br><dt><code>ch</code>
+<dd>String to position the cursor at column <var>c</var> in the same line. 
+<br><dt><code>cl</code>
+<dd>String to clear the entire screen and put cursor at upper left corner. 
+<br><dt><code>cm</code>
+<dd>String to position the cursor at line <var>l</var>, column <var>c</var>. 
+<br><dt><code>CM</code>
+<dd>String to position the cursor at line <var>l</var>, column
+<var>c</var>, relative to display memory. 
+<br><dt><code>co</code>
+<dd>Number: width of the screen. 
+<br><dt><code>cr</code>
+<dd>String to move cursor sideways to left margin. 
+<br><dt><code>cs</code>
+<dd>String to set the scroll region. 
+<br><dt><code>cS</code>
+<dd>Alternate form of string to set the scroll region. 
+<br><dt><code>ct</code>
+<dd>String to clear all tab stops. 
+<br><dt><code>cv</code>
+<dd>String to position the cursor at line <var>l</var> in the same column. 
+<br><dt><code>da</code>
+<dd>Flag: data scrolled off top of screen may be scrolled back. 
+<br><dt><code>db</code>
+<dd>Flag: data scrolled off bottom of screen may be scrolled back. 
+<br><dt><code>dB</code>
+<dd>Obsolete number: msec of padding needed for the backspace character. 
+<br><dt><code>dc</code>
+<dd>String to delete one character position at the cursor. 
+<br><dt><code>dC</code>
+<dd>Obsolete number: msec of padding needed for the carriage-return character. 
+<br><dt><code>DC</code>
+<dd>String to delete <var>n</var> characters starting at the cursor. 
+<br><dt><code>dF</code>
+<dd>Obsolete number: msec of padding needed for the formfeed character. 
+<br><dt><code>dl</code>
+<dd>String to delete the line the cursor is on. 
+<br><dt><code>DL</code>
+<dd>String to delete <var>n</var> lines starting with the cursor's line. 
+<br><dt><code>dm</code>
+<dd>String to enter delete mode. 
+<br><dt><code>dN</code>
+<dd>Obsolete number: msec of padding needed for the newline character. 
+<br><dt><code>do</code>
+<dd>String to move the cursor vertically down one line. 
+<br><dt><code>DO</code>
+<dd>String to move cursor vertically down <var>n</var> lines. 
+<br><dt><code>ds</code>
+<dd>String to disable the display of the status line. 
+<br><dt><code>dT</code>
+<dd>Obsolete number: msec of padding needed for the tab character. 
+<br><dt><code>ec</code>
+<dd>String of commands to clear <var>n</var> characters at cursor. 
+<br><dt><code>ed</code>
+<dd>String to exit delete mode. 
+<br><dt><code>ei</code>
+<dd>String to leave insert mode. 
+<br><dt><code>eo</code>
+<dd>Flag: output of a space can erase an overstrike. 
+<br><dt><code>es</code>
+<dd>Flag: other display commands work while writing the status line. 
+<br><dt><code>ff</code>
+<dd>String to advance to the next page, for a hardcopy terminal. 
+<br><dt><code>fs</code>
+<dd>String to move the cursor back from the status line to its
+previous position (outside the status line). 
+<br><dt><code>gn</code>
+<dd>Flag: this terminal type is generic, not real. 
+<br><dt><code>hc</code>
+<dd>Flag: hardcopy terminal. 
+<br><dt><code>hd</code>
+<dd>String to move the cursor down half a line. 
+<br><dt><code>ho</code>
+<dd>String to position cursor at upper left corner. 
+<br><dt><code>hs</code>
+<dd>Flag: the terminal has a status line. 
+<br><dt><code>hu</code>
+<dd>String to move the cursor up half a line. 
+<br><dt><code>hz</code>
+<dd>Flag: terminal cannot accept <code>~</code> as output. 
+<br><dt><code>i1</code>
+<dd>String to initialize the terminal for each login session. 
+<br><dt><code>i3</code>
+<dd>String to initialize the terminal for each login session. 
+<br><dt><code>ic</code>
+<dd>String to insert one character position at the cursor. 
+<br><dt><code>IC</code>
+<dd>String to insert <var>n</var> character positions at the cursor. 
+<br><dt><code>if</code>
+<dd>String naming a file of commands to initialize the terminal. 
+<br><dt><code>im</code>
+<dd>String to enter insert mode. 
+<br><dt><code>in</code>
+<dd>Flag: outputting a space is different from moving over empty positions. 
+<br><dt><code>ip</code>
+<dd>String to output following an inserted character in insert mode. 
+<br><dt><code>is</code>
+<dd>String to initialize the terminal for each login session. 
+<br><dt><code>it</code>
+<dd>Number: initial spacing between hardware tab stop columns. 
+<br><dt><code>k0</code>
+<dd>String of input sent by function key 0 or 10. 
+<br><dt><code>k1 <small>...</small> k9</code>
+<dd>Strings of input sent by function keys 1 through 9. 
+<br><dt><code>K1 <small>...</small> K5</code>
+<dd>Strings sent by the five other keys in 3-by-3 array with arrows. 
+<br><dt><code>ka</code>
+<dd>String of input sent by the "clear all tabs" key. 
+<br><dt><code>kA</code>
+<dd>String of input sent by the "insert line" key. 
+<br><dt><code>kb</code>
+<dd>String of input sent by the "backspace" key. 
+<br><dt><code>kC</code>
+<dd>String of input sent by the "clear screen" key. 
+<br><dt><code>kd</code>
+<dd>String of input sent by typing the down-arrow key. 
+<br><dt><code>kD</code>
+<dd>String of input sent by the "delete character" key. 
+<br><dt><code>ke</code>
+<dd>String to make the function keys work locally. 
+<br><dt><code>kE</code>
+<dd>String of input sent by the "clear to end of line" key. 
+<br><dt><code>kF</code>
+<dd>String of input sent by the "scroll forward" key. 
+<br><dt><code>kh</code>
+<dd>String of input sent by typing the "home-position" key. 
+<br><dt><code>kH</code>
+<dd>String of input sent by the "home down" key. 
+<br><dt><code>kI</code>
+<dd>String of input sent by the "insert character" or "enter
+insert mode" key. 
+<br><dt><code>kl</code>
+<dd>String of input sent by typing the left-arrow key. 
+<br><dt><code>kL</code>
+<dd>String of input sent by the "delete line" key. 
+<br><dt><code>km</code>
+<dd>Flag: the terminal has a Meta key. 
+<br><dt><code>kM</code>
+<dd>String of input sent by the "exit insert mode" key. 
+<br><dt><code>kn</code>
+<dd>Numeric value, the number of numbered function keys. 
+<br><dt><code>kN</code>
+<dd>String of input sent by the "next page" key. 
+<br><dt><code>ko</code>
+<dd>Very obsolete string listing the terminal's named function keys. 
+<br><dt><code>kP</code>
+<dd>String of input sent by the "previous page" key. 
+<br><dt><code>kr</code>
+<dd>String of input sent by typing the right-arrow key. 
+<br><dt><code>kR</code>
+<dd>String of input sent by the "scroll reverse" key. 
+<br><dt><code>ks</code>
+<dd>String to make the function keys transmit. 
+<br><dt><code>kS</code>
+<dd>String of input sent by the "clear to end of screen" key. 
+<br><dt><code>kt</code>
+<dd>String of input sent by the "clear tab stop this column" key. 
+<br><dt><code>kT</code>
+<dd>String of input sent by the "set tab stop in this column" key. 
+<br><dt><code>ku</code>
+<dd>String of input sent by typing the up-arrow key. 
+<br><dt><code>l0</code>
+<dd>String on keyboard labelling function key 0 or 10. 
+<br><dt><code>l1 <small>...</small> l9</code>
+<dd>Strings on keyboard labelling function keys 1 through 9. 
+<br><dt><code>le</code>
+<dd>String to move the cursor left one column. 
+<br><dt><code>LE</code>
+<dd>String to move cursor left <var>n</var> columns. 
+<br><dt><code>li</code>
+<dd>Number: height of the screen. 
+<br><dt><code>ll</code>
+<dd>String to position cursor at lower left corner. 
+<br><dt><code>lm</code>
+<dd>Number: lines of display memory. 
+<br><dt><code>LP</code>
+<dd>Flag: writing to last column of last line will not scroll. 
+<br><dt><code>mb</code>
+<dd>String to enter blinking mode. 
+<br><dt><code>md</code>
+<dd>String to enter double-bright mode. 
+<br><dt><code>me</code>
+<dd>String to turn off all appearance modes
+<br><dt><code>mh</code>
+<dd>String to enter half-bright mode. 
+<br><dt><code>mi</code>
+<dd>Flag: cursor motion in insert mode is safe. 
+<br><dt><code>mk</code>
+<dd>String to enter invisible mode. 
+<br><dt><code>mm</code>
+<dd>String to enable the functioning of the Meta key. 
+<br><dt><code>mo</code>
+<dd>String to disable the functioning of the Meta key. 
+<br><dt><code>mp</code>
+<dd>String to enter protected mode. 
+<br><dt><code>mr</code>
+<dd>String to enter reverse-video mode. 
+<br><dt><code>ms</code>
+<dd>Flag: cursor motion in standout mode is safe. 
+<br><dt><code>nc</code>
+<dd>Obsolete flag: do not use ASCII carriage-return on this terminal. 
+<br><dt><code>nd</code>
+<dd>String to move the cursor right one column. 
+<br><dt><code>NF</code>
+<dd>Flag: do not use XON/XOFF flow control. 
+<br><dt><code>nl</code>
+<dd>Obsolete alternative name for the <code>do</code> and <code>sf</code> capabilities. 
+<br><dt><code>ns</code>
+<dd>Flag: the terminal does not normally scroll for sequential output. 
+<br><dt><code>nw</code>
+<dd>String to move to start of next line, possibly clearing rest of old line. 
+<br><dt><code>os</code>
+<dd>Flag: terminal can overstrike. 
+<br><dt><code>pb</code>
+<dd>Number: the lowest baud rate at which padding is actually needed. 
+<br><dt><code>pc</code>
+<dd>String containing character for padding. 
+<br><dt><code>pf</code>
+<dd>String to terminate redirection of output to the printer. 
+<br><dt><code>po</code>
+<dd>String to redirect further output to the printer. 
+<br><dt><code>pO</code>
+<dd>String to redirect <var>n</var> characters ofoutput to the printer. 
+<br><dt><code>ps</code>
+<dd>String to print the screen on the attached printer. 
+<br><dt><code>rc</code>
+<dd>String to move to last saved cursor position. 
+<br><dt><code>RI</code>
+<dd>String to move cursor right <var>n</var> columns. 
+<br><dt><code>rp</code>
+<dd>String to output character <var>c</var> repeated <var>n</var> times. 
+<br><dt><code>rs</code>
+<dd>String to reset the terminal from any strange modes. 
+<br><dt><code>sa</code>
+<dd>String to turn on an arbitrary combination of appearance modes. 
+<br><dt><code>sc</code>
+<dd>String to save the current cursor position. 
+<br><dt><code>se</code>
+<dd>String to leave standout mode. 
+<br><dt><code>sf</code>
+<dd>String to scroll the screen one line up. 
+<br><dt><code>SF</code>
+<dd>String to scroll the screen <var>n</var> lines up. 
+<br><dt><code>sg</code>
+<dd>Number: width of magic standout cookie.  Absent if magic cookies are
+not used. 
+<br><dt><code>so</code>
+<dd>String to enter standout mode. 
+<br><dt><code>sr</code>
+<dd>String to scroll the screen one line down. 
+<br><dt><code>SR</code>
+<dd>String to scroll the screen <var>n</var> line down. 
+<br><dt><code>st</code>
+<dd>String to set tab stop at current cursor column on all lines. 
+programs. 
+<br><dt><code>ta</code>
+<dd>String to move the cursor right to the next hardware tab stop column. 
+<br><dt><code>te</code>
+<dd>String to return terminal to settings for sequential output. 
+<br><dt><code>ti</code>
+<dd>String to initialize terminal for random cursor motion. 
+<br><dt><code>ts</code>
+<dd>String to move the terminal cursor into the status line. 
+<br><dt><code>uc</code>
+<dd>String to underline one character and move cursor right. 
+<br><dt><code>ue</code>
+<dd>String to turn off underline mode
+<br><dt><code>ug</code>
+<dd>Number: width of underlining magic cookie.  Absent if underlining
+doesn't use magic cookies. 
+<br><dt><code>ul</code>
+<dd>Flag: underline by overstriking with an underscore. 
+<br><dt><code>up</code>
+<dd>String to move the cursor vertically up one line. 
+<br><dt><code>UP</code>
+<dd>String to move cursor vertically up <var>n</var> lines. 
+<br><dt><code>us</code>
+<dd>String to turn on underline mode
+<br><dt><code>vb</code>
+<dd>String to make the screen flash. 
+<br><dt><code>ve</code>
+<dd>String to return the cursor to normal. 
+<br><dt><code>vi</code>
+<dd>String to make the cursor invisible. 
+<br><dt><code>vs</code>
+<dd>String to enhance the cursor. 
+<br><dt><code>wi</code>
+<dd>String to set the terminal output screen window. 
+<br><dt><code>ws</code>
+<dd>Number: the width of the status line. 
+<br><dt><code>xb</code>
+<dd>Flag: superbee terminal. 
+<br><dt><code>xn</code>
+<dd>Flag: cursor wraps in a strange way. 
+<br><dt><code>xs</code>
+<dd>Flag: clearing a line is the only way to clear the appearance modes of
+positions in that line (or, only way to remove magic cookies on that
+line). 
+<br><dt><code>xt</code>
+<dd>Flag: Teleray 1061; several strange characteristics. 
+</dl>
+
+<p><hr>
+Node:<a name="Var%20Index">Var Index</a>,
+Next:<a rel=next href="#Cap%20Index">Cap Index</a>,
+Previous:<a rel=previous href="#Summary">Summary</a>,
+Up:<a rel=up href="#Top">Top</a>
+<br>
+
+<h2>Variable and Function Index</h2>
+
+<ul compact>
+<li><code>BC</code>: <a href="#tgoto">tgoto</a>
+<li><code>ospeed</code>: <a href="#Output%20Padding">Output Padding</a>
+<li><code>PC</code>: <a href="#Output%20Padding">Output Padding</a>
+<li><code>tgetent</code>: <a href="#Find">Find</a>
+<li><code>tgetflag</code>: <a href="#Interrogate">Interrogate</a>
+<li><code>tgetnum</code>: <a href="#Interrogate">Interrogate</a>
+<li><code>tgetstr</code>: <a href="#Interrogate">Interrogate</a>
+<li><code>tgoto</code>: <a href="#tgoto">tgoto</a>
+<li><code>tparam</code>: <a href="#tparam">tparam</a>
+<li><code>tputs</code>: <a href="#Output%20Padding">Output Padding</a>
+<li><code>UP</code>: <a href="#tgoto">tgoto</a>
+</ul>
+<p><hr>
+Node:<a name="Cap%20Index">Cap Index</a>,
+Next:<a rel=next href="#Index">Index</a>,
+Previous:<a rel=previous href="#Var%20Index">Var Index</a>,
+Up:<a rel=up href="#Top">Top</a>
+<br>
+
+<h2>Capability Index</h2>
+
+<ul compact>
+<li><code>ae</code>: <a href="#Standout">Standout</a>
+<li><code>AL</code>: <a href="#Insdel%20Line">Insdel Line</a>
+<li><code>al</code>: <a href="#Insdel%20Line">Insdel Line</a>
+<li><code>am</code>: <a href="#Wrapping">Wrapping</a>
+<li><code>as</code>: <a href="#Standout">Standout</a>
+<li><code>bc</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>bl</code>: <a href="#Bell">Bell</a>
+<li><code>bs</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>bt</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>bw</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>CC</code>: <a href="#Basic">Basic</a>
+<li><code>cd</code>: <a href="#Clearing">Clearing</a>
+<li><code>ce</code>: <a href="#Clearing">Clearing</a>
+<li><code>ch</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>cl</code>: <a href="#Clearing">Clearing</a>
+<li><code>cm</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>CM</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>co</code>: <a href="#Screen%20Size">Screen Size</a>
+<li><code>cr</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>cS</code>: <a href="#Scrolling">Scrolling</a>
+<li><code>cs</code>: <a href="#Scrolling">Scrolling</a>
+<li><code>ct</code>: <a href="#Initialization">Initialization</a>
+<li><code>cv</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>da</code>: <a href="#Scrolling">Scrolling</a>
+<li><code>dB</code>: <a href="#Pad%20Specs">Pad Specs</a>
+<li><code>db</code>: <a href="#Scrolling">Scrolling</a>
+<li><code>dC</code>: <a href="#Pad%20Specs">Pad Specs</a>
+<li><code>DC</code>: <a href="#Insdel%20Char">Insdel Char</a>
+<li><code>dc</code>: <a href="#Insdel%20Char">Insdel Char</a>
+<li><code>dF</code>: <a href="#Pad%20Specs">Pad Specs</a>
+<li><code>dl</code>: <a href="#Insdel%20Line">Insdel Line</a>
+<li><code>DL</code>: <a href="#Insdel%20Line">Insdel Line</a>
+<li><code>dm</code>: <a href="#Insdel%20Char">Insdel Char</a>
+<li><code>dN</code>: <a href="#Pad%20Specs">Pad Specs</a>
+<li><code>do</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>DO</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>ds</code>: <a href="#Status%20Line">Status Line</a>
+<li><code>dT</code>: <a href="#Pad%20Specs">Pad Specs</a>
+<li><code>ec</code>: <a href="#Clearing">Clearing</a>
+<li><code>ed</code>: <a href="#Insdel%20Char">Insdel Char</a>
+<li><code>ei</code>: <a href="#Insdel%20Char">Insdel Char</a>
+<li><code>eo</code>: <a href="#Basic">Basic</a>
+<li><code>es</code>: <a href="#Status%20Line">Status Line</a>
+<li><code>ff</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>fs</code>: <a href="#Status%20Line">Status Line</a>
+<li><code>gn</code>: <a href="#Basic">Basic</a>
+<li><code>hc</code>: <a href="#Basic">Basic</a>
+<li><code>hd</code>: <a href="#Half-Line">Half-Line</a>
+<li><code>ho</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>hs</code>: <a href="#Status%20Line">Status Line</a>
+<li><code>hu</code>: <a href="#Half-Line">Half-Line</a>
+<li><code>hz</code>: <a href="#Basic">Basic</a>
+<li><code>i1</code>: <a href="#Initialization">Initialization</a>
+<li><code>i3</code>: <a href="#Initialization">Initialization</a>
+<li><code>ic</code>: <a href="#Insdel%20Char">Insdel Char</a>
+<li><code>IC</code>: <a href="#Insdel%20Char">Insdel Char</a>
+<li><code>if</code>: <a href="#Initialization">Initialization</a>
+<li><code>im</code>: <a href="#Insdel%20Char">Insdel Char</a>
+<li><code>in</code>: <a href="#Insdel%20Char">Insdel Char</a>
+<li><code>ip</code>: <a href="#Insdel%20Char">Insdel Char</a>
+<li><code>is</code>: <a href="#Initialization">Initialization</a>
+<li><code>it</code>: <a href="#Initialization">Initialization</a>
+<li><code>K1<small>...</small>K5</code>: <a href="#Keypad">Keypad</a>
+<li><code>k1<small>...</small>k9</code>: <a href="#Keypad">Keypad</a>
+<li><code>kA<small>...</small>kT</code>: <a href="#Keypad">Keypad</a>
+<li><code>ka<small>...</small>ku</code>: <a href="#Keypad">Keypad</a>
+<li><code>km</code>: <a href="#Meta%20Key">Meta Key</a>
+<li><code>l0<small>...</small>l9</code>: <a href="#Keypad">Keypad</a>
+<li><code>le</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>LE</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>li</code>: <a href="#Screen%20Size">Screen Size</a>
+<li><code>ll</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>lm</code>: <a href="#Scrolling">Scrolling</a>
+<li><code>LP</code>: <a href="#Wrapping">Wrapping</a>
+<li><code>mb</code>: <a href="#Standout">Standout</a>
+<li><code>md</code>: <a href="#Standout">Standout</a>
+<li><code>me</code>: <a href="#Standout">Standout</a>
+<li><code>mh</code>: <a href="#Standout">Standout</a>
+<li><code>mi</code>: <a href="#Insdel%20Char">Insdel Char</a>
+<li><code>mk</code>: <a href="#Standout">Standout</a>
+<li><code>mm</code>: <a href="#Meta%20Key">Meta Key</a>
+<li><code>mo</code>: <a href="#Meta%20Key">Meta Key</a>
+<li><code>mp</code>: <a href="#Standout">Standout</a>
+<li><code>mr</code>: <a href="#Standout">Standout</a>
+<li><code>ms</code>: <a href="#Underlining">Underlining</a>, <a href="#Standout">Standout</a>
+<li><code>nc</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>nd</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>NF</code>: <a href="#Initialization">Initialization</a>
+<li><code>nl</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>ns</code>: <a href="#Scrolling">Scrolling</a>
+<li><code>nw</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>os</code>: <a href="#Basic">Basic</a>
+<li><code>pb</code>: <a href="#Pad%20Specs">Pad Specs</a>
+<li><code>pc</code>: <a href="#Pad%20Specs">Pad Specs</a>
+<li><code>pf</code>: <a href="#Printer">Printer</a>
+<li><code>po</code>: <a href="#Printer">Printer</a>
+<li><code>pO</code>: <a href="#Printer">Printer</a>
+<li><code>ps</code>: <a href="#Printer">Printer</a>
+<li><code>rc</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>RI</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>rp</code>: <a href="#Basic">Basic</a>
+<li><code>rs</code>: <a href="#Initialization">Initialization</a>
+<li><code>sa</code>: <a href="#Standout">Standout</a>
+<li><code>sc</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>se</code>: <a href="#Standout">Standout</a>
+<li><code>sf</code>: <a href="#Scrolling">Scrolling</a>
+<li><code>SF</code>: <a href="#Scrolling">Scrolling</a>
+<li><code>sg</code>: <a href="#Standout">Standout</a>
+<li><code>so</code>: <a href="#Standout">Standout</a>
+<li><code>sr</code>: <a href="#Scrolling">Scrolling</a>
+<li><code>SR</code>: <a href="#Scrolling">Scrolling</a>
+<li><code>st</code>: <a href="#Initialization">Initialization</a>
+<li><code>ta</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>te</code>: <a href="#Initialization">Initialization</a>
+<li><code>ti</code>: <a href="#Initialization">Initialization</a>
+<li><code>ts</code>: <a href="#Status%20Line">Status Line</a>
+<li><code>uc</code>: <a href="#Underlining">Underlining</a>
+<li><code>ue</code>: <a href="#Underlining">Underlining</a>
+<li><code>ug</code>: <a href="#Underlining">Underlining</a>
+<li><code>ul</code>: <a href="#Underlining">Underlining</a>
+<li><code>UP</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>up</code>: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li><code>us</code>: <a href="#Underlining">Underlining</a>
+<li><code>vb</code>: <a href="#Bell">Bell</a>
+<li><code>ve</code>: <a href="#Cursor%20Visibility">Cursor Visibility</a>
+<li><code>vi</code>: <a href="#Cursor%20Visibility">Cursor Visibility</a>
+<li><code>vs</code>: <a href="#Cursor%20Visibility">Cursor Visibility</a>
+<li><code>wi</code>: <a href="#Windows">Windows</a>
+<li><code>ws</code>: <a href="#Status%20Line">Status Line</a>
+<li><code>xb</code>: <a href="#Basic">Basic</a>
+<li><code>xn</code>: <a href="#Wrapping">Wrapping</a>
+<li><code>xs</code>: <a href="#Standout">Standout</a>
+<li><code>xt</code>: <a href="#Cursor%20Motion">Cursor Motion</a>, <a href="#Standout">Standout</a>
+</ul>
+<p><hr>
+Node:<a name="Index">Index</a>,
+Previous:<a rel=previous href="#Cap%20Index">Cap Index</a>,
+Up:<a rel=up href="#Top">Top</a>
+<br>
+
+<h2>Concept Index</h2>
+
+<ul compact>
+<li>%: <a href="#Encode%20Parameters">Encode Parameters</a>
+<li>appearance modes: <a href="#Standout">Standout</a>
+<li>bell: <a href="#Bell">Bell</a>
+<li>clearing the screen: <a href="#Clearing">Clearing</a>
+<li>command character: <a href="#Basic">Basic</a>
+<li>cursor motion: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li>delete character: <a href="#Insdel%20Char">Insdel Char</a>
+<li>delete line: <a href="#Insdel%20Line">Insdel Line</a>
+<li>delete mode: <a href="#Insdel%20Char">Insdel Char</a>
+<li>description format: <a href="#Format">Format</a>
+<li>erasing: <a href="#Clearing">Clearing</a>
+<li>generic terminal type: <a href="#Basic">Basic</a>
+<li>home position: <a href="#Cursor%20Motion">Cursor Motion</a>
+<li>inheritance: <a href="#Inheriting">Inheriting</a>
+<li>initialization: <a href="#Initialization">Initialization</a>
+<li>insert character: <a href="#Insdel%20Char">Insdel Char</a>
+<li>insert line: <a href="#Insdel%20Line">Insdel Line</a>
+<li>insert mode: <a href="#Insdel%20Char">Insdel Char</a>
+<li>line speed: <a href="#Output%20Padding">Output Padding</a>
+<li>magic cookie: <a href="#Standout">Standout</a>
+<li>meta key: <a href="#Meta%20Key">Meta Key</a>
+<li>names of terminal types: <a href="#Naming">Naming</a>
+<li>overstrike: <a href="#Basic">Basic</a>
+<li>padding: <a href="#Pad%20Specs">Pad Specs</a>, <a href="#Padding">Padding</a>
+<li>parameters: <a href="#Parameters">Parameters</a>
+<li>printer: <a href="#Printer">Printer</a>
+<li>repeat output: <a href="#Basic">Basic</a>
+<li>reset: <a href="#Initialization">Initialization</a>
+<li>screen size: <a href="#Screen%20Size">Screen Size</a>, <a href="#Naming">Naming</a>
+<li>scrolling: <a href="#Scrolling">Scrolling</a>
+<li>standout: <a href="#Standout">Standout</a>
+<li>status line: <a href="#Status%20Line">Status Line</a>
+<li>Superbee: <a href="#Basic">Basic</a>
+<li>tab stops: <a href="#Initialization">Initialization</a>
+<li>termcap: <a href="#Introduction">Introduction</a>
+<li>terminal flags (kernel): <a href="#Initialize">Initialize</a>
+<li>underlining: <a href="#Underlining">Underlining</a>
+<li>visibility: <a href="#Cursor%20Visibility">Cursor Visibility</a>
+<li>visible bell: <a href="#Bell">Bell</a>
+<li>window: <a href="#Windows">Windows</a>
+<li>wrapping: <a href="#Wrapping">Wrapping</a>, <a href="#Naming">Naming</a>
+</ul>
+
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Introduction"></a>
+    <a href="#Introduction">Introduction</a>
+<li><a name="toc_Library"></a>
+    <a href="#Library">1 The Termcap Library</a>
+<ul>
+<li><a href="#Preparation">1.1 Preparing to Use the Termcap Library</a>
+<li><a href="#Find">1.2 Finding a Terminal Description: <code>tgetent</code></a>
+<li><a href="#Interrogate">1.3 Interrogating the Terminal Description</a>
+<li><a href="#Initialize">1.4 Initialization for Use of Termcap</a>
+<li><a href="#Padding">1.5 Padding</a>
+<ul>
+<li><a href="#Why%20Pad">1.5.1 Why Pad, and How</a>
+<li><a href="#Not%20Enough">1.5.2 When There Is Not Enough Padding</a>
+<li><a href="#Describe%20Padding">1.5.3 Specifying Padding in a Terminal Description</a>
+<li><a href="#Output%20Padding">1.5.4 Performing Padding with <code>tputs</code></a>
+</ul>
+<li><a href="#Parameters">1.6 Filling In Parameters</a>
+<ul>
+<li><a href="#Encode%20Parameters">1.6.1 Describing the Encoding</a>
+<li><a href="#Using%20Parameters">1.6.2 Sending Display Commands with Parameters</a>
+<ul>
+<li><a href="#tparam">1.6.2.1 <code>tparam</code></a>
+<li><a href="#tgoto">1.6.2.2 <code>tgoto</code></a>
+</ul>
+</ul>
+</ul>
+<li><a name="toc_Data%20Base"></a>
+    <a href="#Data%20Base">2 The Format of the Data Base</a>
+<ul>
+<li><a href="#Format">2.1 Terminal Description Format</a>
+<li><a href="#Capability%20Format">2.2 Writing the Capabilities</a>
+<li><a href="#Naming">2.3 Terminal Type Name Conventions</a>
+<li><a href="#Inheriting">2.4 Inheriting from Related Descriptions</a>
+<li><a href="#Changing">2.5 When Changes in the Data Base Take Effect</a>
+</ul>
+<li><a name="toc_Capabilities"></a>
+    <a href="#Capabilities">3 Definitions of the Terminal Capabilities</a>
+<ul>
+<li><a href="#Basic">3.1 Basic Characteristics</a>
+<li><a href="#Screen%20Size">3.2 Screen Size</a>
+<li><a href="#Cursor%20Motion">3.3 Cursor Motion</a>
+<li><a href="#Wrapping">3.4 Wrapping</a>
+<li><a href="#Scrolling">3.5 Scrolling</a>
+<li><a href="#Windows">3.6 Windows</a>
+<li><a href="#Clearing">3.7 Clearing Parts of the Screen</a>
+<li><a href="#Insdel%20Line">3.8 Insert/Delete Line</a>
+<li><a href="#Insdel%20Char">3.9 Insert/Delete Character</a>
+<li><a href="#Standout">3.10 Standout and Appearance Modes</a>
+<li><a href="#Underlining">3.11 Underlining</a>
+<li><a href="#Cursor%20Visibility">3.12 Cursor Visibility</a>
+<li><a href="#Bell">3.13 Bell</a>
+<li><a href="#Keypad">3.14 Keypad and Function Keys</a>
+<li><a href="#Meta%20Key">3.15 Meta Key</a>
+<li><a href="#Initialization">3.16 Initialization</a>
+<li><a href="#Pad%20Specs">3.17 Padding Capabilities</a>
+<li><a href="#Status%20Line">3.18 Status Line</a>
+<li><a href="#Half-Line">3.19 Half-Line Motion</a>
+<li><a href="#Printer">3.20 Controlling Printers Attached to Terminals</a>
+</ul>
+<li><a name="toc_Summary"></a>
+    <a href="#Summary">4 Summary of Capability Names</a>
+<li><a name="toc_Var%20Index"></a>
+    <a href="#Var%20Index">Variable and Function Index</a>
+<li><a name="toc_Cap%20Index"></a>
+    <a href="#Cap%20Index">Capability Index</a>
+<li><a name="toc_Index"></a>
+    <a href="#Index">Concept Index</a>
+</ul>
+
+
+</body></html>
+

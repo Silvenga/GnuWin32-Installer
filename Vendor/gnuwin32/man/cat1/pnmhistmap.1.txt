@@ -1,0 +1,179 @@
+Pnmhistmap User Manual(0)             Pnmhistmap User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       pnmhistmap - draw a histogram for a PGM or PPM file
+
+
+SYNOPSIS
+       pnmhistmap
+
+       [-black]
+
+       [-white]
+
+       [-max N]
+
+       [-verbose]
+
+       [pnmfile]
+
+       Minimum  unique  abbreviation  of  option is acceptable.
+       You may use double hyphens instead of single  hyphen  to
+       denote options.  You may use white space in place of the
+       equals sign to separate an option name from its value.
+
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       pnmhistmap reads a PNM image as input  and  produces  an
+       image  showing a histogram of the color (or gray) values
+       in the input.  A PGM input results in a PBM  output.   A
+       PPM  input  results  in a PPM output with three overlaid
+       histograms: a red one for the red input, a green one for
+       the green input, and a blue one for the blue input.
+
+       For  example, from the following image produces the fol-
+       lowing histogram:
+
+       image histogram from image
+
+       If the input is PBM, pnmhistmap produces an  error  mes-
+       sage and no output image.
+
+
+OPTIONS
+       -red
+
+       -green
+
+       -blue  Include the indicated color component in the out-
+              put.  If you specify none  of  these,  pnmhistmap
+              include all three.
+
+              These  options  are  meaningless  if the input is
+              PGM.
+
+              These options were new in Netpbm  10.26  (January
+              2005).   Before  that, pnmhistmap always included
+              all three color components.
+
+
+       -dots  Plot  the  histogram  as   dots.    By   default,
+              pnmhistmap plots bars.
+
+              Example of dots:.B -dots example
+
+              This  option  was  new  in  Netpbm 10.26 (January
+              2005).  Before that,  pnmhistmap  always  plotted
+              bars.
+
+
+       -lval minpixval
+
+       -rval maxpixval
+              These options specify the range of intensity val-
+              ues to include.  pnmhistmap  ignores  intensities
+              less  than  minpixval and greater than maxpixval.
+              So the left side of the histogram corresponds  to
+              minpixval  and the right side corresponds to max-
+              pixval.
+
+              By default, pnmhistmap plots the entire  possible
+              range: zero to the maxval.
+
+              These  options  were new in Netpbm 10.26 (January
+              2005).  Before that,  pnmhistmap  always  plotted
+              from zero to the maxval.
+
+
+       -height
+
+       -width These  options  specify the dimensions, in pixels
+              of the histogram image.
+
+              The default height is 200 pixels.
+
+              The default width is one pixel for  each  plotted
+              intensity value (so it's controlled by the maxval
+              of the image and the -lval  and  -rval  options).
+              The  'count  buckets' in the histogram are always
+              one pixel wide.  If you specify a width less than
+              the  number of plotted intensity values, a bucket
+              represents more than one intensity value.  If you
+              specify  a width greater that the number of plot-
+              ted intensity values, some buckets  represent  no
+              color (the count is zero).
+
+              This  option  was  new  in  Netpbm 10.26 (January
+              2005).  Before that, the dimensions  were  always
+              what the default is today.
+
+
+
+
+
+
+       -black Ignore the count of black pixels when scaling the
+              histogram.
+
+
+       -white Ignore the count of white pixels when scaling the
+              histogram.
+
+
+
+       The  -black  and -white options, which can be used sepa-
+       rately or together, are useful for images with  a  large
+       percentage  of  pixels whose value is zero or 255, which
+       can cause the remaining histogram data to become unread-
+       baly small.  Note that, for pixmap inputs, these options
+       apply to all colors; if, for example, the  input  has  a
+       large number of bright-red areas, you will probably want
+       to use the -white option.
+
+
+
+       -max N Force the scaling of the histogram to  use  N  as
+              the  largest-count  value.   This  is  useful for
+              inputs with a large  percentage  of  single-color
+              pixels which are not black or white.
+
+
+       -verbose
+              Report  the  progress  of  making  the histogram,
+              including the largest-count value used  to  scale
+              the output.
+
+
+
+
+
+LIMITATIONS
+       pnmhistmap  assumes maxval is always 255.  Images with a
+       smaller maxval will only use the lower-value side of the
+       histogram.   You  can overcome this either by piping the
+       input through pnmdepth or by  cutting  and  scaling  the
+       lower-value side of the histogram.  Neither is a partic-
+       ularly elegant solution to the problem.
+
+       The program does not allow you  to  specify  the  output
+       size.
+
+
+SEE ALSO
+       pgmhist(1), ppmhist(1), pgm(1), ppm(1)
+
+
+AUTHOR
+       Wilson H. Bent. Jr. (whb@usc.edu).
+
+
+
+netpbm documentation    25 October 199Pnmhistmap User Manual(0)

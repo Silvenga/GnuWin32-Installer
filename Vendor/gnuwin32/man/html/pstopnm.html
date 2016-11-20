@@ -1,0 +1,389 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pstopnm User Manual</TITLE></HEAD>
+<BODY>
+<H1>pstopnm</H1>
+Updated: 28 May 2003
+<BR>
+<A HREF="pstopnm.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pstopnm - convert a PostScript file to a PNM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pstopnm</B>
+
+[<B>-stdout</B>]
+
+[<B>-forceplain</B>]
+
+[<B>-help</B>]
+
+[<B>-dpi=</b><i>dpi</i>]
+
+[<B>-xsize=</B><I>pixels</I>]
+[<B>-ysize=</B><I>pixels</I>]
+
+[<B>-xborder=</B><I>frac</I>]
+[<B>-yborder=</B><I>frac</I>]
+
+[<B>-landscape</B>]
+
+[<B>-portrait</B>]
+
+[<B>-nocrop</B>]
+
+[<B>-pbm</B>
+
+|<B>-pgm</B>
+
+|<B>-ppm</B>]
+
+[<B>-llx=</B><I>s</I>]
+[<B>-lly=</B><I>s</I>]
+[<B>-urx=</B><I>s</I>]
+[<B>-ury=</B><I>s</I>]
+
+[<B>-verbose</B>]
+
+[<B>-xmax=</B><I>pixels</I>]
+[<B>-ymax=</B><I>pixels</I>]
+
+
+<I>psfile</I>[<B>.ps</B>]
+
+<?makeman .SH OPTION USAGE ?>
+<P>Minimum unique abbreviation of option is acceptable.  You may use
+double hyphens instead of single hyphen to denote options.  You may use
+white space in place of the equals sign to separate an option name
+from its value.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pstopnm</b> reads a PostScript file as input and produces PBM,
+PGM, or PPM images as output.  This program simply uses GhostScript to
+render a PostScript file with its PNM device drivers.  If you don't
+have GhostScript installed or the version you have installed was not
+built with the relevant PNM device drivers, <B>pstopnm</B> will fail.
+You can see if you have the proper environment by issuing the command
+<kbd>gs --help </kbd>.  If it responds and lists under &quot;Available
+Devices&quot; <B>pbm</B>, <B>pbmraw</B>, <B>pgm</B>, <B>pgmraw</B>,
+<B>pnm</B>, <B>pnmraw</B>, <B>ppm</B>, or <B>ppmraw</B>, you're in
+business.
+
+<P><B>pstopnm</B> uses the value of the <B>GHOSTSCRIPT</B>
+environment variable as the file name for the Ghostscript program.  If
+<B>GHOSTSCRIPT</B> is not set, <B>pstopnm</B> searches your
+<B>PATH</B> for a regular file named <B>gs</B>.  If it doesn't find
+one, it assumes Ghostscript is in the file <b>/usr/bin/gs</b>.
+
+<P><B>pstopnm</B> does not use the Netpbm libraries to generate the
+output files, so may not be entirely consistent with most Netpbm
+programs.
+
+<P><I>psfile</I>[<B>.ps</B>] is the name of the input file.
+<B>pstopnm</B> will add the <B>ps</B> to the end of the name you
+specify if no file exists by the exact name you specify, but one with
+added does.  Use <B>-</B> to indicate Standard Input.
+
+<P>If you use the <B>-stdout </B> option, <B>pstopnm</B> outputs
+images of all the pages as a multi-image file to Standard Output.
+Otherwise, <B>pstopnm</B> creates one file for each page in the
+Postscript document.  The files are named as follows: If the input
+file is named <B>psfile.ps</B>, the name of the files will be
+<B>psfile001.ppm</B>, <B>psfile002.ppm</B>, etc.  The filetype suffix
+is <B>.ppm</B>, <B>.pgm</B>, or <B>.pbm</B>, depending on which kind
+of output you choose with your invocation options.  If the input file
+name does not end in <B>.ps</B>, the whole file name is used in the
+output file name.  For example, if the input file is named
+<B>psfile.old</B>, the output file name is <B>psfile.old001.ppm</B>,
+etc.
+
+<P>Note that the output file selection is inconsistent with most
+Netpbm programs, because it does not default to Standard Output.  This
+is for historical reasons, based on the fact that the Netpbm formats
+did not always provide for a sequence of images in a single file.
+
+<p>Each output image contains a rectangular area of the page to which
+it pertains.  See <a href="pstopnm.html#dimensions">the Dimensions section</a> for
+details on what part of the input image goes into the output image and
+how big it is in the output and what borders and margins are in the
+output image.
+
+<P>It has been reported that on some Postscript Version 1 input,
+Ghostscript, and therefore <B>pstopnm</B>, produces no output.  To
+solve this problem, you can convert the file to Postscript Version 3
+with the program <B>ps2ps</B>.  It is reported that the program
+<B>pstops</B> does not work.
+
+<a name="dimensions"></a>
+<h3>Dimensions</h3>
+
+<p>This section describes what part of the input image gets used in
+the output and the dimensions of the output, including borders and
+background.
+
+<p>Note that an output image is associated with a single input page.
+
+<b>pstopnm</b> starts by taking a rectangular area from the input page.
+That is called the subject image.
+
+<p><b>pstopnm</b> may add borders to the subject image to form what is called
+the bordered subject image.
+
+<p><b>pstopnm</b> places the bordered subject image in the center of
+the output image and clips the edges as necessary to fit the computed
+output image size.
+
+<p>The location of the subject image in the Postscript input page is
+defined by four numbers, the lower left corner and the upper right
+corner x and y coordinates.  These coordinates are usually specified
+by the BoundingBox DSC statement (a Postscript comment) in the
+PostScript file, but they can be overridden by the user by specifying
+one or more of the following options: <B>-llx</B>, <B>-lly</B>,
+<B>-urx</B>, and <B>-ury</B>.
+
+<p>The presence and thickness of a border to be added to the subject
+image to form the bordered subject image is controlled by the options
+<B>-xborder</B> and <B>-yborder</B>.  If <B>pstopnm</B> does not find
+a BoundingBox statement in the input, and you don't specify image area
+coordinates on the command line, <B>pstopnm</B> uses default values.
+If your input is from Standard Input, <B>pstopnm</B> does not use the
+BoundingBox values (due to the technical difficulty of extracting that
+information and still feeding the file to Ghostscript), so you either
+have to specify the image area coordinates or take the default.
+
+<p>The output image size is a confusing thing.  In a Postscript file,
+things have spatial dimensions.  For example, a particular line may be
+3 centimeters long.  A Postscript printer is supposed to print the
+line 3 centimeters long, using however many pixels that takes, without
+regard to how big the sheet of paper on which it is printing is.  In a
+PNM image, by contrast, there is no spatial dimension; there are only
+pixels.  You might have a line that is 100 pixels long, but the PNM
+image says nothing about how long that line should be on a printed
+page.
+
+<p><b>pstopnm</b> fills the role of a Postscript printer.  The PNM image
+is a virtual printed page.  <b>pstopnm</b> must determine how many pixels
+it will use in the output image to represent an inch of input image,
+which is the "output device resolution."  Think of it as the number of
+dots per inch the virtual printer prints on the virtual page.
+
+<p>The simplest thing is for you to tell <b>pstopnm</b> exactly what
+output device resolution to use, using the <b>-dpi</b> option.  If you
+say for example <b>-dpi=300</b> and the bordered subject image is 2
+inches by 2 inches, the PNM output will be 600 pixels by 600 pixels.
+
+<p>Or you can set the output image dimensions with <b>-xsize</b> and
+<b>-ysize</b>.  For example, if you say <b>-xsize=1000 -ysize=1000</b>
+and the bordered subject image is 2 inches by 2 inches, the output
+image is 1000 by 1000 pixels, with each pixel representing 1/500 inch
+of input image.
+
+<p>If you specify one of <b>-xsize</b> and <b>-ysize</b> and not the
+other, <b>pstopnm</b> defaults the other such that the output image
+has the same aspect ratio as the bordered subject image.
+
+<p>If you specify neither the output size nor the output device
+resolution, <b>pstopnm</b> does some weird computation which exists
+mainly for historical reasons:
+
+<p>If you specify <b>-nocrop</b>, <b>pstopnm</b> uses the values of
+<b>-xmax</b> and <b>-ymax</b> for the output image dimensions.  These
+default to 612 and 792 pixels, respectively.
+
+<p>The final case, the default, is where you don't specify any size or
+resolution options of <b>-nocrop</b>.  This is the most complicated
+case.  In this case, <b>pstopnm</b> first chooses an output device
+resolution that would generate the number of pixels indicated by
+<b>-xmax</b> and <b>-ymax</b> from the bordered subject image.  Then,
+based on that resolution, it chooses an output image size that is just
+large enough to accomodate the subject image (no borders).  Remember
+(above) that <b>pstopnm</b> trims the edges of the bordered subject
+image to fit the computed output size.
+
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-forceplain</B>
+
+<DD> forces the output file to be in plain (text) format.  Otherwise,
+it is in raw (binary) format.  See <B><A HREF="pbm.html">pbm</A></B>,
+etc.
+
+<DT><B>-llx=</B><I>bx</I>
+
+<DD>selects <I>bx</I> as the lower left corner x coordinate (in
+inches) on the Postscript input page of the subject image.
+See <a href="pstopnm.html#dimensions">the Dimensions section</a>.
+
+<DT><B>-lly=</B><I>by</I>
+
+<DD>selects <I>by</I> as the lower left corner y coordinate (in inches)
+on the Postscript input page of the subject image.
+See <a href="pstopnm.html#dimensions">the Dimensions section</a>.
+
+<DT><B>-landscape</B>
+
+<DD>renders the image in landscape orientation.  
+
+<DT><B>-portrait</B>
+
+<DD>renders the image in portrait orientation.
+
+<DT><B>-nocrop</B>
+
+<DD>This option causes <b>pstopnm</b> to make the output image
+exactly the dimensions of the bordered subject image.  By default,
+<b>pstopnm</b> makes the output image the dimensions specified by
+<b>-xmax</b> and <b>-ymax</b>.  See <a href="pstopnm.html#dimensions">the Dimensions
+section</a>.
+
+<DT><B>-pbm</b>
+<DT><B>-pgm</B>
+<DT><B>-ppm</B>
+
+<DD>
+selects the format of the output file.  By default, all files are
+rendered as portable pixmaps (ppm format).
+
+<DT><B>-stdout</B>
+
+<DD>causes output to go to Standard Output instead of to regular
+files, one per page (see description of output files above).  Use
+<B>pnmsplit</B> to extract individual pages from Standard Output.
+
+<DT><B>-urx=</B><I>tx</I>
+
+<DD>selects <I>tx</I> as the upper right corner x coordinate (in
+inches) on the Postscript input page of the subject image.  See <a
+href="pstopnm.html#dimensions">the Dimensions section</a>.
+
+<DT><B>-ury=</B><I>ty</I>
+
+<DD>selects <I>ty</I> as the upper right corner y coordinate (in
+inches) on the Postscript input page of the subject image.  See <a
+href="pstopnm.html#dimensions">the Dimensions section</a>.
+
+
+<DT><B>-verbose</B>
+
+<DD>
+prints processing information to stdout.
+
+<DT><B>-xborder=</B><I>frac</I> 
+
+<DD>specifies that the left and right borders added to the subject
+image are to be <I>frac</I> times the subject image width.  The
+default value is 0.1.  See <a href="pstopnm.html#dimensions">the Dimensions
+section</a>.
+
+
+<DT><B>-xmax=</B><I>xmax</I>
+
+<DD>specifies that the output image is to be <I>xmax</I> pixels wide.
+The default is 612.  See <a href="pstopnm.html#dimensions">the Dimensions
+section</a>.
+
+
+<DT><B>-xsize=</B><I>xsize</I>
+
+<DD>specifies that the output image is to be <I>xsize</I> pixels wide.
+See <a href="pstopnm.html#dimensions">the Dimensions section</a>.
+
+<DT><B>-yborder=</B><I>frac</I>
+
+<DD>specifies that the top and bottom borders added to the subject
+image are to be <I>frac</I> times the subject image height.  The
+default value is 0.1.  See <a href="pstopnm.html#dimensions">the Dimensions
+section</a>.
+
+
+<DT><B>-ymax=</B><I>ymax</I>
+
+<DD>
+specifies that the output image is to be <i>ymax</i> pixels high.
+The default is 792.  See <a href="pstopnm.html#dimensions">the Dimensions
+section</a>.
+
+<DT><B>-ysize=</B><I>ysize</I>
+
+<DD>specifies that the output image is to be <i>ymax</i> pixels high.
+See <a href="pstopnm.html#dimensions">the Dimensions section</a>.
+
+<DT><B>-dpi=</b><i>dpi</i>
+
+<DD>specifies the output device resolution, in dots per inch, of the
+Postscript printer that <b>pstopnm</b> simulates.  This is the number of
+PNM pixels <b>pstopnm</b> generates for each inch of image.
+See <a href="pstopnm.html#dimensions">the Dimensions section</a>.
+
+<p>This option was new in Netpbm 10.21 (March 2004).
+     
+</DL>
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>LIMITATIONS</H2>
+
+<P>The program will produce incorrect results with PostScript files that
+initialize the current transformation matrix.  In these cases, page
+translation and rotation will not have any effect.  To render these
+files, probably the best bet is to use the following options:
+
+<pre>
+    pstopnm -xborder 0 -yborder 0 -portrait -nocrop file.ps
+</pre>
+
+<P>Additional options may be needed if the document is supposed to be
+rendered on a medium different from letter-size paper.
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B>gs</B>,
+<B><A HREF="pnmtops.html">pnmtops</A></B>,
+<B><A HREF="psidtopgm.html">psidtopgm</A></B>,
+<B><A HREF="pbmtolps.html">pbmtolps</A></B>,
+<B><A HREF="pbmtoepsi.html">pbmtoepsi</A></B>,
+<B><A HREF="pnmsplit.html">pnmsplit</A></B>,
+<B>pstofits</B>
+
+
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>COPYRIGHT</H2>
+
+<p>Copyright (c) 1992 Smithsonian Astrophysical Observatory
+
+<p>PostScript is a Trademark of Adobe Systems Incorporated.
+
+
+<A NAME="lbAI">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+<p>Alberto Accomazzi, WIPL, Center for Astrophysics.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pstopnm.html#lbAB">NAME</A>
+<LI><A HREF="pstopnm.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pstopnm.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pstopnm.html#lbAE">OPTIONS</A>
+<LI><A HREF="pstopnm.html#lbAF">BUGS</A>
+<LI><A HREF="pstopnm.html#lbAG">SEE ALSO</A>
+<LI><A HREF="pstopnm.html#lbAH">COPYRIGHT</A>
+<LI><A HREF="pstopnm.html#lbAI">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

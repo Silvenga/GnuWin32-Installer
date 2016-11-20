@@ -1,0 +1,357 @@
+<HTML
+><HEAD
+><TITLE
+>A displaying application</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="The libart library"
+HREF="libart.html"><LINK
+REL="UP"
+TITLE="Sample code"
+HREF="sample.html"><LINK
+REL="PREVIOUS"
+TITLE="Sample code"
+HREF="sample.html"><LINK
+REL="NEXT"
+TITLE="Basic APIs"
+HREF="basic.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The libart library</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="sample.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libart.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="sample.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="basic.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="SAMPLE-DISPLAY"
+>A displaying application</A
+></H1
+><P
+>	Once more, the code for this example can be found 
+	<A
+HREF="./art-display.tar.gz"
+TARGET="_top"
+>there</A
+>.
+      </P
+><P
+>	Now that we know how to render our data in a pixel buffer, we want to display it 
+	on screen in a window. To do this, we use the gdkrgb library which transfers
+	pixel buffers to the X server in Drawables.
+	The code below is very similar to our previous example: we just initialize GTK+ and
+	gdkrgb and instead of saving the pixel buffer to a file, we create a widget to display 
+	it and run the GTK+ main loop:
+      </P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>int main (int argc, char *argv[])
+{
+  ArtSVP *path;
+  char *buffer;
+
+  /* gtk/gdkrgb initialization */
+  gtk_init (&amp;argc, &amp;argv);
+  gdk_rgb_init ();
+  gtk_widget_set_default_colormap(gdk_rgb_get_cmap());
+  gtk_widget_set_default_visual(gdk_rgb_get_visual());
+
+  path = make_path ();
+
+  buffer = render_path (path);
+
+  build_widget (buffer);
+
+  /* gtk main loop */
+  gtk_main ();
+
+  return 0;
+}
+      </PRE
+></TD
+></TR
+></TABLE
+><P
+>	The only new function is <TT
+CLASS="FUNCTION"
+>build_widget</TT
+> which is shown
+	below. This function just creates a drawing area and connects a drawing
+	callback to the expose signal.
+      </P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>static void 
+build_widget (unsigned char *buffer)
+{
+  GtkWidget *window = NULL, *drawing_area = NULL;
+
+  window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
+  gtk_window_set_default_size (GTK_WINDOW(window), WIDTH, HEIGHT);
+  gtk_signal_connect (GTK_OBJECT (window), "delete_event",
+		      GTK_SIGNAL_FUNC (destroy_cb), NULL);
+  gtk_signal_connect (GTK_OBJECT (window), "destroy",
+		      GTK_SIGNAL_FUNC (destroy_cb), NULL);
+  drawing_area = gtk_drawing_area_new ();
+  gtk_container_add (GTK_CONTAINER (window),
+		     GTK_WIDGET (drawing_area));
+
+  gtk_signal_connect (GTK_OBJECT (drawing_area), "expose_event",
+		      GTK_SIGNAL_FUNC (expose_cb), buffer);
+  gtk_signal_connect (GTK_OBJECT (drawing_area), "configure_event",
+		      GTK_SIGNAL_FUNC (expose_cb), buffer);
+
+  gtk_widget_show_all (window);
+}
+      </PRE
+></TD
+></TR
+></TABLE
+><P
+>	The expose callback is very simple: it just calls gdkrgb's entry point
+	to render the pixel buffer onto the drawing area we instantiated a little
+	before.
+      </P
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>static int 
+expose_cb (GtkWidget *widget, GdkEventExpose *evt, gpointer data)
+{
+  art_u8 *buf = (art_u8 *)data;
+
+  gdk_draw_rgb_image (widget-&#62;window, widget-&#62;style-&#62;black_gc, 
+		      0, 0, WIDTH, HEIGHT, 
+		      GDK_RGB_DITHER_NONE,
+		      buf,
+		      ROWSTRIDE);
+  return FALSE;
+}
+      </PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="sample.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libart.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="sample.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="basic.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Sample code</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Basic APIs</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

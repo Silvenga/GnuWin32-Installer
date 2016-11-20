@@ -1,0 +1,67 @@
+WCSTOK(3)          Linux Programmer's Manual          WCSTOK(3)
+
+
+
+
+
+NAME
+       wcstok - split wide-character string into tokens
+
+SYNOPSIS
+       #include <wchar.h>
+
+       wchar_t* wcstok (wchar_t* wcs, const wchar_t* delim, wchar_t** ptr);
+
+DESCRIPTION
+       The  wcstok function is the wide-character equivalent of
+       the strtok function, with an added argument to  make  it
+       multithread-safe. It can be used to split a wide-charac-
+       ter string wcs into tokens, where a token is defined  as
+       a  substring  not  containing  any  wide-characters from
+       delim.
+
+       The search starts at wcs, if wcs  is  not  NULL,  or  at
+       *ptr,  if wcs is NULL. First, any delimiter wide-charac-
+       ters are skipped, i.e. the pointer  is  advanced  beyond
+       any wide-characters which occur in delim.  If the end of
+       the wide-character string is now reached, wcstok returns
+       NULL,  to indicate that no tokens were found, and stores
+       an appropriate value in *ptr, so that  subsequent  calls
+       to  wcstok  will continue to return NULL. Otherwise, the
+       wcstok function recognizes the beginning of a token  and
+       returns a pointer to it, but before doing that, it zero-
+       terminates the token by replacing the next  wide-charac-
+       ter which occurs in delim with a L'\0' character, and it
+       updates *ptr so  that  subsequent  calls  will  continue
+       searching after the end of recognized token.
+
+RETURN VALUE
+       The wcstok function returns a pointer to the next token,
+       or NULL if no further token was found.
+
+NOTES
+       The original wcs wide-character string is  destructively
+       modified during the operation.
+
+EXAMPLE
+       The  following code loops over the tokens contained in a
+       wide-character string.
+
+       wchar_t* wcs = ...;
+       wchar_t* token;
+       wchar_t* state;
+       for (token = wcstok(wcs, " \t\n", &state);
+            token != NULL;
+            token = wcstok(NULL, " \t\n", &state)) {
+         ...
+       }
+
+CONFORMING TO
+       ISO/ANSI C, UNIX98
+
+SEE ALSO
+       strtok(3), wcschr(3)
+
+
+
+GNU                      July 25, 1999                WCSTOK(3)

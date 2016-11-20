@@ -1,0 +1,33 @@
+# Example 10 -- Draw image plot of flushing of dye out of cove
+
+if !..publication..
+    draw time stamp
+end if
+\file = "example10.dat"
+query \contours "Superimpose contours? (yes|no)" ("yes")
+query \file     "Input file name               " ("\file")
+open \file
+read line \header
+read \D
+read .nx.
+read .ny.
+set x name "distance along cove"
+set y name "time"
+set x grid 0 1 /.nx.
+set x axis 0 1 0.5 0.1
+set y grid 0 .ny. / .ny.
+set y axis 0 .ny.
+read grid data * * .ny. .nx.
+set image range 0 20
+set image grayscale black 20 white 0 increment 5
+convert grid to image 
+draw image
+if {"\contours" == "yes"}
+    set graylevel 1.0
+    draw contour 0 20 1 unlabelled
+    set graylevel 0.0
+end if
+draw axes
+draw image palette left -1 right 21 increment 5
+draw title "Example 10 -- file=\file header=`\header'"
+

@@ -1,0 +1,2486 @@
+<html lang="en">
+<head>
+<title>GNU Gengetopt 2.20</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU Gengetopt 2.20">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+This manual is for GNU Gengetopt
+(version 2.20, 30 June 2007),
+a tool to write command line option parsers for C programs.
+
+Copyright (C) 2001 - 2007 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.1 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with the Front-Cover Texts
+     being "A GNU Manual," and with the Back-Cover Texts as in (a)
+     below.  A copy of the license is included in the section entitled
+     "GNU Free Documentation License."
+
+     (a) The FSF's Back-Cover Text is: "You have freedom to copy and
+     modify this GNU Manual, like GNU software.  Copies published by
+     the Free Software Foundation raise funds for GNU development."
+   -->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">GNU Gengetopt 2.20</h1>
+   <div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Top" href="#Top">Gengetopt</a>
+<li><a name="toc_Audience" href="#Audience">Audience</a>
+<li><a name="toc_Copying" href="#Copying">Gengetopt Copying Conditions</a>
+<li><a name="toc_Installation" href="#Installation">1 Installation</a>
+<ul>
+<li><a href="#Installation">1.1 Download</a>
+<li><a href="#Installation">1.2 Anonymous CVS Access</a>
+<li><a href="#Installation">1.3 What you need to build gengetopt</a>
+<li><a href="#Installation">1.4 Patching from a previous version</a>
+</li></ul>
+<li><a name="toc_Basic-Usage" href="#Basic-Usage">2 Basic Usage</a>
+<li><a name="toc_Invoking-gengetopt" href="#Invoking-gengetopt">3 Invoking gengetopt</a>
+<li><a name="toc_Terminology" href="#Terminology">4 Terminology</a>
+<li><a name="toc_Group-options" href="#Group-options">5 Group options</a>
+<li><a name="toc_Configuration-files" href="#Configuration-files">6 Configuration files</a>
+<ul>
+<li><a href="#Configuration-files">6.1 Further details on the configuration file parser</a>
+</li></ul>
+<li><a name="toc_Multiple-Options" href="#Multiple-Options">7 Multiple Options</a>
+<li><a name="toc_String-Parsers-and-Multiple-Parsers" href="#String-Parsers-and-Multiple-Parsers">8 String Parsers and Multiple Parsers</a>
+<li><a name="toc_No-getopt_005flong" href="#No-getopt_005flong">9 What if getopt_long is not available?</a>
+<ul>
+<li><a href="#Include-the-getopt_005flong-code-into-the-parser">9.1 Include the <code>getopt_long</code> code into the generated parser</a>
+<li><a href="#Use-automake_002fautoconf">9.2 Use automake/autoconf to check for the existence of <code>getopt_long</code></a>
+<ul>
+<li><a href="#Use-Gnulib">9.2.1 Use Gnulib</a>
+<li><a href="#Use-getopt_005flong-sources">9.2.2 Use getopt_long sources</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_Bugs" href="#Bugs">10 Known Bugs and Limitations</a>
+<ul>
+<li><a href="#Getopt-and-subsequent-calls">10.1 Getopt and subsequent calls</a>
+</li></ul>
+<li><a name="toc_Mailing-Lists" href="#Mailing-Lists">11 Mailing Lists</a>
+<li><a name="toc_Index" href="#Index">Index</a>
+</li></ul>
+</div>
+
+
+
+<div class="node">
+<p><hr>
+<a name="Top"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Audience">Audience</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#dir">(dir)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+
+</div>
+
+<h2 class="unnumbered">Gengetopt</h2>
+
+<p>Gengetopt is a tool to write command line option parsing code for C programs.
+
+   <p>This is Edition 2.20 of the Gengetopt manual.
+
+   <p>This file documents GNU Gengetopt version 2.20.
+
+   <p>This manual is for GNU Gengetopt
+(version 2.20, 30 June 2007),
+a tool to write command line option parsers for C programs.
+
+   <p>Copyright &copy; 2001 - 2007 Free Software Foundation, Inc.
+
+   <blockquote>
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with the Front-Cover Texts being &ldquo;A GNU Manual,&rdquo;
+and with the Back-Cover Texts as in (a) below.  A copy of the
+license is included in the section entitled &ldquo;GNU Free Documentation
+License.&rdquo;
+
+        <p>(a) The FSF's Back-Cover Text is: &ldquo;You have freedom to copy and modify
+this GNU Manual, like GNU software.  Copies published by the Free
+Software Foundation raise funds for GNU development.&rdquo;
+</blockquote>
+
+<!-- All the nodes can be updated using the EMACS command -->
+<!-- texinfo-every-node-update, which is normally bound to C-c C-u C-e. -->
+<!-- @node Top, Introduction, (dir), (dir) -->
+<!-- All the menus can be updated with the EMACS command -->
+<!-- texinfo-all-menus-update, which is normally bound to C-c C-u C-a. -->
+<ul class="menu">
+<li><a accesskey="1" href="#Audience">Audience</a>:                     What is gengetopt and who it is for. 
+<li><a accesskey="2" href="#Copying">Copying</a>:                      Your rights. 
+<li><a accesskey="3" href="#Installation">Installation</a>:                 Download and Installation
+<li><a accesskey="4" href="#Basic-Usage">Basic Usage</a>:                  How to run Gengetopt; syntax of .ggo files
+<li><a accesskey="5" href="#Invoking-gengetopt">Invoking gengetopt</a>:           gengetopt command line options
+<li><a accesskey="6" href="#Terminology">Terminology</a>:                  Definitions of options, values, and so forth. 
+<li><a accesskey="7" href="#Group-options">Group options</a>:                Mutual exclusive options
+<li><a accesskey="8" href="#Configuration-files">Configuration files</a>:          Parsing a configuration file
+<li><a accesskey="9" href="#Multiple-Options">Multiple Options</a>:             Multiple options
+<li><a href="#String-Parsers-and-Multiple-Parsers">String Parsers and Multiple Parsers</a>:   Using multiple parsers in the same program
+<li><a href="#No-getopt_005flong">No getopt_long</a>:               What if getopt_long is not available? 
+<li><a href="#Bugs">Bugs</a>:                         What is lame and/or buggy in Gengetopt 2.20
+<li><a href="#Mailing-Lists">Mailing Lists</a>:                For discussions and announces
+<li><a href="#Index">Index</a>:                        Index. 
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Audience"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Copying">Copying</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="unnumbered">Audience</h2>
+
+<p><a name="index-Audience-1"></a><a name="index-Who-should-use-Gengetopt-2"></a>
+Gengetopt is a tool to generate C code to parse the command line
+arguments <code>argc</code> and <code>argv</code> that are part of every C or C++
+program.  The generated code uses the C library function
+<code>getopt_long</code> to perform the actual command line parsing.
+
+   <p>This manual is written for C and C++ programmers, specifically the
+<em>lazy</em> ones.  If you've written any non-trivial C program, you've
+had to deal with argument parsing.  It isn't particularly difficult, nor
+is it particularly exciting.  It <em>is</em> one of the classic
+programming nuisances, which is why most books on programming leave it
+as an exercise for the reader.  Gengetopt can save you from this work,
+leaving you free to focus on the interesting parts of your program.
+
+   <p>Thus your program will be able to handle command line options such as:
+
+<pre class="example">     myprog --input foo.c -o foo.o --no-tabs -i 100 *.class
+</pre>
+   <p>And both long options (those that start with <code>--</code>) and short
+options (start with <code>-</code> and consist of only one character) can be
+handled (see <a href="#Terminology">Terminology</a> for further details). For standards about
+short and long options you may want to take a look at the GNU Coding
+Standards (<a href="http://www.gnu.org/prep/standards_toc.html">http://www.gnu.org/prep/standards_toc.html</a>).
+
+   <p>Gengetopt can also generate a function to save the command line options
+into a file (see <a href="#Basic-Usage">Basic Usage</a>), and a function to read the command
+line options from a  file (see <a href="#Configuration-files">Configuration files</a>).  Of course,
+these two kinds of files are compliant.
+
+<div class="node">
+<p><hr>
+<a name="Copying"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Installation">Installation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Audience">Audience</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="unnumbered">Gengetopt Copying Conditions</h2>
+
+<p><a name="index-Copying-conditions-3"></a><a name="index-Conditions-for-copying-Gengetopt-4"></a>
+Gengetopt is free software; you are free to use, share and modify it
+under the terms of the GNU General Public License that accompanies this
+manual.
+
+   <p>The code that Gengetopt generates is also free software; however it is
+licensed with a simple all-permissive license instead of the GPL or
+LGPL.  You are free to do anything you like with the generated code,
+including incorporating it into or linking it with proprietary software.
+
+   <p>Gengetopt was originally written by Roberto Arturo Tena Sanchez.   It is
+currently maintained by Lorenzo Bettini <a href="http://www.lorenzobettini.it">http://www.lorenzobettini.it</a>.
+
+   <p>A primordial version of <a href="#Terminology">Terminology</a> was written by
+Adam Greenblatt.
+
+<div class="node">
+<p><hr>
+<a name="Installation"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Basic-Usage">Basic Usage</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Copying">Copying</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">1 Installation</h2>
+
+<p><a name="index-installation-5"></a><a name="index-download-6"></a>
+See the file <samp><span class="file">INSTALL</span></samp> for detailed building and  installation
+instructions; anyway if you're used to compiling Linux software that
+comes with sources you may simply follow the usual procedure, i.e. untar
+the file you downloaded in a directory and then:
+
+<pre class="example">     cd &lt;source code main directory&gt;
+     ./configure
+     make
+     make install
+</pre>
+   <p>Note: unless you specify a different install directory by
+<code>--prefix</code> option of
+configure (e.g. <code>./configure --prefix=&lt;your home&gt;</code>),
+you must be root to run <code>make install</code>.
+
+   <p>Files will be installed in the following directories:
+
+     <dl>
+<dt><code>executables</code><dd>        <code>/prefix/bin</code>
+<br><dt><code>docs</code><dd>        <code>/prefix/share/doc/gengetopt</code>
+<br><dt><code>examples</code><dd>        <code>/prefix/share/doc/gengetopt/examples</code>
+<br><dt><code>additional files</code><dd>        <code>/prefix/share/gengetopt</code>
+</dl>
+
+   <p>Default value for prefix is <code>/usr/local</code>
+but you may change it with <code>--prefix</code>
+option to configure.
+
+<h3 class="section">1.1 Download</h3>
+
+<p><a name="index-download-7"></a>
+You can download it from GNU's ftp site:
+<a href="ftp://ftp.gnu.org/gnu/gengetopt">ftp://ftp.gnu.org/gnu/gengetopt</a> or from one of its mirrors (see
+<a href="http://www.gnu.org/prep/ftp.html">http://www.gnu.org/prep/ftp.html</a>).
+
+   <p>I do not distribute Windows binaries anymore; since, they can be easily
+built by using Cygnus C/C++ compiler, available at
+<a href="http://www.cygwin.com">http://www.cygwin.com</a>.  However, if you don't feel like
+downloading such compiler, you can request such binaries directly to me,
+by e-mail (find my e-mail at my home page) and I can send them to you.
+
+   <p>Archives are digitally signed by me (Lorenzo Bettini) with GNU gpg
+(<a href="http://www.gnupg.org">http://www.gnupg.org</a>). My GPG public key can be found at my home
+page (<a href="http://www.lorenzobettini.it">http://www.lorenzobettini.it</a>).
+
+   <p>You can also get the patches, if they are available for a particular
+release (see below for patching from a previous version).
+
+<h3 class="section">1.2 Anonymous CVS Access</h3>
+
+<p><a name="index-CVS-8"></a>
+This project's CVS repository can be checked out through anonymous
+(pserver) CVS with the following instruction:
+
+<pre class="example">     cvs -z3 -d:pserver:anonymous@cvs.savannah.gnu.org:/sources/gengetopt co gengetopt
+</pre>
+   <p>Further instructions can be found at the address:
+
+   <p><a href="http://savannah.gnu.org/projects/gengetopt">http://savannah.gnu.org/projects/gengetopt</a>.
+
+   <p>Please notice that this way you will get the latest development sources
+of Gengetopt, which may also be unstable.  This solution is the
+best if you intend to correct/extend this program: you should send me
+patches against the latest cvs repository sources.
+
+   <p>If, on the contrary, you want to get the sources of a given release,
+through cvs, say, e.g., version X.Y.Z, you must specify the tag
+<code>rel_X_Y_Z</code> when you run the cvs command or the <code>cvs update</code>
+command.
+
+   <p>NOTICE: This convention holds since release 2.14.
+
+   <p>When you compile the sources that you get through the cvs repository,
+before running the <code>configure</code> and <code>make</code> commands, you
+should, at least the first time, run the command:
+
+   <p><a name="index-autogen_002esh-9"></a>
+<pre class="example">     sh autogen.sh
+</pre>
+   <p class="noindent">This will bootstrap the autotools in the correct order, and also copy
+possibly missing files.  You should have installed recent versions of
+<a name="index-automake-10"></a><a name="index-autoconf-11"></a><a name="index-libtool-12"></a><code>automake</code>, <code>autoconf</code> and <code>libtool</code> in order for this to
+succeed.  You will also need <code>flex</code> and <code>bison</code>.
+
+<h3 class="section">1.3 What you need to build gengetopt</h3>
+
+<p><a name="index-requirements-13"></a>
+Gengetopt has been developed under GNU/Linux, using gcc (C++), and bison
+(yacc) and flex (lex), and ported under Win32 with Cygnus C/C++compiler,
+available at <a href="http://www.cygwin.com">http://www.cygwin.com</a>.
+
+   <p>For developing gengetopt, I use the excellent
+<a name="index-automake-14"></a><a name="index-autoconf-15"></a><a name="index-libtool-16"></a>GNU Autoconf<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>,
+GNU Automake<a rel="footnote" href="#fn-2" name="fnd-2"><sup>2</sup></a> and
+GNU Libtool<a rel="footnote" href="#fn-3" name="fnd-3"><sup>3</sup></a>. 
+<a name="index-gnulib-17"></a>Since version 2.19 I also started to use Gnulib - The GNU Portability
+Library<a rel="footnote" href="#fn-4" name="fnd-4"><sup>4</sup></a>, &ldquo;a central
+location for common GNU code, intended to be shared among GNU packages&rdquo;
+(for instance, I rely on Gnulib for checking for the presence and
+correctness of <code>getopt_long</code> function, <a href="#Use-Gnulib">Use Gnulib</a>).
+
+   <p>Moreover <em>GNU Gengen</em>
+(<a href="http://www.gnu.org/software/gengen">http://www.gnu.org/software/gengen</a>) is used for
+automatically generating the code that generates the command line parser.
+
+   <p>Actually, you don't need all these tools above to build gengetopt
+because I provide generated sources, unless you want to develop
+gengetopt.
+
+   <p>The code generated by gengetopt relies on the <code>getopt_long</code>
+function that is usually in the standard C library; however, there may
+be some implementations of the C library that don't include it; we refer
+to <a href="#No-getopt_005flong">No getopt_long</a>, for instructions on how to check whether
+getopt_long is part of the library and how to deal with their lacking
+(using autoconf and automake).
+
+<h3 class="section">1.4 Patching from a previous version</h3>
+
+<p><a name="index-patching-18"></a>
+If you downloaded a patch, say
+<samp><span class="file">gengetopt-1.3-1.3.1-patch.gz</span></samp> (i.e., the patch to go from version
+1.3 to version 1.3.1), cd to the directory with sources from the
+previous version (gengetopt-1.3) and type:
+
+<pre class="example">     gunzip -cd ../gengetopt-1.3-1.3.1.patch.gz | patch -p1
+</pre>
+   <p>and restart the compilation process (if you had already run configure a
+simple make should do).
+
+<div class="node">
+<p><hr>
+<a name="Basic-Usage"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Invoking-gengetopt">Invoking gengetopt</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Installation">Installation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">2 Basic Usage</h2>
+
+<p><a name="index-how-to-use-Gengetopt-19"></a><a name="index-getting-started-with-Gengetopt-20"></a><a name="index-tutorial-21"></a>
+The command line options, which have to be handled by gengetopt
+generated function, are specified in a file (typically with <samp><span class="file">.ggo</span></samp>
+extension). This file consist in lines of sentences with the formats
+shown below.  Commands in {} are optional (the <code>option</code> sentences
+need not to be given in separate lines):
+
+<pre class="example">     package "&lt;packname&gt;"
+     version "&lt;version&gt;"
+     purpose "&lt;purpose&gt;"
+     usage "&lt;usage&gt;"
+     description "&lt;description&gt;"
+     
+     args "&lt;command line options&gt;"
+     
+     option &lt;long&gt; &lt;short&gt; "&lt;desc&gt;"
+         {argtype} {typestr="&lt;type descr&gt;"}
+         {values="&lt;value1&gt;","&lt;value2&gt;",...}
+         {default="&lt;default value&gt;"}
+         {dependon="&lt;other option&gt;"}
+         {required} {argoptional} {multiple}
+         {hidden}
+     
+     option &lt;long&gt; &lt;short&gt; &lt;desc&gt; flag &lt;on/off&gt;
+     
+     section "section name" {sectiondesc="optional section description"}
+     
+     text "a textual sentence"
+</pre>
+   <p class="noindent">Where:
+
+     <dl>
+<dt><code>package</code><dd><a name="index-package-22"></a>
+This has the precedence over <code>PACKAGE</code> generated by autoconf. 
+Optional.
+
+     <br><dt><code>version</code><dd><a name="index-version-23"></a>
+This has the precedence over <code>VERSION</code> generated by autoconf. 
+Optional.
+
+     <br><dt><code>purpose</code><dd><a name="index-purpose-24"></a>
+What the program does (even on more than one line), it will be printed
+with the help, before the usage string.  Optional.
+
+     <br><dt><code>usage</code><dd><a name="index-usage-25"></a>
+The &ldquo;Usage&rdquo; string that will be printed with the help<a rel="footnote" href="#fn-5" name="fnd-5"><sup>5</sup></a>.  If not specified, it will be generated automatically. 
+Optional.
+
+     <br><dt><code>description</code><dd><a name="index-description-26"></a>
+The &ldquo;Description&rdquo; string that will be printed with the
+help<a rel="footnote" href="#fn-6" name="fnd-6"><sup>6</sup></a>, after the usage string.  Optional.
+
+     <br><dt><code>args</code><dd><a name="index-args-27"></a>
+With <code>args</code><a rel="footnote" href="#fn-7" name="fnd-7"><sup>7</sup></a> you can specify options
+that will be added to the command line options of gengetopt itself.  For
+instance, if you always run gengetopt on your input file with the
+options <code>--no-handle-error --string-parser -u</code>, you can add these
+options in the input file like this:
+
+     <pre class="example">          args "--no-handle-error --string-parser -u"
+     </pre>
+     <p class="noindent">and remove those recurrent options from the command line. 
+Optional.
+
+     <br><dt><code>long</code><dd><a name="index-long-28"></a>
+The long option, a double quoted string with upper and lower case
+characters, digits, a dash (<code>-</code>) and a dot (<code>.</code>).  No spaces
+allowed.  The name of the variables generated to store arguments (see
+later in this section) are long options converted to be legal C variable
+names.  This means that <code>.</code> and <code>-</code> are both replaced by
+<code>_</code>.
+
+     <p><a name="index-short-29"></a><br><dt><code>short</code><dd>
+The short option, a single upper or lower case char, or a digit.  If
+a <code>-</code> is specified, then no short option is considered for the long
+option (thus long options with no associated short options are allowed).
+
+     <p><a name="index-desc-30"></a><br><dt><code>desc</code><dd>
+<a name="index-wrapping-31"></a>
+This description will be printed during the output of
+<code>--help</code>.  Wrapping will be automatically performed.
+
+     <p><a name="index-argtype-32"></a><br><dt><code>argtype</code><dd>
+<code>string</code>, <code>int</code>, <code>short</code>, <code>long</code>, <code>float</code>,
+<code>double</code>, <code>longdouble</code> or <code>longlong</code>.  If no type is
+specified the option does not accept an argument.
+
+     <p><a name="index-typestr-33"></a><br><dt><code>typestr</code><dd>
+a description for the type of the values for the option.   This will be
+used during the output of <code>--help</code> (e.g., <code>"filename"</code> instead
+of simply <code>STRING</code>, or <code>"portnumber"</code> instead of simply
+<code>INT</code>).
+
+     <p><a name="index-values-34"></a><br><dt><code>values</code><dd>
+a list of strings containing all the possible values that can be passed
+to the option.  The type is considered string and must not be specified.
+
+     <p><a name="index-default-35"></a><br><dt><code>default</code><dd>
+an optional default value for the option.  The value must always be
+specified as a double quoted string.
+
+     <p><a name="index-dependon-36"></a><br><dt><code>dependon</code><dd>
+this option depends on another option (whose long name description is
+specified).  If this option is given at command line but not the option
+it depends on, an error will be generated.
+
+     <p><a name="index-required-37"></a><a name="index-optional-38"></a><a name="index-g_t_0040code_007b_002d_002ddefault_002doptional_007d-39"></a><br><dt><code>required</code><dd>
+<code>required</code> or <code>optional</code>.  This specifies whether such option
+must be given at each program invocation.  These keywords were
+introduced in release 2.17.  Before, you had to use the keywords
+<code>yes</code> or <code>no</code>.  You can still use these keywords but their use
+is not advised since they are not much explicative.
+
+     <p>If not specified, an option is considered mandatory; if you do not want
+this behavior, you can require that by default options are considered
+optional, by using the command line option
+<code>--default-optional</code><a rel="footnote" href="#fn-8" name="fnd-8"><sup>8</sup></a>.
+
+     <p><a name="index-argoptional-40"></a><br><dt><code>argoptional</code><dd>
+If this flag is specified then this option has an argument that is
+optional.  In this case, when you specify the argument at command line,
+please use <code>=</code> in case you use a long option, and avoid spaces if
+you use short option.  For instance, if the option with optional
+argument is <code>-B|--bar</code>, use the following command line syntax:
+<code>-B15</code> or <code>--bar=15</code>, and NOT the following one <code>-B 15</code>
+nor <code>--bar 15</code>.
+
+     <p>By using this specification together with <code>default</code> you can obtain
+an option that even if not explicitly specified will have the default
+value, and if it is specified without an argument it will have, again,
+the default value.
+
+     <p><a name="index-multiple-41"></a><br><dt><code>multiple</code><dd>
+If this flag is specified then this option can be specified more than
+once at command line; all the values for this option are stored in an
+array.  You can also specify the number of occurrences that a multiple
+option must be specified.  Notice that this is independent from the
+<code>required</code> flag.  See <a href="#Multiple-Options">Multiple Options</a>.
+
+     <p><a name="index-hidden-42"></a><a name="index-g_t_0040code_007b_002d_002dfull_002dhelp_007d-43"></a><br><dt><code>hidden</code><dd>
+<a name="hidden"></a>If an option is &ldquo;hidden&rdquo; it will not
+appear in the output of <code>--help</code> but it can still be specified at
+command line<a rel="footnote" href="#fn-9" name="fnd-9"><sup>9</sup></a>.  In case hidden options
+are used, the command line option <code>--full-help</code> will also be
+generated.  This will print also the hidden options<a rel="footnote" href="#fn-10" name="fnd-10"><sup>10</sup></a>.
+
+     <p><a name="index-on_002foff-44"></a><br><dt><code>on/off</code><dd>
+<code>on</code> or <code>off</code>.  This is the state of the flag when the program
+starts. If user specifies the option, the flag toggles.
+
+   </dl>
+
+   <p>For strings (delimited by <code>"</code>) the following convention is
+adopted<a rel="footnote" href="#fn-11" name="fnd-11"><sup>11</sup></a>: a string
+spanning more than one line will be interpreted with the corresponding
+line breaks; if the line break is not desired one can use the backslash
+<code>\</code> to break the line without inserting a line break.  A line break
+in a string can also be inserted with the string <code>\n</code>.  Here are
+some examples:
+
+<pre class="example">     "This string will be interpreted
+     into two lines exactly as it is"
+     
+     "This string is specified with two lines \
+     but interpreted as specified in only one line \
+     i.e., without explicit line break"
+     
+     "This string\nwill have a line break"
+</pre>
+   <p class="noindent">Moreover, if the character <code>"</code> must be specified in the string, it
+will have to be escaped with the backslash<a rel="footnote" href="#fn-12" name="fnd-12"><sup>12</sup></a>:
+
+<pre class="example">     "This string contains \"a quoted string\" inside"
+</pre>
+   <p>The part that must be provided in the correct order is
+
+<pre class="example">     option &lt;long&gt; &lt;short&gt; "&lt;desc&gt;"
+</pre>
+   <p class="noindent">while the other specifications can be given in any order<a rel="footnote" href="#fn-13" name="fnd-13"><sup>13</sup></a>.  Thus, for instance
+
+<pre class="example">     option &lt;long&gt; &lt;short&gt; "&lt;desc&gt;" {argtype} {typestr="&lt;type descr&gt;"}
+</pre>
+   <p class="noindent">is the same as
+
+<pre class="example">     option &lt;long&gt; &lt;short&gt; "&lt;desc&gt;" {typestr="&lt;type descr&gt;"} {argtype}
+</pre>
+   <p>Comments begin with <code>#</code> in any place (but in strings) of the line
+and ends in the end of line.
+
+   <p><a name="index-g_t_0040code_007b_002dh_002c_002d_002dhelp_007d-45"></a><a name="index-g_t_0040code_007b_002dV_002c_002d_002dversion_007d-46"></a><a name="addedoptions"></a>
+Notice that the options <code>-h,--help</code> and <code>-V,--version</code> are
+added automatically; however, if you specify an option yourself that has
+<code>h</code> as short form or <code>help</code> as long form, then
+<code>-h,--help</code> is not added (and you have to handle the help option
+manually).  The same holds for <code>-V,--version</code>.
+
+   <p><a name="index-g_t_0040code_007b_002d_002dfull_002dhelp_007d-47"></a>In case hidden options are used, See <a href="#hidden">Hidden options</a>, the
+command line option <code>--full-help</code> will also be generated.  This
+will print also the hidden options<a rel="footnote" href="#fn-14" name="fnd-14"><sup>14</sup></a>.
+
+   <p><a name="index-section-48"></a>Options can be part of sections, that provide a more meaningful
+descriptions of the options.  A <em>section</em> can be defined with the
+following syntax (the <code>sectiondesc</code> is optional) and all the options
+following a section declaration are considered part of that sections:
+
+<pre class="example">     section "section name" {sectiondesc="optional section description"}
+</pre>
+   <p class="noindent">Notice that the separation in sections is stronger than separation in
+groups of mutual exclusive options (see <a href="#Group-options">Group options</a>). 
+Furthermore, sections should not be inserted among group options (but
+only externally).  A section makes sense only if it is followed by some
+options.  If you don't specify any option after a section, that section
+will not be printed at all.  If you need to simply insert some text in
+the output of <code>--help</code>, then you must use <code>text</code>, explained in
+the next paragraph.
+
+   <p><a name="index-text-49"></a>You can insert, among options, a textual string that will be printed in
+the output of <code>--help</code><a rel="footnote" href="#fn-15" name="fnd-15"><sup>15</sup></a>:
+
+<pre class="example">     text "\nA text description with possible line\nbreaks"
+</pre>
+   <p class="noindent">Of course, you can use this mechanism even to manually insert
+blank lines among options with an empty text string:
+
+<pre class="example">     text ""
+</pre>
+   <p>You can also specify the list of <code>values</code> that can be passed to an
+option (in that case the option has type <code>string</code>).  If a value
+that is not in the list is passed, an error is raised.  You can think of
+such options as <em>enumerated</em> options.  It is not necessary to pass
+the complete value at the command line option: a non ambiguous prefix
+will do.  For instance, if the accepted values are
+<code>"foo","bar","foobar"</code>, then you can pass at the command line the
+value <code>"b"</code> and the value <code>"bar"</code> will be selected, or the
+value <code>"foob"</code> and the value <code>"foobar"</code> will be selected;
+instead, passing the value <code>"fo"</code> will raise an ambiguity error.
+
+   <p>Here's an example of such a file (the file is called <samp><span class="file">sample1.ggo</span></samp>)
+
+<!-- Generator: GNU source-highlight, by Lorenzo Bettini, http://www.gnu.org/software/src-highlite -->
+<pre class="smallexample">     # Name of your program
+     package "sample1" # don't use package if you're using automake
+     # Version of your program
+     version "2.0"   # don't use version if you're using automake
+     
+     # Options
+     option  "str-opt"         s "A string option, for a filename"
+             string typestr="filename"     optional
+     text "\nA brief text description"
+     text " before the other options.\n"
+     option  "my-opt"          m "Another integer option, \
+     this time the description of the option should be \"quite\" long to \
+     require wrapping... possibly more than one wrapping :-) \
+     especially if I\nrequire a line break"      int     optional
+     option  "int-opt"         i "A int option"         int        yes
+     section "more involved options"
+             sectiondesc="the following options\nare more complex"
+     text ""
+     option  "flag-opt"        - "A flag option"        flag       off
+     option  "funct-opt"       F "A function option"    optional
+     section "last option section"
+     option  "long-opt"        - "A long option"        long       optional
+     option  "def-opt"         - "A string option with default"
+             string default="Hello" optional
+     option  "enum-opt"         - "A string option with list of values"
+             values="foo","bar","hello","bye" default="hello" optional
+     option  "secret"         S "hidden option will not appear in --help"
+             int optional hidden
+     option  "dependant"         D
+             "option that depends on str-opt" int optional dependon="str-opt"
+     text "\nAn ending text."
+     
+</pre>
+   <p>The simplest way to use gengetopt is to pass this file as the standard input, i.e.:
+
+<pre class="example">     gengetopt &lt; sample1.ggo
+</pre>
+   <p>By default gengetopt generates <samp><span class="file">cmdline.h</span></samp> and <samp><span class="file">cmdline.c</span></samp>.  Otherwise we
+can specify these names with a command line option:
+
+<pre class="example">     gengetopt &lt; sample1.ggo --file-name=cmdline1 --unamed-opts
+</pre>
+   <p><a name="index-parameter-50"></a><a name="index-option-without-name-51"></a>The option <code>--unamed-opts</code> allows the generated command line parser
+to accept also names, without an option (for instance you can pass a
+file name without an option in front of it, and also use wildcards, such
+as <code>*.c</code>, <code>foo*.?</code> and so on).   These are also called
+<em>parameters</em> (see <a href="#Terminology">Terminology</a>).  You can specify an optional
+description for these additional names (default is <code>FILES</code>).
+
+   <p>In <samp><span class="file">cmdline1.h</span></samp> you'll find the generated C struct:
+
+<!-- Generator: GNU source-highlight, by Lorenzo Bettini, http://www.gnu.org/software/src-highlite -->
+<pre class="smallexample">     <i>/* cmdline1.h */</i>
+     
+     <i>/* File autogenerated by gengetopt version 2.20  */</i>
+     
+     <b>#ifndef</b> CMDLINE1_H
+     <b>#define</b> CMDLINE1_H
+     
+     <i>/* If we use autoconf.  */</i>
+     <b>#ifdef</b> HAVE_CONFIG_H
+     <b>#include</b> <tt>"config.h"</tt>
+     <b>#endif</b>
+     
+     <b>#ifdef</b> __cplusplus
+     <b>extern</b> <tt>"C"</tt> {
+     <b>#endif</b> <i>/* __cplusplus */</i>
+     
+     <b>#ifndef</b> CMDLINE_PARSER_PACKAGE
+     <b>#define</b> CMDLINE_PARSER_PACKAGE <tt>"sample1"</tt>
+     <b>#endif</b>
+     
+     <b>#ifndef</b> CMDLINE_PARSER_VERSION
+     <b>#define</b> CMDLINE_PARSER_VERSION <tt>"2.0"</tt>
+     <b>#endif</b>
+     
+     <b>struct</b> <b>gengetopt</b>_args_info
+     {
+       <b>const</b> <b>char</b> *help_help; <i>/* Print help and exit help description.  */</i>
+       <b>const</b> <b>char</b> *full_help_help; <i>/* Print help, including hidden options, and exit help description.  */</i>
+       <b>const</b> <b>char</b> *version_help; <i>/* Print version and exit help description.  */</i>
+       <b>char</b> * str_opt_arg;       <i>/* A string option, for a filename.  */</i>
+       <b>char</b> * str_opt_orig;       <i>/* A string option, for a filename original value given at command line.  */</i>
+       <b>const</b> <b>char</b> *str_opt_help; <i>/* A string option, for a filename help description.  */</i>
+       <b>int</b> my_opt_arg;       <i>/* Another integer option, this time the description of the option should be \"quite\" long to require wrapping... possibly more than one wrapping :-) especially if I\nrequire a line break.  */</i>
+       <b>char</b> * my_opt_orig;       <i>/* Another integer option, this time the description of the option should be \"quite\" long to require wrapping... possibly more than one wrapping :-) especially if I\nrequire a line break original value given at command line.  */</i>
+       <b>const</b> <b>char</b> *my_opt_help; <i>/* Another integer option, this time the description of the option should be \"quite\" long to require wrapping... possibly more than one wrapping :-) especially if I\nrequire a line break help description.  */</i>
+       <b>int</b> int_opt_arg;       <i>/* A int option.  */</i>
+       <b>char</b> * int_opt_orig;       <i>/* A int option original value given at command line.  */</i>
+       <b>const</b> <b>char</b> *int_opt_help; <i>/* A int option help description.  */</i>
+       <b>int</b> flag_opt_flag;       <i>/* A flag option (default=off).  */</i>
+       <b>const</b> <b>char</b> *flag_opt_help; <i>/* A flag option help description.  */</i>
+       <b>const</b> <b>char</b> *funct_opt_help; <i>/* A function option help description.  */</i>
+       <b>long</b> long_opt_arg;       <i>/* A long option.  */</i>
+       <b>char</b> * long_opt_orig;       <i>/* A long option original value given at command line.  */</i>
+       <b>const</b> <b>char</b> *long_opt_help; <i>/* A long option help description.  */</i>
+       <b>char</b> * def_opt_arg;       <i>/* A string option with default (default='Hello').  */</i>
+       <b>char</b> * def_opt_orig;       <i>/* A string option with default original value given at command line.  */</i>
+       <b>const</b> <b>char</b> *def_opt_help; <i>/* A string option with default help description.  */</i>
+       <b>char</b> * enum_opt_arg;       <i>/* A string option with list of values (default='hello').  */</i>
+       <b>char</b> * enum_opt_orig;       <i>/* A string option with list of values original value given at command line.  */</i>
+       <b>const</b> <b>char</b> *enum_opt_help; <i>/* A string option with list of values help description.  */</i>
+       <b>int</b> secret_arg;       <i>/* hidden option will not appear in --help.  */</i>
+       <b>char</b> * secret_orig;       <i>/* hidden option will not appear in --help original value given at command line.  */</i>
+       <b>const</b> <b>char</b> *secret_help; <i>/* hidden option will not appear in --help help description.  */</i>
+       <b>int</b> dependant_arg;       <i>/* option that depends on str-opt.  */</i>
+       <b>char</b> * dependant_orig;       <i>/* option that depends on str-opt original value given at command line.  */</i>
+       <b>const</b> <b>char</b> *dependant_help; <i>/* option that depends on str-opt help description.  */</i>
+     
+       <b>int</b> help_given ;       <i>/* Whether help was given.  */</i>
+       <b>int</b> full_help_given ;       <i>/* Whether full-help was given.  */</i>
+       <b>int</b> version_given ;       <i>/* Whether version was given.  */</i>
+       <b>int</b> str_opt_given ;       <i>/* Whether str-opt was given.  */</i>
+       <b>int</b> my_opt_given ;       <i>/* Whether my-opt was given.  */</i>
+       <b>int</b> int_opt_given ;       <i>/* Whether int-opt was given.  */</i>
+       <b>int</b> flag_opt_given ;       <i>/* Whether flag-opt was given.  */</i>
+       <b>int</b> funct_opt_given ;       <i>/* Whether funct-opt was given.  */</i>
+       <b>int</b> long_opt_given ;       <i>/* Whether long-opt was given.  */</i>
+       <b>int</b> def_opt_given ;       <i>/* Whether def-opt was given.  */</i>
+       <b>int</b> enum_opt_given ;       <i>/* Whether enum-opt was given.  */</i>
+       <b>int</b> secret_given ;       <i>/* Whether secret was given.  */</i>
+       <b>int</b> dependant_given ;       <i>/* Whether dependant was given.  */</i>
+     
+       <b>char</b> **inputs ; <i>/* unamed options */</i>
+       <b>unsigned</b> inputs_num ; <i>/* unamed options number */</i>
+     } ;
+     
+     <b>extern</b> <b>const</b> <b>char</b> *gengetopt_args_info_purpose;
+     <b>extern</b> <b>const</b> <b>char</b> *gengetopt_args_info_usage;
+     <b>extern</b> <b>const</b> <b>char</b> *gengetopt_args_info_help[];
+     <b>extern</b> <b>const</b> <b>char</b> *gengetopt_args_info_full_help[];
+     
+     <b>int</b> cmdline_parser (<b>int</b> argc, <b>char</b> * <b>const</b> *argv,
+       <b>struct</b> <b>gengetopt</b>_args_info *args_info);
+     <b>int</b> cmdline_parser2 (<b>int</b> argc, <b>char</b> * <b>const</b> *argv,
+       <b>struct</b> <b>gengetopt</b>_args_info *args_info,
+       <b>int</b> override, <b>int</b> initialize, <b>int</b> check_required);
+     <b>int</b> cmdline_parser_file_save(<b>const</b> <b>char</b> *filename,
+       <b>struct</b> <b>gengetopt</b>_args_info *args_info);
+     
+     <b>void</b> cmdline_parser_print_help(<b>void</b>);
+     <b>void</b> cmdline_parser_print_full_help(<b>void</b>);
+     <b>void</b> cmdline_parser_print_version(<b>void</b>);
+     
+     <b>void</b> cmdline_parser_init (<b>struct</b> <b>gengetopt</b>_args_info *args_info);
+     <b>void</b> cmdline_parser_free (<b>struct</b> <b>gengetopt</b>_args_info *args_info);
+     
+     <b>int</b> cmdline_parser_required (<b>struct</b> <b>gengetopt</b>_args_info *args_info,
+       <b>const</b> <b>char</b> *prog_name);
+     
+     <b>extern</b> <b>char</b> *cmdline_parser_enum_opt_values[] ;       <i>/* Possible values for enum-opt.  */</i>
+     
+     
+     <b>#ifdef</b> __cplusplus
+     }
+     <b>#endif</b> <i>/* __cplusplus */</i>
+     <b>#endif</b> <i>/* CMDLINE1_H */</i>
+     
+</pre>
+   <p>The <code>&lt;option&gt;_given</code> field is set to a value different from 0 when
+an argument for <code>&lt;option&gt;</code> has been specified.   If the option
+accepts an argument and it is not of <code>flag</code> type The
+<code>&lt;option&gt;_arg</code> field is set to the value passed at the command
+line.  The <code>&lt;option&gt;_arg</code> field has the corresponding C type
+specified in the file passed to gengetopt.
+
+   <p>Notice that if an option has a default value, then the corresponding
+<code>&lt;option&gt;_arg</code> will be initialized with that value but the
+corresponding <code>&lt;option&gt;_given</code> will NOT be initialized to 1.  Thus,
+<code>&lt;option&gt;_given</code> will effectively inform you if the user has
+specified that command line option.
+
+   <p>The additional field <code>&lt;option&gt;_orig</code> is always a string containing
+the original value passed at the command line.  This may be different,
+for instance, in case of numerical arguments: gengetopt converts the
+passed value (a string) into the corresponding numerical type; due to
+conversions, float representations, etc., this may not correspond
+exactly to the original value passed at command line.   It can also be
+different when enumerated options are used (see above): in particular
+the <code>&lt;option&gt;_arg</code> field will contain a value taken from the
+specified list, while <code>&lt;option&gt;_orig</code> contains the (non-ambiguous)
+prefix specified at the command line.
+
+   <p>The user can always access this original value by using
+<code>&lt;option&gt;_orig</code> instead of <code>&lt;option&gt;_arg</code>, as he sees
+fit<a rel="footnote" href="#fn-16" name="fnd-16"><sup>16</sup></a>.  For instance, gengetopt itself uses the original value when it
+saves the command line options into a file (see the <code>_file_save</code>
+function in the following).  However, apart from very specific command
+line processing, the user might hardly need the <code>&lt;option&gt;_orig</code>
+field, and can be always safely use <code>&lt;option&gt;_arg</code>.
+
+   <p>The <code>&lt;option&gt;_help</code> contains the string (concerning this very
+option) that is printed when <code>--help</code> command line is given.
+
+   <p>If it is of <code>flag</code> type, only the field <code>&lt;option&gt;_flag</code>
+is generated.
+
+   <p>The strings <code>cmdline_parser_purpose</code> and
+<code>cmdline_parser_usage</code> contain the <code>purpose</code> as specified in
+the input file and the generated &ldquo;usage&rdquo; string as printed when
+<code>--help</code> command line is given.  Finally, the string array
+<code>cmdline_parser_help</code> contains the strings (one for each option)
+printed when <code>--help</code> command line is given (this array is
+terminated by a null string element).  If hidden options are used also
+the <code>cmdline_parser_full_help</code> array is available (containing also
+help strings concerning hidden options).  All these strings can be used
+by the programmer to build a customized help output<a rel="footnote" href="#fn-17" name="fnd-17"><sup>17</sup></a>.
+
+   <p>Even if <code>&lt;option&gt;_given</code> is 0, the corresponding
+<code>&lt;option&gt;_arg</code> is set to default value (if one has been specified
+for <code>&lt;option&gt;</code>).  However, in this case, the <code>&lt;option&gt;_orig</code>
+is set to <code>NULL</code>.
+
+   <p>Notice that by default the generated function is called
+<code>cmdline_parser</code> (see the command line options below, to override
+this name), and it takes the arguments that main receives and a
+pointer to such a struct, that it will be filled.  Another version,
+<code>cmdline_parser2</code>, can be specified more arguments.  Since you
+typically need this second version only in conjunction with other
+&ldquo;kinds&rdquo; of parsers such as configuration files and multiple parsers,
+you can find more details about it in <a href="#Configuration-files">Configuration files</a>.
+
+   <p><b>IMPORTANT</b>: The array passed to the parser function (that in turn
+is passed to <code>getopt_long</code> is expected to have in the first
+element (of index 0) the name of the program that was invoked.  This
+will be used, for instance, for printing possible errors.
+
+   <p><code>cmdline_parser_free</code> can be called to deallocate memory
+allocated by the parser for string and multiple options.
+
+   <p><code>cmdline_parser_init</code> can be called to initialize the struct (it is
+not mandatory, since it is done automatically by the command line
+parser).
+
+   <p><code>cmdline_parser_file_save</code><a rel="footnote" href="#fn-18" name="fnd-18"><sup>18</sup></a> can be used to save the command line options into a
+file.  The contents of this file are consistent with the configuration
+files (<a href="#Configuration-files">Configuration files</a>).  Notice that if an option has a
+default value, this option will be saved into the file only if it was
+passed explicitly at command line (or read from a configuration file),
+i.e., default values will not be saved into the file.
+
+   <p>And here's how these functions can be used inside the main program:
+
+<!-- Generator: GNU source-highlight, by Lorenzo Bettini, http://www.gnu.org/software/src-highlite -->
+<pre class="smallexample">     <i>/* main1.cc */</i>
+     <i>/* we try to use gengetopt generated file in a C++ program */</i>
+     <i>/* we don't use autoconf and automake vars */</i>
+     
+     <b>#include</b> <tt>&lt;iostream&gt;</tt>
+     <b>#include</b> <tt>"stdlib.h"</tt>
+     
+     <b>#include</b> <tt>"cmdline1.h"</tt>
+     
+     <b>using</b> std::cout;
+     <b>using</b> std::endl;
+     
+     <b>int</b>
+     main (<b>int</b> argc, <b>char</b> **argv)
+     {
+       gengetopt_args_info args_info;
+     
+       cout &lt;&lt; <tt>"This one is from a C++ program"</tt> &lt;&lt; endl ;
+       cout &lt;&lt; <tt>"Try to launch me with some options"</tt> &lt;&lt; endl ;
+       cout &lt;&lt; <tt>"(type sample1 --help for the complete list)"</tt> &lt;&lt; endl ;
+       cout &lt;&lt; <tt>"For example: ./sample1 *.* --funct-opt"</tt> &lt;&lt; endl ;
+     
+       <i>/* let's call our cmdline parser */</i>
+       <b>if</b> (cmdline_parser (argc, argv, &amp;args_info) != 0)
+         exit(1) ;
+     
+       cout &lt;&lt; <tt>"Here are the options you passed..."</tt> &lt;&lt; endl;
+     
+       <b>for</b> ( <b>unsigned</b> i = 0 ; i &lt; args_info.inputs_num ; ++i )
+         cout &lt;&lt; <tt>"file: "</tt> &lt;&lt; args_info.inputs[i] &lt;&lt; endl ;
+     
+       <b>if</b> ( args_info.funct_opt_given )
+         cout &lt;&lt; <tt>"You chose --funct-opt or -F."</tt> &lt;&lt; endl ;
+     
+       <b>if</b> ( args_info.str_opt_given )
+         cout &lt;&lt; <tt>"You inserted "</tt> &lt;&lt; args_info.str_opt_arg &lt;&lt; <tt>" for "</tt> &lt;&lt;
+           <tt>"--str-opt option."</tt> &lt;&lt; endl ;
+     
+       <b>if</b> ( args_info.int_opt_given )
+         cout &lt;&lt; <tt>"This is the integer you input: "</tt> &lt;&lt;
+           args_info.int_opt_arg &lt;&lt; <tt>"."</tt> &lt;&lt; endl;
+     
+       <b>if</b> (args_info.flag_opt_given)
+         cout &lt;&lt; <tt>"The flag option was given!"</tt> &lt;&lt; endl;
+     
+       cout &lt;&lt; <tt>"The flag is "</tt> &lt;&lt; ( args_info.flag_opt_flag ? <tt>"on"</tt> : <tt>"off"</tt> ) &lt;&lt;
+         <tt>"."</tt> &lt;&lt; endl ;
+     
+       <b>if</b> (args_info.enum_opt_given) {
+         cout &lt;&lt; <tt>"enum-opt value: "</tt> &lt;&lt; args_info.enum_opt_arg &lt;&lt; endl;
+         cout &lt;&lt; <tt>"enum-opt (original specified) value: "</tt>
+             &lt;&lt; args_info.enum_opt_orig &lt;&lt; endl;
+       }
+     
+       <b>if</b> (args_info.secret_given)
+         cout &lt;&lt; <tt>"Secret option was specified: "</tt> &lt;&lt; args_info.secret_arg
+             &lt;&lt; endl;
+     
+       cout &lt;&lt; args_info.def_opt_arg &lt;&lt; <tt>"! "</tt>;
+     
+       cout &lt;&lt; <tt>"Have a nice day! :-)"</tt> &lt;&lt; endl ;
+     
+       cmdline_parser_free (&amp;args_info); <i>/* release allocated memory */</i>
+     
+       <b>return</b> 0;
+     }
+     
+</pre>
+   <p>Now you can compile <samp><span class="file">main1.cc</span></samp> and the <samp><span class="file">cmdline1.c</span></samp> generated
+by gengetopt and link all together to obtain <code>sample1</code> executable:
+
+<pre class="example">     gcc -c cmdline1.c
+     g++ -c main1.cc
+     g++ -o sample1 cmdline1.o main1.o
+</pre>
+   <p>(Here we assume that <code>getopt_long</code> is included in the standard C library;
+see <a href="#Installation">Installation</a> and <a href="#No-getopt_005flong">No getopt_long</a>).
+
+   <p>Now let's try some tests with this program:
+
+<pre class="example">     $ ./sample1 -s "hello" --int-opt 1234
+     This one is from a C++ program
+     Try to launch me with some options
+     (type sample1 --help for the complete list)
+     For example: ./sample1 *.* --funct-opt
+     Here are the options you passed...
+     You inserted hello for --str-opt option.
+     This is the integer you input: 1234.
+     The flag is off.
+     Have a nice day! :-)
+</pre>
+   <p>You can also pass many file names to the command line (this also shows
+how flags work):
+
+<pre class="example">     $ ./sample1 *.h -i -100 -x
+     This one is from a C++ program
+     Try to launch me with some options
+     (type sample1 --help for the complete list)
+     For example: ./sample1 *.* --funct-opt
+     Here are the options you passed...
+     file: cmdline1.h
+     file: cmdline2.h
+     file: cmdline.h
+     file: getopt.h
+     This is the integer you input: -100.
+     The flag is on.
+     Have a nice day! :-)
+</pre>
+   <p>And if we try to omit the <code>--int-opt</code> (or <code>-i</code>), which is
+required, we get an error:
+
+<pre class="example">     $ ./sample1
+     This one is from a C++ program
+     Try to launch me with some options
+     (type sample1 --help for the complete list)
+     For example: ./sample1 *.* --funct-opt
+     sample1: `--int-opt' (`-i') option required!
+</pre>
+   <p>Now, let's test the enumerated options, notice the use of a prefix for
+specifying an acceptable value, and the difference between the actual
+passed value and the one recorded in <code>&lt;option&gt;_arg</code>:
+
+<pre class="example">     $ ./sample1 -i 10 --enum-opt h
+     ...
+     enum-opt value: hello
+     enum-opt (original specified) value: h
+     ...
+</pre>
+   <p>While the next one raises an ambiguity error (between <code>"bar"</code>
+and <code>"bye"</code>):
+
+<pre class="example">     $ ./sample1 -i 10 --enum-opt b
+     ...
+     ./sample1: ambiguous argument, "b", for option `--enum-opt'
+</pre>
+   <p><a name="showrequired"></a>
+Here is the output of <code>--help</code> of the parser generated from
+<samp><span class="file">sample1.ggo</span></samp> by specifying the following options to gengetopt:
+<code>--long-help -u --show-required</code> (see <a href="#Invoking-gengetopt">Invoking gengetopt</a> for
+further explanation for these command line options).
+
+<pre class="example">     This one is from a C++ program
+     Try to launch me with some options
+     (type sample1 --help for the complete list)
+     For example: ./sample1 *.* --funct-opt
+     sample1 2.0
+     
+     Usage: sample1 -iINT|--int-opt=INT [-h|--help] [--full-help] [-V|--version]
+              [-sfilename|--str-opt=filename] [-mINT|--my-opt=INT] [--flag-opt]
+              [-F|--funct-opt] [--long-opt=LONG] [--def-opt=STRING]
+              [--enum-opt=STRING] [-DINT|--dependant=INT]  [FILES]...
+     
+       -h, --help              Print help and exit
+           --full-help         Print help, including hidden options, and exit
+       -V, --version           Print version and exit
+       -s, --str-opt=filename  A string option, for a filename
+     
+     A brief text description before the other options.
+     
+       -m, --my-opt=INT        Another integer option, this time the description of
+                                 the option should be "quite" long to require
+                                 wrapping... possibly more than one wrapping :-)
+                                 especially if I
+                                 require a line break
+       -i, --int-opt=INT       A int option (mandatory)
+     
+     more involved options:
+       the following options
+       are more complex
+     
+           --flag-opt          A flag option  (default=off)
+       -F, --funct-opt         A function option
+     
+     last option section:
+           --long-opt=LONG     A long option
+           --def-opt=STRING    A string option with default  (default=`Hello')
+           --enum-opt=STRING   A string option with list of values  (possible
+                                 values="foo", "bar", "hello", "bye"
+                                 default=`hello')
+       -D, --dependant=INT     option that depends on str-opt
+     
+     An ending text.
+</pre>
+   <p><a name="index-wrapping-52"></a>Notice how <code>filename</code> is printed instead of <code>STRING</code> for the
+option <code>--str-opt</code> (since <code>typestr</code> was used in the
+<samp><span class="file">sample1.ggo</span></samp> file) and how the description of <code>--my-opt</code> is
+wrapped to 80 columns, and how the <code>\n</code> is actually interpreted as
+a newline request.  Also the usage string is wrapped.  Moreover, since
+<code>-S,--secret</code> is
+<a name="index-hidden-53"></a>an hidden option (See <a href="#hidden">Hidden options</a>.) it is not printed;
+<a name="index-g_t_0040code_007b_002d_002dfull_002dhelp_007d-54"></a>if you wanted that to be printed, you should use <code>--full-help</code>.
+
+   <p>Finally, notice how the <code>text</code> strings are printed in the help
+output (and the empty line after the &ldquo;more involved options&rdquo; section
+achieved with an empty <code>text</code> string).
+
+   <p>If you're curious you may want to take a look at the generated C file
+<samp><span class="file">cmdline1.c</span></samp>.
+
+   <p>You may find other examples in <samp><span class="file">/prefix/share/doc/gengetopt/examples</span></samp>
+or in the <samp><span class="file">tests</span></samp> of the source tarbal.
+
+<div class="node">
+<p><hr>
+<a name="Invoking-gengetopt"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Terminology">Terminology</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Basic-Usage">Basic Usage</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">3 Invoking gengetopt</h2>
+
+<p><a name="index-invoking-55"></a><a name="index-gengetopt-options-56"></a>
+This is the output of <code>gengetopt --help</code>:
+
+<pre class="smallexample">     gengetopt
+     
+     This program generates a C function that uses getopt_long function
+     to parse the command line options, validate them and fill a struct.
+     
+     Usage: gengetopt [OPTIONS]...
+     
+       -h, --help                    Print help and exit
+       -V, --version                 Print version and exit
+     
+     Main options:
+     
+       -i, --input=filename          input file (default std input)
+       -f, --func-name=name          name of generated function
+                                       (default=`cmdline_parser')
+       -a, --arg-struct-name=name    name of generated args info struct
+                                       (default=`gengetopt_args_info')
+       -F, --file-name=name          name of generated file  (default=`cmdline')
+           --output-dir=path         output directory
+       -c, --c-extension=ext         extension of c file  (default=`c')
+       -H, --header-extension=ext    extension of header file  (default=`h')
+       -l, --long-help               long usage line in help
+           --default-optional        by default, an option is considered optional if
+                                       not specified otherwise
+       -u, --unamed-opts[=STRING]    accept options without names (e.g., file names)
+                                        (default=`FILES')
+     
+     The parser generated is thought to be used to parse the command line arguments.
+     However, you can also generate parsers for configuration files, or strings that
+     contain the arguments to parse, by using the following two options.
+     
+       -C, --conf-parser             generate a config file parser
+       -S, --string-parser           generate a string parser (the string contains
+                                       the command line)
+     
+     Additional options:
+     
+       -G, --include-getopt          adds the code for getopt_long in the generated
+                                       C file
+       -n, --no-handle-help          do not handle --help|-h automatically
+       -N, --no-handle-version       do not handle --version|-V automatically
+       -e, --no-handle-error         do not exit on errors
+           --show-required[=STRING]  in the output of help will specify which
+                                       options are mandatory, by using the optional
+                                       passed string  (default=`(mandatory)')
+       -g, --gen-version             put gengetopt version in the generated file
+                                       (default=on)
+           --set-package=STRING      set the package name (override package defined
+                                       in the .ggo file)
+           --set-version=STRING      set the version number (override version
+                                       defined in the .ggo file)
+           --show-help               show the output of --help instead of generating
+                                       code
+           --show-full-help          show the output of --help (including hidden
+                                       options) instead of generating code
+           --show-version            show the output of --version instead of
+                                       generating code
+     
+     Please refer to the info manual for further explanations.
+</pre>
+   <p>The options should be clear; in particular:
+
+     <dl>
+<dt><code>--func-name</code><dd><a name="index-g_t_0040code_007b_002d_002dfunc_002dname_007d-57"></a>if no <code>--func-name</code> is given, <code>cmdline_parser</code> is taken by default;
+
+     <br><dt><code>--output-dir</code><dd><a name="index-g_t_0040code_007b_002d_002doutput_002ddir_007d-58"></a>if no <code>--output-dir</code><a rel="footnote" href="#fn-19" name="fnd-19"><sup>19</sup></a> is given, the
+files are generated in the current directory;
+
+     <br><dt><code>--arg-struct-name</code><dd><a name="index-g_t_0040code_007b_002d_002darg_002dstruct_002dname_007d-59"></a>allows to specify the name of the generated struct for command line
+arguments (default is <code>gengetopt_args_info</code>)
+
+     <br><dt><code>--long-help</code><dd><a name="index-g_t_0040code_007b_002d_002dlong_002dhelp_007d-60"></a>the &ldquo;Usage&rdquo; line reports all the options;
+this may be unpleasant if options are many;
+
+     <br><dt><code>--default-optional</code><dd><a name="index-g_t_0040code_007b_002d_002ddefault_002doptional_007d-61"></a>If this command line option is given, by default, options are considered
+optional (if not explicitly specified otherwise).  Otherwise, options
+are considered mandatory (if not explicitly specified otherwise).
+
+     <br><dt><code>--unamed-opts</code><dd><a name="index-g_t_0040code_007b_002d_002dunamed_002dopts_007d-62"></a>the program will accept also options without a name, which, in most
+case, means that we can pass many file names to the program (see the
+example in <a href="#Basic-Usage">Basic Usage</a>, where we call <code>sample1 *.h</code>). You can
+specify an optional description for these additional names (default is
+<code>FILES</code>).
+
+     <br><dt><code>--no-handle-help</code><dt><code>--no-handle-version</code><dd><a name="index-g_t_0040code_007b_002d_002dno_002dhandle_002dhelp_007d-63"></a><a name="index-g_t_0040code_007b_002d_002dno_002dhandle_002dversion_007d-64"></a>if <code>--no-handle-help</code> (<code>--no-handle-version</code>) is given the
+command line option <code>--help|-h</code> (<code>--version|-V</code>) is not
+handled automatically, so the programmer will be able to print some
+other information; then the function for printing the standard help
+(version) response can be used; this function is called
+<code>&lt;parser-name&gt;_print_help</code> (<code>&lt;parser-name&gt;_print_version</code>),
+where <code>&lt;parser-name&gt;</code> is the name specified with <code>--func-name</code>
+or the default, <code>cmdline_parser</code>.
+
+     <br><dt><code>--no-handle-error</code><dd><a name="index-g_t_0040code_007b_002d_002dno_002dhandle_002derror_007d-65"></a>if <code>--no-handle-error</code> is given, an error in the parsing does not
+provoke the exit of the program; instead, since the parser function, in
+case of an error, returns a value different 0, the program can print a
+help message, as gengetopt itself does in case of an error (try it!).
+
+     <br><dt><code>--show-required</code><dd><a name="index-g_t_0040code_007b_002d_002dshow_002drequired_007d-66"></a>if <code>--show-required</code> is given, possibly with
+a string, in the output of <code>--help</code> will be made explicit
+which options are actually required, See <a href="#showrequired">Basic Usage</a>.
+
+     <br><dt><code>--gen-version</code><dd><a name="index-g_t_0040code_007b_002d_002dgen_002dversion_007d-67"></a>is a flag (default on) that when disabled does not put in the output
+file the gengetopt version (it is useful for testing purposes).
+
+     <br><dt><code>--conf-parser</code><dd><a name="index-g_t_0040code_007b_002d_002dconf_002dparser_007d-68"></a>Detailed in <a href="#Configuration-files">Configuration files</a>.
+
+     <br><dt><code>--string-parser</code><dd><a name="index-g_t_0040code_007b_002d_002dstring_002dparser_007d-69"></a>Detailed in <a href="#String-Parsers-and-Multiple-Parsers">String Parsers and Multiple Parsers</a>.
+
+     <br><dt><code>--include-getopt</code><dd><a name="index-g_t_0040code_007b_002d_002dinclude_002dgetopt_007d-70"></a>Adds the code for <code>getopt_long</code> into the generated parser C file. 
+This will make your generated parser much bigger, but it will be
+compiled in any system, even if <code>getopt_long</code> is not part of the C
+library where your program is being compiled.  See also <a href="#No-getopt_005flong">No getopt_long</a>.
+
+     <br><dt><code>--show-help</code><dt><code>--show-full-help</code><dt><code>--show-version</code><dd><a name="index-g_t_0040code_007b_002d_002dshow_002dhelp_007d-71"></a><a name="index-g_t_0040code_007b_002d_002dshow_002dfull_002dhelp_007d-72"></a><a name="index-g_t_0040code_007b_002d_002dshow_002dversion_007d-73"></a>only make gengetopt show the output of <code>--help</code>,
+<code>--full-help</code> and <code>--version</code> command lines without
+generating any code, See <a href="#addedoptions">Automatically added options</a>. 
+For instance, I use the <code>--show-help</code> option to generate a
+texinfo file with the output of help (this also shows an example of
+use of <code>--set-package</code> and <code>--set-version</code>):
+
+     <pre class="example">          ../src/gengetopt --show-help -i ../src/cmdline.ggo \
+             --set-package="gengetopt" \
+             --set-version="" &gt; help_output.texinfo
+     </pre>
+     </dl>
+
+   <p>You may have already guessed it: gengetopt uses gengetopt itself for
+command line options, and its specification file is <code>cmdline.ggo</code>
+in the source directory.   In particular the command line for gengetopt
+itself is generated with the following command:
+
+<pre class="example">     gengetopt --input=cmdline.ggo --no-handle-version \
+               --no-handle-help --no-handle-error
+</pre>
+   <p>Indeed when <code>--help|-h</code> is passed on the command line, gengetopt will call
+<code>cmdline_parser_print_help()</code> and then the lines for reporting bugs.  When
+<code>--version|-V</code> is passed, it will call cmdline_parser_print_version() and
+then prints a copyright.  If an error occurs it prints a message on the
+screen:
+
+<pre class="example">     $ ./gengetopt --zzzz
+     ./gengetopt: unrecognized option `--zzzz'
+     Run gengetopt --help to see the list of options.
+</pre>
+   <div class="node">
+<p><hr>
+<a name="Terminology"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Group-options">Group options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invoking-gengetopt">Invoking gengetopt</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">4 Terminology</h2>
+
+<p><a name="index-Terminology-74"></a><a name="index-argument_002c-defined-75"></a><a name="index-option_002c-defined-76"></a><a name="index-value_002c-defined-77"></a><a name="index-parameter_002c-defined-78"></a><a name="index-short-option_002c-defined-79"></a><a name="index-long-option_002c-defined-80"></a><a name="index-multiple-option_002c-defined-81"></a><a name="index-required-option_002c-defined-82"></a>
+An <dfn>argument</dfn> is an element of the <code>argv</code> array passed into
+your C or C++ program by your operating system.
+
+   <p>An <dfn>option</dfn> is an argument that begins with <samp><span class="option">-</span></samp>,
+or <samp><span class="option">--</span></samp>.
+
+   <p>A <dfn>value</dfn> is an argument, or part of an argument, that is associated
+with a particular option (an option may also not accept any value).  For
+example, in
+
+<pre class="example">     &gt; ls --width=80
+</pre>
+   <p class="noindent"><samp><span class="command">ls</span></samp> is called with one argument, <samp><span class="option">--width=80</span></samp>,
+which is an option that has a value, <code>80</code>, while in
+
+<pre class="example">     &gt; ls --width 80
+</pre>
+   <p class="noindent"><samp><span class="command">ls</span></samp> is called with two arguments, <samp><span class="option">--width</span></samp>,
+which is an option, and <code>80</code> which might or might not be a value. 
+In this case, whether the <code>80</code> is treated as a value associated
+with the preceding <samp><span class="option">--width</span></samp> option, or as the name of a file to
+list depends on how <samp><span class="command">ls</span></samp> parses the <samp><span class="option">--width</span></samp> option.
+
+   <p>The order in which options are specified is <em>usually</em> unimportant:
+
+<pre class="example">     &gt; ls -a -l
+     &gt; ls -l -a
+</pre>
+   <p class="noindent">both do exactly the same thing.
+
+   <p>An <dfn>parameter</dfn> is an argument that is not an option.  For example, in
+
+<pre class="example">     &gt; cp --archive source dest
+</pre>
+   <p class="noindent"><samp><span class="command">cp</span></samp> is called with three arguments, the option
+<samp><span class="option">--archive</span></samp>, the parameter <code>source</code>, and the parameter
+<code>dest</code>.  Unlike options, the order in which parameters are
+specified usually <em>is</em> important:
+
+<pre class="example">     &gt; cp --archive --verbose source dest
+     &gt; cp --verbose --archive source dest
+     &gt; cp --archive source --verbose dest
+     &gt; cp --archive --verbose dest source
+</pre>
+   <p class="noindent">The first three <samp><span class="command">cp</span></samp> commands do the same thing, but the
+fourth one is completely different.
+
+   <p>If you're new to Gengetopt, you may wish to skip the rest of this
+section.  It goes into more detail about different sorts of options, and
+how they are parsed.
+
+   <p>Note that some parameters may begin with <samp><span class="option">-</span></samp> or <samp><span class="option">--</span></samp>. 
+Equivalently, not <em>all</em> arguments that begin with <samp><span class="option">-</span></samp> or
+<samp><span class="option">--</span></samp> are options.  Consider
+
+<pre class="example">     &gt; ls -- -file
+     &gt; tar -c -f - . &gt; ../foo.tar
+</pre>
+   <p class="noindent">The <samp><span class="command">ls</span></samp> command has two arguments; the first
+argument, <samp><span class="option">--</span></samp> is ignored by <samp><span class="command">ls</span></samp>, but causes the
+<samp><span class="option">-file</span></samp> argument to be interpreted as a parameter.  The <samp><span class="command">tar</span></samp>
+command has four arguments.  The <samp><span class="option">-c</span></samp> argument tells tar to
+create an archive; the <samp><span class="option">-f</span></samp> argument, which takes a value,
+<code>-</code>, tells tar that the archive should be written onto the standard
+output, and the fourth argument, <code>.</code>, tells tar what directories to
+include in the archive.  (The remaining two items, <code>&gt;</code> and
+<code>../foo.tar</code>, tell the shell to redirect the <samp><span class="command">tar</span></samp>
+command's output to the file ../foo.tar.  The <samp><span class="command">tar</span></samp> command
+doesn't even see them.)
+
+   <p>The GNU convention is that <samp><span class="option">-</span></samp> by itself is always interpreted as
+a value or parameter, while the first <samp><span class="option">--</span></samp> by itself is always
+ignored, but causes all subsequent arguments to be interpreted as
+parameters.  Gengetopt always behaves this way.
+
+   <p>A <dfn>short option</dfn> is an option that begins with <samp><span class="option">-</span></samp>.  Not
+including the leading dash, short options must be one character long:
+
+<pre class="example">     &gt; ls -a -l -t --width=80
+</pre>
+   <p class="noindent">The <samp><span class="option">-a</span></samp>, <samp><span class="option">-l</span></samp>, and <samp><span class="option">-t</span></samp> options are all short
+options.  Multiple short options may be combined into a single
+argument:
+
+<pre class="example">     &gt; ls -alt --width=80
+</pre>
+   <p class="noindent">is equivalent to the above example.
+
+   <p>A <dfn>long option</dfn> is an option that begins with <samp><span class="option">-</span></samp>
+or <samp><span class="option">--</span></samp>.  Ignoring the leading punctuation, long
+options may be one or more characters long:
+
+<pre class="example">     &gt; ls --all -fs
+</pre>
+   <p class="noindent">The <samp><span class="command">ls</span></samp> command has two arguments; the long option
+<samp><span class="option">--all</span></samp>, and the pair of short options <samp><span class="option">-fs</span></samp>.
+
+   <p>Long options need not have synonymous short options; after all, complex
+programs like <samp><span class="command">cc</span></samp> have more long options than there are valid
+short option characters; it wouldn't be possible to assign a short
+option to each of them.  Short options are encouraged, but not required,
+to have a synonymous long option.
+
+   <p>Long options may be abbreviated, as long as the abbreviation is not
+ambiguous.  Gengetopt automatically treats unambiguous abbreviations as
+synonyms.
+
+   <p>Short options may have values just like long options, but if several
+short options are grouped together into one argument, only the last one
+may have a value.  Values in the same argument as a long option are
+delimited by an equals sign, values in the same argument as a short
+option are not:
+
+<pre class="example">     &gt; ls --width 60  # ok, value is "60"
+     &gt; ls --width=60  # ok, value is "60"
+     &gt; ls -w60        # ok, value is "60"
+     &gt; ls -w 60       # ok, value is "60"
+     &gt; ls -w=60       # unexpected, value is "=60"
+     &gt; ls -T7 -w60    # ok, value for -T is 7, value for -w is 60
+     &gt; ls -T7w60      # unexpected, value for -T is "7w60", no -w at all
+</pre>
+   <p>A <dfn>required option</dfn> must be present, otherwise  an error will be
+raised.
+
+   <p>A <dfn>multiple option</dfn> is an option that may appear more than once on
+the command line.  Gengetopt would create a tidy array for multiple
+options (see <a href="#Multiple-Options">Multiple Options</a>, for further details about dealing
+with multiple options).
+
+<div class="node">
+<p><hr>
+<a name="Group-options"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Configuration-files">Configuration files</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Terminology">Terminology</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">5 Group options</h2>
+
+<p><a name="index-group-options-83"></a>
+It is also possible to group options; options belonging to a <em>group</em> are
+considered <em>in mutual exclusion</em>.  In order to use this feature, first the
+<code>group</code> has to be defined, and then a <code>groupoption</code> can be defined.  A
+groupoption has basically the same syntax of a standard option, apart
+that the required flag must not be specified (it would not make sense,
+since the options of the same group are mutual exclusive) and the group
+to which the option belongs has to be specified.
+
+<pre class="example">     defgroup "&lt;group name&gt;" {groupdesc="&lt;group description&gt;"} {yes}
+     groupoption &lt;long&gt; &lt;short&gt; "&lt;desc&gt;" &lt;argtype&gt; group="&lt;group name&gt;" \
+          {argoptional} {multiple}
+</pre>
+   <p>If a group is defined as required, then one (but only one) option
+belonging to the group has to be specified.
+
+   <p>Here's an example (taken from the test <samp><span class="file">test_group_cmd.ggo</span></samp>):
+
+<pre class="example">     defgroup "my grp2"
+     defgroup "grp1" groupdesc="an option of this group is required" required
+     groupoption "opta" a "string a" group="grp1" multiple
+     groupoption "optA" A "string A" string group="grp1" argoptional
+     groupoption "optAmul" M "string M" string group="grp1" argoptional multiple
+     groupoption "optb" b "string b" group="grp1"
+     groupoption "optc" - "string c" group="my grp2"
+     groupoption "optd" d "string d" group="my grp2"
+</pre>
+   <p>The group <code>grp1</code> is required, so either <code>--opta</code> or
+<code>--optb</code> has to be specified (but only one of them).  Here's the
+output of some executions:
+
+<pre class="example">     $ ./test_groups
+     test_groups: 0 options of group grp1 were given. One is required
+     $ ./test_groups -a          OK
+     $ ./test_groups -a -a       OK (the same option given twice)
+     $ ./test_groups -a -b
+     test_groups: 2 options of group grp1 were given. One is required
+     $ ./test_groups -a -c       OK
+     $ ./test_groups -a --optc -d
+     test_groups: 2 options of group my grp2 were given. At most one is required
+</pre>
+   <div class="node">
+<p><hr>
+<a name="Configuration-files"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Multiple-Options">Multiple Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Group-options">Group options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">6 Configuration files</h2>
+
+<p><a name="index-configuration-files-84"></a>
+<a name="index-g_t_0040code_007b_002dC_002c_002d_002dconf_002dparser_007d-85"></a>It is often useful to specify command line options directly in a
+configuration file, so that the value of some options are read from
+this file if they are not given as command line options.  When the
+command line option <code>-C|--conf-parser</code> is given to gengetopt,
+apart from the standard command line option parser, also this
+additional parser is generated (its name is
+<code>&lt;commandline_parser&gt;_configfile</code>):
+
+<pre class="example">     int
+     &lt;cmd_parser_name&gt;_configfile (char * const filename,
+                                   struct gengetopt_args_info *args_info,
+                                   int override,
+                                   int initialize,
+                                   int check_required);
+</pre>
+   <p>The parameter <code>override</code> tells whether the values read in the
+configuration file have to override those specified at the command line. 
+The <code>initialize</code> tells whether the args_info struct has to be
+initialize.
+
+   <p>IMPORTANT: you have to explicitly set <code>initialize</code> to true (i.e.,
+different from 0) if you call the config file parser before the standard
+command line option parser, otherwise unpredictable results may show.
+
+   <p>The <code>check_required</code> tells whether the check for required options
+must be performed or not.
+
+   <p>If you call the config file parser before the standard command line
+option parser and then you want to call the standard command line parser
+you MUST use this second version, passing 0 for initialized, so that
+collected values from the config file are not lost:
+
+<pre class="example">     int
+     &lt;cmd_parser_name&gt;2 (int argc,
+                         char * const *argv,
+                         struct gengetopt_args_info *args_info,
+                         int override,
+                         int initialize,
+                         int check_required);
+</pre>
+   <p>Notice, that with this version you can also specify whether the options
+passed at the command line must override the ones read from the config
+file. 
+<!-- If you set @code{override} to 0, and a command line option is -->
+<!-- given that has already been read from the config file, an error will be -->
+<!-- raised. -->
+Moreover, you have to specify whether the check for missing
+required options must be performed or not.  This concerns also options
+of a required group (<a href="#Group-options">Group options</a>).
+
+   <p>If you decide not to request the check for required option, you can
+test it manually, after the command line parsing returns by using the
+following generated function:
+
+<pre class="example">     int
+     &lt;cmd_parser_name&gt;_required (struct gengetopt_args_info *args_info,
+                                 const char *program_name);
+</pre>
+   <p>where <code>program_name</code> is the name of your executable (usually you
+should pass <code>argv[0]</code> as argument).  If the function returns a
+value different from 0, then some required options are missing.  An
+error has already been printed by this function.  This concerns also
+options of a required group (<a href="#Group-options">Group options</a>).
+
+   <p>The config file has the following simple syntax: lines starting with #
+are considered comments and:
+
+<pre class="example">     &lt;option_name&gt; = {&lt;option_val&gt;}
+</pre>
+   <p class="noindent">or simply (if the option does not take an argument):
+
+<pre class="example">     &lt;option_name&gt;
+</pre>
+   <p class="noindent">which means that <code>option_name</code> is given, and if it accepts an argument,
+then its value is <code>option_val</code>.  The <code>=</code> is not mandatory.
+
+   <p><a name="index-include-86"></a>Since version 2.19, it is possible to include other files (i.e., other
+configuration files) in a configuration file, by using the
+<code>include</code> syntax:
+
+<pre class="example">     include "filename"
+</pre>
+   <p>For instance here's a program that uses this feature (this is the test
+<samp><span class="file">test_conf_parser</span></samp>):
+
+<!-- Generator: GNU source-highlight, by Lorenzo Bettini, http://www.gnu.org/software/src-highlite -->
+<pre class="smallexample">     <i>/* test_conf_parser.c test */</i>
+     
+     <i>/* test all kinds of options and the conf file parser */</i>
+     
+     <b>#include</b> <tt>&lt;stdlib.h&gt;</tt>
+     <b>#include</b> <tt>&lt;stdio.h&gt;</tt>
+     
+     <b>#include</b> <tt>"test_conf_parser_cmd.h"</tt>
+     
+     <b>static</b> <b>struct</b> my_args_info args_info;
+     
+     <b>int</b>
+     main (<b>int</b> argc, <b>char</b> **argv)
+     {
+       <b>int</b> i;
+       <b>int</b> result = 0;
+     
+       <b>if</b> (test_conf_parser_cmd_parser (argc, argv, &amp;args_info) != 0) {
+         result = 1;
+         <b>goto</b> stop;
+       }
+     
+       <i>/* override cmd options, but do not initialize args_info, check for required options */</i>
+       <b>if</b> (test_conf_parser_cmd_parser_configfile
+           (args_info.conf_file_arg, &amp;args_info, 1, 0, 1) != 0)
+         {
+           result = 1;
+           <b>goto</b> stop;
+         }
+     
+       printf (<tt>"value of required: %s</tt>\n<tt>"</tt>, args_info.required_arg);
+       printf (<tt>"value of string: %s</tt>\n<tt>"</tt>, args_info.string_arg);
+       printf (<tt>"value of no-short_given: %d</tt>\n<tt>"</tt>, args_info.no_short_given);
+       printf (<tt>"value of int: %d</tt>\n<tt>"</tt>, args_info.int_arg);
+       printf (<tt>"value of float: %f</tt>\n<tt>"</tt>, args_info.float_arg);
+     
+       printf (<tt>"value of multi-string_given: %d</tt>\n<tt>"</tt>, args_info.multi_string_given);
+       <b>for</b> (i = 0; i &lt; args_info.multi_string_given; ++i)
+         printf (<tt>"  value of multi-string: %s</tt>\n<tt>"</tt>, args_info.multi_string_arg [i]);
+     
+       printf (<tt>"value of multi-string-def_given: %d</tt>\n<tt>"</tt>,
+               args_info.multi_string_def_given);
+       <b>for</b> (i = 0; i &lt; args_info.multi_string_def_given; ++i)
+         printf (<tt>"  value of multi-string-def: %s</tt>\n<tt>"</tt>,
+                 args_info.multi_string_def_arg [i]);
+       <b>if</b> (!args_info.multi_string_def_given &amp;&amp; args_info.multi_string_def_arg [0])
+         printf (<tt>"default value of multi-string-def: %s</tt>\n<tt>"</tt>,
+                 args_info.multi_string_def_arg [0]);
+     
+       printf (<tt>"value of opta: %s</tt>\n<tt>"</tt>, args_info.opta_arg);
+     
+       printf (<tt>"noarg given %d times</tt>\n<tt>"</tt>, args_info.noarg_given);
+       printf (<tt>"noarg_noshort given %d times</tt>\n<tt>"</tt>, args_info.noarg_noshort_given);
+     
+       printf (<tt>"opt-arg given: %d</tt>\n<tt>"</tt>, args_info.opt_arg_given);
+       printf (<tt>"opt-arg value: %s</tt>\n<tt>"</tt>, (args_info.opt_arg_arg ? args_info.opt_arg_arg : <tt>"not given"</tt>));
+     
+       <b>if</b> (args_info.file_save_given) {
+         <b>if</b> (test_conf_parser_cmd_parser_file_save (args_info.file_save_arg, &amp;args_info) == EXIT_FAILURE)
+           result = 1;
+         <b>else</b>
+           printf (<tt>"saved configuration file %s</tt>\n<tt>"</tt>, args_info.file_save_arg);
+       }
+     
+      stop:
+       test_conf_parser_cmd_parser_free (&amp;args_info);
+     
+       <b>return</b> result;
+     }
+     
+</pre>
+   <p>So if we use the following config file
+
+<pre class="example">     # required option
+     required "this is a test"
+     float 3.14
+     no-short
+     string another
+</pre>
+   <p class="noindent">and we run <code>test_conf_parser</code> like that, we will have
+
+<pre class="example">     ./test_conf_parser -r bar -i 100 --float 2.14 --conf-file test_conf.conf
+     value of required: this is a test
+     value of string: another
+     value of no-short: 1
+     value of int: 100
+     value of float: 3.140000
+</pre>
+   <p>If, instead we call the <code>test_conf_parser_cmd_parser_configfile</code> with 0
+for override argument, we get the following result
+
+<pre class="example">     value of required: bar
+     value of string: another
+     value of no-short: 1
+     value of int: 100
+     value of float: 2.140000
+</pre>
+   <p>This second example use the second version of the command line parser:
+first call the configuration file parser and then the command line
+parser (the command line options will override the configuration file
+options):
+
+<!-- Generator: GNU source-highlight, by Lorenzo Bettini, http://www.gnu.org/software/src-highlite -->
+<pre class="smallexample">     <i>/* test_conf_parser_ov2.c test */</i>
+     
+     <i>/* test all kinds of options and the conf file parser */</i>
+     <i>/* differently from test_conf_parser_ov.c, first scan the conf file and</i>
+     <i>   then the command line */</i>
+     
+     <b>#include</b> <tt>&lt;stdlib.h&gt;</tt>
+     <b>#include</b> <tt>&lt;stdio.h&gt;</tt>
+     
+     <b>#include</b> <tt>"test_conf_parser_cmd.h"</tt>
+     
+     <b>static</b> <b>struct</b> my_args_info args_info;
+     
+     <b>int</b>
+     main (<b>int</b> argc, <b>char</b> **argv)
+     {
+       <i>/* do not override command line options, initialize args_info */</i>
+       <b>if</b> (test_conf_parser_cmd_parser_configfile
+           (<tt>"./test_conf2.conf"</tt>, &amp;args_info, 0, 1, 0) != 0)
+         exit(1);
+     
+       <b>if</b> (test_conf_parser_cmd_parser2 (argc, argv, &amp;args_info, 1, 0, 1) != 0)
+         exit(1) ;
+     
+       printf (<tt>"value of required: %s</tt>\n<tt>"</tt>, args_info.required_arg);
+       printf (<tt>"value of string: %s</tt>\n<tt>"</tt>, args_info.string_arg);
+       printf (<tt>"value of no-short_given: %d</tt>\n<tt>"</tt>, args_info.no_short_given);
+       printf (<tt>"value of int: %d</tt>\n<tt>"</tt>, args_info.int_arg);
+       printf (<tt>"value of float: %f</tt>\n<tt>"</tt>, args_info.float_arg);
+     
+       test_conf_parser_cmd_parser_free (&amp;args_info);
+     
+       <b>return</b> 0;
+     }
+     
+</pre>
+   <p class="noindent">This is an invocation and its results:
+
+<pre class="example">     ./test_conf_parser_ov2 -r "bar" --float 2.14 -i 100
+     value of required: bar
+     value of string: another
+     value of no-short: 1
+     value of int: 100
+     value of float: 2.140000
+</pre>
+   <h3 class="section">6.1 Further details on the configuration file parser</h3>
+
+<p>The generated config file parser function uses the constant
+<code>CONFIG_FILE_LINE_SIZE</code> to read each line of the configuration
+file.  By default this constant is set to <code>2048</code> that should be
+enough for most applications.  If your application uses configuration
+files with lines that are longer, you can compile the generated C file
+by specifying an explicit value for this constant with the <code>-D</code>
+command line option of <code>gcc</code>.
+
+<div class="node">
+<p><hr>
+<a name="Multiple-Options"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#String-Parsers-and-Multiple-Parsers">String Parsers and Multiple Parsers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Configuration-files">Configuration files</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">7 Multiple Options</h2>
+
+<p><a name="index-multiple-options-87"></a>
+If an option is specified as <code>multiple</code>, then it can be specified multiple
+times at command line.  In this case, say the option is called <code>foo</code>, the
+generated <code>foo_given</code> field in the args structure contains the number of
+times it was specified and the generated field <code>foo_arg</code> is an array
+containing all the values that were specified for this option.
+
+   <p>Notice that if a default value is specified for a multiple option, that
+value is assigned to the option only if no other value is specified on
+the command line (and the corresponding <code>_given</code> field will be set to 1),
+i.e., a default value IS NOT always part of the values of a multiple
+option.
+
+   <p>For instance, if the gengetopt file is as follows
+
+<pre class="example">     # test options that can be given more than once
+     option "string"      s "string option" string optional multiple
+     option "int"         i "int option" int optional multiple
+</pre>
+   <p class="noindent">Then the command line options can be collected like that
+
+<pre class="example">     
+</pre>
+   <p class="noindent">Then if this program is called with the following command line options
+
+<!-- Generator: GNU source-highlight, by Lorenzo Bettini, http://www.gnu.org/software/src-highlite -->
+<pre class="smallexample">     <i>/* test options that can be given more than once */</i>
+     
+     <b>#include</b> <tt>&lt;stdlib.h&gt;</tt>
+     <b>#include</b> <tt>&lt;stdio.h&gt;</tt>
+     
+     <b>#include</b> <tt>"test_multiple_cmd.h"</tt>
+     
+     <b>static</b> <b>struct</b> gengetopt_args_info args_info;
+     
+     <b>int</b>
+     main (<b>int</b> argc, <b>char</b> **argv)
+     {
+       <b>int</b> i = 0;
+     
+       <b>if</b> (test_multiple_cmd_parser (argc, argv, &amp;args_info) != 0)
+         exit(1) ;
+     
+       <b>for</b> (i = 0; i &lt; args_info.string_given; ++i)
+         printf (<tt>"passed string: %s</tt>\n<tt>"</tt>, args_info.string_arg[i]);
+     
+       <b>for</b> (i = 0; i &lt; args_info.int_given; ++i)
+         printf (<tt>"passed int: %d</tt>\n<tt>"</tt>, args_info.int_arg[i]);
+     
+       <b>return</b> 0;
+     }
+     
+</pre>
+   <p class="noindent">The output of the program will be
+
+<pre class="example">     passed string: world
+     passed string: hello
+     passed string: bar
+     passed string: foo
+     passed int: 200
+     passed int: 100
+</pre>
+   <p>You can also pass arguments to a multiple option separated by commas (if
+you need to actually specify the comma operator as part of the argument
+you can escape it with <code>\</code>), as in the following:
+
+<pre class="example">     ./test_multiple -s"foo","bar","hello" -i100,200 -s "world"
+</pre>
+   <p>You can specify the number of occurrences of multiple options by using
+the following syntax (that must be given after the <code>multiple</code>
+keyword):
+
+     <dl>
+<dt><code>(number)</code><dd>requires that the multiple option, if given, must be given exactly
+<code>number</code> times
+
+     <br><dt><code>(number1-number2)</code><dd>requires that the multiple option, if given, must be given not less than
+<code>number1</code> times and no more than <code>number2</code> times
+
+     <br><dt><code>(number-)</code><dd>requires that the multiple option, if given, must be given not less than
+<code>number</code> times
+
+     <br><dt><code>(-number)</code><dd>requires that the multiple option, if given, must be given not more than
+<code>number</code> times
+</dl>
+
+   <p>Here are some examples:
+
+<pre class="example">     option "string"      s "string option" string optional multiple(4)
+</pre>
+   <pre class="example">     option "string"      s "string option" string optional multiple(1-4)
+</pre>
+   <pre class="example">     option "string"      s "string option" string optional multiple(-5)
+</pre>
+   <p>Notice that this is independent from the <code>required</code> flag.
+
+<div class="node">
+<p><hr>
+<a name="String-Parsers-and-Multiple-Parsers"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#No-getopt_005flong">No getopt_long</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Multiple-Options">Multiple Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">8 String Parsers and Multiple Parsers</h2>
+
+<p><a name="index-multiple-parsers-88"></a><a name="index-string-parsers-89"></a>
+The parsers generated by gengetopt (indeed the C and header files) are
+self-contained and different parsers can be linked in the same
+program, without interferences.  This is useful, e.g., in cases where
+a specific command line option argument has a complex syntax that
+accepts options itself according to terminology already defined, the
+one handled by <code>getopt_long</code>, see <a href="#Terminology">Terminology</a>.  Another
+case when multiple parsers can be useful is when your command behaves
+differently according to a specific command line option.
+
+   <p>Obviously there exists only one instance of command line arguments
+passed to the <code>main</code> function (namely the variables <code>argc</code>
+and <code>argv</code>) so passing the same arguments to different command
+line parsers is likely to generate errors: the different command line
+parsers are likely to have different syntaxes for accepted options.
+
+   <p><a name="index-g_t_0040code_007b_002dS_002c_002d_002dstring_002dparser_007d-90"></a>For this reason gengetopt can generate parser functions that take a
+string containing the further options to parse, instead of taking an
+array.  This additional parser will have the parser name and the
+suffix <code>_string</code>.  If you want these additional parsers to be
+generated you have to pass the command line option
+<code>-S|--string-parser</code> to gengetopt (see <a href="#Invoking-gengetopt">Invoking gengetopt</a>). 
+The two functions will be:
+
+<pre class="example">     int &lt;parser_name&gt;_string (const char *cmdline,
+         struct test_first_cmdline_cmd_struct *args_info,
+         const char *prog_name);
+     int &lt;parser_name&gt;_string2 (const char *cmdline,
+         struct test_first_cmdline_cmd_struct *args_info,
+         const char *prog_name,
+         int override, int initialize, int check_required);
+</pre>
+   <p>The second one allows you to specify more details about the parsing
+(this is the same as for configuration files, thus we refer to that
+section for the details of the two functions and default values, see
+<a href="#Configuration-files">Configuration files</a>).
+
+   <p>Of course, these functions can be used in general to simulate the
+invocation of a program with specific command line options (stored in
+the first string argument), or in general to parse options that are
+all stored in a string (instead of a vector).
+
+   <p>The first argument of these parsers is a string containing the options
+to parse (remember that this must respect the option format handled by
+<code>getopt_long</code>, see <a href="#Terminology">Terminology</a>).  The second one is the
+pointer to the struct that will be filled with passed options and
+arguments, as usual.  The third option is the program name: this will
+be used when errors have to be printed.  This last argument can be
+null: in this case, the first element of the first string argument is
+considered the program name.
+
+   <p>Let's show these functionalities with an example.  Consider a program
+that accepts two command line options (required in this case):
+
+<pre class="example">     # test for multiple parsers, this is the main file
+     # test_main_cmdline_cmd.ggo
+     
+     option "first-cmd" F "the first command line to parse" required \
+            typestr="first command" string multiple
+     option "second-cmd" S "the second command line to parse" required \
+            typestr="second command" string multiple
+</pre>
+   <p class="noindent">These two options accept strings as argument that in turn are
+considered command line arguments, according to specific syntaxes. 
+The first one is:
+
+<pre class="example">     # test for multiple parsers, this is the first command line file
+     # test_first_cmdline_cmd.ggostr
+     
+     option "option-a" a "option a of the first command line to parse"
+     optional int option "multi" M \
+              "multiple option of the first command line to parse" \
+              optional string multiple
+</pre>
+   <p class="noindent">and the second one is:
+
+<pre class="example">     # test for multiple parsers, this is the second command line file
+     # test_second_cmdline_cmd.ggostr
+     
+     option "option-a" a "option a of the second command line to parse" \
+            optional string
+     option "option-b" b "option a of the second command line to parse" \
+            optional string
+     option "my-multi" M \
+            "multiple option of the second command line to parse" \
+            optional string multiple
+</pre>
+   <p>These last two files are processed with gengetopt using the
+<code>--string-parser</code>.  Let's put everything together in this main
+file:
+
+<!-- Generator: GNU source-highlight, by Lorenzo Bettini, http://www.gnu.org/software/src-highlite -->
+<pre class="smallexample">     <b>#include</b> <tt>&lt;stdio.h&gt;</tt>
+     <b>#include</b> <tt>&lt;stdlib.h&gt;</tt>
+     
+     <b>#include</b> <tt>"test_main_cmdline_cmd.h"</tt>
+     <b>#include</b> <tt>"test_first_cmdline_cmd.h"</tt>
+     <b>#include</b> <tt>"test_second_cmdline_cmd.h"</tt>
+     
+     <b>int</b>
+     main(<b>int</b> argc, <b>char</b> **argv)
+     {
+       <b>struct</b> gengetopt_args_info main_args_info;
+       <b>struct</b> test_first_cmdline_cmd_struct first_args_info;
+       <b>struct</b> test_second_cmdline_cmd_struct second_args_info;
+       <b>int</b> exit_code = 0, i, j;
+     
+       <b>if</b> (test_main_cmdline_cmd_parser (argc, argv, &amp;main_args_info) != 0) {
+         exit_code = 1;
+         <b>return</b> exit_code;
+       }
+     
+       <b>for</b> (j = 0; j &lt; main_args_info.second_cmd_given; ++j) {
+         printf(<tt>"second cmdline: %s</tt>\n<tt>"</tt>, main_args_info.second_cmd_arg[j]);
+         <b>if</b> (test_second_cmdline_cmd_parser_string
+            (main_args_info.second_cmd_arg[j], &amp;second_args_info, argv[0]) == 0) {
+           <b>if</b> (second_args_info.option_a_given)
+            printf(<tt>"  --option-a: %s</tt>\n<tt>"</tt>, second_args_info.option_a_arg);
+           <b>if</b> (second_args_info.option_b_given)
+            printf(<tt>"  --option-b: %s</tt>\n<tt>"</tt>, second_args_info.option_b_arg);
+           <b>for</b> (i = 0; i &lt; second_args_info.my_multi_given; ++i)
+            printf(<tt>"  --my-multi: %s</tt>\n<tt>"</tt>, second_args_info.my_multi_arg[i]);
+     
+           test_second_cmdline_cmd_parser_free (&amp;second_args_info);
+         }
+       }
+     
+       <b>for</b> (j = 0; j &lt; main_args_info.first_cmd_given; ++j) {
+         printf(<tt>"first cmdline: %s</tt>\n<tt>"</tt>, main_args_info.first_cmd_arg[j]);
+         <b>if</b> (test_first_cmdline_cmd_parser_string
+            (main_args_info.first_cmd_arg[j], &amp;first_args_info, argv[0]) == 0) {
+           <b>if</b> (first_args_info.option_a_given)
+            printf(<tt>"  --option-a: %d</tt>\n<tt>"</tt>, first_args_info.option_a_arg);
+           <b>for</b> (i = 0; i &lt; first_args_info.multi_given; ++i)
+            printf(<tt>"  --multi: %s</tt>\n<tt>"</tt>, first_args_info.multi_arg[i]);
+     
+           test_first_cmdline_cmd_parser_free (&amp;first_args_info);
+         }
+       }
+     
+       test_main_cmdline_cmd_parser_free (&amp;main_args_info);
+     
+       <b>return</b> exit_code;
+     }
+     
+</pre>
+   <p>Notice that in the <code>for</code> loops we always free the elements of the
+argument structures in order to avoid memory leaks.
+
+   <p>Now if you can run this program as follows (notice that we use the comma
+separated arguments for multiple option arguments but we escape it with
+<code>\</code> because otherwise, e.g., 200 and 300 would be intended as
+further arguments of <code>--first-cmd</code> instead of <code>--multi</code>, see
+<a href="#Multiple-Options">Multiple Options</a>):
+
+<pre class="example">     ./test_multiple_parsers \
+             --first-cmd="-M400 -a10 --multi 100\,200\,300" \
+             --second-cmd="-a20 -b10 --my-multi=a\,b\,c\,d\,e\,f" \
+             -F"-M500 -M600" -S"--my-multi g"
+     second cmdline: -a20 -b10 --my-multi=a,b,c,d,e,f
+       --option-a: 20
+       --option-b: 10
+       --my-multi: a
+       --my-multi: b
+       --my-multi: c
+       --my-multi: d
+       --my-multi: e
+       --my-multi: f
+     second cmdline: --my-multi g
+       --my-multi: g
+     first cmdline: -M400 -a10 --multi 100,200,300
+       --option-a: 10
+       --multi: 400
+       --multi: 100
+       --multi: 200
+       --multi: 300
+     first cmdline: -M500 -M600
+       --multi: 500
+       --multi: 600
+</pre>
+   <div class="node">
+<p><hr>
+<a name="No-getopt_long"></a>
+<a name="No-getopt_005flong"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Bugs">Bugs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#String-Parsers-and-Multiple-Parsers">String Parsers and Multiple Parsers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">9 What if getopt_long is not available?</h2>
+
+<p><a name="index-getopt_005flong-91"></a>
+If you use gengetopt to generate C functions for parsing command line
+arguments you have to know that these generated functions use
+<code>getopt_long</code> to actually read the command line and parsing it. 
+This function is typically part of the standard C library, but some
+implementations may not include it.  If you want your program to be
+portable on several systems, and be compilable with many C compilers,
+you can rely on one of the following solutions.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Include-the-getopt_005flong-code-into-the-parser">Include the getopt_long code into the parser</a>
+<li><a accesskey="2" href="#Use-automake_002fautoconf">Use automake/autoconf</a>
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Include-the-getopt_long-code-into-the-parser"></a>
+<a name="Include-the-getopt_005flong-code-into-the-parser"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Use-automake_002fautoconf">Use automake/autoconf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#No-getopt_005flong">No getopt_long</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#No-getopt_005flong">No getopt_long</a>
+
+</div>
+
+<h3 class="section">9.1 Include the <code>getopt_long</code> code into the generated parser</h3>
+
+<p>Since version 2.17, gengetopt can include into the generated C parser
+file the code of <code>getopt_long</code>, so that the include code will be
+used to actually parse the command line arguments, instead of that taken
+from the C library.
+
+   <p>This solution is actually quite easy, but it has two main drawbacks:
+
+     <ul>
+<li>The generate C file of the parser will be much bigger;
+
+     <li>You won't be able to use the latest version of <code>getopt_long</code>
+of the C library
+</ul>
+
+   <p>It is up to you to choose between this and the automake/autoconf based
+solution.
+
+   <p>Actually, this solution has the advantage that your program won't behave
+strangely when used with another implementation of <code>getopt_long</code>.
+
+   <p>I prefer the automake/autoconf based solution, as described in <a href="#Use-automake_002fautoconf">Use automake/autoconf</a>, in particular the one described in <a href="#Use-Gnulib">Use Gnulib</a>,
+which is also the one I adopt for gengetopt itself.
+
+<div class="node">
+<p><hr>
+<a name="Use-automake%2fautoconf"></a>
+<a name="Use-automake_002fautoconf"></a>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Include-the-getopt_005flong-code-into-the-parser">Include the getopt_long code into the parser</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#No-getopt_005flong">No getopt_long</a>
+
+</div>
+
+<h3 class="section">9.2 Use automake/autoconf to check for the existence of <code>getopt_long</code></h3>
+
+<p><a name="index-automake-92"></a><a name="index-autoconf-93"></a>Autoconf and Automake are great tools to generate a configure script
+that automatically checks for the configuration of your system and for
+possible missing functions required to compile your program.  However,
+in case of detected missing functions, your program must be able to
+provide a replacement for such functions.  In the next sections we
+describe two mechanisms for including the (possible) missing code for
+<code>getopt_long</code> and for checking its presence with automake/autoconf. 
+Since version 2.19, gengetopt itself uses the first mechanism.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Use-Gnulib">Use Gnulib</a>
+<li><a accesskey="2" href="#Use-getopt_005flong-sources">Use getopt_long sources</a>
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Use-Gnulib"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Use-getopt_005flong-sources">Use getopt_long sources</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Use-automake_002fautoconf">Use automake/autoconf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Use-automake_002fautoconf">Use automake/autoconf</a>
+
+</div>
+
+<h4 class="subsection">9.2.1 Use Gnulib</h4>
+
+<p><a name="index-gnulib-94"></a>Since version 2.19 I also started to use Gnulib - The GNU Portability
+Library<a rel="footnote" href="#fn-20" name="fnd-20"><sup>20</sup></a>, &ldquo;a central
+location for common GNU code, intended to be shared among GNU
+packages&rdquo;.  Gnulib provides an easy and smooth way to add to your
+package sources the sources of functions that you want to check during
+configure.  It will also handle the checks for these functions in the
+configure script, and in case they're not in your system (or they're
+present but with some missing features) it compiles their sources into a
+library (that you will need to link your program to, as illustrated in
+the following).
+
+   <p>Once you retrieved gnulib (for the moment it is available
+only through CVS, see the home page), you can invoke
+`<samp><span class="samp">gnulib-tool --import</span></samp>' that will copy source files, create a
+<samp><span class="file">Makefile.am</span></samp> to build them, generate a file <samp><span class="file">gnulib-comp.m4</span></samp> with
+Autoconf M4 macro declarations used by <samp><span class="file">configure.ac</span></samp>, and generate
+a file <samp><span class="file">gnulib-cache.m4</span></samp> containing the cached specification of how
+Gnulib is used.  In particular, you must specify the modules you want
+to import, and in our case, it is getopt:
+
+<pre class="example">     gnulib-tool --import getopt
+</pre>
+   <p>By default, the source code is copied into <samp><span class="file">lib/</span></samp> and the M4
+macros in <samp><span class="file">m4/</span></samp>.  You can override these paths by using
+<code>--source-base=DIRECTORY</code> and <code>--m4-base=DIRECTORY</code>. 
+For instance, gengetopt uses <code>gl</code> and <code>gl/m4</code>, respectively. 
+We will use these directories in the rest of this section.
+
+   <p>You must ensure Autoconf can find the macro definitions in
+<samp><span class="file">gnulib-comp.m4</span></samp>.  Use the <code>ACLOCAL_AMFLAGS</code> specifier in your
+top-level <samp><span class="file">Makefile.am</span></samp> file (and the first time you run
+<code>aclocal</code> you have to use the <code>-I</code> as well); for instance, in
+the case of gengetopt we have:
+
+<pre class="example">     ACLOCAL_AMFLAGS = -I gl/m4
+</pre>
+   <p>You are now ready to call the M4 macros in <code>gnulib-comp.m4</code> from
+<samp><span class="file">configure.ac</span></samp>.  The macro <code>gl_EARLY</code> must be called as soon
+as possible after verifying that the C compiler is working. 
+Typically, this is immediately after <code>AC_PROG_CC</code>, as in:
+
+<pre class="example">     ...
+     AC_PROG_CC
+     gl_EARLY
+     ...
+</pre>
+   <p>The core part of the gnulib checks are done by the macro
+<code>gl_INIT</code>.  Place it further down in the file, typically where
+you normally check for header files or functions.  For example:
+
+<pre class="example">     ...
+     # For gnulib.
+     gl_INIT
+     ...
+</pre>
+   <p><code>gl_INIT</code> will in turn call the macros related with the gnulib
+functions, be it specific gnulib macros.  So there is no need to call
+those macros yourself when you use the corresponding gnulib modules.
+
+   <p>You must also make sure that the gnulib library is built.  Add the
+<code>Makefile</code> in the gnulib source base directory to
+<code>AC_CONFIG_FILES</code>, as in:
+
+<pre class="example">     AC_CONFIG_FILES(... gl/Makefile ...)
+</pre>
+   <p>You must also make sure that <code>make</code> will recurse into the gnulib
+directory.  To achieve this, add the gnulib source base directory to a
+<code>SUBDIRS</code> Makefile.am statement, as in:
+
+<pre class="example">     SUBDIRS = gl
+</pre>
+   <p>Finally, you have to add compiler and linker flags in the appropriate
+source directories, so that you can make use of the gnulib library. 
+Since the `<samp><span class="samp">getopt</span></samp>' module copies files into
+the build directory, <samp><span class="file">top_builddir/gl</span></samp> is needed as well
+as <samp><span class="file">top_srcdir/gl</span></samp>.  For example:
+
+<pre class="example">     ...
+     AM_CPPFLAGS = -I$(top_srcdir)/gl -I$(top_builddir)/gl
+     ...
+     LDADD = gl/libgnu.a
+     ...
+</pre>
+   <p>Don't forget to <code>#include</code> the various header files.  In this
+example, you would need to make sure that `<samp><span class="samp">#include "getopt.h"</span></samp>' is
+evaluated when compiling all source code files, that want to make use of
+<code>getopt</code> or <code>getopt_long</code>.  If you simply use the files
+generated by gengetopt, you won't need include this header though, since
+it is already handled by the generated files.
+
+   <p>Every now and then, check whether there are updates in the Gnulib
+modules, and if the modules you use (e.g., <code>getopt</code>) are upgraded,
+please remember to also update your files, simply by running:
+
+<pre class="example">     gnulib-tool --update
+</pre>
+   <p>We refer to Gnulib documentation for further explanations and features.
+
+<div class="node">
+<p><hr>
+<a name="Use-getopt_long-sources"></a>
+<a name="Use-getopt_005flong-sources"></a>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Use-Gnulib">Use Gnulib</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Use-automake_002fautoconf">Use automake/autoconf</a>
+
+</div>
+
+<h4 class="subsection">9.2.2 Use getopt_long sources</h4>
+
+<p>NOTICE: this was the procedure used by gengetopt itself up to version
+2.18.  We suggest now to use the procedure described in <a href="#Use-Gnulib">Use Gnulib</a>, since the files described in the following might not be kept
+up-to-date.
+
+   <p><a name="index-automake-95"></a><a name="index-autoconf-96"></a>We provide C files that actually implement <code>getopt_long</code> function:
+<samp><span class="file">getopt.c</span></samp> <samp><span class="file">getopt1.c</span></samp> and <samp><span class="file">gnugetopt.h</span></samp>.   You'll find
+these files in the <samp><span class="file">&lt;install prefix&gt;/share/gengetopt</span></samp> directory
+where <samp><span class="file">&lt;install prefix&gt;</span></samp> is the one you specified during
+compilation.   If no prefix had been specified, <samp><span class="file">/usr/local</span></samp> is the
+default.   If you downloaded gengetopt in binary form prefix will
+probably be <samp><span class="file">/usr/local</span></samp> or <samp><span class="file">/usr</span></samp>.
+
+   <p>You can rename <samp><span class="file">gnugetopt.h</span></samp> to <samp><span class="file">getopt.h</span></samp> and then simply
+compile these files and link them to the executable of you program. 
+However, if you use automake and autoconf here's a more elegant
+solution: you should download the file <samp><span class="file">adl_func_getopt_long.m4</span></samp>
+you find at this site:
+
+   <p><a href="http://autoconf-archive.cryp.to">http://autoconf-archive.cryp.to</a>
+
+<p class="noindent">and add its contents to your <samp><span class="file">acinclude.m4</span></samp>.  You can find this
+macro also in the <samp><span class="file">acinclude.m4</span></samp> in the sources of gengetopt.
+
+   <p>This macro checks if getopt_long function is in C library;
+if it is not then it adds <samp><span class="file">getopt.o</span></samp> and <samp><span class="file">getopt1.o</span></samp> to the objects files
+that will be linked to your executable (<code>LIBOBJS</code>).
+
+   <p>Then in <samp><span class="file">Makefile.am</span></samp> of your source directory you have to add the contents
+of <code>LIBOBJS</code> to the <code>LDADD</code> of the program that has to use getopt_long;
+e.g., if the program <samp><span class="file">foo</span></samp> has to use getopt_long, you have to add
+the following line
+
+<pre class="example">     foo_LDADD = @LIBOBJS@
+</pre>
+   <p>Now these files will be compiled and linked to your program only if
+necessary.
+
+   <p>Moreover you have to add <samp><span class="file">getopt.c</span></samp> <samp><span class="file">getopt1.c</span></samp> and
+<samp><span class="file">gnugetopt.h</span></samp> to your distribution.  Note that it is not necessary
+to put these file names among the <code>foo_SOURCES</code> contents), but you have to
+add <samp><span class="file">gnugetopt.h</span></samp> to <code>EXTRA_DIST</code>:
+
+<pre class="example">     EXTRA_DIST = gnugetopt.h
+</pre>
+   <p>You may want to take a look at gengetopt's <samp><span class="file">configure.in</span></samp> and
+<samp><span class="file">src/Makefile.am</span></samp>: they both use the techniques described here.
+
+<div class="node">
+<p><hr>
+<a name="Bugs"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Mailing-Lists">Mailing Lists</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#No-getopt_005flong">No getopt_long</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">10 Known Bugs and Limitations</h2>
+
+<p><a name="index-Known-Bugs-97"></a><a name="index-Limits-98"></a><a name="index-Misfeatures-99"></a>
+If you find a bug in <samp><span class="command">gengetopt</span></samp>, please send electronic
+mail to
+
+   <p><code>bug-gengetopt at gnu dot org</code>
+
+   <p>Include the version
+number, which you can find by running `<samp><span class="samp">gengetopt&nbsp;--version</span></samp>'<!-- /@w -->.  Also include in your message the output that the program
+produced and the output you expected.
+
+   <p>If you have other questions, comments or suggestions about
+<samp><span class="command">gengetopt</span></samp>, contact the author via electronic mail
+(find the address at <a href="http://www.lorenzobettini.it">http://www.lorenzobettini.it</a>).  The author will try to help
+you out, although he may not have time to fix your problems.
+
+   <p>The list of to-dos in the <samp><span class="file">TODO</span></samp>.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Getopt-and-subsequent-calls">Getopt and subsequent calls</a>
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Getopt-and-subsequent-calls"></a>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Bugs">Bugs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Bugs">Bugs</a>
+
+</div>
+
+<h3 class="section">10.1 Getopt and subsequent calls</h3>
+
+<p>It seems that <code>getopt_long</code>, at least the version in the GNU
+library, if invoked with different <code>argv</code> arrays, might access
+memory in a bad way leading to crashes or unexpected behaviors.  This
+happens because it keeps pointers to locations of the previous arrays
+if not initialized each time by setting <code>optind =
+0</code><a rel="footnote" href="#fn-21" name="fnd-21"><sup>21</sup></a>. 
+Unfortunately this initialization behavior seems to be part only of
+the implementation of GNU library and actually it is not documented
+(you can see it by taking a look into the source of <samp><span class="file">getopt.c</span></samp>);
+other implementations of <code>getopt_long</code> might not be affected by
+this problem; alternatively, as reported by a user, <code>optind = 0</code>
+leads some <code>getopt_long</code> implementations to consider the program
+name as a command line option (since it is in position 0), which is
+bad anyway!
+
+   <p>Probably this is usually not a problem since you usually parse only the
+command line, thus you only invoke the command line parser only once,
+and only with one instance of array (i.e., the <code>argv</code> passed to
+<code>main</code>).  However, it can lead to problems when you use advanced
+features, as in the case of configuration file parsing (see
+<a href="#Configuration-files">Configuration files</a>) and multiple parsers (see <a href="#String-Parsers-and-Multiple-Parsers">String Parsers and Multiple Parsers</a>).
+
+   <p>To deal with this problem, in case one uses configuration parsers
+(<code>-C,--conf-parser</code>) or string parsers
+(<code>-S,--string-parser</code>) a customized version of
+<code>getopt_long</code>, called indeed
+<a name="index-g_t_0040code_007bcustom_005fgetopt_005flong_007d-100"></a><code>custom_getopt_long</code> is
+inserted in the generated C file.  This version does not suffer from
+the problem above (and of course does not interfere with the standard
+<code>getopt_long</code>, which will be used to parse the actual command
+line arguments).
+
+   <p>Of course this is transparent to the programmer, and we report this
+detail here only because the inserted <code>custom_getopt_long</code> will
+add about 20k of C code in the generated file, so don't panic if you
+start to use configuration or string parsers and your program gets a
+little bigger than before :-).
+
+<div class="node">
+<p><hr>
+<a name="Mailing-Lists"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Index">Index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Bugs">Bugs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">11 Mailing Lists</h2>
+
+<p><a name="index-mailing-list-101"></a>
+The following mailing lists are available:
+
+   <p><code>help-gengetopt at gnu dot org</code>
+
+<p class="noindent">for generic discussions about the program and for asking for help about
+it (open mailing list),
+<a href="http://mail.gnu.org/mailman/listinfo/help-gengetopt">http://mail.gnu.org/mailman/listinfo/help-gengetopt</a>
+
+   <p><code>info-gengetopt at gnu dot org</code>
+
+<p class="noindent">for receiving information about new releases and features (read-only
+mailing list),
+<a href="http://mail.gnu.org/mailman/listinfo/info-gengetopt">http://mail.gnu.org/mailman/listinfo/info-gengetopt</a>.
+
+   <p>If you want to subscribe to a mailing list just go to the URL and follow
+the instructions, or send me an e-mail and I'll subscribe you.
+
+   <p>I'll describe new features in new releases also in my blog, at
+this URL:
+
+   <p><a href="http://tronprog.blogspot.com/search/label/gengetopt">http://tronprog.blogspot.com/search/label/gengetopt</a>
+
+<div class="node">
+<p><hr>
+<a name="Index"></a>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Mailing-Lists">Mailing Lists</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="unnumbered">Index</h2>
+
+<ul class="index-cp" compact>
+<li><a href="#index-g_t_0040code_007b_002d_002darg_002dstruct_002dname_007d-59"><code>--arg-struct-name</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dconf_002dparser_007d-68"><code>--conf-parser</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002ddefault_002doptional_007d-61"><code>--default-optional</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002ddefault_002doptional_007d-39"><code>--default-optional</code></a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dfull_002dhelp_007d-43"><code>--full-help</code></a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dfunc_002dname_007d-57"><code>--func-name</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dgen_002dversion_007d-67"><code>--gen-version</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dinclude_002dgetopt_007d-70"><code>--include-getopt</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dlong_002dhelp_007d-60"><code>--long-help</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dno_002dhandle_002derror_007d-65"><code>--no-handle-error</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dno_002dhandle_002dhelp_007d-63"><code>--no-handle-help</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dno_002dhandle_002dversion_007d-64"><code>--no-handle-version</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002doutput_002ddir_007d-58"><code>--output-dir</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dshow_002dfull_002dhelp_007d-72"><code>--show-full-help</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dshow_002dhelp_007d-71"><code>--show-help</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dshow_002drequired_007d-66"><code>--show-required</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dshow_002dversion_007d-73"><code>--show-version</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dstring_002dparser_007d-69"><code>--string-parser</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002d_002dunamed_002dopts_007d-62"><code>--unamed-opts</code></a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-g_t_0040code_007b_002dC_002c_002d_002dconf_002dparser_007d-85"><code>-C,--conf-parser</code></a>: <a href="#Configuration-files">Configuration files</a></li>
+<li><a href="#index-g_t_0040code_007b_002dh_002c_002d_002dhelp_007d-45"><code>-h,--help</code></a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-g_t_0040code_007b_002dS_002c_002d_002dstring_002dparser_007d-90"><code>-S,--string-parser</code></a>: <a href="#String-Parsers-and-Multiple-Parsers">String Parsers and Multiple Parsers</a></li>
+<li><a href="#index-g_t_0040code_007b_002dV_002c_002d_002dversion_007d-46"><code>-V,--version</code></a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-argoptional-40">argoptional</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-args-27">args</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-argtype-32">argtype</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-argument_002c-defined-75">argument, defined</a>: <a href="#Terminology">Terminology</a></li>
+<li><a href="#index-Audience-1">Audience</a>: <a href="#Audience">Audience</a></li>
+<li><a href="#index-autoconf-96">autoconf</a>: <a href="#Use-getopt_005flong-sources">Use getopt_long sources</a></li>
+<li><a href="#index-autoconf-93">autoconf</a>: <a href="#Use-automake_002fautoconf">Use automake/autoconf</a></li>
+<li><a href="#index-autoconf-11">autoconf</a>: <a href="#Installation">Installation</a></li>
+<li><a href="#index-autogen_002esh-9">autogen.sh</a>: <a href="#Installation">Installation</a></li>
+<li><a href="#index-automake-95">automake</a>: <a href="#Use-getopt_005flong-sources">Use getopt_long sources</a></li>
+<li><a href="#index-automake-92">automake</a>: <a href="#Use-automake_002fautoconf">Use automake/autoconf</a></li>
+<li><a href="#index-automake-10">automake</a>: <a href="#Installation">Installation</a></li>
+<li><a href="#index-Conditions-for-copying-Gengetopt-4">Conditions for copying Gengetopt</a>: <a href="#Copying">Copying</a></li>
+<li><a href="#index-configuration-files-84">configuration files</a>: <a href="#Configuration-files">Configuration files</a></li>
+<li><a href="#index-Copying-conditions-3">Copying conditions</a>: <a href="#Copying">Copying</a></li>
+<li><a href="#index-g_t_0040code_007bcustom_005fgetopt_005flong_007d-100"><code>custom_getopt_long</code></a>: <a href="#Getopt-and-subsequent-calls">Getopt and subsequent calls</a></li>
+<li><a href="#index-CVS-8">CVS</a>: <a href="#Installation">Installation</a></li>
+<li><a href="#index-default-35">default</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-dependon-36">dependon</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-desc-30">desc</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-description-26">description</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-download-6">download</a>: <a href="#Installation">Installation</a></li>
+<li><a href="#index-gengetopt-options-56">gengetopt options</a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-getopt_005flong-91">getopt_long</a>: <a href="#No-getopt_005flong">No getopt_long</a></li>
+<li><a href="#index-getting-started-with-Gengetopt-20">getting started with Gengetopt</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-gnulib-94">gnulib</a>: <a href="#Use-Gnulib">Use Gnulib</a></li>
+<li><a href="#index-gnulib-17">gnulib</a>: <a href="#Installation">Installation</a></li>
+<li><a href="#index-group-options-83">group options</a>: <a href="#Group-options">Group options</a></li>
+<li><a href="#index-hidden-42">hidden</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-how-to-use-Gengetopt-19">how to use Gengetopt</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-include-86">include</a>: <a href="#Configuration-files">Configuration files</a></li>
+<li><a href="#index-installation-5">installation</a>: <a href="#Installation">Installation</a></li>
+<li><a href="#index-invoking-55">invoking</a>: <a href="#Invoking-gengetopt">Invoking gengetopt</a></li>
+<li><a href="#index-Known-Bugs-97">Known Bugs</a>: <a href="#Bugs">Bugs</a></li>
+<li><a href="#index-libtool-12">libtool</a>: <a href="#Installation">Installation</a></li>
+<li><a href="#index-Limits-98">Limits</a>: <a href="#Bugs">Bugs</a></li>
+<li><a href="#index-long-28">long</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-long-option_002c-defined-80">long option, defined</a>: <a href="#Terminology">Terminology</a></li>
+<li><a href="#index-mailing-list-101">mailing list</a>: <a href="#Mailing-Lists">Mailing Lists</a></li>
+<li><a href="#index-Misfeatures-99">Misfeatures</a>: <a href="#Bugs">Bugs</a></li>
+<li><a href="#index-multiple-41">multiple</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-multiple-option_002c-defined-81">multiple option, defined</a>: <a href="#Terminology">Terminology</a></li>
+<li><a href="#index-multiple-options-87">multiple options</a>: <a href="#Multiple-Options">Multiple Options</a></li>
+<li><a href="#index-multiple-parsers-88">multiple parsers</a>: <a href="#String-Parsers-and-Multiple-Parsers">String Parsers and Multiple Parsers</a></li>
+<li><a href="#index-on_002foff-44">on/off</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-option-without-name-51">option without name</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-option_002c-defined-76">option, defined</a>: <a href="#Terminology">Terminology</a></li>
+<li><a href="#index-optional-38">optional</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-package-22">package</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-parameter-50">parameter</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-parameter_002c-defined-78">parameter, defined</a>: <a href="#Terminology">Terminology</a></li>
+<li><a href="#index-patching-18">patching</a>: <a href="#Installation">Installation</a></li>
+<li><a href="#index-purpose-24">purpose</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-required-37">required</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-required-option_002c-defined-82">required option, defined</a>: <a href="#Terminology">Terminology</a></li>
+<li><a href="#index-requirements-13">requirements</a>: <a href="#Installation">Installation</a></li>
+<li><a href="#index-section-48">section</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-short-29">short</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-short-option_002c-defined-79">short option, defined</a>: <a href="#Terminology">Terminology</a></li>
+<li><a href="#index-string-parsers-89">string parsers</a>: <a href="#String-Parsers-and-Multiple-Parsers">String Parsers and Multiple Parsers</a></li>
+<li><a href="#index-Terminology-74">Terminology</a>: <a href="#Terminology">Terminology</a></li>
+<li><a href="#index-text-49">text</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-tutorial-21">tutorial</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-typestr-33">typestr</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-usage-25">usage</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-value_002c-defined-77">value, defined</a>: <a href="#Terminology">Terminology</a></li>
+<li><a href="#index-values-34">values</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-version-23">version</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+<li><a href="#index-Who-should-use-Gengetopt-2">Who should use Gengetopt</a>: <a href="#Audience">Audience</a></li>
+<li><a href="#index-wrapping-31">wrapping</a>: <a href="#Basic-Usage">Basic Usage</a></li>
+   </ul><div class="footnote">
+<hr>
+<a name="texinfo-footnotes-in-document"></a><h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> <a href="http://www.gnu.org/software/autoconf">http://www.gnu.org/software/autoconf</a></p>
+
+   <p class="footnote"><small>[<a name="fn-2" href="#fnd-2">2</a>]</small> <a href="http://www.gnu.org/software/automake">http://www.gnu.org/software/automake</a></p>
+
+   <p class="footnote"><small>[<a name="fn-3" href="#fnd-3">3</a>]</small> <a href="http://www.gnu.org/software/libtool">http://www.gnu.org/software/libtool</a></p>
+
+   <p class="footnote"><small>[<a name="fn-4" href="#fnd-4">4</a>]</small> <a href="http://www.gnu.org/software/gnulib">http://www.gnu.org/software/gnulib</a></p>
+
+   <p class="footnote"><small>[<a name="fn-5" href="#fnd-5">5</a>]</small> Since
+version 2.19.</p>
+
+   <p class="footnote"><small>[<a name="fn-6" href="#fnd-6">6</a>]</small> Since version 2.19.</p>
+
+   <p class="footnote"><small>[<a name="fn-7" href="#fnd-7">7</a>]</small> Since version 2.18</p>
+
+   <p class="footnote"><small>[<a name="fn-8" href="#fnd-8">8</a>]</small> Since version 2.20.</p>
+
+   <p class="footnote"><small>[<a name="fn-9" href="#fnd-9">9</a>]</small> Since version 2.15.</p>
+
+   <p class="footnote"><small>[<a name="fn-10" href="#fnd-10">10</a>]</small> Since
+version 2.16.</p>
+
+   <p class="footnote"><small>[<a name="fn-11" href="#fnd-11">11</a>]</small> This is true since version 2.19. Before this version,
+strings were not allowed to spawn more than one line.</p>
+
+   <p class="footnote"><small>[<a name="fn-12" href="#fnd-12">12</a>]</small> Since version 2.19.</p>
+
+   <p class="footnote"><small>[<a name="fn-13" href="#fnd-13">13</a>]</small> This
+holds since version 2.15: in previous versions the option specifications
+had to be given in a fixed order.</p>
+
+   <p class="footnote"><small>[<a name="fn-14" href="#fnd-14">14</a>]</small> Since version 2.16.</p>
+
+   <p class="footnote"><small>[<a name="fn-15" href="#fnd-15">15</a>]</small> Since version 2.18.</p>
+
+   <p class="footnote"><small>[<a name="fn-16" href="#fnd-16">16</a>]</small> The <code>&lt;option&gt;_orig</code> was introduced in the release
+2.14.</p>
+
+   <p class="footnote"><small>[<a name="fn-17" href="#fnd-17">17</a>]</small> These
+strings and the <code>&lt;option&gt;_help</code> were introduced in the release
+2.17.</p>
+
+   <p class="footnote"><small>[<a name="fn-18" href="#fnd-18">18</a>]</small> This function was introduced in
+the release 2.14.</p>
+
+   <p class="footnote"><small>[<a name="fn-19" href="#fnd-19">19</a>]</small> Since version 2.17.</p>
+
+   <p class="footnote"><small>[<a name="fn-20" href="#fnd-20">20</a>]</small> <a href="http://www.gnu.org/software/gnulib">http://www.gnu.org/software/gnulib</a></p>
+
+   <p class="footnote"><small>[<a name="fn-21" href="#fnd-21">21</a>]</small> <code>optind</code> is the global variable in getopt
+implementation that is the index in ARGV of the next element to be
+scanned.  This is used for communication to and from the caller and
+for communication between successive calls to <code>getopt_long</code>.</p>
+
+   <p><hr></div>
+
+</body></html>
+

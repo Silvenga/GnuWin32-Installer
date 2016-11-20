@@ -1,0 +1,280 @@
+
+OptiPNG - Design decisions and rationale
+========================================
+
+Everyone is welcome to contribute to the development of OptiPNG.
+This document provides useful information to the potential
+contributors, but many general advices given here may be followed
+by any programmer.
+
+
+Quality
+-------
+
+Priority has been given to the following quality factors, in
+decreasing order of importance:
+
+1. Correctness.
+   The most important goal is to produce PNG files that comply
+   to the PNG specification. The code is written with great care,
+   and it is tested extensively.
+   Bug reports may be sent to <cosmin@cs.toronto.edu>
+
+2. Efficiency.
+   OptiPNG is designed to be fast. It needs to run a series of
+   brute-force trials, and the biggest amount of time is spent
+   during zlib compression and decompression, and during I/O.
+   This amount of time is reduced to a minimum:
+
+   - No auxiliary I/O (i.e. no temporary files) is involved in
+     the trials. Instead, the standard libpng I/O routines are
+     redirected using the png_set_read_fn, png_set_write_fn
+     functions, to a customized function optipng_read_write_data
+     that gathers the necessary statistics, and writes the chunk
+     data to a file only in the final optimization step.
+
+   - There is a single decompression step per file.
+
+   - The output file is recompressed only if the trials indicate
+     that the file size will decrease.
+
+   - While it is still possible to further reduce the amount of
+     time spent during trials (e.g. by estimating the compressed
+     size without actually producing the compressed zlib stream),
+     this cannot be achieved without breaking the encapsulation
+     of the zlib library. Since correctness can be at risk, this
+     aspect of efficiency has not been considered.
+
+3. Readability and maintainability.
+["Premature optimization is the root of all evil." - D. E. Knuth]
+
+   OptiPNG is not a simple application, even though the code is
+   clear and well commented. It may be possible to optimize the
+   code even more, and sacrifice some readability, by inlining
+   functions manually, eliminating the overhead of the structured
+   exception handling, etc. There is a strong word of caution
+   against this, because the time spent in OptiPNG is minimal,
+   and such gain is insignificant. No visible extra performance
+   will be achieved, and readability will have much to suffer.
+
+   There is a particular issue characteristic to some PNG
+   processing applications, which should be avoided:
+
+   It is customary for the libpng-dependent applications to check
+   at compile time if certain features are supported. If some
+   feature is not supported by the particular version and build
+   of libpng which exists in the system, the program logic is
+   split in two or more branches, increasing the difficulty of
+   comprehending and maintaining it. For example:
+
+#if PNG_FLOATING_POINT_SUPPORTED
+   implement a certain application feature using the libpng
+   floating point routines
+#elif PNG_FIXED_POINT_SUPPORTED
+   implement the same feature using the libpng fixed point
+   routines
+#else
+   implement the same feature using hand-crafted code, or do not
+   implement it at all, crippling the application
+#endif
+
+   In this case, the maintainability has much to suffer, and the
+   only gain is an easier build process. Two pieces of code that
+   are expected to do the same thing are a source of problems,
+   especially when the person who modifies them is not completely
+   aware of the situation.
+   It is much less painful to simply _require_ a certain libpng
+   feature:
+
+#ifndef PNG_FIXED_POINT_SUPPORTED
+#error This program requires libpng with fixed point processing
+#endif
+
+   The disadvantage of the latter approach is possibly a more
+   inconvenient build process, in which libpng may have to be
+   rebuilt and linked statically. This is much smaller, though,
+   and a bloat of roughly 100K in the executable is less
+   problematic, compared to having a crippled product, or a
+   product of lower quality.
+
+4. Functionality.
+   OptiPNG serves its primary goal: to optimize the size of the
+   given PNG files. Additional features can be added (e.g. error
+   recovery, or basic metadata editing at the chunk level), as
+   long as the level of the other quality factors, especially of
+   those with a higher priority, is preserved.
+   The ability to read external formats such as PNM, GIF, BMP, or
+   even JPEG and JP2 has been considered. It has not been decided
+   yet whether to implement this by hand-crafted code, or by
+   using external code such as the JasPer library. Again, all the
+   other quality factors must not be ignored.
+
+5. Portability.
+   - Language and standard library:
+     The program is written in pure ANSI/ISO (Standard) C.
+     If Standard C is not enough to implement some potentially
+     useful feature (e.g. directory traversal), it may be
+     necessary to reduce the level of portability to POSIX.
+     Most of today's platforms, including Windows, offer some
+     degree of POSIX functionality.
+
+   - Machine:
+     The program is designed to run on any 32-bit machine.
+     Porting the program to a 16-bit machine is feasible, but
+     this should be done without sacrificing simplicity.
+     Given the nature of the PNG optimization task, the program
+     should not be run on old and slow machines, or on machines
+     with limited memory.
+
+   - External dependencies/libraries:
+     Portability is one of the most important factors when
+     developing software libraries, because it is difficult or
+     impossible to control the applications that use established
+     features. On the other hand, applications that are at the
+     end of the dependency tree, such as OptiPNG, may take more
+     liberal decisions for the benefit of other quality factors.
+     In this case, the readability and maintainability are given
+     a higher priority over portability.
+
+
+
+Usage
+-----
+
+The program usage is typical to the category of command-line
+applications. There are some peculiarities, however, which are
+enumerated below.
+
+* Input and output file specification.
+  Given the nature of this task, it is difficult for OptiPNG to
+  use the standard input and act as a program filter.
+  We considered the following alternatives:
+
+  1. Explicit specification of the input files, which will be
+     overwritten by the optimized output files.
+        optipng input1.png input2.png input3.png
+     This behavior is similar to that of compress, gzip and other
+     Unix utilities. At the user's option, the input is preserved
+     in backup files.
+     This approach is more natural to batch processing. It is
+     easy, for example, to run OptiPNG in a WWW directory and
+     optimize all the PNG files, leaving everything else in
+     place.
+     Another advantage resides in a higher processing speed, when
+     the input file is already optimized. Instead of being copied
+     to an identical output file, it is just left in place.
+
+  2. Explicit specification of the input and output files:
+        optipng input.png output.png
+     This may be more useful for experimentation purposes, but it
+     is more onerous for the regular user. Running the program in
+     batch mode is still possible, but that would require an
+     alternate mode, such as:
+        optipng -multi input1.png input2.png input3.png
+        optipng input1.png input2.png input3.png -dir outdir/
+     The disadvantages of this approach are the inconsistency
+     between the two modes, and the difficulty to run the
+     optimization in-place.
+
+  The first alternative serves the purpose better. Given that
+  OptiPNG transforms the input losslessly, even the accidental
+  omission of the backup option by the user does not lead to
+  data loss.
+
+* Option specification.
+  The options are preceded by a single dash '-' and are
+  case-insensitive. Single-letter options cannot be contracted;
+  e.g. "optipng -k -q" cannot be contracted to "optipng -kq".
+  There is no need to use a double dash to specify a long option,
+  e.g. -q, -quiet and --quiet are equivalent. Double-dashed
+  option specification is used mainly as a work around problems
+  of compatibility in programs that used option contraction in
+  the older versions. Even if newer programs use double-dashed
+  option specification, with or without allowing contractions,
+  this is not necessarily good style.
+  On the other hand, multiple dashes are accepted by OptiPNG.
+
+On a side note: while case sensitivity is useful in C, mainly to
+resolve issues raised by macro-processing, it is a mixed blessing
+in the Unix file system. If two names of two different files are
+distinguished only by one or more capital letters, these names
+still say and mean the same thing. No good directory organization
+should have two such files in the same directory.
+From this point of view, the Windows approach where the letter
+case is retained, but the access is case-independent, is better.
+At least we are lucky that email addresses are case-insensitive...
+
+
+
+File recovery
+-------------
+
+A regular PNG decoder may choose to stop the decoding process
+whenever it detects problems with the input. On the other hand,
+at the user's option, OptiPNG can ignore non-fatal errors and
+replace the bad input with a corrected output. Currently, OptiPNG
+accepts files that have bad CRCs in non-critical chunks, and
+files that end unexpectedly (they have incomplete chunks, or they
+do not have the IEND chunk), provided that they have IDAT and all
+the other critical chunks are in good condition.
+The error recovery is provided via structured exception handling
+(see below).
+
+
+
+Compiler optimizations
+----------------------
+
+It is essential for this program to run as fast as possible.
+Here are some advices on how to adjust the compiler parameters in
+order to obtain the best speed results, and still to maintain a
+small size of the executable.
+
+- Compile the zlib library using the most aggressive set of
+  optimizations, such as "gcc -O3". Loop unrolling may also be
+  enabled. Most of the time is spent by this code, and it is
+  important to optimize it to the maximum extent possible.
+
+- Compile the libpng library and the OptiPNG source code using
+  a set of optimizations that do not sacrifice the code size,
+  such as "gcc -O2". The speed of the OptiPNG program is
+  determined by the speed of the compression and decompression
+  routines (zlib), and the amount of time spent doing other tasks
+  is insignificant, so this code needs not be inlined. Besides,
+  too much inlining may increase the chance of cache penalty,
+  with a negative effect on program execution.
+
+- Remove the libpng features that are unnecessary for OptiPNG.
+  This is possible by #defining PNG_NO_XXX macros when compiling
+  libpng. Here are a few examples:
+    PNG_NO_FLOATING_POINT_SUPPORTED	// not needed for now
+    PNG_NO_MNG_FEATURES			// no MNG support for now
+    PNG_NO_SETJMP_SUPPORTED		// see "Exception handling"
+    PNG_NO_READ_TRANSFORMS
+    PNG_NO_WRITE_TRANSFORMS
+
+
+
+Exception handling
+------------------
+
+It is unfortunate that C does not provide an exception handling
+system, and the standard alternatives (returned error codes or
+the setjmp mechanism) are many times unsatisfactory.
+OptiPNG uses CEXCEPT, an ultra-thin abstraction layer that
+implements structured exception handling on top of the setjmp
+mechanism.
+
+Essentially, the CEXCEPT exception handling system defines macros
+such as Throw, Try, Catch, which are used by OptiPNG. The
+multi-layered approach to throwing, catching and re-throwing
+exceptions allows the program to continue with the next file,
+even if fatal errors occur inside libpng. By using CEXCEPT, the
+source code is very clean, and the performance overload is
+insignificant.
+
+There are many issues pertaining to how the CEXCEPT macros work,
+and they can be read inside the "cexcept.h" file. If OptiPNG or
+portions of it are ported to C++, it is strongly recommended to
+use the native C++ exception handling instead.
+

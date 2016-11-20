@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri Mode: editing completed syntax</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile GriModeEditing.html "Gri Mode: editing completed syntax" "Gri Mode: editing completed syntax" --> 
+<!-- @node   Editing the syntax, User commands, Variable completion, Major Gri-mode commands -->
+<a name="Editingthesyntax" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="MajorGriModeCommands.html#MajorGri-modecommands" shape="rect" coords="516,2,532,24" href="MajorGriModeCommands.html#MajorGri-modecommands">
+<area alt="Gri Mode: variable completion" shape="rect" coords="557,2,573,24" href="GriModeCompletionVarSyn.html">
+<area alt="Gri Mode: user commands" shape="rect" coords="581,2,599,24" href="GriModeUserCommands.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri Mode: user commands" shape="rect" coords="581,2,599,24" href="GriModeUserCommands.html">
+</map>
+<h3>12.4.5: Editing the syntax output by gri-complete</h3>
+
+
+You might wonder what to do with all the bracketed code left behind by
+`<font color="#82140F"><code>gri-complete</code></font>'.  It certainly won't go through the gri parser
+without error, so you have to edit it out.
+ 
+The tools provided in gri-mode are `<font color="#82140F"><code>gri-option-select</code></font>' (`<font color="#82140F"><kbd>C-C C-o</kbd></font>') and `<font color="#82140F"><code>gri-kill-option</code></font>' (`<font color="#82140F"><kbd>C-C C-k</kbd></font>') to narrow in on a
+particular gri command, given a syntax description left on the line by
+`<font color="#82140F"><code>gri-complete</code></font>'.  The cursor location is used to decide which gri
+command(s) to narrow to.
+<p>
+For example, if `<font color="#82140F"><code>gri-complete</code></font>' is used on the line `dr x a', the
+result will be a line like 
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw x axis [at bottom|top|{.y. [cm]} [lower|upper]]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+This is the gri way of describing many commands at once.  The above
+syntax description is a shortcut formulation for all of:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw x axis
+draw x axis at bottom
+draw x axis at bottom top
+draw x axis at bottom bottom
+draw x axis at top
+draw x axis at top top
+draw x axis at top bottom
+draw x axis at .y. cm
+draw x axis at .y. cm lower
+draw x axis at .y. cm upper
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+The `<font color="#82140F"><code>gri-option-select</code></font>' (`<font color="#82140F"><kbd>C-C C-o</kbd></font>') command provides easy
+navigation to select one of these commands.  The narrowing process is
+governed by the cursor position.  For example, to get the command
+narrowed down to
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw x axis at bottom [lower|upper]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+place the cursor somewhere in the word `bottom' and invoke
+`<font color="#82140F"><code>gri-option-select</code></font>'.  To complete the narrowing process, selecting
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw x axis at bottom lower
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+move the cursor to some place in the word `lower' and invoke
+`<font color="#82140F"><code>gri-option-select again</code></font>'.  On the other hand, to get
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw x axis at bottom
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+you would have put the cursor over either the word `lower' or `upper',
+and invoke `<font color="#82140F"><code>gri-kill-option</code></font>' (`<font color="#82140F"><kbd>C-C C-k</kbd></font>') instead.
+<p>
+<b>NOTE:</b> you might want to practice using this example to learn
+how to do it.  If you make a mistake, note that the normal Emacs undo
+works.
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

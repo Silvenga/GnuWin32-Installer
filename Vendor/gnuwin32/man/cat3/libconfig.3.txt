@@ -1,0 +1,86 @@
+LIBCONFIG(3)                                       LIBCONFIG(3)
+
+
+
+
+
+NAME
+       libconfig - Consistent configuration library.
+
+
+SYNOPSIS
+       #include <libconfig.h>
+
+       int  lc_register_callback(const  char  *var,  char  opt,
+       lc_var_type_t type, int (*callback)(const char *,  const
+       char *, const char *, const char *, lc_flags_t, void *),
+       void *extra);
+
+       int lc_register_var(const char *var, lc_var_type_t type,
+       void *data, char opt);
+
+       int  lc_process(int  argc, char **argv, const char *app-
+       name, lc_conf_type_t type, const char *extra);
+
+       lc_err_t lc_geterrno(void);
+
+       char *lc_geterrstr(void);
+
+
+DESCRIPTION
+       Libconfig is a library to provide easy access to config-
+       uration  data in a consistent and logical manner.  Vari-
+       ables (registered through lc_register_var(3) or  lc_reg-
+       ister_callback(3))  are processed with the lc_process(3)
+       and lc_process_file(3) functions.  Errors can  be  exam-
+       ined through lc_geterrno(3) and lc_geterrstr(3).  Clean-
+       up may be performed using the lc_cleanup(3) function.
+
+
+EXAMPLE
+       #include <libconfig.h>
+       #include <stdlib.h>
+       #include <stdio.h>
+
+       int main(int argc, char **argv) {
+            int lc_p_ret, lc_rv_ret;
+            char *filename = NULL;
+
+            lc_rv_ret = lc_register_var("File", LC_VAR_STRING,
+                                        &filename, 'f');
+
+            if (lc_rv_ret != 0) {
+                 fprintf(stderr, "Error registering variable: %i.\n",
+                         lc_geterrno());
+                 return(EXIT_FAILURE);
+            }
+
+            lc_p_ret = lc_process(argc, argv, "example", LC_CONF_APACHE,
+                                  NULL);
+
+            lc_cleanup();
+
+            if (lc_p_ret != 0) {
+                 fprintf(stderr, "Error processing configuration: \
+                         %s\n", lc_geterrstr());
+                 return(EXIT_FAILURE);
+            }
+
+            if (filename != NULL) {
+                 printf("File specified was: %s\n", filename);
+            } else {
+                 printf("No filename specified.\n");
+            }
+
+            return(EXIT_SUCCESS);
+       }
+
+
+SEE ALSO
+       lc_register_var(3),             lc_register_callback(3),
+       lc_geterr(3),       lc_geterrstr(3),      lc_cleanup(3),
+       lc_process(3), lc_process_file(3)
+
+
+
+libconfig 0.1.16           25 Oct 04               LIBCONFIG(3)

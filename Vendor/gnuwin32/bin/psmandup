@@ -1,0 +1,269 @@
+#! /bin/sh -e
+# -*- ksh -*-
+
+# psmandup --- produce a version of a PS file to print in manual Duplex.
+
+# Copyright (c) 1998, 1999 Akim Demaille, Miguel Santana
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, you can either send email to this
+# program's maintainer or write to: The Free Software Foundation,
+# Inc.; 59 Temple Place, Suite 330; Boston, MA 02111-1307, USA.
+
+# Author: Akim Demaille <Akim.Demaille@freefriends.org>
+
+# Get the name of the program
+program=`echo $0 | sed 's#.*/##g'`
+
+# Local vars
+address=0	# Where to put the manual feed feature
+back=:		# Print the back side pages.
+debug=
+file=
+front=:		# Print the front side pages.
+output=-	# Default is stdout
+fixps=${FIXPS:-fixps}
+message=
+psselect=${PSSELECT:-psselect}
+psset=${PSSET:-psset}
+tmpdir=`mktemp -d -t psmandup.XXXXXX` || { echo "$program: Cannot create temporary dir!" >&2 ; exit 1; }
+
+# These two must be kept in synch.  They are opposed.
+verbose=echo
+quiet=:
+
+# The version/usage strings
+version="psmandup 2.1 (GNU a2ps 4.14)
+Written by Akim Demaille.
+
+Copyright (c) 1998-1999 Akim Demaille, Miguel Santana
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+
+usage="\
+Usage: $program FILE
+Tries to produce a version of the PostScript FILE to print in manual
+Duplex.
+
+Options:
+ -h, --help           display this help and exit
+ -v, --version        display version information and exit
+ -q, --quiet          don't print informational messages
+ -o, --output=FILE    save result in FILE.  If FILE is \`-', send to stdout
+ -n, --no-fix         don't call fixps to fix PS problems in FILE
+ -f, --front          output only the front pages (recto) on the regular
+                      tray
+ -b, --back           output only the back pages (verso) on the manual
+                      feed tray
+
+Produced output is meant for PS level 2 printers which don't support
+Duplex printing, but support Manual Feed.  Once the first set of pages
+is printed (odd pages), manual feed is asked: introduce the odd pages
+to print the even pages on the other side.
+
+Because there is usually a short time out for manually fed jobs, you
+should really be next to the printer.  If ever the time out expired,
+use the option -b to send only the missing part.
+
+Environment variables FIXPS, PSSELECT and PSSET, if defined, are used
+to find the tools.
+
+News, updates and documentation: http://www.inf.enst.fr/~demaille/a2ps/
+Report bugs to <bug-a2ps@gnu.org>"
+
+help="Try \`$program --help' for more information."
+
+# Parse command line arguments.
+option_without_arguments='vhsqnDbf'
+
+# Push a token among the arguments that will be used to notice when
+# we ended options/arguments parsing.
+arg_sep="$$--$$"
+set dummy ${1+"$@"} "$arg_sep"
+shift
+while test "x$1" != "x$arg_sep"; do
+
+  # Handle --option=value by splitting apart and putting back on argv.
+  case "$1" in
+    --*=*)
+      opt=`echo "$1" | sed -e 's/=.*//'`
+      val=`echo "$1" | sed -e 's/[^=]*=//'`
+      shift
+      set dummy "$opt" "$val" ${1+"$@"}
+      shift
+      ;;
+
+    -[$option_without_arguments]?*)
+      # Prefix $1 with x to avoid running `echo -na' for instance.
+      opt=`echo "x$1" | sed -e 's/x-\(.\).*/-\1/'`
+      rest=`echo "x$1" | sed -e 's/x-.\(.*\)/-\1/'`
+      shift
+      set dummy "$opt" "$rest" ${1+"$@"}
+      shift
+      ;;
+
+    # This case needs to be protected so that the case `-??*' does
+    # not split long options without arguments
+    --*)
+      ;;
+
+    # This is an option with argument.  Split apart and put back on argv.
+    -??*)
+      opt=`echo "x$1" | sed -e 's/x-\(.\).*/-\1/'`
+      arg=`echo "x$1" | sed -e 's/x-.\(.*\)/\1/'`
+      shift
+      set dummy "$opt" "$arg" ${1+"$@"}
+      shift
+      ;;
+  esac
+
+  # Now, handle the options.  $1 is the option *only*.  If it has an
+  # argument, it is now necessarily in $2 etc.  Remember to shift
+  # when fetching an argument.
+  case "$1" in
+    -v | --v*) echo "$version"; exit 0;;
+    -h | --h*) echo "$usage"; exit 0;;
+    -q | -s | --s* | --q*) verbose=:; quiet=echo;;
+    # Delay debugging so that options parsing does not appear
+    -D | --deb*) debug=-D ;;
+    -o | --out*) shift ; output=$1 ;;
+    -b | --bac*) front= ; back=: ;;
+    -f | --fro*) front=: ; back= ;;
+    -) # We are working with stdin ;;
+       set dummy "$@" "$1"
+       shift
+       ;;
+    -n | --no*) fixps= ;;
+
+    --) # What remains are not options.
+      shift
+      while test "x$1" != "x$arg_sep"; do
+        set dummy ${1+"$@"} "$1"
+        shift
+	shift
+      done
+      break;;
+
+    -*)
+      echo "$program: Unknown or ambiguous option \`$1'." >&2
+      echo "$program: Try \`--help' for more information." >&2
+      exit 1;;
+    *) set dummy ${1+"$@"} "$1"
+       shift
+       ;;
+   esac
+   shift
+done
+# Pop the token
+shift
+
+
+# Check the number of arguments.
+case $# in
+  0)  file=-;;
+  1)  file=$1;;
+  *)  echo "$program: too many arguments" 1>&2
+      echo "$help"  1>&2
+      exit 1;;
+esac
+
+if test -n "$debug"; then
+  # Set -x now if debugging
+  set -x
+else
+  # Temp dir.  Get ready not to leave junk (if not debugging)
+  trap "/bin/rm -rf $tmpdir" 0 1 2 3 13 15
+fi
+
+# If printing from stdin, save into a tmp file
+if test $file = '-'; then
+  file=$tmpdir/stdin.ps
+  cat > $file
+fi
+
+# Fix the file beforehand, so that we can really expect to find the
+# page numbers.
+if test -n "$fixps"; then
+  $fixps $file -o $tmpdir/fixed.ps `$quiet -q`
+  file=$tmpdir/fixed.ps
+fi
+
+# Get the number of pages of the document
+pagenum=`sed -ne '/^%%Pages:/{
+s/%%Pages: \\([0-9]*\\).*$/\\1/p
+q
+}' $file`
+
+# Make the string to get the front pages (even, increasing) if needed
+if test -n "$front"; then
+  evens="1"
+  i=3
+  # Build the string to give to psselect
+  while test $i -le $pagenum;
+  do
+    evens="$evens,$i"
+    i=`expr $i + 2`
+  done
+fi
+
+# Make the string to get the back pages (odd, decreasing) if needed
+if test -n "$back"; then
+  # If the number of pages is odd, we need to insert a blank sheet
+  case "$pagenum" in
+    *[13579])
+      odds="_"
+      i=`expr $pagenum - 1 || exit 0`
+      ;;
+    *) # Odd, and not 0, so at least >= 2
+       odds=$pagenum
+       i=`expr $pagenum - 2 || exit 0`
+       ;;
+  esac
+
+  # Make the string to get the second half (odd, decreasing)
+  while test $i != 0;
+  do
+    odds="$odds,$i"
+    i=`expr $i - 2 || exit 0`
+  done
+fi
+
+# If there are both odds and evens to print, the separator is `,'
+test -n "$odds" && test -n "$evens" && separator=,
+
+# Reorder the pages
+$psselect -q $evens$separator$odds $file > $tmpdir/ordered.ps
+
+# If needed, insert the manual feed request
+if test -n "$back"; then
+  # The option of psset to ask the manual feed.  If not set,
+  # psset just does nothing.
+  pssetmanfeed=-m
+  # Compute the address, depending on front pages are printed or not.
+  if test -n "$front"; then
+    address=`expr '(' $pagenum + 1 ')' / 2 + 1`
+    message="\
+Once the first half of the file printed, insert the sheets stack into
+the manual feed tray to print the second half.  Be aware the time out
+if usually short.  If it expired, use option -b to proceed."
+  else
+    address=0
+    message="Insert the front pages stack into the manual feed tray."
+  fi
+fi
+
+# Insert the manual feed request if needed
+$psset -n $pssetmanfeed -a $address -o$output $tmpdir/ordered.ps $debug
+
+test -n "$message" && $verbose "$message" 1>&2
+exit 0

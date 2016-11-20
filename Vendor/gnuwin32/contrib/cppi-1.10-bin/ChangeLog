@@ -1,0 +1,385 @@
+2001-07-14  Jim Meyering  <meyering@lucent.com>
+
+	* Version 1.10.
+
+	* obstack.c (__attribute__): Define it to be empty for compilers
+	that don't support that syntax.
+
+	* Makefile.maint (rel-files): Define and factor.
+	(emit-rsync-commands): Also emit code to rsync the .bz2 files.
+
+	* Makefile.maint: Create tar.bz2 files and include them in announcement.
+
+2001-07-09  Jim Meyering  <meyering@lucent.com>
+
+	* Version 1.9.
+
+	* tests/d1: Don't use `: >' to create empty files.  Use touch instead.
+	The former doesn't work with Ultrix 4.4's /bin/sh.
+
+	* Makefile.am: Comment out first definition of flex_debug to placate
+	automake.
+
+	* Makefile.cfg: New file.
+	* Makefile.am (EXTRA_DIST): Add Makefile.cfg.
+	* GNUmakefile: Include Makefile.cfg.
+
+2001-07-07  Jim Meyering  <meyering@lucent.com>
+
+	* cppi.l (--ansi): Report the line number of the offending directive --
+	was off by one or more.
+	(--ansi): Break out of the loop (rather than continuing it) after
+	reading a C++ comment.
+	* tests/ansi-4: Adjust line numbers accordingly.
+	* tests/ansi-5: Likewise.
+
+	Add tests for the above-fixed bugs.
+	* tests/Makefile.am (TESTS): Add ansi-7 and ansi-8.
+	* tests/ansi-8: New file.
+	* tests/ansi-7: New file.
+
+2001-01-21  Jim Meyering  <meyering@lucent.com>
+
+	* m4/lex.m4: Don't undefine AM_PROG_LEX.
+
+	* configure.in: Move AC_AIX and AC_MINIX to precede first compile test.
+
+2001-01-07  Jim Meyering  <meyering@lucent.com>
+
+	* cppi.l (emit_indented_cpp): Ignore return value from a call to
+	emit_or_check since the next statment sets *fail unconditionally.
+	("\""): Don't fatal upon finding first EOF in string.  Instead,
+	warn, set `fail', and break out of the loop.
+	Don't fatal upon finding string that's too long;  record the failure
+	and continue on, in case there are other problems.
+
+2000-12-06  Jim Meyering  <meyering@lucent.com>
+
+	* Version 1.8.
+
+	* configure.in (AC_PROG_RANLIB): Use it.
+	* Makefile.am: Add the framework required to build a library.
+	(cpp.h): Don't use GNU make's $< variable.
+
+	* cppi.l (INPUT_AND_ECHO): Define only after declaration of
+	inhibit_output.
+
+2000-11-04  Jim Meyering  <meyering@lucent.com>
+
+	* m4/Makefile.am (EXTRA_DIST): Add assert.m4 and lex.m4.
+	* assert/lex.m4: New file.
+	* m4/lex.m4: New file.  Require flex.
+
+	Remove the gcc-only restriction.
+	* cppi.l (INPUT_AND_ECHO) [!defined __GNUC__]: Provide a function.
+
+	* Makefile.am (EXTRA_DIST): Add .prev-version.
+	* Makefile.maint: Update from fileutils.
+
+	* cppi.l: Include unistd.h.
+	Add block of string.h/strings.h/memory.h includes.
+	(usage): Also print the bug-reporting address.
+	* configure.in: Add memory.h and unistd.h.
+	Use jm_ASSERT.
+
+2000-08-03  Jim Meyering  <meyering@lucent.com>
+
+	* config.sub: New file.
+	* config.guess: New file.
+	* configure.in: Add AC_CANONICAL_HOST.
+
+	* Makefile.am (cppi_SOURCES): Add xstrtoul.c and xstrtol.c
+	(noinst_HEADERS): Add xstrtol.h.
+	(SUBDIRS): Prepend `.' and m4.
+	(ACLOCAL_AMFLAGS): Set to `-I m4"
+	(Makefile): Depend on $(BUILT_SOURCES).
+
+	* xstrtol.c: New file.
+	* xstrtol.h: New file.
+	* xstrtoul.c: New file.
+
+2000-08-02  Jim Meyering  <meyering@lucent.com>
+
+	* missing: New file.
+
+	* cppi.l: Add new option: --max-string-length=LEN.
+
+	* configure.in: Add AC_PROG_CC_STDC before AC_C_CONST.
+	(AC_PROG_RANLIB): Remove.
+	(jm_AC_PREREQ_XSTRTOUMAX): Use it.
+	Use AC_CONFIG_FILES and AC_OUTPUT.
+
+	* acconfig.h: Remove file.
+
+2000-05-04  Jim Meyering  <meyering@lucent.com>
+
+	* cppi.l: Remove unused variable, `preceding_backslash'.
+
+1999-02-13  Jim Meyering  <meyering@ascend.com>
+
+	* Version 1.7.
+
+	* tests/Makefile.am (TESTS): Add cxx-3.
+	* tests/cxx-3: New test.
+
+1999-02-12  Jim Meyering  <meyering@ascend.com>
+
+	* cppi.l (gobble_line): New function.
+	"//": New rule.  Handle C++ comments.
+	(#-directive-rule): Recognize C++ comments here, too.
+	Reported by Hanif.
+
+	* Makefile.am (distcheck-hook): Add hook to Makefile.maint.
+
+	* tests/test-common: Don't prepend .. to $PATH here.
+	* tests/Makefile.am (TESTS_ENVIRONMENT): Prepend .. to $PATH here.
+	(TESTS): Add cxx-1 and cxx-2.
+	* tests/cxx-1: New test.
+	* tests/cxx-2: New test.
+
+	* configure.in: Require autoconf-2.13.
+	* Makefile.am (AUTOMAKE_OPTIONS): Require automake-1.4.
+
+	* tests/ansi-6: New test.
+	* tests/Makefile.am (TESTS): Add it.
+
+1999-02-10  Jim Meyering  <meyering@ascend.com>
+
+	* cppi.l (gobble_c_comment): New function -- extracted from
+	comment-processing rule.
+	(#-directive-rule): Detect text after #else and #endif.
+	Use gobble_c_comment here, too.
+	New option: --ansi (-a).
+
+	* tests/Makefile.am (TESTS): Add new ansi-? tests.
+
+	* tests/e9: Adjust for new #else/#endif ansi test.
+	* tests/ansi-1: New test.
+	* tests/ansi-2: New test.
+	* tests/ansi-3: New test.
+	* tests/ansi-4: New test.
+
+1998-11-22  Jim Meyering  <meyering@ascend.com>
+
+	* Version 1.6.
+
+	* cppi.l: Include cpp-cond.c, not cpp-cond-lookup.c.
+
+1998-11-12  Jim Meyering  <meyering@ascend.com>
+
+	* Makefile.am (cpp-cond.c): Rename from cpp-cond-lookup.c (was longer
+	than 14 chars).
+	Perform the gperf and sed in separate commands, not a pipe.
+	Otherwise, folks without gperf would end up with an empty
+	cpp-cond-lookup.c file that would evoke compile errors.
+
+1998-10-28  Jim Meyering  <meyering@ascend.com>
+
+	* Version 1.5.
+
+1998-10-09  Jim Meyering  <meyering@ascend.com>
+
+	* cppi.l (main, usage): Remove and undocument DISABLE_CPP_INDENT_CHECK
+	envvar support.
+
+1998-10-02  Jim Meyering  <meyering@ascend.com>
+
+	* Makefile.am (CLEANFILES): Add lex.backup.
+
+	* Version 1.4.
+
+	Line numbers in diagnostics were off -- sometimes by a lot.
+	Reported by Tim Lynch.
+	* cppi.l (gobble_define): Count newlines.
+	Adjust caller.
+	* tests/Makefile.am (TESTS): Add d5.
+	* tests/d5: New file -- test for the above fix.
+
+	* tests/stringify-2: Adjust line numbers.
+
+1998-09-09  Jim Meyering  <meyering@ascend.com>
+
+	* cppi.l (lookup_cpp_keyword): Declare function to be static.
+
+1998-09-08  Jim Meyering  <meyering@ascend.com>
+
+	* Makefile.am (cpp.h): Generate declarations of `enum Eic_type'
+	and the `directive' array of strings.
+	(BUILT_SOURCES): Add cpp.h.
+
+	* cppi.l: Include cpp.h here in place of hard-coded dcls.
+	(emit_indented_cpp): Don't use gcc extension for struct initialization.
+
+	* cppi.l: Remove and undocument kludgey --cvs (-C) option.
+	* tests/Makefile.am (TESTS): Remove f6 (used -C).
+
+1998-09-02  Jim Meyering  <meyering@ascend.com>
+
+	* Makefile.maint: New file.
+	* GNUmakefile: New file.
+	* Makefile.am (EXTRA_DIST): Add GNUmakefile and Makefile.maint.
+
+1998-09-01  Jim Meyering  <meyering@ascend.com>
+
+	* configure.in (VERSION): Bump to 1.3.
+
+	* Makefile.am (flex_8_bit): New variable.
+	(LFLAGS): Include it here.
+	* tests/8-bit: New file.
+	* tests/Makefile.am (TESTS): Add 8-bit.
+
+1998-08-01  Jim Meyering  <meyering@ascend.com>
+
+	* configure.in: Bump version to 1.2.
+
+	* cppi.l (gobble_define): New function.
+	Call it for every #define directive.
+
+	Tests for the above.
+	* tests/stringify-1: New file.
+	* tests/stringify-2: New file.
+	* tests/stringify-3: New file.
+	* tests/stringify-4: New file.
+	* tests/Makefile.am (TESTS): Add new tests.
+
+1998-04-08  Jim Meyering  <meyering@ascend.com>
+
+	* configure.in: Bump version from 1.1a to 1.1b.
+
+	ADMIN EOI 19316: FreeBSD portability fixes
+	* Makefile.am (cpp-cond-lookup.c): Don't use gperf's -E option:
+	some older versions don't support it and we don't need it.
+	* fatal.c: Include config.h.
+
+1998-03-27  Jim Meyering  <meyering@eng.ascend.com>
+
+	* cppi.l (initial_i_depth): New variable.
+	(%{%}-block): Initialize initial_i_depth, and i_depth from that.
+	(emit_or_check): Accommodate possibility that i_depth may now be
+	negative.
+	(emit_indented_cpp): Likewise.
+	(<<EOF>>): Likewise.
+	Suggestion from Ulrich Drepper.
+
+	* configure.in: Use AM_PROG_LEX in place of the (AC_PROG_LEX,
+	AC_DECL_YYTEXT) pair.
+
+1998-03-15  Jim Meyering  <meyering@eng.ascend.com>
+
+	* Makefile.am (cppi.c): Add explicit rule.
+
+	* cppi.l (VERSION): Remove definition.
+	(usage): Describe options.
+
+	autoconfiscate and automakify
+	* Add associated new files.
+
+	* fatal.c: Remove duplicate code.  Use #ifdefs instead.
+
+	* tests/: New directory.
+	Move test scripts into it.
+
+1997-12-29  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* cppi.l (usage): Add `\n\' at end of last line of message.
+
+1997-12-06  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* Makefile (cpp-cond-lookup.c): Use sed to insert a cast of str[]
+	reference to `unsigned char' to avoid warnings from gcc.
+
+1997-11-01  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* Makefile (cppi): Depend on obstack.o.
+
+	* obstack.c: New file.
+	* obstack.h: New file.
+
+	* cppi.l: Remove hard-coded limit: use an obstack for
+	keyword/line_number pairs.
+
+1997-10-26  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* cppi.l: Don't pack keyword/line_number pairs into an int.
+	Instead, keep a stack of structs.
+	Update stack manipulation functions.
+	(nth_entry): New function.
+
+Thu Jun 26 23:27:31 1997  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* cppi.l (#<any-cpp-directive>): Don't try to return early when
+	detecting improper indentation and -l was specified.
+
+Tue Jun 24 08:31:36 1997  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* cppi.l (emit_indented_cpp): Initialize *fail to zero.
+
+Mon Jun 23 06:59:06 1997  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* Makefile (cppi): Add getopt.o and getopt1.o.
+
+	* cppi.l (main): Add --list-files-only (-l) option.
+	Suggestion from Ignacio Goyret.
+	Use GNU getopt.
+
+Sun Jun 15 08:16:31 1997  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* cppi.l (emit_or_check): Handle leading-space #pragmas a little
+	differently.
+	* f5: Modify test to reflect the change.
+
+Thu May 29 09:50:24 1997  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* cppi.l (usage): Describe white-space-squeezing xform.
+
+Tue May 27 11:04:27 1997  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* Makefile: Remove old cpp-indent rules.
+	Begin converting empty, a, b, c tests to new format.
+
+	* cppi.l (emit_or_check): Remove now-spurious exclusion:
+	type == EIC_OTHER.
+	(emit_indented_cpp): Handle EIC_DEFINE.
+	(cpp_indent): Take another parameter.
+	In CVS mode, don't fail when IN_FILE doesn't exist.
+	That happens when you commit a file after cvs-deleting it.
+	(main): Update single caller of cpp_indent.
+
+	* cpp.gp: Add `define'.
+
+	* cppi.l (enum Eic_type): Add EIC_PRAGMA.
+	(emit_or_check): Treat ` #pragma' as a special case.
+	(emit_indented_cpp): Treat EIC_PRAGMA just like EIC_OTHER.
+	(^[ \t]*#[ \t]*[a-zA-Z0-9_]+): Emit/require a single space after each
+	#if and #elif.
+	[all tests]: Update for required space after #if/#elif.
+	(emit_or_check): Allow either of two formats for #pragma.
+	Sometimes, portability dictates that the `#' be indented.
+	(emit_or_check): Fix to preserve `#'-or-` '-first for pragmas.
+
+	* cpp.gp: Add `pragma'.
+
+Thu May 22 20:59:08 1997  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* cppi.l (main): New option, -C.  Now, `cppi -C' is usable directly
+	via CVS's commitinfo file.
+	Add rules to avoid flex's backup states.
+
+Fri May 16 08:49:52 1997  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* cppi.l: Revamp to avoid backup states.
+
+	* Makefile (cpp-cond-lookup.c): Add rule to create gperf-generated
+	lookup function.
+
+	* cpp.gp: New file.
+
+Thu May 15 17:24:00 1997  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* cppi.l: Remove a few useless rules.
+	Get rid of some of flex's backup states.
+
+Thu May  8 09:05:31 1997  Jim Meyering  <meyering@na-net.ornl.gov>
+
+	* cppi.l (main): Add back door: DISABLE_CPP_INDENT_CHECK.
+	(usage): Flesh out.

@@ -1,0 +1,164 @@
+Sldtoppm User Manual(0)                 Sldtoppm User Manual(0)
+
+
+
+Table Of Contents
+
+NAME
+       sldtoppm - convert an AutoCAD slide file to a PPM image
+
+
+SYNOPSIS
+       sldtoppm  [-adjust]  [-dir] [{-height|-ysize} s] [-info]
+       [{-lib|-Lib}     name]     [-scale     s]     [-verbose]
+       [{-width|-xsize} s] [slidefile]
+
+       All  options can be abbreviated to their shortest unique
+       prefix.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       sldtoppm reads an AutoCAD(R) slide file  and  outputs  a
+       PPM  image.   If  you  don't specify slidefile, sldtoppm
+       reads input from Standard Input.  sldtoppm uses the ppm-
+       draw  library to convert the vector and polygon informa-
+       tion in the slide file to a raster; see  the  file  ppm-
+       draw.h for details on this package.
+
+
+OPTIONS
+       -adjust
+              If  the  display on which the slide file was cre-
+              ated had non-square pixels, when you process  the
+              slide  with  sldtoppm  and don't specify -adjust,
+              sldtoppm issues the following warning;
+
+              Warning - pixels on source screen were non-square.
+
+              Specifying -adjust will correct the  image  width
+              to  compensate.   Specifying  the  -adjust option
+              causes sldtoppm to scale the width of  the  image
+              so  that  pixels in the resulting portable pixmap
+              are square (and hence circles appear as true cir-
+              cles, not ellipses).  The scaling is performed in
+              the vector domain,  before  scan  converting  the
+              objects.  The results are, therefore, superior in
+              appearance to what you'd obtain were you to  per-
+              form  the  equivalent scaling with pamscale after
+              the bitmap had been created.
+
+
+       -dir   The input is  assumed  to  be  an  AutoCAD  slide
+              library  file.  A directory listing each slide in
+              the library is printed on standard error.
+
+
+       -height size
+              Scales the image in the vector domain  so  it  is
+              size  pixels  in  height.   If  you don't specify
+              -width or -xsize, sldtoppm adjusts the  width  to
+              preserve the pixel aspect ratio.
+
+
+       -info  Dump  the  slide  file  header on standard error,
+              displaying the original screen  size  and  aspect
+              ratio among other information.
+
+
+       -lib name
+              Extracts  the  slide with the given name from the
+              slide library given as input.  sldtoppm  converts
+              the specified name to upper case.
+
+
+       -Lib name
+              Extracts  the  slide with the given name from the
+              slide library given as input.  sldtoppm uses name
+              in  the case specified; it does not convert it to
+              upper case.
+
+
+       -scale s
+              Scales the image by factor s, which  may  be  any
+              floating point value greater than zero.  sldtoppm
+              does the scaling after aspect  ratio  adjustment,
+              if  any.  Since it does the scaling in the vector
+              domain, before rasterisation,  the  results  look
+              much  better  than running the output of sldtoppm
+              through pamscale.
+
+
+       -verbose
+              Dumps the slide file header and lists every  vec-
+              tor and polygon to Standard Error.
+
+
+       -width size
+              Scales  the  image  in the vector domain so it is
+              size pixels wide.  If you don't  specify  -height
+              or  -ysize,  sldtoppm  adjusts the height to pre-
+              serve the pixel aspect ratio.
+
+
+       -xsize size
+              Scales the image in the vector domain  so  it  is
+              size  pixels  wide.  If you don't specify -height
+              or -ysize, sldtoppm adjusts the  height  to  pre-
+              serve the pixel aspect ratio.
+
+
+       -ysize size
+              Scales  the  image  in the vector domain so it is
+              size pixels in  height.   If  you  don't  specify
+              -width  or  -xsize, sldtoppm adjusts the width to
+              preserve the pixel aspect ratio.
+
+
+
+
+LIMITATIONS
+       sldtoppm can convert only Level 2 slides.  Level 1  for-
+       mat  has  been  obsolete  since  the  advent  of AutoCAD
+       Release 9 in 1987, and was not portable  across  machine
+       architectures.
+
+       Slide library items with names containing 8 bit (such as
+       ISO) or 16 bit (Kanji, for example) characters  may  not
+       be  found  when  chosen with the -lib option unless sld-
+       toppm was built with character set conversion  functions
+       appropriate  to  the  locale.   You  can always retrieve
+       slides from libraries regardless of the character set by
+       using the -Lib option and specifying the precise name of
+       library member.  Use the -dir option to list the  slides
+       in a library if you're unsure of the exact name.
+
+
+SEE ALSO
+       AutoCAD   Reference  Manual:  Slide  File  Format,  pam-
+       scale(1), ppm(1)
+
+
+AUTHOR
+       John Walker
+       Autodesk SA
+       Avenue des Champs-Montants 14b
+       CH-2074 MARIN
+       Suisse/Schweiz/Svizzera/Svizra/Switzerland
+           Usenet:kelvin@Autodesk.com
+           Fax:038/33 88 15
+           Voice:038/33 76 33
+
+       Permission to use, copy,  modify,  and  distribute  this
+       software and its documentation for any purpose and with-
+       out fee is hereby granted,  without  any  conditions  or
+       restrictions.  This software is provided 'as is' without
+       express or implied warranty.
+
+       AutoCAD  and  Autodesk  are  registered  trademarks   of
+       Autodesk, Inc.
+
+
+
+netpbm documentation    10 October 1991 Sldtoppm User Manual(0)

@@ -1,0 +1,352 @@
+#! /bin/sh
+#
+#  Generated automatically from wlocdrv.in by configure.
+#
+#  $Id: wlocdrv.in 0.08 2000/06/14 00:00:08 tom Exp $
+#
+#  wlocdrv.in:  Uses `wlocdrv1[.awk|.pl]' and `wlocdrv2[.awk|.pl]'
+#                 for processing the ZONE file `zone.tab' to generate the
+#                 Gcal resource file `wlocdrv.rc' and the `wloc' script text,
+#                 which creates location files containing air line distances
+#                 and course angles between several geographic locations
+#                 around the world.
+#
+#                Usage: wlocdrv --help | --version
+#                Usage: wlocdrv [--debug] [--precise] [ZONE-FILE]
+#
+#                `--debug':    Turn on shell debugging.
+#                `--precise':  Use more precise values.
+#
+#  UN*X solution.
+#
+#  Needs `test', `echo', `expr', `eval', `set', `rm', `chmod', `sed'
+#  and `perl' or `awk' for processing!
+#
+#  Returns 0 if processing was successfully.
+#  Returns 1 in case an error occured while processing.
+#  Returns 2 if neither Perl nor AWK are present for further processing.
+#
+#  Copyright (c) 2000  Thomas Esken      <esken@uni-muenster.de>
+#                      Im Hagenfeld 84
+#                      D-48147 M"unster
+#                      GERMANY
+#
+#  This software doesn't claim completeness, correctness or usability.
+#  On principle I will not be liable for ANY damages or losses (implicit
+#  or explicit), which result from using or handling my software.
+#  If you use this software, you agree without any exception to this
+#  agreement, which binds you LEGALLY !!
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the `GNU General Public License' as published by
+#  the `Free Software Foundation'; either version 2, or (at your option)
+#  any later version.
+#
+#  You should have received a copy of the `GNU General Public License'
+#  along with this program; if not, write to the:
+#
+#    Free Software Foundation, Inc.
+#    59 Temple Place - Suite 330
+#    Boston, MA 02111-1307,  USA
+#
+#
+
+#
+# Basically used programs.
+#
+Rm=rm
+Sed=sed
+Set=set
+Test=test
+Echo=echo
+Expr=expr
+Chmod=chmod
+
+#
+# Basically used texts.
+#
+packagedatamiscdir=c:/progra~1/Gcal/share/gcal/misc/wloc
+#
+PACKAGE=gcal
+VERSION=3.01
+transform=s,$$,,; s,^,,; s/i386-pc-mingw32//
+#
+mydefaultname=wlocdrv
+#
+myname=`$Echo "$0" | $Sed -e 's,.*/,,' -e "$transform"`
+myversion=0.08
+myinternalname="$myname ($PACKAGE $VERSION) $myversion"
+#
+pool=$packagedatamiscdir/zone.tab
+runscriptname=wloc
+gcal_resource_file_suffix=.rc
+gcal_resource_file=$mydefaultname""$gcal_resource_file_suffix
+#
+info1="$myname: Generates the Gcal resource file \`$gcal_resource_file' and"
+info2="$myname: the \`$runscriptname' script text, which creates location"
+info3="$myname: files containing air line distances and course angles"
+info4="$myname: between several geographic locations around the world."
+info5="$myname:"
+usage1="usage: $myname  --help | --version"
+usage2="usage: $myname  [--debug] [--precise] [ZONE-FILE]"
+usage3="usage: $myname  without ZONE-FILE uses file \`$pool' by default"
+
+#
+# Some constant values (EXIT_SUCCESS(==0) and EXIT_FATAL(==2)
+#   are also returned by the processed AWK/Perl script.
+#
+EXIT_SUCCESS=0
+EXIT_FAILURE=1
+EXIT_FATAL=2
+
+#
+# The used programs.
+#
+Eval=eval
+ThisGcal=`$Echo "$PACKAGE" | $Sed "$transform"`
+#
+Awk=gawk
+Awk_script1=$mydefaultname""1.awk
+Awk_script2=$mydefaultname""2.awk
+#
+Perl=perl
+Perl_script1=$mydefaultname""1.pl
+Perl_script2=$mydefaultname""2.pl
+
+#
+# Let's check for command line arguments.
+#
+debug=no
+precise=""
+commands=""
+previous=""
+for option in $*
+do
+  #
+  # If the previous option needs an argument, assign it.
+  #
+  if $Test -n "$previous";
+  then
+    $Eval "$previous=\$option"
+    previous=""
+    continue
+  fi
+
+  case "$option" in
+    -*=)  optarg="###error###" ;;
+    -*=*) optarg=`$Echo "$option" | $Sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *)    optarg="" ;;
+  esac
+
+  #
+  # Manage the options.
+  #
+  case "$option" in
+    -help=* | -hel=* | -he=* | -h=* | -help | -hel | -he | -h | \
+    --help=* | --hel=* | --he=* | --h=* | --help | --hel | --he | --h)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$info1"
+      $Echo "$info2"
+      $Echo "$info3"
+      $Echo "$info4"
+      $Echo "$info5"
+      $Echo "$usage1"
+      $Echo "$usage2"
+      $Echo "$usage3"
+      exit $EXIT_SUCCESS ;;
+
+    -version=* | -versio=* | -versi=* | -vers=* | -ver=* | -ve=* | -v=* | \
+    -version | -versio | -versi | -vers | -ver | -ve | -v | \
+    --version=* | --versio=* | --versi=* | --vers=* | --ver=* | --ve=* | --v=* | \
+    --version | --versio | --versi | --vers | --ver | --ve | --v)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$myinternalname"
+      exit $EXIT_SUCCESS ;;
+
+    -debug=* | -debu=* | -deb=* | -de=* | -d=* | \
+    -debug | -debu | -deb | -de | -d | \
+    --debug=* | --debu=* | --deb=* | --de=* | --d=* | \
+    --debug | --debu | --deb | --de | --d)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      debug=yes
+      shift ;;
+
+    -precise=* | -precis=* | -preci=* | -prec=* | -pre=* | -pr=* | -p=* | \
+    -precise | -precis | -preci | -prec | -pre | -pr | -p | \
+    --precise=* | --precis=* | --preci=* | --prec=* | --pre=* | --pr=* | --p=* | \
+    --precise | --precis | --preci | --prec | --pre | --pr | --p)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      precise="--precise"
+      shift ;;
+
+    -*)
+      $Echo "$myname: error: $option: invalid option, use --help to show usage" 1>&2
+      exit $EXIT_FAILURE ;;
+
+    *)
+      if $Test -z "$commands";
+      then
+        commands="$option"
+      else
+        commands="$commands $option"
+      fi
+  esac
+done
+
+#
+# Get the number of commands given and assign them to the local variables.
+#
+cmd_number=0
+cmd_1=""
+for cmd in $commands
+do
+  if $Test -z "$cmd_1";
+  then
+    cmd_1="$cmd"
+  fi
+  cmd_number=`$Expr $cmd_number + 1`
+done
+
+#
+# Enable tracing.
+#
+if $Test "$debug" = yes;
+then
+  $Set -x
+else
+  trap "$Rm -f $runscriptname $gcal_resource_file;exit $EXIT_FAILURE" 1 2 15
+fi
+
+#
+# Let's start processing now.
+#
+if $Test -n "$Awk" || $Test -n "$Perl";
+then
+  if $Test "$cmd_number" -gt 1;
+  then
+    $Echo "$info1"
+    $Echo "$info2"
+    $Echo "$info3"
+    $Echo "$info4"
+    $Echo "$info5"
+    $Echo "$usage1"
+    $Echo "$usage2"
+    $Echo "$usage3"
+    exit $EXIT_FAILURE
+  else
+    if $Test "$cmd_number" -eq 1;
+    then
+      pool="$cmd_1"
+    fi
+    if $Test ! -s "$pool";
+    then
+      $Echo "$myname: error: ZONE-FILE \`$pool' not found" 1>&2
+      exit $EXIT_FAILURE
+    fi
+    #
+    # We prefer the use of Perl.
+    #
+    if $Test -n "$Perl";
+    then
+      if $Test ! -s "$packagedatamiscdir/$Perl_script1";
+      then
+        $Echo "$myname: error: file \`$packagedatamiscdir/$Perl_script1' is missing" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      if $Test ! -s "$packagedatamiscdir/$Perl_script2";
+      then
+        $Echo "$myname: error: file \`$packagedatamiscdir/$Perl_script2' is missing" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$myname: generating the script text \`$runscriptname', please wait..."
+      $Perl -- $packagedatamiscdir/$Perl_script1 -a1 -b./$gcal_resource_file -c$ThisGcal -d$precise $pool > $runscriptname
+      status=$?
+      if $Test "$status" -eq "$EXIT_FATAL";
+      then
+        $Echo "$myinternalname: error: invalid option to \`$Perl' given" 1>&2
+        if $Test "$debug" = no;
+        then
+          $Rm -f $runscriptname
+        fi
+        exit $status
+      else
+        if $Test -s "$runscriptname";
+        then
+          $Chmod u+x $runscriptname
+        fi
+      fi
+      $Echo "$myname: generating the Gcal resource file \`$gcal_resource_file', please wait..."
+      $Perl -- $packagedatamiscdir/$Perl_script2 -a1 -b$gcal_resource_file $pool > $gcal_resource_file
+      status=$?
+      if $Test "$status" -eq "$EXIT_FATAL";
+      then
+        $Echo "$myinternalname: error: invalid option to \`$Perl' given" 1>&2
+        if $Test "$debug" = no;
+        then
+          $Rm -f $gcal_resource_file
+        fi
+        exit $status
+      fi
+    else
+      if $Test ! -s "$packagedatamiscdir/$Awk_script1";
+      then
+        $Echo "$myname: error: file \`$packagedatamiscdir/$Awk_script1' is missing" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      if $Test ! -s "$packagedatamiscdir/$Awk_script2";
+      then
+        $Echo "$myname: error: file \`$packagedatamiscdir/$Awk_script2' is missing" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$myname: generating the script text \`$runscriptname', please wait..."
+      $Awk -f $packagedatamiscdir/$Awk_script1 -- -a1 -b./$gcal_resource_file -c$ThisGcal -d$precise $pool > $runscriptname
+      status=$?
+      if $Test "$status" -eq "$EXIT_FATAL";
+      then
+        $Echo "$myinternalname: error: invalid option to \`$Awk' given" 1>&2
+        if $Test "$debug" = no;
+        then
+          $Rm -f $runscriptname
+        fi
+        exit $status
+      else
+        if $Test -s "$runscriptname";
+        then
+          $Chmod u+x $runscriptname
+        fi
+      fi
+      $Echo "$myname: generating the Gcal resource file \`$gcal_resource_file', please wait..."
+      $Awk -f $packagedatamiscdir/$Awk_script2 -- -a1 -b$gcal_resource_file $pool > $gcal_resource_file
+      status=$?
+      if $Test "$status" -eq "$EXIT_FATAL";
+      then
+        $Echo "$myinternalname: error: invalid option to \`$Awk' given" 1>&2
+        if $Test "$debug" = no;
+        then
+          $Rm -f $gcal_resource_file
+        fi
+        exit $status
+      fi
+    fi
+  fi
+  exit $EXIT_SUCCESS
+else
+  $Echo "$myinternalname: error: neither \`perl' nor \`awk' available" 1>&2
+  exit $EXIT_FATAL
+fi

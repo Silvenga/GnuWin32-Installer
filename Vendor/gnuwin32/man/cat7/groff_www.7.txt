@@ -1,0 +1,363 @@
+GROFF_WWW(7)                                       GROFF_WWW(7)
+
+
+
+
+
+NAME
+       groff_www - groff macros for authoring web pages
+
+SYNOPSIS
+       groff -mwww [ options ] file ...
+
+DESCRIPTION
+       This  manual page describes the GNU -mwww macro package,
+       which is part of the groff document  formatting  system.
+       The  manual  page  is  very  a basic guide, and the html
+       device driver (grohtml) has  been  completely  rewritten
+       but  still  remains  as  in an alpha state.  It has been
+       included into the distribution so that a lot  of  people
+       have  a chance to test it.  Note that this macro file is
+       automatically called (via the troffrc file) if  you  use
+       -Thtml or -Txhtml.
+
+       To  see the hyperlinks in action, please format this man
+       page with the grohtml device.
+
+       Here is a summary of the functions found in  this  macro
+       set.
+
+       .JOBNAME     split output into multiple files
+       .HX          automatic heading level cut off
+       .BCL         specify colours on a web page
+       .BGIMG       specify background image
+       .URL         create a url using two parameters
+       .FTP         create an ftp reference
+       .MTO         create a html email address
+       .FTP         create an ftp reference
+       .TAG         generate an html name
+       .IMG         include an image file
+       .PIMG        include png image
+       .MPIMG       place png on the margin and wrap text around it
+       .HnS         begin heading
+       .HnE         end heading
+       .LK          emit automatically collected links.
+       .HR          produce a horizontal rule
+       .NHR         suppress automatic generation of rules.
+       .HTL         only generate HTML title
+       .HEAD        add data to <head> block
+       .ULS         unorder list begin
+       .ULE         unorder list end
+       .OLS         ordered list begin
+       .OLE         ordered list end
+       .DLS         definition list begin
+       .DLE         definition list end
+       .LI          insert a list item
+       .DC          generate a drop capital
+       .HTML        pass an html raw request to the device driver
+       .CDS         code example begin
+       .CDE         code example end
+       .ALN         place links on left of main text.
+       .LNS         start a new two-column table with links in the left.
+       .LNE         end the two-column table.
+       .LINKSTYLE   initialize default url attributes.
+
+       Output  of the pic, eqn, refer, and tbl preprocessors is
+       acceptable as input.
+
+REQUESTS
+       .JOBNAME filename
+              Split output into multiple HTML files.  A file is
+              split  whenever  a  .SH  or .NH 1 is encountered.
+              Its argument is the file  stem  name  for  future
+              output  files.   This  option  is  equivalent  to
+              grohtml's -j option.
+
+       .HX n  Specify the cut off depth when  generating  links
+              from  section headings.  For example, a parameter
+              of 2 would cause grohtml to generate  a  list  of
+              links  for  .NH 1  and  .NH 2  but not for .NH 3.
+              Whereas
+
+                     .HX 0
+
+              tells grohtml that no  heading  links  should  be
+              created at all.  Another method for turning auto-
+              matic headings off is by issuing the the  command
+              line switch -P-l to groff.
+
+       .BCL foreground background active not-visited visited
+              This  macro  takes  five  parameters: foreground,
+              background, active hypertext link, hypertext link
+              not  yet  visited,  and  visited  hypertext  link
+              colour.
+
+       .BGIMG imagefile
+              the only parameter to this  macro  is  the  back-
+              ground image file.
+
+       .URL url [description] [after]
+              generates  a  URL  using either one, two or three
+              arguments.  The first  parameter  is  the  actual
+              URL,  the second is the name of the link, and the
+              third is optional stuff to be printed immediately
+              afterwards.   If description and after are absent
+              then the url becomes the  anchor  text.   Hyphen-
+              ation  is disabled while printing the actual URL;
+              explicit breakpoints should be inserted with  the
+              \: escape.  Here is how to encode foo <http://
+              foo.org/>:
+
+                     .URL http://\:foo.\:org/ foo :
+
+              If this is  processed  by  a  device  other  than
+              -Thtml or -Txhtml it appears as:
+
+                     foo <http://foo.org>:
+
+              The  URL macro can be of any type; for example we
+              can reference Eric Raymond's pic guide <pic.html>
+              by:
+
+                     .URL pic.html "Eric Raymond's pic guide"
+
+       .MTO address [description] [after]
+              Generate  an  email  html  reference.   The first
+              argument is mandatory as the email address.   The
+              optional  second  argument is the text you see in
+              your browser  If  an  empty  argument  is  given,
+              address is used instead.  An optional third argu-
+              ment is  stuff  printed  immediately  afterwards.
+              Hyphenation is disabled while printing the actual
+              email   address.    For   example,    Joe    User
+              <joe@user.org>  was  achieved  by  the  following
+              macro:
+
+                     .MTO joe@user.org "Joe User"
+
+              Note that all the URLs actually  are  treated  as
+              consuming  no textual space in groff.  This could
+              be considered as a bug since it causes some prob-
+              lems.   To  circumvent  this,  www.tmac inserts a
+              zero-width character which expands to a  harmless
+              space (only if run with -Thtml or -Txhtml).
+
+       .FTP url [description] [after]
+              indicates that data can be obtained via ftp.  The
+              first argument is the url and the second  is  the
+              browser  text.   A third argument, similar to the
+              macros above, is intended for stuff printed imme-
+              diately  afterwards.   The  second  and the third
+              parameter are optional.  Hyphenation is  disabled
+              while  printing  the  actual URL.  As an example,
+              here the location of the GNU ftp server <ftp://
+              ftp.gnu.org/>.  The macro example above was spec-
+              ified by:
+
+                     .FTP ftp://\:ftp.gnu.org/ "GNU ftp server"
+                     .
+
+       .TAG name
+              Generates  an  html  name  tag from its argument.
+              This can then be referenced using the URL  <#URL>
+              macro.   As you can see, you must precede the tag
+              name with # since it is a local reference.   This
+              link  was  achieved  via placing a TAG in the URL
+              description above; the source looks like this:
+
+                     .TP
+                     .B URL
+                     generates
+                     .TAG URL
+                     a URL using either two or three arguments.
+                     ...
+
+       .IMG [-R|-L|-C] filename [width] [height]
+              Include a picture into the document.   The  first
+              argument is the horizontal location: right, left,
+              or center (-R, -L, or -C).  Alignment is centered
+              by  default  (-C).   The  second  argument is the
+              filename.  The optional third  and  fourth  argu-
+              ments  are the width and height.  If the width is
+              absent it defaults to 1 inch.  If the  height  is
+              absent  it defaults to the width.  This maps onto
+              an html img tag.  If  you  are  including  a  png
+              image then it is advisable to use the PIMG macro.
+
+       .PIMG [-R|-L|-C] filename [width [height]]
+              Include an image in PNG format.  This macro takes
+              exactly  the same parameters as the IMG macro; it
+              has the advantage of working with postscript  and
+              html devices also since it can automatically con-
+              vert the image into the  EPS  format,  using  the
+              following  programs  of  the netpbm package: png-
+              topnm, pnmcrop, and  pnmtops.   If  the  document
+              isn't processed with -Thtml or -Txhtml it is nec-
+              essary to use the -U option of groff.
+
+       .MPIMG [-R|-L] [-G gap] filename [width [height]]
+              Place a PNG image on the  margin  and  wrap  text
+              around  it.   The  first parameters are optional.
+              The alignment: left or right (-L or -R) specifies
+              the  margin  where the picture is placed at.  The
+              default  alignment  is  left  (-L).   Optionally,
+              -G  gap  can be used to arrange a gap between the
+              picture and the text that wraps around  it.   The
+              default gap width is zero.
+              The  first non-optional argument is the filename.
+              The optional following arguments  are  the  width
+              and  height.   If the width is absent it defaults
+              to 1 inch.  If the height is absent  it  defaults
+              to the width.  Example:
+
+                     .MPIMG -L -G 2c foo.png 3c 1.5c
+
+              The  height  and  width may also be given as per-
+              centages. The PostScript  device  calculates  the
+              width  from  the  .l register and the height from
+              the .p register. For example:
+
+                     .MPIMG -L -G 2c foo.png 15%
+
+       .HnS n Begin heading.  The numeric heading  level  n  is
+              specified by the first parameter.  Use this macro
+              if your headings contain URL, FTP or MTO  macros.
+              Example:
+
+                     .HnS 1
+                     .HR
+                     GNU Troff
+                     .URL http://groff.ffii.org (Groff)
+                     -- a
+                     .URL http://www.gnu.org/ GNU
+                     project.
+                     Hosted by
+                     .URL http://ffii.org/ FFII .
+                     .HR
+                     .HnE
+
+              In  this case you might wish to disable automatic
+              links to headings.  This can  be  done  via  -P-l
+              from the command line.
+
+
+       .HnE   End heading.
+
+       .LK    Force  grohtml  to place the automatically gener-
+              ated links at this position.  If this manual page
+              has  been  processed with -Thtml or -Txhtml those
+              links can be seen right here.
+
+       .HR    Generate a full-width horizontal rule for  -Thtml
+              and -Txhtml.  No effect for all other devices.
+
+       .NHR   Suppress  generation  of the top and bottom rules
+              which grohtml emits by default.
+
+       .HTL   Generate an HTML title only.  This  differs  from
+              the TL macro of the ms macro package which gener-
+              ates both an HTML title and an <H1> heading.  Use
+              it to provide an HTML title as search engine fod-
+              der but a graphic title  in  the  document.   The
+              macro  terminates  when  a space or break is seen
+              (.sp, .br).
+
+       .HEAD  Add arbitrary HTML  data  to  the  <head>  block.
+              Ignored  if not processed with -Thtml or -Txhtml.
+              Example:
+
+                     .HEAD "<link \
+                       rel=""icon"" \
+                       type=""image/png"" \
+                       href=""http://foo.org//bar.png""/>"
+
+       .HTML  All text after this macro is treated as raw html.
+              If  the  document  is processed without -Thtml or
+              -Txhtml then the macro is  ignored.   Internally,
+              this  macro is used as a building block for other
+              higher-level macros.
+
+              For example, the BGIMG macro is defined as
+
+                     .de BGIMG
+                     .   HTML <body background=\$1>
+                     ..
+
+       .DC l text [color]
+              Produce a drop capital.  The first  parameter  is
+              the letter to be dropped and enlarged, the second
+              parameter text is the ajoining text whose  height
+              the first letter should not exceed.  The optional
+              third parameter is the color of the dropped  let-
+              ter.  It defaults to black.
+
+       .CDS   Start displaying a code section in constant width
+              font.
+
+       .CDE   End code display
+
+       .ALN [color] [percentage]
+              Place section heading links automatically to  the
+              left  of  the  main  text.  The color argument is
+              optional and  if  present  indicates  which  HTML
+              background  color  is to be used under the links.
+              The optional percentage indicates the  amount  of
+              width  to  devote  to  displaying the links.  The
+              default values are #eeeeee and 30 for  color  and
+              percentage   width,   respectively.   This  macro
+              should only be called once at  the  beginning  of
+              the document.  After calling this macro each sec-
+              tion heading emits an HTML  table  consisting  of
+              the links in the left and the section text on the
+              right.
+
+       .LNS   Start a new two-column table with  links  in  the
+              left  column.  This can be called if the document
+              has text before the first  .SH  and  if  .ALN  is
+              used.   Typically  this is called just before the
+              first paragraph and after the main  title  as  it
+              indicates  that  text  after this point should be
+              positioned to the right of the left-hand  naviga-
+              tional links.
+
+       .LNE   End a two-column table.  This should be called at
+              the end of the document if .ALN was used.
+
+       .LINKSTYLE color [ fontstyle [ openglyph closeglyph ] ]
+              Initialize default url attributes to be  used  if
+              this  macro set is not used with the HTML device.
+              The macro set initializes itself with the follow-
+              ing call
+
+                     .LINKSTYLE blue C \[la] \[ra]
+
+              but  these  values  will  be superseded by a user
+              call to LINKSTYLE.
+
+SECTION HEADING LINKS
+       By default grohtml generates links to all section  head-
+       ings  and  places these at the top of the html document.
+       (See LINKS <#LK> for details of how to switch  this  off
+       or alter the position).
+
+LIMITATIONS OF GROHTML
+       tbl information is currently rendered as a PNG image.
+
+FILES
+       c:/progra~1/groff/share/groff/1.20/tmac/www.tmac
+
+SEE ALSO
+       groff(1), troff(1) grohtml(1), netpbm(1)
+
+AUTHOR
+       grohtml was written by Gaius Mulley <gaius@glam.ac.uk>
+
+BUGS
+       Report  bugs  to  the Groff Bug Mailing List <bug-groff@
+       gnu.org>.  Include a  complete,  self-contained  example
+       that  will allow the bug to be reproduced, and say which
+       version of groff you are using.
+
+
+
+Groff Version 1.20       5 January 2009            GROFF_WWW(7)

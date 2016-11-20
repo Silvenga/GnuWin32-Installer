@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: handling headers</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile HandlingHeaders.html "Gri: handling headers" "Examples" --> 
+
+<!-- @node   Handling Headers, Ignoring Columns, Handling Data, Handling Data -->
+<a name="HandlingHeaders" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="HandlingData.html#HandlingData" shape="rect" coords="516,2,532,24" href="HandlingData.html#HandlingData">
+<area alt="Gri: handling data" shape="rect" coords="557,2,573,24" href="HandlingData.html">
+<area alt="Gri: ignoring columns" shape="rect" coords="581,2,599,24" href="IgnoringColumns.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: ignoring columns" shape="rect" coords="581,2,599,24" href="IgnoringColumns.html">
+</map>
+
+<h3>8.12.1: Handling headers</h3>
+
+
+<b>Case 1 -- known number of header lines.</b>
+This is easy.  If you know that the file has, say, 10 header lines, you
+can just do this:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open file
+skip 10
+read columns x y
+...
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<b>Case 2 -- header itself indicates number of header lines.</b>
+Quite often the first line of a file will indicate the number of header
+lines.  For example, suppose the first line contains a single number,
+indicating the number of header lines to follow:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open file
+read .skip.
+skip .skip.
+read columns x y
+...
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<b>Case 3 -- header lines marked by a textual key.</b>
+Sometimes header lines are indicated by a textual key, for example, the
+characters `<font color="#82140F"><code>HEADER</code></font>' at the start of the line in the file.  The easy
+way to skip such a header is to use a system command.  Depending on your
+familiarity with the operating system (here presumed to be Unix), you
+might choose to use Grep, Awk, or Perl.  Here are examples:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "grep -v '^HEADER' file |"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+For more on the `<font color="82140F"><code>|</code></font>' mechanism, see see <a href="Open.html#Open">Open</a>.  The Grep command
+prints lines which do not match the indicated string
+(because of the `<font color="#82140F"><code>-v</code></font>' switch), and the `<font color="#82140F"><code>^</code></font>' character stands for
+the start of the line (see <a href="SystemTools.html#Grep">Grep</a>).  Thus all lines with the key word at the
+<b>start</b> of the line are skiped.
+<p>
+<b>Case 4 -- reading and using information in header.</b>
+Consider a dataset in which the first line gives the time of
+observation, followed by a list of observations.  This might be, for
+example, an indication of the data taken from a weather balloon released
+at a particular time from a fixed location, with the main data being air
+temperature as a function of elevation of the balloon.  The time
+indication might be, for instance, the hour number.  One might need to
+know the time to print a label on the diagram.  You could do that by:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open file
+read .time.
+read columns x y
+draw curve
+sprintf \label "Time of observation is %f hour" .time.
+draw title "\label"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+where the `<font color="#82140F"><code>sprintf</code></font>' command has been used to change the numerical
+time indication into a synonym that can be inserted into a quoted string
+for drawing the title of the diagram (see <a href="Sprintf.html#Sprintf">Sprintf</a>).  Here the time has
+been assumed to be a decimal hour.  You might also have three numbers on
+the line, perhaps a day, an hour and a minute.  Then you could do
+something like
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open file
+read .d. .h. .m.
+read columns x y
+draw curve
+sprintf \label "Obs. %.0f:%.0f, day %.0f" .h. .m. .d.
+draw title "\label"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Here the `<font color="#82140F"><code>%.0f</code></font>' code is used to ensure no numbers will be written
+after the decimal point.  Naturally, you could convert this to a decimal
+day, by e.g.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+...
+.dday. = {rpn .day. .hour. 24 / .min. 24 / 60 /}
+sprintf \label "Decimal day is %.4f" .dday.
+...
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+(Some of you might know how many minutes in a day, but I'm silly so I
+kept the extra mathematical step -- nothing is lost by being
+straightforward!)
+<p>
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+LC_PROCESS_FILE(3)                           LC_PROCESS_FILE(3)
+
+
+
+
+
+NAME
+       lc_process_file - Process a specific file
+
+
+SYNOPSIS
+       #include <libconfig.h>
+
+       int  lc_process_file(const  char  *appname,  const  char
+       *pathname, lc_conf_type_t type);
+
+
+DESCRIPTION
+       The lc_process_file(3) function  processes  exactly  one
+       configuration  file.  The file is specified by the path-
+       name argument and should be in the format  specified  by
+       the  type  argument.   The  appname argument should be a
+       reasonable form of the name of the application.
+
+
+RETURN VALUE
+       On success 0 is returned, otherwise -1 is returned.
+
+
+EXAMPLE
+       #include <libconfig.h>
+       #include <stdlib.h>
+       #include <stdio.h>
+
+       int main(int argc, char **argv) {
+            int lc_p_ret, lc_rv_ret;
+            char *filename = NULL;
+
+            lc_rv_ret = lc_register_var("File", LC_VAR_STRING,
+                                        &filename, 'f');
+            if (lc_rv_ret != 0) {
+                 fprintf(stderr, "Error registering variable: %i.\n",
+                         lc_geterrno());
+                 return(EXIT_FAILURE);
+            }
+
+            lc_p_ret = lc_process_file("example", "/data/extra.conf",
+                                       LC_CONF_APACHE);
+
+            lc_cleanup();
+
+            if (lc_p_ret != 0) {
+                 fprintf(stderr, "Error processing configuration file: \
+                         %s\n", lc_geterrstr());
+                 return(EXIT_FAILURE);
+            }
+
+            if (filename != NULL) {
+                 printf("File specified was: %s\n", filename);
+            } else {
+                 printf("No filename specified.\n");
+            }
+
+            return(EXIT_SUCCESS);
+       }
+
+
+SEE ALSO
+       lc_register_var(3),  lc_register_callback(3),  lc_geter-
+       rno(3), lc_geterrstr(3), lc_cleanup(3), lc_process(3)
+
+
+

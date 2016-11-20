@@ -1,0 +1,71 @@
+<html>
+<head>
+<title>../../../gri-2.12.10-src/doc/examples/example10color.gri</title>
+</head>
+<body bgcolor="#FFFFFF">
+<i># This html document was prepared by gri2html based on the Gri script named</i>
+<br><i>#    <a href="../../../gri-2.12.10-src/doc/examples/example10color.gri">../../../gri-2.12.10-src/doc/examples/example10color.gri</a></i>
+<br># <i>Gri is available for free at <a href="http://gri.sourceforge.net">http://gri.sourceforge.net</a></i>
+<pre>
+<font color=#B22222># Example 10 -- Draw color image plot</font>
+
+<font color=#B22222># Test various colorscales.</font>
+<font color=#B22222># INSTRUCTIONS: Uncomment one of the following '\scale = ' statements</font>
+
+<font color=#B22222># CASE 1: From black at high values to white at low values</font>
+<font color=#B22222>#\scale = "rgb 0 0 0 20.0 rgb 1 1 1  0.0 increment 5"</font>
+
+<font color=#B22222># CASE 2: From skyblue at 20 to tan for 0; traverse RGB space</font>
+<font color=#B22222>#         See also case 5, which names the colors.</font>
+<font color=#B22222>#\scale = "rgb 0.529 0.808 0.922 20.0 rgb 0.824 0.706 0.549 0.0 increment 5"</font>
+
+<font color=#B22222># CASE 3: From skyblue at 20 to tan for 0; traverse HSB space</font>
+<font color=#B22222>#         Is it just me, or is this uglier than case 2?</font>
+<font color=#B22222>#\scale = "hsb 0.548 0.426 0.922 20.0 hsb 0.095 0.334 0.824 0.0 increment 5"</font>
+
+<font color=#B22222># CASE 4: Use a spectrum; traverse HSB space</font>
+<font color=#B22222>#\scale = "hsb 0 1 1 20.0 hsb 0.6666 1 1  0.0 increment 5"</font>
+
+<font color=#B22222># CASE 5: From skyblue to tan, traversing RGB space (by default)</font>
+<font color=#B22222>#         (Compare case 2, which uses similar endpoints, with</font>
+<font color=#B22222>#         colors specified with RGB values, and larger increment.)</font>
+<font color=#B22222>#\scale = "skyblue 20.0 tan 0.0 increment 2"</font>
+
+<font color=#B22222># CASE 6: From skyblue to tan, traversing RGB space (by default)</font>
+<font color=#B22222>#         Compare 2 and 5; note this has continuous increment</font>
+<font color=#B22222>#\scale = "skyblue 20.0 tan 0.0"</font>
+
+<font color=#B22222># CASE 7: From blue to brown</font>
+<font color=#0000EE>\scale =</font> <font color=#2F4F4F>"blue 20.0 brown 0.0 increment 2.5"</font>
+
+open example10.dat
+read line<font color=#0000EE> \header
+</font>read<font color=#0000EE> \D
+</font>read<font color=#CDAD00> .nx.</font>
+read<font color=#CDAD00> .ny.</font>
+set x name <font color=#2F4F4F>"distance along cove"</font>
+set y name <font color=#2F4F4F>"time"</font>
+set x grid 0 1 /.nx.
+set x axis 0 1 0.5 0.1
+set y grid 0<font color=#CDAD00> .ny.</font> /<font color=#CDAD00> .ny.</font>
+set y axis 0<font color=#CDAD00> .ny.</font>
+read grid data * *<font color=#CDAD00> .ny.</font><font color=#CDAD00> .nx.</font>
+set image range 0 20
+convert grid to image 
+set image colorscale<font color=#0000EE> \scale
+</font>draw image
+
+<font color=#B22222># Draw contours in white ink</font>
+set graylevel 1.0
+draw contour 0 20 1 unlabelled
+set graylevel 0.0
+
+draw axes			<font color=#B22222># redraw in case whited out </font>
+draw image palette left -1 right 21 increment 5
+set font size 9
+
+<font color=#B22222># Title tells what method used</font>
+draw title <font color=#2F4F4F>"Used `draw image colorscale<font color=#0000EE> \scale'"</font>
+</font></pre>
+</body>
+</html>

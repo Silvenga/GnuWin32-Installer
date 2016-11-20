@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pnmtopclxl User Manual</TITLE></HEAD>
+<BODY>
+<H1>pnmtopclxl</H1>
+Updated: 23 July 2002
+<BR>
+
+<A HREF="pnmtopclxl.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+pnmtopclxl - convert a PNM image to an HP LaserJet PCL XL printer stream
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pnmtopclxl</b>
+[<b>-o</b> <i>outfile</i>]
+[<b>-dpi</b> <i>N</i>]
+[<b>-xoffs</b> <i>N</i>]
+[<b>-yoffs</b> <i>N</i>]
+[<b>-center</b>]
+[<b>-duplex</b> {<b>vertical</b>|<b>horizontal</b>}]
+[<b>-format</b> <i>paperformat</i>]
+[<b>-feeder</b> <i>N</i>]
+[<b>-copies</b> <i>N</i>]
+[<b>-colorok</b>]
+<i>pnmfile1</i> <i>pnmfile2</i> ...
+
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<b>pnmtopclxl</b> reads one or more PNM input streams, each containing one
+or more PNM images, and generates a sequence of output pages in the
+HP PCL-XL (formerly named PCL 6) printer control language.  You can send
+this stream to a PCL-XL printer to print the images.
+
+<p>If the input is PPM, the output is a color printer stream (the PCL
+color space is RGB).  Otherwise, the output is grayscale (the PCL color space
+is grayscale).  If you want a grayscale output from a color input, run your
+input through <b><a href="ppmtopgm.html">ppmtopgm</a></b>.  See the 
+<b>-colorok</b> option for more information about choosing between color
+and grayscale.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<dt><B>-o</B> <i>outfile</i>
+<dd>
+This option specifies the name
+of the PCL-XL output file.  If you don't specify this, the output goes
+to Standard Output.  All of the pages go to one file, concatenated in the
+same order as the input images.
+
+<dt><b>-dpi</b> <i>N</i>
+<dd>This option selects the resolution of the image (not the printer!).
+<i>N</i> is the resolution in dots per inch, from 1 to 65535.  The default
+is 300.
+
+<dt><b>-xoffs</b> <i>N</i>
+<dd>This option and <b>-yoffs</b> determine the location on the page of the
+upper left corner of each image.  Note that the image may have built in
+borders tool, which would make the main image within more left and down 
+that what you specify here.
+
+<p><b>-xoffs</b> and <b>-yoffs</b> specify the distance from the left of the
+page and from the top of the page, respectively, in inches, of the upper left
+corner of the image.  The default for each is zero.
+
+<p>These options are meaningless if you specify <b>-center</b>.
+
+<dt><b>-yoffs</b> <i>N</i>
+<dd>See <b>-xoffs</b>.
+
+<dt><b>-center</b>
+<dd>This option tells <b>pnmtopclxl</b> to center each image on the page.
+If you don't specify this option, the position of an image on the page is
+determined by <b>-xoffs</b> and <b>-yoffs</b> (or their defaults).
+
+<dt><b>-duplex</b> {<b>vertical</b>|<b>horizontal</b>} <dd>This option
+causes <b>pnmtopclxl</b> to create a printer stream that prints pages
+on boths sides of the sheet of paper.  <b>vertical</b> means to print
+them so that the left edge of both pages is on the same edge of the
+sheet, while <b>horizontal</b> means the more usual duplexing where the
+top of both pages is on the same edge of the sheet.
+
+<dt><b>-format</b> <i>paperformat</i>
+<dd>This option selects the media (e.g. paper size) that the printer
+control stream specifies.  <i>paperformat</i> is one of the following
+self-explanatory keywords:
+
+<ul>
+<li>letter
+<li>legal
+<li>a3
+<li>a4
+<li>a5
+<li>a6
+<li>jb4
+<li>jb5
+<li>jb6
+<li>exec
+<li>ledger
+<li>b5envelope
+<li>c5envelope
+<li>com10envelope
+<li>monarchenvelope
+<li>dlenvelope
+<li>jpostcard
+<li>jdoublepostcard
+</ul>
+
+<p>The default is "letter".
+
+<dt><b>-feeder</b> <i>N</i>
+<dd>This options selects the media source (e.g. paper tray) that the
+printer control stream specifies.
+
+<dt><b>-copies</b> <i>N</i>
+<dd>This option specifies the number of copies that the printer control
+stream tells the printer to print.
+
+<dt><b>-colorok</b>
+<dd>This option simply tells <b>pnmtopclxl</b> not to warn you if you supply
+a color input and therefore get color output.  By default, <b>pnmtopclxl</b>
+issues a warning any time it produces a color printer stream because it is
+usually a mistake.  It's a mistake because PCL XL is mainly used for laser
+printers, and laser printers are mainly black and white.  If you send a color
+print stream to a black and white printer, it typically refuses to print
+anything, and even if it manages to convert it to black and white and print
+it, it takes 3 times as long to transmit a color stream to the printer than
+to transmit the grayscale image that gives the same result.
+
+</DL>
+<A NAME="seealso">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<a href="ppmtolj.html"><b>ppmtolj</b></a>,
+<a href="pbmtolj.html"><b>pbmtolj</b></a>,
+<a href="ppmtopj.html"><b>ppmtopj</b></a>,
+<a href="ppmtopjxl.html"><b>ppmtopjxl</b></a>,
+<a href="thinkjettopbm.html"><b>thinkjettopbm</b></a>,
+<a href="ppm.html"><b>ppm</b></a>
+
+<A NAME="history">&nbsp;</A>
+<H2>HISTORY</H2>
+
+<p><b>pnmtopclxl</b> was added to Netpbm in Release 10.6 (July 2002).
+It was contributed by
+<a href="mailto:cip307@cip.physik.uni-wuerzburg.de">Jochen Karrer</a>.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pnmtopclxl.html#lbAB">NAME</A>
+<LI><A HREF="pnmtopclxl.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pnmtopclxl.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pnmtopclxl.html#lbAE">OPTIONS</A>
+<LI><A HREF="pnmtopclxl.html#seealso">SEE ALSO</A>
+<LI><A HREF="pnmtopclxl.html#history">HISTORY</A>
+</UL>
+</BODY>
+</HTML>

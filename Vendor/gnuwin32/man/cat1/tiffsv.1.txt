@@ -1,0 +1,83 @@
+TIFFSV(1)                                             TIFFSV(1)
+
+
+
+
+
+NAME
+       tiffsv  -  save  an image from the framebuffer in a TIFF
+       file (Silicon Graphics version)
+
+SYNOPSIS
+       tiffsv [ options ] output.tif [ x1 x2 y1 y2 ]
+
+DESCRIPTION
+       tiffsv saves all or part of the framebuffer  in  a  file
+       using  the  Tag  Image  File  Format,  Revision 6.0.  By
+       default, the image is saved  with  data  samples  packed
+       (PlanarConfiguration=1),  compressed with the Lempel-Ziv
+       & Welch algorithm (Compression=5), and with  each  strip
+       no  more than 8 kilobytes.  These characteristics can be
+       overridden, or explicitly  specified  with  the  options
+       described below.
+
+OPTIONS
+       -b     Save the image as a greyscale image as if it were
+              processed by tiff2bw(1).  This option is included
+              for  compatibility  with the standard scrsave(6D)
+              program.
+
+       -c     Specify the compression to use for  data  written
+              to  the  output  file:  none  for no compression,
+              packbits for PackBits compression, jpeg for base-
+              line  JPEG  compression, zip for Deflate compres-
+              sion, and lzw for Lempel-Ziv & Welch  compression
+              (default).
+
+              LZW  compression can be specified together with a
+              predictor value.  A predictor value of  2  causes
+              each scanline of the output image to undergo hor-
+              izontal differencing  before  it  is  encoded;  a
+              value  of  1  forces  each scanline to be encoded
+              without differencing.  LZW-specific  options  are
+              specified  by appending a ``:''-separated list to
+              the ``lzw'' option; e.g.  -c lzw:2 for  LZW  com-
+              pression with horizontal differencing.
+
+       -p     Specify  the planar configuration to use in writ-
+              ing image data.  By default, tiffsv will create a
+              new  file  with  the data samples packed contigu-
+              ously.  Specifying -p contig will force  data  to
+              be   written   with   multi-sample   data  packed
+              together, while -p separate will force samples to
+              be written in separate planes.
+
+       -r     Specify  the  number  of rows (scanlines) in each
+              strip of data written to  the  output  file.   By
+              default,  tiffsv  attempts  to set the rows/strip
+              that no more than 8 kilobytes of data appear in a
+              strip.
+
+NOTE
+       Except  for  the use of TIFF, this program is equivalent
+       to the standard scrsave program.  This means, for  exam-
+       ple,  that  you can use it in conjunction with the stan-
+       dard icut program simply by creating a link called  scr-
+       save,  or by creating a shell script called scrsave that
+       invokes tiffgt with the appropriate options.
+
+BUGS
+       If data are saved compressed  and  in  separate  planes,
+       then  the  rows  in each strip is silently set to one to
+       avoid limitations in the libtiff(3TIFF) library.
+
+SEE ALSO
+       scrsave(6D)    pal2rgb(1),    tiffdump(1),    tiffgt(1),
+       tiffinfo(1), tiffcp(1), tiffmedian(1), libtiff(3TIFF)
+
+       Libtiff   library   home   page:  http://www.remotesens-
+       ing.org/libtiff/
+
+
+
+libtiff                September 20, 2005             TIFFSV(1)

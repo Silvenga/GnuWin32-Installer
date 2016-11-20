@@ -1,0 +1,302 @@
+#! /bin/sh
+#
+#  Generated automatically from daily.in by configure.
+#
+#  $Id: daily.in 0.12 2000/03/24 00:01:02 tom Exp $
+#
+#  daily.in:  Uses `daily[.awk|.pl]' for processing Gcal resource file lines
+#               used for time management of fixed dates stored in the fixed
+#               `DATE-PART HH1:MM1,HH2:MM2,%n,%t  FIXED-DATE-TEXT' format.
+#               `HH1:MM1' is the time (HOUR:MINUTE) the fixed date takes place.
+#               `HH2:MM2' is the time (HOUR:MINUTE) the fixed date is warned
+#               in advance.  The valid range of HOUR is 00...23, and the
+#               valid range of MINUTE is 00...59.  For example
+#                 `0 08:15,00:30,%n,%t  Dentist'
+#               creates a today's fixed date message of 30 minutes
+#               starting at 07:45 until 08:15.
+#
+#               Usage: daily --help | --version
+#               Usage: daily [--debug] [--mail[=ADDRESS]]
+#                            [RESOURCE-FILE...] [more Gcal options...]
+#
+#               `--debug':           Turn on shell debugging.
+#               `--mail[=ADDRESS]':  If any fixed date messages are created,
+#                                      eMail them to the specified ADDRESS.
+#                                      If no ADDRESS is given, eMail them
+#                                      to $MAILTO, $USER or $LOGNAME.
+#
+#  UN*X solution.
+#
+#  Needs `test', `echo', `eval', `set', `sed', `date', `mail', `gcal'
+#  and `perl' or `awk'  for processing!
+#
+#  Returns 0 if one or more fixed date is active (returned by AWK/Perl script
+#            if neither `--help' nor `--version' option was specified).
+#  Returns 1 in case no fixed date is active (returned by AWK/Perl script).
+#  Returns 2 if neither Perl nor AWK are present for further processing.
+#
+#  Copyright (c) 2000  Thomas Esken      <esken@uni-muenster.de>
+#                      Im Hagenfeld 84
+#                      D-48147 M"unster
+#                      GERMANY
+#
+#  This software doesn't claim completeness, correctness or usability.
+#  On principle I will not be liable for ANY damages or losses (implicit
+#  or explicit), which result from using or handling my software.
+#  If you use this software, you agree without any exception to this
+#  agreement, which binds you LEGALLY !!
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the `GNU General Public License' as published by
+#  the `Free Software Foundation'; either version 2, or (at your option)
+#  any later version.
+#
+#  You should have received a copy of the `GNU General Public License'
+#  along with this program; if not, write to the:
+#
+#    Free Software Foundation, Inc.
+#    59 Temple Place - Suite 330
+#    Boston, MA 02111-1307,  USA
+#
+#
+
+#
+# Basically used programs.
+#
+Sed=sed
+Set=set
+Test=test
+Echo=echo
+
+#
+# Basically used texts.
+#
+packagedatamiscdir=c:/progra~1/Gcal/share/gcal/misc/daily
+#
+PACKAGE=gcal
+VERSION=3.01
+transform=s,$$,,; s,^,,; s/i386-pc-mingw32//
+#
+mydefaultname=daily
+#
+myname=`$Echo "$0" | $Sed -e 's,.*/,,' -e "$transform"`
+myversion=0.12
+myinternalname="$myname ($PACKAGE $VERSION) $myversion"
+#
+gcal_resource_file_suffix=.rc
+gcal_resource_file=$mydefaultname""$gcal_resource_file_suffix
+info1="$myname: Time management of fixed dates, which are stored"
+info2="$myname: in a Gcal resource file by using the fixed format"
+info3="$myname: \`DATE-PART HH1:MM1,HH2:MM2,%n,%t  FIXED-DATE-TEXT'."
+info4="$myname:"
+usage1="usage: $myname  --help | --version"
+usage2="usage: $myname  [--debug] [--mail[=ADDRESS]] [RESOURCE-FILE...] [more Gcal options..]"
+usage3="usage: $myname  without RESOURCE-FILE uses file "\
+"\`$packagedatamiscdir/$gcal_resource_file' by default"
+
+#
+# Some constant values (EXIT_SUCCESS(==0) and EXIT_FAILURE(==1)
+#   are also returned by the processed AWK/Perl script.
+#
+EXIT_SUCCESS=0
+EXIT_FAILURE=1
+EXIT_FATAL=2
+
+#
+# The used programs.
+#
+Eval=eval
+Date=date
+ThisMail=mail
+ThisGcal=`$Echo "$PACKAGE" | $Sed "$transform"`
+#
+Awk=gawk
+Awk_script=$mydefaultname"".awk
+#
+Perl=perl
+Perl_script=$mydefaultname"".pl
+
+#
+# Let's check for command line arguments.
+#
+debug=no
+mail=no
+opt_mail=""
+previous=""
+for option in $*
+do
+  #
+  # If the previous option needs an argument, assign it.
+  #
+  if $Test -n "$previous";
+  then
+    $Eval "$previous=\$option"
+    previous=""
+    continue
+  fi
+
+  case "$option" in
+    -*=)  optarg="###error###" ;;
+    -*=*) optarg=`$Echo "$option" | $Sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *)    optarg="" ;;
+  esac
+
+  #
+  # Manage the options.
+  #
+  case "$option" in
+    -help=* | -hel=* | -he=* | -h=* | -help | -hel | -he | -h | \
+    --help=* | --hel=* | --he=* | --h=* | --help | --hel | --he | --h)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$info1"
+      $Echo "$info2"
+      $Echo "$info3"
+      $Echo "$info4"
+      $Echo "$usage1"
+      $Echo "$usage2"
+      $Echo "$usage3"
+      exit $EXIT_SUCCESS ;;
+
+    -version=* | -versio=* | -versi=* | -vers=* | -ver=* | -ve=* | -v=* | \
+    -version | -versio | -versi | -vers | -ver | -ve | -v | \
+    --version=* | --versio=* | --versi=* | --vers=* | --ver=* | --ve=* | --v=* | \
+    --version | --versio | --versi | --vers | --ver | --ve | --v)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$myinternalname"
+      exit $EXIT_SUCCESS ;;
+
+    -debug=* | -debu=* | -deb=* | -de=* | -d=* | \
+    -debug | -debu | -deb | -de | -d | \
+    --debug=* | --debu=* | --deb=* | --de=* | --d=* | \
+    --debug | --debu | --deb | --de | --d)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      debug=yes
+      shift ;;
+
+    -mail=* | -mai=* | -ma=* | -m=* | -mail | -mai | -ma | -m | \
+    --mail=* | --mai=* | --ma=* | --m=* | --mail | --mai | --ma | --m)
+      if $Test "$optarg" = "###error###";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=//g'`' requires an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      opt_mail="$optarg"
+      mail=yes
+      shift ;;
+  esac
+done
+
+#
+# Enable tracing.
+#
+if $Test "$debug" = yes;
+then
+  $Set -x
+fi
+
+#
+# Let's start processing now.
+#
+if $Test -n "$Awk" || $Test -n "$Perl";
+then
+  ARGS=""
+  CMDS=""
+  FILS=""
+  for arg in $*
+  do
+    case "$arg" in
+      -*) ARGS="$ARGS $arg" ;;
+      /*) ARGS="$ARGS $arg" ;;
+      @*) ARGS="$ARGS $arg" ;;
+      %*) ARGS="$ARGS $arg" ;;
+      [0-9*]*) CMDS="$CMDS $arg" ;;
+      *) if $Test -z "$FILS";
+         then
+           FILS="$arg"
+         else
+           FILS="$FILS+$arg"
+         fi
+    esac
+  done
+  if $Test -z "$FILS";
+  then
+    FILS=$packagedatamiscdir/$gcal_resource_file
+  fi
+  if $Test "$mail" = no;
+  then
+    ARGS="$ARGS -Hyes"
+  fi
+  #
+  # We prefer the use of Perl.
+  #
+  if $Test -n "$Perl";
+  then
+    result=`$ThisGcal $ARGS -QUax -f $FILS $CMDS | \
+            $Perl $packagedatamiscdir/$Perl_script`
+  else
+    result=`$ThisGcal $ARGS -QUax -f $FILS $CMDS | \
+            $Awk -f $packagedatamiscdir/$Awk_script`
+  fi
+  status=$?
+  if $Test "$status" -eq "$EXIT_FAILURE";
+  then
+    $Echo "$myname: no active fixed dates actually" 1>&2
+  else
+    #
+    # Detect the proper eMail address.
+    #
+    if $Test "$mail" = yes;
+    then
+      if $Test -n "$opt_mail";
+      then
+        MailAddr="$opt_mail"
+      else
+        if $Test -n "$MAILTO";
+        then
+          MailAddr="$MAILTO"
+        else
+          if $Test -n "$USER";
+          then
+            MailAddr="$USER"
+          else
+            if $TEST -n "$LOGNAME";
+            then
+              MailAddr="$LOGNAME"
+            else
+              $Echo "$myname: warning: cannot send mail, address unknown" 1>&2
+              $Echo "$result" 1>&2
+              exit $EXIT_FAILURE
+            fi
+          fi
+        fi
+      fi
+      if $Test -n "$MAILPROG";
+      then
+        ThisMail="$MAILPROG"
+      fi
+      if $Test "$debug" = no;
+      then
+        $Echo "$result" | $ThisMail -s "Mail from \`$myname' (`$Date`)" $MailAddr
+      fi
+      $Echo "$myname: active fixed dates sent by $ThisMail to \`$MailAddr'"
+    else
+      $Echo "$result"
+    fi
+  fi
+  exit $status
+else
+  $Echo "$myinternalname: error: neither \`perl' nor \`awk' available" 1>&2
+  exit $EXIT_FATAL
+fi

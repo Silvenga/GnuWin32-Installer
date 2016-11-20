@@ -1,0 +1,109 @@
+# Style sheet for Emacs Lisp
+# Copyright (c) 1998-99 Akim Demaille, Miguel Santana
+# $Id: elisp.ssh,v 1.1.1.1.2.1 2007/12/29 01:58:29 mhatta Exp $
+#
+
+#
+# This file is part of a2ps.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+style "Emacs Lisp" is
+
+version is 2.1
+written by "Didier Verna <verna@infres.enst.fr>"
+requires a2ps version 4.12a
+
+documentation is
+   "This style sheet includes support for some extensions dumped with XEmacs."
+end documentation
+
+
+alphabets are
+  # Problem: the other characters, I mean ALL of them are allowed in symbol
+  # names, but should appear quoted. For instance, it's theoretically
+  # possible to have a symbol `f o o'. Only it's written `f\ o\ o'
+  # It seems that the current `alphabet' logic is not powerfull enough to
+  # describe this.
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-+=*/_~!@$%^&:<>{}"
+
+# This should really be the default
+case sensitive
+
+keywords in Keyword are
+  # Special values
+  t, nil,
+  # Special argument markers
+  &optional, &rest,
+  # Scheme-like keywords, ie beginning with `:'.
+  # We often find this in custom code.
+  /:[^ \t\n]+/,
+  # Characters
+  /\\?[^ \t\n]+/
+end keywords
+
+
+keywords in Keyword_strong are
+  # Logical connectors
+  if, when, unless, while, cond, and, or, not,
+  do, dolist, loop,
+  # Blocks
+  let, let*, letf, letf*, prog1, prog2, progn, progv, lambda
+end keywords
+
+optional keywords in Keyword_strong are
+  # Assignement
+  set, setq, setq-default, setf, setcar, setcdr,
+  # Constructors
+  list, list*, cons, append, conc, nconc, push, pop,
+  # Predicate tests
+  eq, eql, equal, equalp, listp, consp, null
+end keywords
+
+
+sequences are
+  # Comments
+  ";"  Comment,
+  ";;" Comment_strong,
+
+  # Strings
+  C-string,
+
+  # Declarations
+  (/\\(/
+   /(def(/
+     /setf|subst|subst\\*|math|type|/
+     /un|un\\*|foo|/
+     /const|var|varalias|voo|/
+     /advice|alias|/
+     /macro|macro\\*|/
+     /subst|subst\\*|/
+     /|custom|face|group)/
+   /)/
+     /([ \t]+)/
+    "(" Plain, \1 Keyword_strong, \3 Plain) Label_strong
+    /[ \t\n]/ Plain,
+
+  # Special sequences
+  # CAVEAT: this regexp is actually wrong because in theory, I could have a
+  # `)' in the feature name, provided that it be quoted properly.
+  (/\\((require|provide|featurep)([ \t]+)([^)]*)\\)/
+    "(" Plain, \1 Keyword_strong, \2 Plain, \3 Label, ")" Plain) Label
+    /[ \t\n]/ Plain
+end sequences
+
+end style

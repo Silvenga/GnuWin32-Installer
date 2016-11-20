@@ -1,0 +1,203 @@
+Ppmtopcx User Manual(0)                 Ppmtopcx User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       ppmtopcx - convert a PPM image to a PCX file
+
+
+SYNOPSIS
+       ppmtopcx
+
+       [-24bit]
+
+       [-8bit]
+
+       [-packed]
+
+       [-stdpalette]
+
+       [-palette=palettefile]
+
+       [-planes=planes]
+
+       [-xpos=cols]
+
+       [-ypos=rows]
+
+       [ppmfile]
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       ppmtopcx  reads  a PPM image as input and produces a PCX
+       file as output.  The type of the PCX file depends on the
+       number of colors in the pixmap:
+
+
+
+       16 colors or fewer:
+              1 bit/pixel, 1-4 planes.
+
+
+       more than 16 colors, but no more than 256:
+              8 bits/pixel, 1 plane, colormap at the end of the
+              file.
+
+
+       More than 256 colors:
+              24bit truecolor file (8 bits/pixel, 3 planes).
+
+
+
+       You can override some of that and explicitly choose  the
+       format with the options below.
+
+
+
+OPTIONS
+       -24bit Produce  a  24bit truecolor PCX file, even if the
+              image has 256 colors or fewer.
+
+
+       -8bit  Produce an 8bit (256 colors) PCX  file,  even  if
+              the image has 16 colors or fewer.
+
+              This  option  was  added  in Netpbm 10.18 (August
+              2003).
+
+
+       -packed
+              Use 'packed pixel' format for files with 16  col-
+              ors or fewer: 1, 2, or 4 bits/pixel, 1 plane.
+
+
+       -stdpalette
+              Instead of computing a palette from the colors in
+              the image, use  a  standard,  built-in  16  color
+              palette.   If  the image contains a color that is
+              not in the standard palette, ppmtopcx fails.
+
+              The standard palette is not only a set of colors,
+              but a specific mapping of palette indexes to col-
+              ors.  E.g. red is 4.
+
+              You can use pnmremap with a suitable PPM image of
+              the  standard  palette to adapt your image to use
+              exactly those colors in the palette so that  ppm-
+              topcx -stdpalette will work on it.
+
+              The file pcxstd.ppm, part of Netpbm, contains the
+              standard palette.
+
+              Although  the  PCX  header  tells  exactly   what
+              palette  is  used  in  the  file,  some older PCX
+              interpreters do not use that  information.   They
+              instead  assume  the  standard  palette.   If you
+              don't use the -stdpalette option, ppmtopcx,  ppm-
+              topcx  may  create an image that uses a different
+              palette (a rearrangement of the same colors)  and
+              then one of these older interpreters would inter-
+              pret the colors in the image wrong.
+
+              You  cannot  specify  this  option   along   with
+              -palette.
+
+              This option was new in Netpbm 10.22 (April 2004).
+
+
+       -palette=palettefile
+              Instead of computing the palette from the  colors
+              in  the  image,  use  the  palette  from the file
+              palettefile.  If the  palette  contains  a  color
+              that is not in that palette, ppmtopcx fails.
+
+              The  palette  file  must be a PPM image that con-
+              tains one pixel for each color  in  the  palette.
+              It  doesn't  matter  what the aspect ratio of the
+              palette image is.  The order of the colors in the
+              PCX palette is the order of the pixels in the PPM
+              image in standard western reading order (left  to
+              right,  top  to bottom).  If there is a duplicate
+              color in the palette,  ppmtopcx  chooses  between
+              them arbitrarily in building the PCX raster.
+
+              You would need this only if you have a PCX reader
+              that can't read the palette that is  in  the  PCX
+              file and instead assumes some particular palette.
+              See also the -stdpalette option.
+
+              If your input image might  contain  colors  other
+              than  those  in your palette, you can convert the
+              input image to one that contains only those  col-
+              ors in your palette with pnmremap.
+
+              You cannot specify this along with -stdpalette.
+
+              This  option  was  new  in Netpbhm 10.25 (October
+              2004).
+
+
+       -planes=planes
+              Generate a PCX  file  with  planes  planes,  even
+              though the number of colors in the image could be
+              represented  in  fewer.   This  makes  the   file
+              larger,  but some PCX interpreters are capable of
+              processing only certain numbers of planes.
+
+              This is meaningful only when  ppmtopcx  generates
+              an  image  in the 16 color palette format without
+              packed pixels.  Consequently, you cannot  specify
+              this  option  together  with  -24bit  or -8bit or
+              -packed.
+
+              The valid values for planes are 1, 2, 3,  and  4.
+              By  default, ppmtopcx chooses the smallest number
+              of planes that can represent the  colors  in  the
+              image.   E.g.  if  there  are  5 colors, ppmtopcx
+              chooses 3 planes.
+
+              This option was new in Netpbm 10.21 (March 2004).
+
+
+       -xpos=cols
+
+
+       -ypos=rows
+               These  options  set the position of the image in
+              some field (e.g. on a screen) in columns  to  the
+              right  of  the  left  edge and rows below the top
+              edge.  The PCX  format  contains  image  position
+              information.   Don't  confuse this with the posi-
+              tion of an area of  interest  within  the  image.
+              For  example, using pnmpad to add a 10 pixel left
+              border to an image and then converting that image
+              to  PCX with xpos = 0 is not the same as convert-
+              ing the original image to PCX and setting xpos  =
+              10.
+
+              The values may be from -32767 to 32768.
+
+              The default for each is zero.
+
+
+
+
+
+SEE ALSO
+       pcxtoppm(1), ppm(1)
+
+
+AUTHORS
+       Copyright  (C)  1994  by Ingo Wilken (Ingo.Wilken@infor-
+       matik.uni-oldenburg.de)
+
+       Based on previous work by Michael Davidson.
+
+
+
+netpbm documentation     27 March 2004  Ppmtopcx User Manual(0)

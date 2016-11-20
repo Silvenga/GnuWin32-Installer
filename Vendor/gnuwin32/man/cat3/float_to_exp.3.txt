@@ -1,0 +1,49 @@
+FLOAT_TO_EXP(3)                                 FLOAT_TO_EXP(3)
+
+
+
+
+
+NAME
+       float_to_exp - Convert floating point values into "expo-
+              nential" pixels.
+
+SYNOPSIS
+       #include <rle.h>
+
+       float_to_exp( count, floats, pixels )
+       int count;
+       float * floats;
+       rle_pixel * pixels;
+
+DESCRIPTION
+       The function float_to_exp converts count floating  point
+       numbers  (pointed  to  by  floats)  into  count+1  bytes
+       (pointed to by pixels) using  an  "exponential"  format.
+       This  format  generates  count pixels as eight bit "man-
+       tissa" values, and  another  byte  containing  a  common
+       exponent  for all of the data values.  This format has a
+       wider dynamic range of values with  little  extra  over-
+       head.  The inverse mapping is
+            float expnt, flt_val;
+            rle_pixel exponent, val;
+            expnt = ldexp( 1/256.0, (int)exponent - 127 );
+            flt_val = (float)val * expnt;
+
+       Files  containing exponential data may be converted into
+       displayable images using the  unexp(1)  command.   Unexp
+       should  be  used  before  using  any  tools that perform
+       arithmetic on pixel values,  or  displaying  the  image.
+       Unexp  expects files containing exponential data to have
+       an "exponential_data" picture comment.
+
+SEE ALSO
+       unexp(1), rle_putcom(3), librle(3), RLE(5).
+
+AUTHOR
+       John W. Peterson, based on code by Spencer Thomas.
+       University of Utah
+
+
+
+3                      November 10, 1987        FLOAT_TO_EXP(3)

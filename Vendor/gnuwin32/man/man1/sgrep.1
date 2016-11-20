@@ -1,0 +1,1093 @@
+.if n .ds Q \&"
+.if t .ds Q ``
+.if n .ds U \&"
+.if t .ds U ''
+.TH "SGREP" 1 
+.tr \&
+.nr bi 0
+.nr ll 0
+.nr el 0
+.de DS
+..
+.de DE
+..
+.de Pp
+.ie \\n(ll>0 \{\
+.ie \\n(bi=1 \{\
+.nr bi 0
+.if \\n(t\\n(ll=0 \{.IP \\(bu\}
+.if \\n(t\\n(ll=1 \{.IP \\n+(e\\n(el.\}
+.\}
+.el .sp 
+.\}
+.el \{\
+.ie \\nh=1 \{\
+.LP
+.nr h 0
+.\}
+.el .PP 
+.\}
+..
+.SH NAME
+
+.Pp
+sgrep - search a file for a structured pattern
+.SH SYNOPSIS
+
+.Pp
+\fIsgrep \fP
+[\fB-aCcDdhilNnPqSsTtV\fP]
+[\fB-O\fP \fIfilename\fP]
+[\fB-o\fP "\fIformat\fP"]
+[\fB-p\fP \fIpreprocessor\fP] 
+[\fB-e\fP] 
+\fIexpression\fP
+[\fIfilename \fP ...]
+.Pp
+\fIsgrep\fP
+[\fB-aCcDdhilNnPqSsTtV\fP]
+[\fB-O\fP \fIfilename\fP] 
+[\fB-o\fP "\fIformat\fP"]
+[ \fB-p\fP \fIpreprocessor\fP] 
+\fB-f\fP \fIfilename\fP
+[\fB-e \fP \fIexpression\fP] 
+[\fIfilename\fP ...] 
+.Pp
+\fIsgrep \fP
+\fB-h\fP
+.SH DESCRIPTION
+
+.Pp
+\fIsgrep (structured grep)\fP
+is a tool for searching 
+\fItext files\fP
+and filtering 
+\fItext streams\fP
+using structural criteria.  The data model of sgrep is based on
+\fIregions\fP,
+which are non-empty substrings of text. 
+\fIRegions \fP
+are typically occurrences of constant strings or 
+meaningful text elements, 
+which are recognizable through some delimiting strings.
+Regions 
+can be arbitrarily long, arbitrarily 
+overlapping, and arbitrarily nested.
+.Pp
+\fBsgrep\fP
+uses patterns called
+\fIregion expressions\fP
+to express which
+regions
+of the input text are output to standard output. The selection of
+regions 
+is based on mutual  
+\fIcontainment and ordering conditions \fP
+of the regions, 
+expressed by the region expression.
+.Pp
+\fIRegion expressions\fP
+are read by default first from file
+\fB$HOME/.sgreprc,\fP
+or if it doesn't exist,
+from file
+\fB/usr/lib/sgreprc, \fP
+and then from the command line. Different behavior
+can be specified through command line options.
+.Pp
+Input 
+\fIfiles \fP
+are processed one by one (i.e., regions 
+cannot extend over file boundaries), except if the
+\fB-S\fP
+flag is given, in which case
+\fBsgrep\fP
+takes the concatenation of the input 
+files as its input text. 
+If no input files are  given,
+\fBsgrep\fP
+reads the standard input.
+Standard input can also be specified as an input file by giving 
+hyphen '-' as a file name.
+.Pp
+The selected regions are output in increasing order of their start positions. 
+If several output regions overlap, a minimal region that covers them all 
+is output, by default, instead of outputting each of them separately.  
+.Pp
+.SH OPTIONS
+
+.Pp
+.nr ll +1
+.nr t\n(ll 2
+.if \n(ll>1 .RS
+.IP "\fB-a\fP"
+.nr bi 1
+.Pp
+Act as a filter: display the maching regions,
+possibly formatted according to the output format, 
+interleaved with the rest of the text.
+(See the description of option -o below.)
+.Pp
+.IP "\fB-C \fP"
+.nr bi 1
+.Pp
+Display copyright notice.
+.IP "\fB-c \fP"
+.nr bi 1
+.Pp
+Display only the count of the regions that match the expression.
+.IP "\fB-D\fP"
+.nr bi 1
+.Pp
+Display verbose progress output. 
+\fBNOTE:\fP
+This is used for debugging purposes only and may not function in
+future versions of sgrep.
+.IP "\fB-d \fP"
+.nr bi 1
+.Pp
+Display each matching region once, even if the regions overlap or nest.
+.IP "\fB-e\fP \fIexpression\fP"
+.nr bi 1
+.Pp
+Search the input text for occurrences of 
+\fIexpression\fP.
+.IP "\fB-f\fP \fIfile\fP"
+.nr bi 1
+.Pp
+Read the region expression from the named file. Filename
+\fB- \fP
+refers to stdin.
+.IP "\fB-h\fP"
+.nr bi 1
+.Pp
+Display a short help.
+.IP "\fB-i\fP"
+.nr bi 1
+.Pp
+Ignore case distinctions in phrases.
+.IP "\fB-l\fP"
+.nr bi 1
+.Pp
+Long output format: precede each output region by a 
+line which indicates the
+ordinal number of the region, the name of the file where the region starts,
+the length of the region in bytes, the start and end positions of 
+the region within the entire input text, the start position of the 
+region within the file containing the start, and the end position 
+of the region within the file containing the end.
+.IP "\fB-N\fP"
+.nr bi 1
+.Pp
+Do not add a newline after the last output region.
+.IP "\fB-n\fP"
+.nr bi 1
+.Pp
+Suppress reading \fB$HOME/.sgreprc\fP or 
+\fB/usr/lib/sgreprc.\fP
+.IP "\fB-O\fP file"
+.nr bi 1
+.Pp
+Read the output format from file. See the description of output
+formats below.
+.IP "\fB-o\fP format"
+.nr bi 1
+.Pp
+Set the output format.
+The format is displayed for each output region 
+with any occurrences of the following place holders substituted:
+.nr ll +1
+.nr t\n(ll 2
+.if \n(ll>1 .RS
+.IP "\fB%f\fP"
+.nr bi 1
+.Pp
+name of the file containing the start of the region
+.IP "\fB%s \fP"
+.nr bi 1
+.Pp
+start position of the region
+.IP "\fB%e \fP"
+.nr bi 1
+.Pp
+end position of the region
+.IP "\fB%l \fP"
+.nr bi 1
+.Pp
+length of the region in bytes (i.e., \fB%e-%s+1\fP) 
+.IP "\fB%i\fP"
+.nr bi 1
+.Pp
+start position of the region in the file where the region begins 
+.IP "\fB%j\fP"
+.nr bi 1
+.Pp
+end position of the region in the file where the region ends
+.IP "\fB%r\fP"
+.nr bi 1
+.Pp
+text of the region. "%r" is the default output format.
+.IP "\fB%n\fP"
+.nr bi 1
+.Pp
+gets the ordinal number of the region
+.if \n(ll>1 .RE
+.nr ll -1
+.IP "\fB-P\fP"
+.nr bi 1
+.Pp
+Display the (preprocessed) region expression without executing it.
+.IP "\fB-p\fP \fIpreprocessor\fP"
+.nr bi 1
+.Pp
+Apply 
+\fIpreprocessor \fP
+to the region expression before evaluating it. 
+.IP "\fB-S\fP"
+.nr bi 1
+.Pp
+Stream mode. With this option sgrep considers 
+it's input files as a continuous stream, so
+that regions may extend across file boundaries.
+.DS
+.sp
+.ft CR
+.nf
+    sgrep -S file_1 ... file_n
+.DE
+.fi 
+.ec
+.ft P
+.sp
+
+is similar to
+.DS
+.sp
+.ft CR
+.nf
+    cat file_1 ... file_n | sgrep
+.DE
+.fi 
+.ec
+.ft P
+.sp
+
+except that the latter creates a temporary disk file of the input
+stream.  Sgrep may use much more memory when run with the 
+\fB-S\fP option, since then it cannot release its internal 
+region lists between processing each file.
+.IP "\fB-s\fP"
+.nr bi 1
+.Pp
+Short output format (default): do not format the text of the 
+output regions, and display overlapping parts of regions only once.
+.IP "\fB-T\fP"
+.nr bi 1
+.Pp
+Display statistics about the execution.
+.IP "\fB-t\fP"
+.nr bi 1
+.Pp
+Display time usage.
+.IP "\fB-V\fP"
+.nr bi 1
+.Pp
+Display version information.
+.IP "\fB--\fP"
+.nr bi 1
+.Pp
+No more options.
+.if \n(ll>1 .RE
+.nr ll -1
+.Pp
+A list of options can be given also as the value of the 
+environment variable
+\fBSGREPOPT\fP.
+.SH SYNTAX OF EXPRESSIONS
+
+.Pp
+.DS
+.sp 
+.ft CR
+.nf
+region_expr ->   basic_expr 
+               | operator_expr
+
+operator_expr -> region_expr ['not'] 'in' basic_expr
+               | region_expr ['not'] 'containing' basic_expr
+               | region_expr ['not'] 'equal' basic_expr
+               | region_expr 'or' basic_expr
+               | region_expr 'extracting' basic_expr
+               | region_expr '..' basic_expr
+               | region_expr '_.' basic_expr
+               | region_expr '._' basic_expr
+               | region_expr '__' basic_expr
+               | region_expr 'quote' basic_expr
+               | region_expr '_quote' basic_expr
+               | region_expr 'quote_' basic_expr
+               | region_expr '_quote_' basic_expr
+               | 'concat' '(' region_expr ')'
+               | 'inner' '(' region_expr ')'
+               | 'outer' '(' region_expr ')'
+               | 'join' '(' integer ',' region_expr ')'
+
+basic_expr ->   phrase
+              | 'start'
+              | 'end'
+              | 'chars'
+              | constant_list
+              | '(' region_expr ')'
+
+phrase -> '"' char [ char ... ] '"'
+
+constant_list -> '[' ']' | '[' regions ']'
+
+regions ->   region 
+           | region regions
+
+region -> '(' integer ',' integer ')' 
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+Note that region expressions are left-associative. This means, for example,
+that an expression 
+.DS
+.sp
+.ft CR
+.nf
+     '"<a>".."</a>" or "</b>"'
+.DE
+.fi 
+.ec
+.ft P
+.sp
+
+evaluates to the regions starting with
+\f(CR"<a>"\fP and ending with
+\f(CR"</a>"\fP,
+or comprising only the string
+\f(CR"</b>"\fP.
+In order to obtain the regions that begin with
+\f(CR"<a>"\fP
+and end with either
+\f(CR"</a>"\fP or
+\f(CR"</b>"\fP,
+one should indicate the proper order of evaluation using
+parentheses:
+.Pp
+.DS
+.sp
+.ft CR
+.nf
+     "<a>".. ("</a>" or "</b>")
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+.Pp
+Expressions can also contain 
+\fIcomments\fP,
+which start with '#' and
+extend to the end of the line. However, a '#'-sign in a phrase does not
+begin a comment.
+.Pp
+.SH SEMANTICS OF EXPRESSIONS
+
+.Pp
+The value of an expression is a set of regions of input text
+that satisfy the expression.
+.Pp
+Value \fBv(basic_expr)\fP
+of a basic expression:
+.Pp
+.nr ll +1
+.nr t\n(ll 2
+.if \n(ll>1 .RS
+.IP "\fBv(phrase):= \fP"
+.nr bi 1
+.Pp
+the set of regions of input text whose text equals the text of the
+phrase.
+.IP "\fBv('start'):=\fP"
+.nr bi 1
+.Pp
+a set consisting of single-character regions for the first position
+of each input file. If the -S option is given, the value is a set
+containing a single region that comprises the
+first character in the input stream.
+.IP "\fBv('end'):=\fP"
+.nr bi 1
+.Pp
+a set consisting of single-character regions for the last position
+of each input file. If the -S option is given, the value is a set
+containing a single region that comprises the
+last character in the input stream.
+.IP "\fBv('chars'):= \fP"
+.nr bi 1
+.Pp
+a set consisting of all single-character regions.
+.IP "\fBv([ ]):= \fP"
+.nr bi 1
+.Pp
+an empty set.
+.IP "\fBv([(s_1,e_1) (s_1,e_2) ... (s_n,e_n)]):= \fP"
+.nr bi 1
+.Pp
+a set consisting of regions 
+\fBr_i \fP
+for each 
+\fBi = 1,...,n,\fP
+where the start position of region 
+\fBr_i \fP
+is 
+\fBs_i \fP
+and its end position is 
+\fBe_i. \fP
+The positions have to be nonnegative integers, and the regions have
+to be given in increasing order of their start positions; regions with
+a common start positions have to be given in increasing order of their 
+end positions. The positions are counted from the first character
+of each input file, unless the -S option is given, in which case
+the positions are counted starting from the beginning of the input
+stream. The number of the first position in a file or a stream is
+zero.
+.IP "\fBv('('region_expr')'):= v(region_expr).\fP"
+.nr bi 1
+.Pp
+.if \n(ll>1 .RE
+.nr ll -1
+.Pp
+.Pp
+Value \fBv(operator_expr)\fP
+of operator expressions:
+.nr ll +1
+.nr t\n(ll 2
+.if \n(ll>1 .RS
+.IP "\fBv(region_expr 'in' basic_expr):=\fP"
+.nr bi 1
+.Pp
+the set of the regions in \fBv(region_expr) \fP
+that are contained in some region in \fBv(basic_expr)\fP.
+A region \fBx\fP is contained in another region \fBy\fP if and
+only if the start position of \fBx\fP is greater than the start
+position of \fBy\fP and the end position of \fBx\fP is not greater
+than the end position of \fBy\fP, or the  end position of \fBx\fP
+is smaller than the end position of \fBy\fP and the start position of
+\fBx\fP is not smaller than the start position of \fBy\fP.
+.IP "\fBv(region_expr 'not' 'in' basic_expr):=\fP"
+.nr bi 1
+.Pp
+the set of the regions in
+\fBv(region_expr) \fP
+that are not contained in any region in 
+\fBv(basic_expr).\fP
+.IP "\fBv(region_expr 'containing' basic_expr):=\fP"
+.nr bi 1
+.Pp
+the set of the regions in 
+\fBv(region_expr) \fP
+that contain some region in 
+\fBv(basic_expr).\fP
+.IP "\fBv(region_expr 'not' 'containing' basic_expr):=\fP"
+.nr bi 1
+.Pp
+the set of the regions in 
+\fBv(region_expr) \fP
+that do not contain any region in
+\fBv(basic_expr).\fP
+.IP "\fBv(region_expr 'equal' basic_expr):=\fP"
+.nr bi 1
+.Pp
+The set of regions, which occur in both
+\fBv(region_expr) \fP
+and
+\fBv(basic_expr).\fP
+.IP "\fBv(region_expr 'not equal' basic_expr):=\fP"
+.nr bi 1
+.Pp
+The set of regions, which occur in
+\fBv(region_expr) \fP
+but do not occur in
+\fBv(basic_expr).\fP
+.IP "\fBv(region_expr 'or' basic_expr):=\fP"
+.nr bi 1
+.Pp
+the set of the regions that appear in
+\fBv(region_expr) \fP
+or in
+\fBv(basic_expr) \fP
+or in both.
+.IP "\fBv(region_expr 'extracting' basic_expr):=\fP"
+.nr bi 1
+.Pp
+the set of the non-empty regions that are formed of the 
+regions in
+\fBv(region_expr) \fP
+by extracting an overlap with any region in
+\fBv(basic_expr).\fP
+For example, the value of 
+.Pp
+.DS
+.sp
+.ft CR
+.nf
+    '[(1,4) (3,6) (7,9)] extracting [(2,5) (4,7)]' 
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+consists of the regions (1,1) and (8,9). 
+.IP "\fBv(region_expr '..' basic_expr):\fP"
+.nr bi 1
+.Pp
+The value of this expression consists of the regions that can be formed by
+\fIpairing \fP
+regions from 
+\fBv(region_expr) \fP
+with regions from 
+\fBv(basic_expr).\fP
+The pairing is defined as a generalization of the way how nested
+parentheses are paired together "from inside out". 
+For this we need to be able to compare the order of regions,
+which may be overlapping and nested. This ordering is defined as follows.
+.Pp
+Let 
+\fBx \fP
+and 
+\fBy \fP
+be two regions. We say that region 
+\fBx \fP
+\fIprecedes \fP
+region
+\fBy \fP
+if the end position of 
+\fBx \fP
+is smaller than the start position of 
+\fBy.\fP
+We say that region 
+\fBx \fP
+is 
+\fIlater \fP
+than region 
+\fBy \fP
+if the end position of 
+\fBx \fP
+is greater than the end position of 
+\fBy, \fP
+or if they end at the same position and the start of 
+\fBx \fP
+is greater than the start of 
+\fBy. \fP
+Region 
+\fBx \fP
+is 
+\fIearlier \fP
+than region 
+\fBy \fP
+if the start position of 
+\fBx \fP
+is smaller than the start position of 
+\fBy, \fP
+or if they start at the same position and the end position of 
+\fBx \fP
+is less than the end position of 
+\fBy.\fP
+Now a region 
+\fBx \fP
+from 
+\fBv(region_expr) \fP
+and a region 
+\fBy \fP
+from
+\fBv(basic_expr) \fP
+are paired in expression 
+\fBv(region_expr '..' basic_expr) \fP
+if and only if
+.nr ll +1
+.nr el +1
+.nr t\n(ll 1
+.nr e\n(el 0 1
+.af e\n(el \*(f\n(el
+.if \n(ll>1 .RS
+.nr bi 1
+.Pp
+\fBx \fP
+precedes 
+\fBy,\fP
+.nr bi 1
+.Pp
+\fBx \fP
+is not paired with any region  from 
+\fBv(basic_expr) \fP
+which is earlier than 
+\fBy,\fP
+and 
+.nr bi 1
+.Pp
+\fBy \fP
+is not paired with any region from
+\fBv(region_expr) \fP
+which is later than 
+\fBx. \fP
+.if \n(ll>1 .RE
+.nr el -1
+.nr ll -1
+
+The pairing of regions 
+\fBx \fP
+and 
+\fBy \fP
+forms a region that extends from the start position of 
+\fBx \fP
+to the end position of 
+\fBy.\fP
+.IP "\fBv(region_expr '._' basic_expr):\fP"
+.nr bi 1
+.Pp
+The pairing of the regions from
+\fBv(region_expr) \fP
+and the regions from 
+\fBv(basic_expr) \fP
+is defined similarly to 
+\fBv(region_expr '..' basic_expr) above,\fP
+except that the pairing of regions 
+\fBx \fP
+and 
+\fBy \fP
+now forms a region which extends from the start position of 
+\fBx \fP
+to the position immediately preceding the start of 
+\fBy.\fP
+.IP "\fBv(region_expr '_.' basic_expr):=\fP"
+.nr bi 1
+.Pp
+The pairing of the regions from 
+\fBv(region_expr) \fP
+and the regions from 
+\fBv(basic_expr) \fP
+is defined similarly to 
+\fBv(region_expr '..' basic_expr) above, except that\fP
+the pairing of regions 
+\fBx \fP
+and 
+\fBy \fP
+now forms a region which extends from the position 
+immediately following the end position of 
+\fBx \fP
+to the end position of 
+\fBy.\fP
+.IP "\fBv(region_expr '__' basic_expr):=\fP"
+.nr bi 1
+.Pp
+The pairing of the regions from 
+\fBv(region_expr) \fP
+and the regions from 
+\fBv(basic_expr) \fP
+is defined similarly to 
+\fBv(region_expr '..' basic_expr)\fP above, except that now
+the pairing of regions 
+\fBx\fP and \fBy\fP
+forms a region which extends from the text 
+position immediately following the end of 
+\fBx\fP
+to the text position immediately preceding the start of 
+\fBy\fP.
+Possibly resulting empty regions are excluded from the result.
+.Pp
+.IP "\fBv(region_expr 'quote' basic_expr):\fP"
+.nr bi 1
+.Pp
+The value of this expression consists of 
+the regions that extend from the start position of a "\fIleft-quote region\fP" in 
+\fBv(region_expr)\fP to the end position of a corresponding 
+"\fIright-quote region\fP" in \fBv(basic_expr)\fP.
+The regions in the result are non-nesting and non-overlapping.
+The left-quote regions and the right-quote
+regions are defined as follows:
+.nr ll +1
+.nr t\n(ll 0
+.if \n(ll>1 .RS
+.nr bi 1
+.Pp
+The earliest region (see above) in \fBv(region_expr)\fP is 
+a \fIpossible left-quote region\fP.
+.nr bi 1
+.Pp
+For each possible left-quote region \fBx\fP, the earliest region in
+\fBv(basic_expr)\fP preceeded by \fBx\fP is its right-quote region.
+.nr bi 1
+.Pp
+For each  right-quote region \fBy\fP in \fBv(basic_expr)\fP, the
+earliest region in \fBv(region_expr)\fP preceeded by \fBy\fP is a
+possible left-quote region.
+.if \n(ll>1 .RE
+.nr ll -1
+
+The below example query finds C-style non-nesting comments:
+.DS
+.sp
+.ft CR
+.nf
+        "/*" quote "*/"
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+The below example query finds strings between quotation marks:
+.DS
+.sp
+.ft CR
+.nf
+        "\\"" quote "\\""
+.DE
+.fi 
+.ec
+.ft P
+.sp
+
+(Notice the difference to expression \fB"\\"" .. "\\""\fP, 
+which would evaluate to any substring of input text that starts with 
+a quotation mark and ends with the next quotation mark.)
+.Pp
+The variants \fB_quote\fP, \fBquote_\fP and \fB_quote_\fP
+are analogical to the operators
+\fB_.\fP, \fB._\fP and \fB__\fP, in the sense that 
+the "quote regions" originating from the expression on the side of the
+underscore \fB_\fP are excluded from the result regions.
+(In the case of \fB_quote_\fP any possibly resulting empty regions
+are excluded from the result.)
+.Pp
+.IP "\fBv('concat' '(' region_expr ')' ):=\fP"
+.nr bi 1
+.Pp
+the set of the longest regions of input text that are covered by
+the regions in
+\fBv(region_expr).\fP
+.IP "\fBv('inner' '(' region_expr ')' ):=\fP"
+.nr bi 1
+.Pp
+the set of regions in
+\fBv(region_expr) \fP
+that do not contain any other region in 
+\fBv(region_expr).\fP
+Note that for any region expression \fBA\fP, the expression 
+\fBinner(A)\fP is equivalent to \fB(A not containing A)\fP.
+.IP "\fBv('outer' '(' region_expr ')' ):=\fP"
+.nr bi 1
+.Pp
+the set of regions in 
+\fBv(region_expr) \fP
+that are not contained in any other region in 
+\fBv(region_expr).\fP
+Note that for any region expression \fBA\fP, the expression
+\fBouter(A)\fP is equivalent to \fB(A not in A)\fP.  
+.IP "\fBv('join' '(' n ',' region_expr ')' ):\fP"
+.nr bi 1
+.Pp
+The value of this expression is formed by 
+processing the regions of v(region_expr) in increasing order of their
+start positions (and in increasing order of end positions for
+regions with a common start). Each region 
+\fBr\fP
+produces a result region beginning  at the start of r
+and extending to the end of the (n-1)th region after r.
+The operation is useful only with non-nesting regions. Especially,
+when applied to 'chars', it can be used to express nearness
+conditions. For example,
+.Pp
+.DS
+.sp
+.ft CR
+.nf
+    '"/*" quote "*/" in join(10,chars)' 
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+selects comments  "/*  ... */" which are at most 10 characters long. 
+.if \n(ll>1 .RE
+.nr ll -1
+.Pp
+.SH EXAMPLES OF REGION EXPRESSIONS
+
+.Pp
+Count the number of occurrences of string "sort" in file eval.c:
+.DS
+.sp
+.ft CR
+.nf
+    sgrep -c '"sort"' eval.c
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+Show all blocks delimited by braces in file eval.c:
+.DS
+.sp
+.ft CR
+.nf
+    sgrep '"{" .. "}"' eval.c
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+Show the outermost blocks that contain "sort" or "nest":
+.Pp
+.DS
+.sp
+.ft CR
+.nf
+    sgrep 'outer("{" .. "}" containing ("sort" or "nest"))'\\
+            eval.c
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+Show all lines containing "sort" but no "nest" in files with
+an extension .c, preceded by the name of the file:
+.Pp
+.DS
+.sp
+.ft CR
+.nf
+    sgrep -o "%f:%r" '"\\n" _. "\\n" containing "sort" \\
+                      not containing "nest"' *.c
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+(Notice that this query would omit the first line, since it has no
+preceding new-line character '\\n',  and also the
+last one, if not terminated by a new-line. For a correct way to
+express text lines, see the definition of the LINE macro below.)
+.Pp
+Show the beginning of conditional statements,
+consisting of "if" followed by a condition in parentheses,
+in files *.c. The query has
+to disregard "if"s appearing within comments "/* ... */" or on
+compiler control lines beginning with '#':
+.Pp
+.DS
+.sp
+.ft CR
+.nf
+    sgrep '"if" not in ("/*" quote "*/" or ("\\n#" .. "\\n"))  \\
+                        .. ("(" ..  ")")' *.c
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+Show the if-statements containing string "access" in their condition
+part appearing in the main
+function of the program in source files *.c:
+.Pp
+.DS
+.sp
+.ft CR
+.nf
+    sgrep '"if" not in ("/*" quote "*/" or ("\\n#" .. "\\n"))  \\
+             .. ("(" ..  ")") containing "access" \\
+                              in ("main(" .. ("{" .. "}")) \\
+            .. ("{" .. "}" or ";")'  *.c
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+We see that complicated conditions can become rather
+illegible. The use of carefully designed 
+\fImacros \fP
+can make expressing queries much easier. 
+For example, one could give the 
+below m4 macro processor definitions in a file, say, c.macros:
+.Pp
+.DS
+.sp
+.ft CR
+.nf
+    define(BLOCK,( "{" .. "}" ))
+    define(COMMENT,( "/*" quote "*/" ))
+    changecom(%)
+    define(CTRLINE,( "#" in start or "\\n#" 
+                      _. ("\\n" or end) ))
+    define(IF_COND,( "if" not in (COMMENT or CTRLINE) 
+                      .. ("(" .. ")")))
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+Then the above query could be written more intuitively as
+.Pp
+.DS
+.sp
+.ft CR
+.nf
+    sgrep -p m4 -f c.macros -e 'IF_COND containing "access"\\
+           in ( "main(" ..  BLOCK ) .. (BLOCK or  ";")' *.c
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+.SH OPTIMIZATION
+
+.Pp
+\fBsgrep\fP
+performs common subexpression elimination on the query
+expression, so that recurring
+sub-expressions are evaluated only once. For example, in
+expression
+.Pp
+.DS
+.sp
+.ft CR
+.nf
+    '(" " or "\\n" or "\\t") .. (" " or "\\n" or "\\t")'
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+the sub-expression
+.Pp
+.DS
+.sp
+.ft CR
+.nf
+    '(" " or "\\n" or "\\t")'
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+is evaluated only one.
+.SH DIAGNOSTICS
+
+.Pp
+Exit status is 0 if any matching regions are found, 1 if none, 2  for
+syntax  errors  or  inaccessible files (even if matching regions were
+found).
+.Pp
+.SH ENVIRONMENT
+
+.Pp
+One's own default options for sgrep can be given as a value of the
+environment variable
+\fISGREPOPT\fP.
+For example, executing 
+.DS
+.sp
+.ft CR
+.nf
+    setenv  SGREPOPT  '-p m4 -o %r\\n'
+.DE
+.fi 
+.ec
+.ft P
+.sp
+
+makes sgrep to apply m4 preprocessor to the expression and
+display each output region as such followed by a line feed. 
+.Pp
+.SH FILES
+
+.Pp
+\fBSgrep\fP
+tries to read the contents of the files 
+\fI$HOME/.sgreprc\fP
+and 
+\fI/usr/lib/sgreprc\fP.
+Generally useful macro definitions may be placed in  these files.
+Using m4 (or some other) macro processor, for example the following definitions
+could go in one of these files:
+.Pp
+.DS
+.sp
+.ft CR
+.nf
+    define(BLANK,( " " or "\\t" or "\\n"))
+    define(LEND,( "\\n" or end ))
+    define(LINE,( start .. LEND or ("\\n" _. LEND) ))
+    define(NUMERAL,( "1" or "2" or "3" or "4" or "5" or
+                     "6" or "7" or "8" or "9" or "0" ))
+.DE
+.fi 
+.ec
+.ft P
+.sp
+.Pp
+.Pp
+.SH FUTURE EXTENSIONS
+
+.Pp
+.nr ll +1
+.nr t\n(ll 0
+.if \n(ll>1 .RS
+.nr bi 1
+.Pp
+Regular expressions (The most important missing feature)
+.nr bi 1
+.Pp
+Built-in macro preprocessor
+.nr bi 1
+.Pp
+More operations
+.nr bi 1
+.Pp
+Indexing for large static texts     
+.if \n(ll>1 .RE
+.nr ll -1
+.Pp
+.Pp
+.SH AUTHORS
+
+.Pp
+Jani Jaakkola and Pekka Kilpelainen, University of Helsinki,
+Department of Computer Science, 1995.
+.Pp
+.SH BUGS
+
+.Pp
+\fBSgrep\fP
+may use lots
+of memory, when evaluating complex queries on big files. 
+When sgrep reads its input text from a pipe, it 
+copies it to a temporary file.
+sgrep does not have regular expressions in search patters.
+.Pp
+.SH SEE ALSO
+
+.Pp
+\fBawk(1), ed(1),  grep(1)\fP
+.Pp
+sgrep home page at
+\f(CRhttp://www.cs.helsinki.fi/~jjaakkol/sgrep.html\fP
+.Pp
+.Pp

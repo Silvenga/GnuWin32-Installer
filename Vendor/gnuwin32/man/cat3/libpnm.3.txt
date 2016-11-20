@@ -1,0 +1,220 @@
+User manual for old pnm funUsernmanual for old pnm functions(3)
+
+
+
+Table Of Contents
+
+NAME
+       libpnm - libnetpbm functions to read and write PNM image
+       files
+
+
+SYNOPSIS
+       #include <pnm.h>
+
+       void pnm_init( int *argcP, char *argv[] );
+
+       xel ** pnm_allocarray( int cols, int rows);
+
+       xel * pnm_allocrow( int cols);
+
+       void pnm_freearray( xel **xels, int rows);
+
+       void pnm_freerow( xel *xelrow);
+
+       void pnm_readpnminit( FILE *fp, int *colsP, int  *rowsP,
+       xelval *maxvalP, int *formatP );
+
+       void  pnm_readpnmrow(  FILE  *fp, xel *xelrow, int cols,
+       xelval maxval, int format );
+
+       xel ** pnm_readpnm( FILE *fp, int  *colsP,  int  *rowsP,
+       xelval *maxvalP, int* formatP );
+
+       void  pnm_writepnminit( FILE *  fp , int cols, int rows,
+       xelval maxval, int format, int forceplain);
+
+       void pnm_writepnmrow( FILE *fp, xel *xelrow,  int  cols,
+       xelval maxval, int format, int forceplain );
+
+       void  pnm_writepnm( FILE *fp, xel ** xels, int cols, int
+       rows, xelval maxval, int format, int forceplain );
+
+       void pnm_check( FILE * file,  const  enum  pm_check_type
+       check_type,  const int format, const int cols, const int
+       rows, const xelval maxval, enum pm_check_code *retvalP);
+
+       void pnm_promoteformatrow( xel *xelrow, int cols, xelval
+       maxval, int format, xelval newmaxval, int newformat);
+
+       void pnm_promoteformat( xel  **xels,  int  cols,  xelval
+       maxval, int format, xelval newmaxval, int newformat);
+
+       xel pnm_whitexel( xelval maxval, int format);
+
+       xel pnm_blackxel( xelval maxval, int format);
+
+       void pnm_invertxel( xel *x, xelval maxval, int format);
+
+       xel  pnm_backgroundxelrow( xel *xelrow, int cols, xelval
+       maxval, int format);
+
+       xel pnm_backgroundxel( xel **xels, int cols,  int  rows,
+       xelval maxval, int format);
+
+       typedef ... xelval;
+
+       typedef ... xel;
+
+       extern xelval pnm_pbmmaxval;
+
+       #define PNM_ASSIGN1(x,v) ...
+
+       #define PNM_GET1(x) ...
+
+       #define PNM_EQUAL(x,y) ...
+
+       #define PNM_FORMAT_TYPE(format) ...
+
+
+DESCRIPTION
+       These library functions are part of Netpbm(1).
+
+
+
+   PNM TYPES AND CONSTANTS
+       Each  xel  contains  three xelvals, each of which should
+       contain only the values  between  0  and  PNM_MAXMAXVAL,
+       inclusive.   pnm_pbmmaxval is the maxval used when a PNM
+       program reads a PBM file.  Normally it  is  1;  however,
+       for  some programs, a larger value gives better results.
+
+
+   PNM XEL MANIPULATIONS
+       The PNM_GET1 macro extracts a single value from an  xel,
+       when  you  know  it's from a PBM or PGM file.  When it's
+       from  a  PPM  file,  use  PPM_GETR(),  PPM_GETG(),   and
+       PPM_GETB().
+
+       The  PNM_ASSIGN1 macro assigns a single value to an xel,
+       when you know it's from a PBM or PGM  file.   When  it's
+       from a PPM file, use PPM_ASSIGN.
+
+       The  PNM_EQUAL  macro checks two xels for equality.  The
+       PNM_FORMAT_TYPE macro computes a format type code from a
+       format  code.   The  format types are PBM, PGM, PPM, and
+       PAM.  But note that PBM, PGM, and PPM each are two  dif-
+       ferent formats: a plain one and a raw one.  So there are
+       four format types, but seven  formats.   PNM_FORMAT_TYPE
+       does not work on the PAM format code.
+
+
+   INITIALIZATION
+       pnm_init is identical to pm_init().
+
+
+   MEMORY MANAGEMENT
+       pnm_allocarray()  allocates  space for an array of xels.
+       pnm_freearray()  frees  an  array  space  allocated   by
+       pnm_allocarray() or pnm_readpnm().
+
+       pnm_allocrow() allocates space for a row of a PNM image.
+       pnm_freerow() frees it.
+
+
+
+   READING PNM FILES
+       pnm_readpnminit() is similar to  pnm_readpaminit(),  but
+       reads  only  PNM  images  and  has a different parameter
+       list.
+
+       pnm_readpnmrow() is similar to pnm_readpamrow() but only
+       works  on  PNM images and has a different parameter list
+       and returns the row as  an  array  of  xels  instead  of
+       tuples.
+
+       pnm_readpnm() is similar to pnm_readpam() except that it
+       reads only PNM images and  uses  a  different  parameter
+       list and returns an array of rows such that pnm_readpnm-
+       row() would return rather than  such  that  pnm_readpam-
+       row() would return.
+
+
+
+   WRITING FILES
+       pnm_writepnminit()   is  similar  to  pnm_writepaminit()
+       except that it can write only a PNM  header  and  has  a
+       different parameter list.
+
+       forceplain  is  a binary value.  True (nonzero) means to
+       write the image in the  plain  (ASCII)  version  of  the
+       selected  format.  False (zero) means to write it in the
+       raw (binary) version of the selected format.   See  PNM-
+       formatspecification(1).
+
+       pnm_writepnmrow() is similar to pnm_writepamrow() except
+       that it works only on PNM images  and  has  a  different
+       parameter  list and takes an array of xels instead of an
+       array of tuples.   See  the  description  of  forceplain
+       above.
+
+       pnm_writepnm()  is similar to pnm_writepam() except that
+       it works only on PNM image, has  a  different  parameter
+       list,  and  takes an array of rows of xels instead of an
+       array of rows of tuples.  See the description of  force-
+       plain above.
+
+
+
+   MISCELLANEOUS
+        pnm_check()  is  similar  to  pnm_checkpam()  except it
+       works only on PNM images.
+
+       pnm_check() is identical to ppm_check().
+
+
+   PNM FORMAT PROMOTION
+       pnm_promoteformatrow() promotes a row of xels  from  one
+       maxval  and  format to a new set.  Use this when you are
+       combining multiple anymaps of  different  types  -  just
+       take  the  maximum of the maxvals and the maximum of the
+       formats, and promote them all to that.
+
+       pnm_promoteformat() promotes an entire anymap.
+
+
+
+   PNM XEL MANIPULATION
+       pnm_whitexel() and  pnm_blackxel()  return  a  white  or
+       black  xel,  respectively, for the given maxval and for-
+       mat.
+
+       pnm_invertxel() inverts an xel.
+
+       pnm_backgroundxelrow() figures out an appropriate  back-
+       ground  xel  based  on  the row of xels xelrow, which is
+       cols xels wide, has maxval  maxval,  and  represents  an
+       image with format format.
+
+       This estimate works best when the row is the top or bot-
+       tom row of the image.
+
+       pnm_backgroundxel() does the  same  thing  as  pnm_back-
+       groundxelrow(),  except based on an entire image instead
+       of just one row.  This tends to do a slightly better job
+       than pnmbackgroundxelrow().
+
+
+SEE ALSO
+       Libnetpbm(1),  LibnetpbmUser'sGuide(1),  LibnetpbmDirec-
+       tory(1),  pbm(1),  pgm(1),  ppm(1),  pam(1),  libpbm(1),
+       libpgm(1), libppm(1)
+
+
+AUTHOR
+       Copyright   (C)  1989,  1991  by  Tony  Hansen  and  Jef
+       Poskanzer.
+
+
+
+netpbm documentation      2Userlmanual for old pnm functions(3)

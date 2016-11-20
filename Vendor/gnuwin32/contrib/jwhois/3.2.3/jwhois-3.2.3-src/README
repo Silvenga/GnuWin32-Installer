@@ -1,0 +1,115 @@
+This is jwhois, an improved Whois client capable of selecting Whois server
+to query based on a flexible configuration file using either regular
+expressions or CIDR blocks.
+
+Please send bug reports, suggestions, improvements, rewrites and other
+material to bug-jwhois@gnu.org.
+
+
+ 1.  Configuration file
+ 2.  ./configure
+ 2.1 Default Host
+ 2.2 Cache Functionality
+ 3.  IPv6 support
+ 4.  What to do when things go wrong
+ 5.  Obtaining jwhois
+ 6.  What to do after you've gotten things to work
+ 7.  The history of jwhois
+
+1. Configuration File
+=====================
+
+   In the example/ subdirectory in the distribution archive is an example
+configuration file for jwhois. This file should contain all of the known
+public Whois server records. Any changes to either host listed in that
+example configuration file should be reported to the maintainer so that
+the change can be included in future releases.
+
+   The configuration file should reside in the /usr/local/etc directory,
+or the directory that you specified using the --sysconfdir switch to the
+configure script.
+
+2. ./configure
+
+2.1. Default Host
+=================
+
+   If jwhois can't find any configuration file, the queries will be
+directed to a default host. The default value is `whois.internic.net',
+but this can be changed by using the --enable-DEFAULTHOST switch to
+the configure script.
+
+2.2. Cache Functionality
+========================
+
+   This version of jwhois includes a functionality that can cache Whois
+responses. The cached information is stored in a local database which can
+be read and written to by jwhois.  The default location for this file
+is /usr/local/var, but this can be changed by adding another directory
+with --localstatedir=<dir> when running the configure script.
+
+   The location of the database can also be set in the configuration file.
+For this to work, jwhois has to be able to read and write to the cache file.
+If you're on a single-user machine, this can be done easily by creating a
+cache file and changing the owner of it to the user you're running as. If you
+have several users, you would normally allow a specific group to write to the
+cache file and setgid the jwhois binary to this group.
+
+   If you don't know how to do this, you can ask someone in your area with
+more UNIX experience. Chances are, if you don't use jwhois actively, there
+is little point in configuring a cache since it would not be used very much
+anyway.
+
+
+3. IPv6 Support
+===============
+
+   jwhois has support for IPv6 using the inet6-apps package from The
+Inner Net.  The package is delivered with the libinet6.a library which
+consists of a number of functions required for IPv6, such as improved
+versions of getaddrinfo().  If your systems C library already has support
+for IPv6 in getaddrinfo(), you don't need the inet6-apps package.
+
+4. What to do when things go wrong
+==================================
+
+   There is a command line switch called -v or --verbose. Use it. The
+output that it gives can give significant help with locating a potential
+problem with jwhois.  When attempting to use the cache feature, the most
+common problem is that jwhois doesn't have permission to write the database
+files that it need.  Use the verbose flag to see if this is indeed the problem.
+
+   If you want to receive even more debugging output, you can specify
+multiple -v switches. If you specify more than one -v switch, debugging output
+is enabled.
+
+5. Obtaining JWHOIS
+===================
+JWHOIS can be obtained via anonymous FTP from
+ftp://ftp.gnu.org/gnu/jwhois/
+
+6. What to do after you've gotten things to work
+================================================
+
+   If you use JWHOIS and find it useful, you could always send a message to
+us at help-jwhois@gnu.org to let us know. You don't have to do this, but we
+would appreciate the gesture :-)
+
+7. The history of jwhois
+========================
+
+   The first public version of jwhois (version 1.1) was released in April
+1999. Since then, some ten public releases has been made, arriving at the
+jwhois as it exists today. Here is a brief outline of the development:
+
+   1.1  Written in Perl with a standalone caching proxy.
+   2.0  Rewrite in C. Standalone caching proxy dropped from distribution.
+   2.1  Better documentation. Support for whois servers on other ports than 43.
+   2.2  Support for CIDR blocks and IPv6.
+   2.3  Redirections, caches and i18n are introduced.
+   2.4  Maintanance release preparing for 3.0
+   3.0  Rwhois and http support. Rewriting of queries introduced.
+   3.1  Added "default" to configuration file.
+   3.2  Added advanced rewrite of queries.
+
+A more detailed list of changes can be found in the file NEWS.

@@ -1,0 +1,333 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: Using System Tools With Gri</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile SystemTools.html "Gri: Using System Tools With Gri" "Gri Environment" --> 
+
+<!-- @node   Using System Tools, Why Use The Environment, gri_unpage, Environment -->
+<a name="UsingSystemTools" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Environment.html#Environment" shape="rect" coords="516,2,532,24" href="Environment.html#Environment">
+<area alt="Gri: Extras" shape="rect" coords="557,2,573,24" href="Extras.html">
+<area alt="Gri: Discussion Group" shape="rect" coords="581,2,599,24" href="DiscussionGroup.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: Discussion Group" shape="rect" coords="581,2,599,24" href="DiscussionGroup.html">
+</map>
+<h2>11.2: Using System Tools With Gri</h2>
+
+
+Using system tools to manipulate your data makes sense for several
+reasons.  First, you may be familiar with those tools already.  Second,
+learning these tools will help you in all your work.  
+<p>
+<UL>
+<LI><a href="SystemTools.html#WhyUseTheEnvironment">Why Use The Environment</a>: Introduction
+<LI><a href="SystemTools.html#Grep">Grep</a>: Search files for patterns
+<LI><a href="SystemTools.html#Sed">Sed</a>: Serial editor
+<LI><a href="SystemTools.html#Awk">Awk</a>: Search and manipulate data
+<LI><a href="SystemTools.html#Perl">Perl</a>: Search and manipulate data
+</UL>
+
+<!-- @node   Why Use The Environment, Grep, Using System Tools, Using System Tools -->
+<a name="WhyUseTheEnvironment" ></a>
+<h3>11.2.1: Introduction</h3>
+
+
+Each of the programs listed in the sections below is available for Unix.
+Some (e.g. Perl and the Awk variant called Gawk) are available on other
+operating systems as well.  Each of these tools is fully documented in
+Unix manpages, so here I'll just give an indication of a couple of
+useful techniques you might want to use.
+<p>
+Bear in mind that these tools can do very similar jobs.  For example,
+Awk can do much of what Sed and Grep can do, but also a whole lot more.
+If you don't know Sed or Grep, I suggest you learn Awk instead.  Then
+again, Perl can also do anything Gawk can do, and a whole lot more!
+(For one thing, it is easier to work with multiple files in Perl.)  In
+fact, Perl is the most powerful of this list.  If you know none of these
+tools, you might want to learn Perl instead of the others.  But Perl is
+more complicated for simple work than Awk is, so the most reasonable
+path might be to learn both Awk and Perl.
+<p>
+For simple applications, you will probably want to use these tools in a
+piped open command, e.g.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "awk '{print $1, $3/$2}' MyFile |"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+which creates a temporary file (automatically erased when Gri finishes)
+which contains the output from running the system command that preceeds
+the pipe symbol (`<font color="82140F"><code>|</code></font>') (see <a href="Open.html#Open">Open</a>).
+<p>
+(Here and in all the examples of this chapter, it is assumed that the
+user's input file is named `<font color="#82140F"><samp>MyFile</samp></font>'.)
+<p>
+For more complicated appplications, you may use the Gri `<font color="#82140F"><code>system</code></font>'
+command as follows.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+system perl   &gt;tmp  &lt;&lt;"EOF"
+open(IN, "MyFile");
+while(&lt;IN&gt;) {
+    ($x, $y) = split;
+    print "$x", " ", cos($y), "\n";
+}
+EOF
+open tmp
+read columns x y
+draw curve
+system rm -f tmp
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Here a temporary file, named `<font color="#82140F"><samp>tmp</samp></font>', has been used to store the
+results of the calculation.  Note that this file was specifically
+cleaned up by the second `<font color="#82140F"><code>system</code></font>' command.  (Many folks, including
+the author, would prefer to take the perl script out of the above and
+make it a standalone executable script, calling it from Gri with the
+one-line form.  But it is just a matter of style.)
+<p>
+
+
+<!-- @node   Grep, Sed, Why Use The Environment, Using System Tools -->
+<a name="Grep" ></a>
+<h3>11.2.2: Grep</h3>
+
+
+
+The most common application of Grep is to select lines matching a
+pattern, or not matching a pattern.  Here is how to skip all lines with
+the word "HEADER" in them:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "grep -v 'HEADER' MyFile |"
+...
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Note that Gawk and Perl do this just as easily.
+<p>
+
+<!-- @node Sed, Awk, Grep, Using System Tools -->
+<a name="Sed" ></a>
+<h3>11.2.3: Sed</h3>
+
+
+
+Sed is normally used for simple changes to files.  For example, if you
+have columnar data which are separated with comma characters instead of
+whitespace, you could make it Gri compatible by 
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "sed -e 's/,/ /g' MyFile |"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Where the `<font color="#82140F"><code>-e</code></font>' flag indicates that the next item is a command to
+Sed, in this case a command to switch ("s") the comma character with the
+blank character, globally ("g") across each line of the file.  See also
+the overview of Perl.
+<p>
+<!-- @node Awk, Perl, Sed, Using System Tools -->
+<a name="Awk" ></a>
+<h3>11.2.4: Awk</h3>
+
+
+
+Awk is great for one-liners.  If your system lacks Awk, you can procure
+the GNU version, called Gawk, from the web for free.  For better or
+worse, Gawk is not fully compatible with Awk.  The good thing is that
+Gawk is pretty much the same on all operating systems, whereas the
+installed Awk may not be.  I use Gawk instead of Awk, for this reason
+and because it is normally faster.
+<p>
+The main concept in Awk is of "patterns" and "actions."  In the Awk
+syntax, actions are written in braces following patterns written with no
+braces.  (This will become clear presently.)
+<p>
+Whenever a line in the data file matches the pattern, the action is
+done.
+<p>
+The default pattern is to match to every line in the file.  This is done
+if no pattern is supplied.
+<p>
+The default action is to print the line, and this is done if no action
+is supplied.
+<p>
+Here are a few examples.  To skip first 10 lines of a file:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "awk 'NR&gt;10' MyFile |"
+read ...
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Here the pattern was that `<font color="#82140F"><code>NR</code></font>' (a special Awk variable for the
+number of the record, starting with 1 for the first line of the file)
+exceeded 10.  And the action was taken by default since nothing was
+supplied between braces, to print this line.
+<p>
+
+To plot the cosine of the second column against the first column:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "awk '{print ($1, cos($2))}' MyFile |"
+read columns x y
+draw curve
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Here no pattern was supplied, so the action was done for every line.
+<p>
+Combining these two forms, then, and supplying both a pattern and an
+action, here is how one might print the first and eighth columns of the
+file `<font color="#82140F"><samp>MyFile</samp></font>', but only for the first 10 lines of the file:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "awk NR&lt;=10 {print ($1, $8)} MyFile |"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+
+
+<!-- @node  Perl, Discussion Group, Awk, Using System Tools -->
+<a name="Perl" ></a>
+<h3>11.2.5: Perl</h3>
+
+
+
+Perl can do almost <b>anything</b> with your data, since it is a full
+programming language designed to also emulate several Unix utilities.
+<p>
+In perl, as in other commands, the commandline switch `<font color="#82140F"><code>-e</code></font>'
+indicates that a Perl command is given in the next word of the command
+line.  The commandline switch `<font color="#82140F"><code>-p</code></font>' indicates to print the line,
+after any indicated Perl actions have been done on it.  Here, for
+example, is how one would emulate a Sed replacement of comma by blank:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "perl -pe 's/,/ /g' MyFile |"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Perl also has a commandline switch `<font color="#82140F"><code>-a</code></font>' indicating that lines
+should be "autosplit" into an array called `<font color="#82140F"><code>$F</code></font>'.  The first element
+of this array is `<font color="#82140F"><code>$F[0]</code></font>'.  Splitting is normally done on
+white-space character(s), although this may be changed if desired.
+Here, for example, is how to take the cosine of the second column of a
+file, and print this after the first column:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "perl -pea 'print($F[0], cos($F[1]))' MyFile |"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

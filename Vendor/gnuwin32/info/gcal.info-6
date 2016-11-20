@@ -1,0 +1,1375 @@
+This is gcal.info, produced by makeinfo version 4.0 from gcal.texi.
+
+INFO-DIR-SECTION GNU packages
+START-INFO-DIR-ENTRY
+* Gcal: (gcal).                       GNU calendar program.
+* Tcal: (gcal)Invoking tcal.          Run Gcal with tomorrow's date.
+* Txt2gcal: (gcal)Invoking txt2gcal.  Calendar text to resource file.
+* Gcal2txt: (gcal)Invoking gcal2txt.  Calendar resource to text file.
+END-INFO-DIR-ENTRY
+
+  This file documents Gcal, a program for calculating and printing
+calendars.
+
+  Copyright (c) 1994, 95, 96, 1997, 2000 Thomas Esken
+
+  This edition is for Gcal version 3.01.
+
+  Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+  Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+  Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation approved by the Free Software Foundation.
+
+  Any suggestions, improvements, extensions, bug reports, donations,
+proposals for contract work, and so forth are welcome!  Please send
+them directly to my eMail address <esken@gmx.net>.  If you like my
+work, I'd appreciate a postcard from you!
+
+------------------------oOO      \\\_''/      OOo---------------------------
+Thomas Esken               O     (/o-o\)     O  eMail: esken@gmx.net
+Im Hagenfeld 84                 ((  ^  ))       Phone: +49 251 232585
+D-48147 Muenster; Germany    \____) ~ (____/    MotD : 2old2live, 2young2die
+
+
+File: gcal.info,  Node: Regexp Operators,  Prev: Regexp Usage,  Up: Regular Expressions
+
+Regular Expression Operators
+============================
+
+  You can combine regular expressions with the following characters,
+called "regular expression operators", or "metacharacters", to increase
+the power and versatility of regular expressions.
+
+  Here is a table of these metacharacters.  All characters that are not
+listed in the table stand for themselves.
+
+`\'
+     This is used to suppress the special meaning of a character when
+     matching.  For example:
+
+          \$
+
+     matches the character `$'.
+
+`^'
+     This matches the beginning of a string.  For example:
+
+          ^@chapter
+
+     matches the `@chapter' at the beginning of a string, and can be
+     used to identify chapter beginnings in Texinfo source files.  The
+     `^' is known as an "anchor", since it anchors the pattern to
+     matching only at the beginning of the string.
+
+`$'
+     This is similar to `^', but it matches only at the end of a string.
+     For example:
+
+          p$
+
+     matches a string that ends with a `p'.  The `$' is also an anchor.
+
+`.'
+     The period, or dot, matches any single character.  For example:
+
+          .P
+
+     matches any single character followed by a `P' in a string.  Using
+     concatenation we can make a regular expression like `U.A', which
+     matches any three-character sequence that begins with `U' and ends
+     with `A'.
+
+`[...]'
+     This is called a "character list".  It matches any _one_ of the
+     characters that are enclosed in the square brackets.  For example:
+
+          [MVX]
+
+     matches any one of the characters `M', `V', or `X' in a string.
+
+     Ranges of characters are indicated by using a hyphen between the
+     beginning and ending characters, and enclosing the whole thing in
+     brackets.  For example:
+
+          [0-9]
+
+     matches any digit.  Multiple ranges are allowed. E.g., the list
+     `[A-Za-z0-9]' is a common way to express the idea of "all
+     alphanumeric characters."
+
+     To include one of the characters `\', `]', `-' or `^' in a
+     character list, put a `\' in front of it.  For example:
+
+          [d\]]
+
+     matches either `d', or `]'.
+
+     "Character classes" are a new feature introduced in the POSIX
+     standard.  A character class is a special notation for describing
+     lists of characters that have a specific attribute, but where the
+     actual characters themselves can vary from country to country
+     and/or from character set to character set.  For example, the
+     notion of what is an alphabetic character differs in the U.S.A.
+     and in France.
+
+     A character class is only valid in a regexp _inside_ the brackets
+     of a character list.  Character classes consist of `[:', a keyword
+     denoting the class, and `:]'.  Here are the character classes
+     defined by the POSIX standard:
+
+    `[:alnum:]'
+          Alphanumeric characters.
+
+    `[:alpha:]'
+          Alphabetic characters.
+
+    `[:blank:]'
+          Space and tab characters.
+
+    `[:cntrl:]'
+          Control characters.
+
+    `[:digit:]'
+          Numeric characters.
+
+    `[:graph:]'
+          Characters that are printable and are also visible(1) (*note
+          Regexp Operators-Footnote-1::).
+
+    `[:lower:]'
+          Lower-case alphabetic characters.
+
+    `[:print:]'
+          Printable characters(2) (*note Regexp Operators-Footnote-2::).
+
+    `[:punct:]'
+          Punctuation characters(3) (*note Regexp
+          Operators-Footnote-3::).
+
+    `[:space:]'
+          Space characters(4) (*note Regexp Operators-Footnote-4::).
+
+    `[:upper:]'
+          Upper-case alphabetic characters.
+
+    `[:xdigit:]'
+          Characters that are hexadecimal digits.
+
+     For example, before the POSIX standard, to match alphanumeric
+     characters, you had to write `[A-Za-z0-9]'.  If your character set
+     had other alphabetic characters in it, this would not match them.
+     With the POSIX character classes, you can write `[[:alnum:]]', and
+     this will match _all_ the alphabetic and numeric characters in
+     your character set.
+
+     Two additional special sequences can appear in character lists.
+     These apply to non-ASCII character sets, which can have single
+     symbols (called "collating elements") that are represented with
+     more than one character, as well as several characters that are
+     equivalent for collating, or sorting, purposes.  (E.g., in French,
+     a plain `e' and a grave-accented `è' are equivalent.)
+
+    Collating Symbols
+          A "collating symbol" is a multi-character collating element
+          enclosed in `[.' and `.]'.  For example, if `ch' is a
+          collating element, then `[[.ch.]]' is a regexp that matches
+          this collating element, while `[ch]' is a regexp that matches
+          either `c' or `h'.
+
+    Equivalence Classes
+          An "equivalence class" is a list of equivalent characters
+          enclosed in `[=' and `=]'.  Thus, `[[=eè=]]' is a regexp that
+          matches either `e' or `è'.
+
+     These features are very valuable in non-English speaking locales.
+
+     *Caution:*
+     The library functions that Gcal uses for regular expression
+     matching currently only recognize POSIX character classes
+     (possibly); they do not recognize collating symbols or equivalence
+     classes.
+
+`[^ ...]'
+     This is a "negated character list" respectively "complemented
+     character list".  The first character after the `[' _must_ be a
+     `^'.  It matches any characters _except_ those in the square
+     brackets.  For example:
+
+          [^0-9]
+
+     matches any character that is not a digit.
+
+`|'
+     This is the "alternation operator", and it is used to specify
+     alternatives.  For example:
+
+          ^P|[0-9]
+
+     matches any string that matches either `^P' or `[0-9]'.  This
+     means it matches any string that starts with `P' or contains a
+     digit.
+
+     The alternation applies to the largest possible regexps on either
+     side.  In other words, `|' has the lowest precedence of all the
+     regular expression operators.
+
+`(...)'
+     Parentheses are used for grouping in regular expressions as in
+     arithmetic.  They can be used to concatenate regular expressions
+     containing the alternation operator, `|'.  For example,
+     `@(samp|code)\{[^}]+\}' matches both `@code{foo}' and
+     `@samp{bar}'. (These are Texinfo formatting control sequences.)
+
+`*'
+     This symbol means that the preceding regular expression is to be
+     repeated as many times as necessary to find a match.  For example:
+
+          ph*
+
+     applies the `*' symbol to the preceding `h' and looks for matches
+     of one `p' followed by any number of `h's.  This will also match
+     just `p' if no `h's are present.
+
+     The `*' repeats the _smallest_ possible preceding expression.
+     (Use parentheses if you wish to repeat a larger expression.)  It
+     finds as many repetitions as possible.  For example:
+
+          gcal --filter-text='\(c[ad][ad]*r x\)' -f sample.rc -y
+
+     prints every fixed date in `sample.rc' containing a fixed date text
+     of the form `(car x)', `(cdr x)', `(cadr x)', and so on.  Notice
+     the escaping of the parentheses by preceding them with backslashes.
+
+`+'
+     This symbol is similar to `*', but the preceding expression must be
+     matched at least once.  This means that:
+
+          wh+y
+
+     would match `why' and `whhy' but not `wy', whereas `wh*y' would
+     match all three of these strings.  This is a simpler way of
+     writing the last `*' example:
+
+          gcal --filter-text='\(c[ad]+r x\)' -f sample.rc -y
+
+`?'
+     This symbol is similar to `*', but the preceding expression can be
+     matched either once or not at all.  For example:
+
+          fe?d
+
+     will match `fed' and `fd', but nothing else.
+
+`{N}'
+`{N,}'
+`{N,M}'
+     One or two numbers inside braces denote an "interval expression"
+     which is available in the POSIX standard.  If there is one number
+     in the braces, the preceding regexp is repeated N times.  If there
+     are two numbers separated by a comma, the preceding regexp is
+     repeated N to M times.  If there is one number followed by a
+     comma, then the preceding regexp is repeated at least N times.
+
+    `wh{3}y'
+          matches `whhhy' but not `why' or `whhhhy'.
+
+    `wh{3,5}y'
+          matches `whhhy' or `whhhhy' or `whhhhhy', only.
+
+    `wh{2,}y'
+          matches `whhy' or `whhhy', and so on.
+
+  GNU software that deals with regular expressions provides a number of
+additional regexp operators.  These operators are described here.
+
+  Most of the additional operators are for dealing with word matching.
+For our purposes, a "word" is a sequence of one or more letters, digits,
+or underscores (`_').
+
+`\w'
+     This operator matches any word-constituent character, i.e. any
+     letter, digit, or underscore. Think of it as a short-hand for
+     `[A-Za-z0-9_]' or `[[:alnum:]_]'.
+
+`\W'
+     This operator matches any character that is not word-constituent.
+     Think of it as a short-hand for `[^A-Za-z0-9_]' or `[^[:alnum:]_]'.
+
+`\<'
+     This operator matches the empty string at the beginning of a word.
+     For example, `\<away' matches `away', but not `stowaway'.
+
+`\>'
+     This operator matches the empty string at the end of a word.  For
+     example, `stow\>' matches `stow', but not `stowaway'.
+
+`\b'
+     This operator matches the empty string at either the beginning or
+     the end of a word (the word *b*oundary).  For example, `\bballs?\b'
+     matches either `ball' or `balls' as a separate word.
+
+`\B'
+     This operator matches the empty string within a word. In other
+     words, `\B' matches the empty string that occurs between two
+     word-constituent characters. For example, `\Brat\B' matches
+     `crate', but it does not match `dirty rat'.  `\B' is essentially
+     the opposite of `\b'.
+
+  There are two other operators that work on buffers.  In Emacs, a
+"buffer" is, naturally, an Emacs buffer.  For other programs, the
+regexp library routines that Gcal uses consider the entire string to be
+matched as the buffer(5) (*note Regexp Operators-Footnote-5::).
+
+  For Gcal, since `^' and `$' always work in terms of the beginning and
+end of strings, these operators do not add any new capabilities.  They
+are provided for compatibility with other GNU software.
+
+`\`'
+     This operator matches the empty string at the beginning of the
+     buffer.
+
+`\''
+     This operator matches the empty string at the end of the buffer.
+
+  In regular expressions, the `*', `+', and `?' operators, as well as
+the braces `{' and `}', have the highest precedence, followed by
+concatenation, and finally by `|'.  As in arithmetic, parentheses can
+change how operators are grouped.
+
+  Case is normally significant in regular expressions, both when
+matching ordinary characters (i.e. not metacharacters), and inside
+character sets.  Thus a `w' in a regular expression matches only a
+lower-case `w' and not an upper-case `W'.
+
+  The simplest way to do a case-independent match is to use a character
+list: `[Ww]'.  However, this can be cumbersome if you need to use it
+often; and unfortunately, it can make the regular expressions harder to
+read.  Supplying a want, Gcal offers the `--ignore-case' option which
+ignores all case distinctions in both the regular expression and the
+completely expanded text of each *valid* fixed date.  *Note Fixed date
+option `--ignore-case': x-ignore-case.
+
+
+File: gcal.info,  Node: Regexp Operators-Footnotes,  Up: Regexp Operators
+
+  (1) A space is printable, but not visible, while an `a' is both.
+
+  (2) Characters that are not control characters.
+
+  (3) Characters that are not letter, digits, control characters, or
+space characters.
+
+  (4) Such as Space, Tab, and Form-feed, to name a few.
+
+  (5) That is the _text part_ of a Gcal resource file line.
+
+
+File: gcal.info,  Node: Regexp Summary,  Next: Special Texts,  Prev: Regular Expressions,  Up: Top
+
+Summary of all Regular Expressions
+**********************************
+
+  Regular expressions are based on POSIX EREs (Extended Regular
+Expressions).  Regexps are composed of characters.  Here is a
+short-list of them all:
+
+`C'
+     matches the character C (assuming C is none of the characters
+     listed below).
+
+`\C'
+     matches the literal character C.
+
+`.'
+     matches any character.
+
+`^'
+     matches the beginning of a string.
+
+`$'
+     matches the end of a string.
+
+`[ABC...]'
+     matches any of the characters ABC... (character list).
+
+`[[:KEYWORD:]]'
+     matches any character in the character class KEYWORD.  Allowable
+     classes are `alnum', `alpha', `blank', `cntrl', `digit', `graph',
+     `lower', `print', `punct', `space', `upper', and `xdigit'.
+
+`[[.ELEMENT.]]'
+     matches the multi-character collating ELEMENT.  Gcal does not
+     currently support collating symbols.
+
+`[[=LIST=]]'
+     matches any of the equivalent characters in LIST.  Gcal does not
+     currently support equivalence classes.
+
+`[^ABC...]'
+     matches any character except ABC... (negated resp.  complemented
+     character list).
+
+`R1|R2'
+     matches either R1 or R2 (alternation).
+
+`R1R2'
+     matches R1, and then R2 (concatenation).
+
+`R+'
+     matches one or more R's.
+
+`R*'
+     matches zero or more R's.
+
+`R?'
+     matches zero or one R's.
+
+`(R)'
+     matches R (grouping).
+
+`R{N}'
+`R{N,}'
+`R{N,M}'
+     matches at least N, N to any number, or N to M occurrences of R
+     (interval expressions).
+
+`\b'
+     matches the empty string at either the beginning or the end of a
+     word.
+
+`\B'
+     matches the empty string within a word.
+
+`\<'
+     matches the empty string at the beginning of a word.
+
+`\>'
+     matches the empty string at the end of a word.
+
+`\w'
+     matches any word-constituent character (alphanumeric characters and
+     the underscore).
+
+`\W'
+     matches any character that is not word-constituent.
+
+`\`'
+     matches the empty string at the beginning of a buffer(1) (*note
+     Regexp Summary-Footnote-1::).
+
+`\''
+     matches the empty string at the end of a buffer.
+
+
+File: gcal.info,  Node: Regexp Summary-Footnotes,  Up: Regexp Summary
+
+  (1) The same as a _text part_ of a resource file line in Gcal.
+
+
+File: gcal.info,  Node: Special Texts,  Next: Special Texts Summary,  Prev: Regexp Summary,  Up: Top
+
+`%?'... Special Texts
+*********************
+
+* Menu:
+
+* Exclusions::     How to Exclude dates.
+* Replacements::   How to Replace texts.
+* Shell Command::  How to run a Shell Command.
+
+  The `%?'... special texts which can be used in the text part of a
+Gcal resource file line can coarsely be separated into three categories.
+So there are special texts used for suppression output of fixed dates in
+definite cases.  Others are replaced by particular texts or cause the
+shell to start external commands.  *Note `%?'... Special Texts: Special
+Texts processed, for a general description of the special texts which
+may be used in the text part of a Gcal resource file line.
+
+  Some of these special texts may have an optional format instruction
+(called FORMAT in the further context), which affects the representation
+of an expanded special text.  *Note Format Instruction::, for the
+detailed description of the format instruction and its components.  A
+possibly specified FORMAT within special texts which may not have a
+format instruction is ignored by Gcal and not displayed in output.
+
+  But Gcal is also able to represent such special texts in a special
+way by using a format instruction, and that by using an indirect
+method.  For displaying, you simply assign the special text exclusively
+to a text variable which contains a format instruction.  Nevertheless,
+it is important to note that the field width component of the format
+instruction is chosen in the way that it refers to the assigned
+contents of the text variable, if the format instruction has a fixed
+format component.  The contents assigned to the text variable is only
+the special text, and not its expanded result.  Gcal has to proceed
+like that, because the special text which is hidden in the text
+variable could not be used (here: displayed) only for a definite date,
+but possibly also for several dates, and that adjusted to each date it
+is referenced.  Thus exists a special text in the text variable which
+has a definite length, and a format instruction also exists, whose
+field width component has to affect the expanded result of the special
+text.  Indeed, Gcal does not know at the moment when the assignment of
+the special text to the text variable is made, of which length the
+expanded result will be, because this expansion is made at a much later
+phase in the program execution.  So, in such a case, the field width
+component of a format instruction should have the length of the special
+text minimum, otherwise it is crippled and expanded respectively
+displayed incorrectly by the internal methods which effect the
+expansion.
+
+  Of course, not all possibilities concerning the representation
+--which are offered by the format instruction-- are listed here for
+those special texts those expanded representation may be affected by an
+optional FORMAT instruction, but only some few exemplary.
+
+  And some of these special texts may also have an optional simple or
+special date argument (called DATE in the further context) or another
+argument (called ARGUMENT in the further context).  The DATE argument
+must be given in one of the following date formats in case a special
+text is directly trailed by it:
+
+   * `YYYY[MM[DD|WWWN]]'
+
+   * `YYYY*d|wN[WWW]'
+
+   * `YYYY@e|t|DVAR[[+|-]N[WWW]]'
+
+  Special texts that may have a DATE argument *must* always be trailed
+by a _whitespace_ character which is removed in output, no matter
+whether DATE was given or not!
+
+  *Note Summary of all `%?'... Special Texts: Special Texts Summary,
+for a short-list of all applicable special texts.
+
+
+File: gcal.info,  Node: Exclusions,  Next: Replacements,  Prev: Special Texts,  Up: Special Texts
+
+`%?'... special texts for date exclusion
+========================================
+
+* Menu:
+
+* Exclusions with date argument::
+* Exclusions without any argument::
+
+  `%?'... special texts used for exclusion of points of time or periods
+of dates are very useful if they are used together with ranges of days
+(*note Ranges of days::).  The complete special text is always
+suppressed in output in case the fixed date text must be displayed.
+
+
+File: gcal.info,  Node: Exclusions with date argument,  Next: Exclusions without any argument,  Prev: Exclusions,  Up: Exclusions
+
+Exclusions with date argument `%?[DATE]' special texts
+------------------------------------------------------
+
+* Menu:
+
+* Inclusive date period::
+* Exclusive date period::
+
+  First of all, an "inclusive date" period `%?[DATE]' special text can
+be specified with the effect, that only those fixed dates are respected
+and displayed which are part of this period.  And the specification of
+an "exclusive date" period `%?[DATE]' special text has the effect, that
+only those fixed dates are respected and displayed which are not part
+of this period.
+
+  Cleverly combined, these special texts offer very effective
+filtration capabilities used for the definition of special periods in a
+highly flexible manner, for example:
+
+     0*d1#999 Every day of year: from January...August except April\
+              %i00001#00008 %e00004#00004
+     ;
+     0*d1#999 Every day of year: from 1991...1993 and from 1996\
+              except February 1992 and all September\
+              %i1991#1993 %i1996# %e19922#19922 %e00009#00009
+
+
+File: gcal.info,  Node: Inclusive date period,  Next: Exclusive date period,  Prev: Exclusions with date argument,  Up: Exclusions with date argument
+
+Inclusive date period `%i[DATE][#[DATE]]' special text
+......................................................
+
+  `%i[DATE][#[DATE]]' references an inclusive date period, i.e. all
+dates which are part of the specified period are valid and are
+displayed.  Of course this means, that all fixed dates which are not
+part of this period (not covered by it) are invalid and remain
+undisplayed therefore.
+
+  The first specified date defines the "starting date" of the fixed
+date, i.e. the first date the fixed date may occur.  For the starting
+date, the following rules concerning definite omission values are
+valid, elucidated by using the `YYYY[MM[DD|WWWN]]' date format:
+
+   * If YYYY is set to `0000', the current year is assumed for the year.
+
+   * If MM is not given, then `01' (==January) is assumed for the month.
+
+   * If MM is set to `00', the current month is assumed for the month,
+     and the December is assumed in case MM is set to `99'.
+
+   * If DD|WWW is not given, then `01' is assumed for the day.
+
+   * If DD is set to `00', the current day is assumed for the day, and
+     the last day of the month MM is assumed in case DD is set to `99'.
+
+   * If the N field is given (range `1...5' or `9'), then a WWW field
+     must also be specified.
+
+  The second specified date defines the "ending date" of the fixed date,
+i.e. the last date the fixed date may occur.  For the ending date, the
+following rules concerning definite omission values are valid, likewise
+elucidated by using the `YYYY[MM[DD|WWWN]]' date format:
+
+   * If YYYY is set to `0000', the current year is assumed for the year.
+
+   * If MM is not given, then `12' (==December) is assumed for the
+     month.
+
+   * If MM is set to `00', the current month is assumed for the month,
+     and the December is assumed in case MM is set to `99'.
+
+   * If DD|WWW is not given, the last day of the month MM is assumed
+     for the day.
+
+   * If DD is set to `00', the current day is assumed for the day, and
+     the last day of the month MM is assumed in case DD is set to `99'.
+
+   * If the N field is given (range `1...5' or `9'), then a WWW field
+     must also be specified.
+
+  The preceding rules are analogously valid for the other permitted
+date formats.
+
+  If the starting date, which is encoded in the `%i...' special text,
+is later the ending date, the `%i...' special text will be ignored.
+
+  In case neither the starting date nor the ending date is specified,
+means only `%i' is given, the implicit period 1st January 1...31st
+December 9999 (00010101...99991231) will be used.
+
+  If only the starting date is specified, means either `%iDATE' or
+`%iDATE#' is given, the implicit ending date 31st December 9999
+(99991231) will be used.
+
+  In case only the ending date is specified, means `%i#DATE' is given,
+the implicit starting date 1st January 1 (00010101) will be used.
+
+  For example:
+
+     0d*1#999 Every day of year: only April and July\
+              %i00004#00004 %i00007#00007
+     ;
+     0*d1#999 Every day of year: from January...October\
+              %i#000010
+     ;
+     0*d1#999 Every day of year: from August 1990\
+              %i19908
+     ;
+     0*d1#999 Every day of year: from August...December\
+              %i00008
+     ;
+     0*d1#999 Every day of year: only today%i0@t#0@t
+
+
+File: gcal.info,  Node: Exclusive date period,  Prev: Inclusive date period,  Up: Exclusions with date argument
+
+Exclusive date period `%e[DATE][#[DATE]]' special text
+......................................................
+
+  `%e[DATE][#[DATE]]' references an exclusive date period, i.e. all
+dates which are part of the specified period are invalid and remain
+undisplayed therefore.  Of course this means, that all fixed dates
+which are not part of this period (not covered by it) are valid and are
+displayed.
+
+  The first specified date defines the starting date of the fixed date,
+i.e. the first date the fixed date may occur.  For the starting date,
+the following rules concerning definite omission values are valid,
+elucidated by using the `YYYY[MM[DD|WWWN]]' date format:
+
+   * If YYYY is set to `0000', the current year is assumed for the year.
+
+   * If MM is not given, then `01' (==January) is assumed for the month.
+
+   * If MM is set to `00', the current month is assumed for the month,
+     and the December is assumed in case MM is set to `99'.
+
+   * If DD|WWW is not given, then `01' is assumed for the day.
+
+   * If DD is set to `00', the current day is assumed for the day, and
+     the last day of the month MM is assumed in case DD is set to `99'.
+
+   * If the N field is given (range `1...5' or `9'), then a WWW field
+     must also be specified.
+
+  The second specified date defines the ending date of the fixed date,
+i.e. the last date the fixed date may occur.  For the ending date, the
+following rules concerning definite omission values are valid, likewise
+elucidated by using the `YYYY[MM[DD|WWWN]]' date format:
+
+   * If YYYY is set to `0000', the current year is assumed for the year.
+
+   * If MM is not given, then `12' (==December) is assumed for the
+     month.
+
+   * If MM is set to `00', the current month is assumed for the month,
+     and the December is assumed in case MM is set to `99'.
+
+   * If DD|WWW is not given, the last day of the month MM is assumed
+     for the day.
+
+   * If DD is set to `00', the current day is assumed for the day, and
+     the last day of the month MM is assumed in case DD is set to `99'.
+
+   * If the N field is given (range `1...5' or `9'), then a WWW field
+     must also be specified.
+
+  The preceding rules are analogously valid for the other permitted
+date formats.
+
+  If the starting date, which is encoded in the `%e...' special text,
+is later the ending date, the `%e...' special text will be ignored.
+
+  In case neither the starting date nor the ending date is specified,
+means only `%e' is given, the implicit period 1st January 1...31st
+December 9999 (00010101...99991231) will be used.
+
+  If only the starting date is specified, means either `%eDATE' or
+`%eDATE#' is given, the implicit ending date 31st December 9999
+(99991231) will be used.
+
+  In case only the ending date is specified, means `%e#DATE' is given,
+the implicit starting date 1st January 1 (00010101) will be used.
+
+  For example:
+
+     0d*1#999 Every day of year: except April and July\
+             %e00004#00004 %e00007#00007
+     ;
+     0*d1#999 Every day of year: except January...October\
+              %e#000010
+     ;
+     0*d1#999 Every day of year: until July 1990\
+              %e19908
+     ;
+     0*d1#999 Every day of year: except August...December\
+              %e00008
+     ;
+     0*d1#999 Every day of year: except today%e0@t#0@t
+
+
+File: gcal.info,  Node: Exclusions without any argument,  Prev: Exclusions with date argument,  Up: Exclusions
+
+Exclusions without any argument `%?' special texts
+--------------------------------------------------
+
+* Menu:
+
+* Inclusive day period::
+* Exclusive day period::
+
+  First of all, an "inclusive day" period `%?' special text can be
+specified with the effect, that only those fixed dates are respected
+and displayed which are part of this period.  And the specification of
+an "exclusive day" period `%?' special text has the effect, that only
+those fixed dates are respected and displayed which are not part of
+this period.
+
+  Cleverly combined, these special texts also offer very effective
+filtration capabilities used for the definition of very special periods.
+
+  For example:
+
+     0*d1#999 Every day of year: all Mondays...Fridays\
+              except Wednesdays and all legal holidays\
+              %r%F%V
+     ;
+     00001001#9999 Every day in last quarter of year: all holidays\
+                   which are not on a Sunday%x %P
+
+
+File: gcal.info,  Node: Inclusive day period,  Next: Exclusive day period,  Prev: Exclusions without any argument,  Up: Exclusions without any argument
+
+Inclusive day period `%?' special texts
+.......................................
+
+  The following inclusive day periods `%?' special texts are respected,
+at which _inclusive_ is meant for the period which is not excluded.
+
+`%v'
+     Excludes fixed date in case it is not listed as legal holiday in
+     the _eternal holiday list_.
+
+`%x'
+     Excludes fixed date in case it is neither listed as legal holiday
+     nor memorial day in the _eternal holiday list_.
+
+`%a'
+     Excludes fixed date in case it is no Monday.
+
+`%c'
+     Excludes fixed date in case it is no Tuesday.
+
+`%f'
+     Excludes fixed date in case it is no Wednesday.
+
+`%g'
+     Excludes fixed date in case it is no Thursday.
+
+`%h'
+     Excludes fixed date in case it is no Friday.
+
+`%l'
+     Excludes fixed date in case it is no Saturday.
+
+`%p'
+     Excludes fixed date in case it is no Sunday.
+
+`%q'
+     Excludes fixed date in case it is no Monday...Thursday.
+
+`%r'
+     Excludes fixed date in case it is no Monday...Friday.
+
+
+File: gcal.info,  Node: Exclusive day period,  Prev: Inclusive day period,  Up: Exclusions without any argument
+
+Exclusive day period `%?' special texts
+.......................................
+
+  The following exclusive day periods `%?' special texts are respected,
+at which _exclusive_ is meant for the period which is excluded.
+
+`%V'
+     Excludes fixed date in case it is listed as legal holiday in the
+     _eternal holiday list_.
+
+`%X'
+     Excludes fixed date in case it is either listed as legal holiday or
+     memorial day in the _eternal holiday list_.
+
+`%A'
+     Excludes fixed date in case it is a Monday.
+
+`%C'
+     Excludes fixed date in case it is a Tuesday.
+
+`%F'
+     Excludes fixed date in case it is a Wednesday.
+
+`%G'
+     Excludes fixed date in case it is a Thursday.
+
+`%H'
+     Excludes fixed date in case it is a Friday.
+
+`%L'
+     Excludes fixed date in case it is a Saturday.
+
+`%P'
+     Excludes fixed date in case it is a Sunday.
+
+`%Q'
+     Excludes fixed date in case it is a Monday...Thursday.
+
+`%R'
+     Excludes fixed date in case it is a Monday...Friday.
+
+
+File: gcal.info,  Node: Replacements,  Next: Shell Command,  Prev: Exclusions,  Up: Special Texts
+
+`%?'... special texts for text replacement
+==========================================
+
+* Menu:
+
+* Replacements with date argument::
+* Replacements with other argument::
+* Replacements without any argument::
+
+  `%?'... special texts which are replaced by particular texts at
+program run-time causes the interspersing of data into the fixed date
+text, which quality is essentially depending on the command line
+arguments given for running the program.  The complete special text is
+always replaced accordingly in output if the fixed date text must be
+displayed.
+
+  Cleverly combined, these special texts also offer very effective
+mechanisms used for the definition of particular texts in a highly
+flexible manner, for example:
+
+     0*d1#999 Every day of year: Today is %K, the %n (%N)
+
+
+File: gcal.info,  Node: Replacements with date argument,  Next: Replacements with other argument,  Prev: Replacements,  Up: Replacements
+
+Replacements with date argument `%?[DATE]' special texts
+--------------------------------------------------------
+
+* Menu:
+
+* Weekday name::
+* Weekday number::
+* Day-of-year number::
+* Day number::
+* Week number::
+* Month name::
+* Month number::
+* Year number::
+* Moon phase::
+* Biorhythm::
+* Difference value::
+
+  Apart from different representations of a weekday name, it is possible
+to create its weekday number.  Likewise, the current day-of-year number,
+the day number, the week number, the month name, the month number, the
+year number, the Moon phase, the biorhythm, and some useful difference
+values can be produced.
+
+  For the DATE argument these `%?[DATE]' special text may have, the
+following rules concerning definite omission values are valid,
+elucidated by using the `YYYY[MM[DD|WWWN]]' date format(1) (*note
+Replacements with date argument-Footnote-1::):
+
+   * If YYYY... is not given (==*no* date encoded), the current year is
+     assumed for the date.
+
+   * If YYYY is set to `0000', the current year is assumed for the year.
+
+   * If MM is not given or set to `00', the current month is assumed for
+     the month, and the December is assumed in case MM is set to `99'.
+
+   * If DD|WWW is not given or set to `00', the current day is assumed
+     for the day, and the last day of the month is assumed in case DD
+     is set to `99'.
+
+   * If the N field is given (range `1...5' or `9'), then a WWW field
+     must also be specified.
+
+
+File: gcal.info,  Node: Replacements with date argument-Footnotes,  Up: Replacements with date argument
+
+  (1) The succeeding rules are analogously valid for the other
+permitted date formats.
+
+
+File: gcal.info,  Node: Weekday name,  Next: Weekday number,  Prev: Replacements with date argument,  Up: Replacements with date argument
+
+Weekday name `%[FORMAT]K[DATE]' special text
+............................................
+
+`%K[DATE]'
+     Is replaced by the complete *weekday name* of the current day,
+     e.g.:
+
+          The text `Today is %K , the %n' will be expanded to
+          ==> `Today is Monday, the 10-Jun-1996', in case the actual
+          system date is the 10th June 1996.
+
+`%>3#K[DATE]'
+     Is replaced by the 3-letter *weekday name* of the current day,
+     e.g.:
+
+          The text `Today is %>3#K0@t+1 , the %n+1' will be expanded to
+          ==> `Today is Tue, the 11-Jun-1996', in case the actual
+          system date is the 10th June 1996.
+
+`%>2#K[DATE]'
+     Is replaced by the 2-letter *weekday name* of the current day,
+     e.g.:
+
+          The text `Today is %>2#K , the %n' will be expanded to
+          ==> `Today is Mo, the 10-Jun-1996', in case the actual system
+          date is the 10th June 1996.
+
+
+File: gcal.info,  Node: Weekday number,  Next: Day-of-year number,  Prev: Weekday name,  Up: Replacements with date argument
+
+Weekday number `%[FORMAT]?[DATE]' special texts
+...............................................
+
+  The following weekday number `%[FORMAT]?[DATE]' special texts are
+respected, e.g.:
+
+`%W[DATE]'
+     Is replaced by the *weekday number* of the current day, and which
+     is determined by the `Monday==1...Sunday==7' counting method, e.g.:
+
+          The text `Today is weekday %W , the %n' will be expanded to
+          ==> `Today is weekday 1, the 10-Jun-1996', in case the actual
+          system date is the 10th June 1996.
+
+`%>1&*W[DATE]'
+     Is replaced by the *weekday number* with trailing Ordinal Number
+     suffix of the current day, and which is determined by the
+     `Monday==1...Sunday==7' counting method, e.g.:
+
+          The text `Today is weekday %>1&*W0@t+1 , the %n+1' will be
+          expanded to
+          ==> `Today is weekday 2nd, the 11-Jun-1996', in case the
+          actual system date is the 10th June 1996.
+
+`%E[DATE]'
+     Is replaced by the *weekday number* of the current day, and which
+     is determined by the `Monday==0...Sunday==6' counting method, e.g.:
+
+          The text `Today is weekday %E , the %n' will be expanded to
+          ==> `Today is weekday 0, the 10-Jun-1996', in case the actual
+          system date is the 10th June 1996.
+
+`%>1&*E[DATE]'
+     Is replaced by the *weekday number* with trailing Ordinal Number
+     suffix of the current day, and which is determined by the
+     `Monday==0...Sunday==6' counting method, e.g.:
+
+          The text `Today is weekday %>1&*E , the %n' will be expanded
+          to
+          ==> `Today is weekday 0th, the 10-Jun-1996', in case the
+          actual system date is the 10th June 1996.
+
+`%I[DATE]'
+     Is replaced by the *weekday number* of the current day, and which
+     is determined by the `Sunday==1...Saturday==7' counting method,
+     e.g.:
+
+          The text `Today is weekday %I , the %n' will be expanded to
+          ==> `Today is weekday 2, the 10-Jun-1996', in case the actual
+          system date is the 10th June 1996.
+
+`%>1&*I[DATE]'
+     Is replaced by the *weekday number* with trailing Ordinal Number
+     suffix of the current day, and which is determined by the
+     `Sunday==1...Saturday==7' counting method, e.g.:
+
+          The text `Today is weekday %>1&*I , the %n' will be expanded
+          to
+          ==> `Today is weekday 2nd, the 10-Jun-1996', in case the
+          actual system date is the 10th June 1996.
+
+`%J[DATE]'
+     Is replaced by the *weekday number* of the current day, and which
+     is determined by the `Sunday==0...Saturday==6' counting method,
+     e.g.:
+
+          The text `Today is weekday %J , the %n' will be expanded to
+          ==> `Today is weekday 1, the 10-Jun-1996', in case the actual
+          system date is the 10th June 1996.
+
+`%>1&*J[DATE]'
+     Is replaced by the *weekday number* with trailing Ordinal Number
+     suffix of the current day, and which is determined by the
+     `Sunday==0...Saturday==6' counting method, e.g.:
+
+          The text `Today is weekday %>1&*J , the %n' will be expanded
+          to
+          ==> `Today is weekday 1st, the 10-Jun-1996', in case the
+          actual system date is the 10th June 1996.
+
+`%S[DATE]'
+     Is replaced by the *weekday number* of the current day, and which
+     is determined by the `STARTING DAY OF WEEK==1...ENDING DAY OF
+     WEEK==7' counting method (*note Calendar option
+     `--starting-day=ARGUMENT': x-starting-day.), e.g.:
+
+          The text `Today is weekday %S , the %n' will be expanded to
+          ==> `Today is weekday 4, the 10-Jun-1996', in case the actual
+          system date is the 10th June 1996 and Friday (==5) is the
+          starting day of week.
+
+`%>1&*S[DATE]'
+     Is replaced by the *weekday number* with trailing Ordinal Number
+     suffix of the current day, and which is determined by the
+     `STARTING DAY OF WEEK==1...ENDING DAY OF WEEK==7' counting method
+     (*note Calendar option `--starting-day=ARGUMENT': x-starting-day.),
+     e.g.:
+
+          The text `Today is weekday %>1&*S , the %n' will be expanded
+          to
+          ==> `Today is weekday 4th, the 10-Jun-1996', in case the
+          actual system date is the 10th June 1996 and Friday (==5) is
+          the starting day of week.
+
+`%T[DATE]'
+     Is replaced by the *weekday number* of the current day, and which
+     is determined by the `STARTING DAY OF WEEK==0...ENDING DAY OF
+     WEEK==6' counting method (*note Calendar option
+     `--starting-day=ARGUMENT': x-starting-day.), e.g.:
+
+          The text `Today is weekday %T , the %n' will be expanded to
+          ==> `Today is weekday 3, the 10-Jun-1996', in case the actual
+          system date is the 10th June 1996 and Friday (==5) is the
+          starting day of week.
+
+`%>1&*T[DATE]'
+     Is replaced by the *weekday number* with trailing Ordinal Number
+     suffix of the current day, and which is determined by the
+     `STARTING DAY OF WEEK==0...ENDING DAY OF WEEK==6' counting method
+     (*note Calendar option `--starting-day=ARGUMENT': x-starting-day.),
+     e.g.:
+
+          The text `Today is weekday %>1&*T , the %n' will be expanded
+          to
+          ==> `Today is weekday 3rd, the 10-Jun-1996', in case the
+          actual system date is the 10th June 1996 and Friday (==5) is
+          the starting day of week.
+
+
+File: gcal.info,  Node: Day-of-year number,  Next: Day number,  Prev: Weekday number,  Up: Replacements with date argument
+
+Day-of-year number `%[FORMAT]N[DATE]' special text
+..................................................
+
+`%N[DATE]'
+     Is replaced by the *day-of-year number* of the current day of year,
+     e.g.:
+
+          The text `Day %N  of year, the %n' will be expanded to
+          ==> `Day 53 of year, the 22-Feb-1996', in case the actual
+          system date is the 22nd February 1996.
+
+`%>03*N[DATE]'
+     Is replaced by the 3-digit *day-of-year number* with leading zeroes
+     of the current day of year, e.g.:
+
+          The text `Day %>03*N0@t-1  of year, the %n-1' will be
+          expanded to
+          ==> `Day 052 of year, the 21-Feb-1996', in case the actual
+          system date is the 22nd February 1996.
+
+`%>1&*N[DATE]'
+     Is replaced by the *day-of-year number* with trailing Ordinal
+     Number suffix of the current day of year, e.g.:
+
+          The text `Day %>1&*N  of year, the %n' will be expanded to
+          ==> `Day 53rd of year, the 22-Feb-1996', in case the actual
+          system date is the 22nd February 1996.
+
+`%>03&*N[DATE]'
+     Is replaced by the 3-digit *day-of-year number* with leading zeroes
+     and trailing Ordinal Number suffix of the current day of year,
+     e.g.:
+
+          The text `Day %>03&*N  of year, the %n' will be expanded to
+          ==> `Day 053rd of year, the 22-Feb-1996', in case the actual
+          system date is the 22nd February 1996.
+
+
+File: gcal.info,  Node: Day number,  Next: Week number,  Prev: Day-of-year number,  Up: Replacements with date argument
+
+Day number `%[FORMAT]D[DATE]' special text
+..........................................
+
+`%D[DATE]'
+     Is replaced by the *day number* of the current day of month, e.g.:
+
+          The text `Day %D , %n' will be expanded to
+          ==> `Day 2, 02-Feb-1996', in case the actual system date is
+          the 2nd February 1996.
+
+`%>02*D[DATE]'
+     Is replaced by the 2-digit *day number* with leading zero of the
+     current day of month, e.g.:
+
+          The text `Day %>02*D0@t-1 , %n-1' will be expanded to
+          ==> `Day 01, 01-Feb-1996', in case the actual system date is
+          the 2nd February 1996.
+
+`%>1&*D[DATE]'
+     Is replaced by the *day number* with trailing Ordinal Number suffix
+     of the current day of month, e.g.:
+
+          The text `Day %>1&*D , %n' will be expanded to
+          ==> `Day 2nd, 02-Feb-1996', in case the actual system date is
+          the 2nd February 1996.
+
+`%>02&*D[DATE]'
+     Is replaced by the 2-digit *day number* with leading zero and
+     trailing Ordinal Number suffix of the current day of month, e.g.:
+
+          The text `Day %>02&*D , %n' will be expanded to
+          ==> `Day 02nd, 02-Feb-1996', in case the actual system date
+          is the 2nd February 1996.
+
+
+File: gcal.info,  Node: Week number,  Next: Month name,  Prev: Day number,  Up: Replacements with date argument
+
+Week number `%k[DATE]' special text
+...................................
+
+`%k[DATE]'
+     Is replaced by either the 2-digit *ISO week number* or the
+     *standard week number* with leading zero, or a 4-alphanumeric
+     character text of the current week of year
+     (see *Note Calendar option `--starting-day=ARGUMENT':
+     x-starting-day, *Note Calendar option `--iso-week-number=yes|no':
+     x-iso-week-number, and *Note Aspects in Internationalization:
+     Internationalization, for further details), e.g.:
+
+          The text `Today is %K  of week %k' will be expanded to
+          ==> `Today is Monday of week 24', in case the actual system
+          date is the 10th June 1996.
+
+
+File: gcal.info,  Node: Month name,  Next: Month number,  Prev: Week number,  Up: Replacements with date argument
+
+Month name `%[FORMAT]U[DATE]' special text
+..........................................
+
+`%U[DATE]'
+     Is replaced by the complete *month name* of the current month of
+     year, e.g.:
+
+          The text `Today is %U , %n' will be expanded to
+          ==> `Today is June, 10-Jun-1996', in case the actual system
+          date is the 10th June 1996.
+
+`%>3#U[DATE]'
+     Is replaced by the 3-letter *month name* of the current month of
+     year, e.g.:
+
+          The text `Today is %>3#U19961010 , %n' will be expanded to
+          ==> `Today is Oct, 10-Jun-1996', in case the actual system
+          date is the 10th June 1996.
+
+
+File: gcal.info,  Node: Month number,  Next: Year number,  Prev: Month name,  Up: Replacements with date argument
+
+Month number `%[FORMAT]M[DATE]' special text
+............................................
+
+`%M[DATE]'
+     Is replaced by the *month number* of the current month of year,
+     e.g.:
+
+          The text `Month %M , %n' will be expanded to
+          ==> `Month 2, 22-Feb-1996', in case the actual system date is
+          the 22nd February 1996.
+
+`%>02*M[DATE]'
+     Is replaced by the 2-digit *month number* with leading zero of the
+     current month of year, e.g.:
+
+          The text `Month %>02*M000001 , %n' will be expanded to
+          ==> `Month 01, 22-Feb-1996', in case the actual system date
+          is the 22nd February 1996.
+
+`%>1&*M[DATE]'
+     Is replaced by the *month number* with trailing Ordinal Number
+     suffix of the current month of year, e.g.:
+
+          The text `Month %>1&*M , %n' will be expanded to
+          ==> `Month 2nd, 22-Feb-1996', in case the actual system date
+          is the 22nd February 1996.
+
+`%>02&*M[DATE]'
+     Is replaced by the 2-digit *month number* with leading zero and
+     trailing Ordinal Number suffix of the current month of year, e.g.:
+
+          The text `Month %>02&*M , %n' will be expanded to
+          ==> `Month 02nd, 22-Feb-1996', in case the actual system date
+          is the 22nd February 1996.
+
+
+File: gcal.info,  Node: Year number,  Next: Moon phase,  Prev: Month number,  Up: Replacements with date argument
+
+Year number `%[FORMAT]Y[DATE]' special text
+...........................................
+
+`%Y[DATE]'
+     Is replaced by the *year number* of the current year, e.g.:
+
+          The text `Year %Y , %n' will be expanded to
+          ==> `Year 933, 22-Feb-0933', in case the actual system date
+          is the 22nd February 933.
+
+`%>04*Y[DATE]'
+     Is replaced by the 4-digit *complete year number* with leading
+     zeroes of the current year, e.g.:
+
+          The text `Year %>04*Y0015 , %n' will be expanded to
+          ==> `Year 0015, 22-Feb-0933', in case the actual system date
+          is the 22nd February 933.
+
+
+File: gcal.info,  Node: Moon phase,  Next: Biorhythm,  Prev: Year number,  Up: Replacements with date argument
+
+Moon phase `%[FORMAT]?[DATE]' special texts
+...........................................
+
+  Gcal uses a very simple algorithm for detecting the Moon phase, which
+computes approximate values only.  The Moon phase is always calculated
+for 0 o'clock Universal time (UTC/GMT).  *Note Calendar option
+`--time-offset=ARGUMENT': x-time-offset, how to change the base time
+for which the astronomical functions are calculated.  The following
+Moon phase `%[FORMAT]?[DATE]' special texts are respected:
+
+`%O[DATE]'
+     Is replaced by the *Moon phase text* of the current day of year,
+     e.g.:
+
+          The text `Moon phase %O , %n' will be expanded to
+          ==> `Moon phase 94%+, 22-Dec-1996', in case the actual system
+          date is the 22nd December 1996.
+
+     The constructed Moon phase text consists of a percent value, which
+     informs about the illuminated fraction of the Moon's disk, and a
+     trailing sign that tells something about the state of the Moon.  A
+     trailing `+' sign indicates a waxing Moon, a `-' sign a waning
+     Moon, a `@' sign indicates the Full Moon phase, and a `!' sign the
+     New Moon phase.
+
+`%>03*O[DATE]'
+     Is replaced by the 3-digit *Moon phase text* with leading zeroes
+     of the current day of year, e.g.:
+
+          The text `Moon phase %>03*O0@t+1 , %n+1' will be expanded to
+          ==> `Moon phase 098%+, 23-Dec-1996', in case the actual
+          system date is the 22nd December 1996.
+
+     The constructed Moon phase text consists of a percent value, which
+     informs about the illuminated fraction of the Moon's disk, and a
+     trailing sign that tells something about the state of the Moon.  A
+     trailing `+' sign indicates a waxing Moon, a `-' sign a waning
+     Moon, a `@' sign indicates the Full Moon phase, and a `!' sign the
+     New Moon phase.
+
+`%Z[DATE]'
+     Is replaced by the *Moon phase text graphics* of the current day
+     of year, e.g.:
+
+          The text `Date %n %Z  --- Moon phase %>03*O ~Text' will be
+          expanded to
+          ==> `Date 08-Mar-1995 '
+          ==> `           (       @@@@@@'
+          ==> `      (              @@@@@@@@@'
+          ==> `    (                @@@@@@@@@@@'
+          ==> `  (                   @@@@@@@@@@@@'
+          ==> ` (                    @@@@@@@@@@@@@'
+          ==> `(                      @@@@@@@@@@@@@'
+          ==> `(                      @@@@@@@@@@@@@'
+          ==> ` (                    @@@@@@@@@@@@@'
+          ==> `  (                   @@@@@@@@@@@@'
+          ==> `   (                  @@@@@@@@@@@'
+          ==> `      (             @@@@@@@@@'
+          ==> `           (        @@@@@@@ --- Moon phase 041%+'
+          ==> `Text', in case the actual system date is the 8th March
+          1995.
+
+     *Note Fixed date option `--moonimage-lines=NUMBER':
+     x-moonimage-lines, how to change the size of a Moon phase text
+     graphics.
+
+     A possibly specified FORMAT within this special text is ignored by
+     Gcal.
+

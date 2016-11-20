@@ -1,0 +1,115 @@
+This library provides UTF-8 locale support, for use on systems which don't
+have UTF-8 locales, or whose UTF-8 locales are unreasonably slow.
+
+It provides support for
+  - the wchar_t and wint_t types,
+  - the mbs/wcs functions typically found in <stdlib.h>,
+  - the wide string functions typically found in <wchar.h>,
+  - the wide character classification functions typically found in <wctype.h>,
+  - some of the wide character I/O functions typically found in <wchar.h>,
+  - the setlocale function typically found in <locale.h>.
+All this according to the ISO/ANSI C specifications, and with support for
+old 8-bit locales and Unicode UTF-8 locales.
+
+libutf8 is for you if your application supports 8-bit and multibytes locales
+like chinese or japanese, and you wish to add UTF-8 locale support but the
+corresponding support lacks from your system.
+
+libutf8 is for you also if your application supports only 8-bit locales, and
+you wish to add UTF-8 locale support. Because libutf8 implements an ISO/ANSI C
+compatible set of types and functions, the support for libutf8 you add will
+also automatically work (without libutf8) with other multibytes locales,
+as far as supported by the system.
+
+libutf8 concentrates on 8-bit and UTF-8 encodings and therefore does not
+suffer from the complexity needed to support other multibytes locales.
+
+To use this library, as a C/C++ package developer:
+  - Make sure your application is already internationalized (i.e. typically
+    calls setlocale(LC_ALL,"") once and for all),
+  - In all files which use wide character or wide string functions or
+    setlocale, add
+        #ifdef HAVE_LIBUTF8
+        #include <libutf8.h>
+        #endif
+    after all system include files are included.
+  - If the macro MB_CUR_MAX evaluates to an integer > 1, the application
+    is running in a multibyte locale, and you should use the mbs* and wcs*
+    functions for string manipulation. If MB_CUR_MAX is 1, you can stay
+    with the str* functions. (Using the mbs* and wcs* functions will work
+    in this case too, but is less efficient that using the str* functions.)
+  - Don't use the compiler built-ins for wide characters (L'x') and wide
+    strings (L"x"). You can't do that because your program should be portable
+    to systems whose compiler doesn't support wchar_t and the L prefix, and
+    also because even on systems which have support for it, libutf8's wchar_t
+    encoding might be different from the system's encoding. To create wide
+    characters and strings from ASCII data, use btowc and mbstowcs instead.
+  - For autoconfiguration, add CL_UTF8 to your configure.in, and libutf8.m4
+    to you aclocal.m4. [Not yet contained in this distribution.]
+
+Installation:
+
+As usual for GNU packages:
+
+    $ ./configure --prefix=/usr/local
+    $ make
+    $ make install
+
+Special configuration options:
+
+  --with-traditional-mbstowcs
+
+    The traditional semantics of the mbrtowc, mbrlen, mbsrtowcs, mbsnrtowcs
+    functions in ISO C 89 Amendment 1 is to process complete multibyte
+    characters. When an incomplete multibyte character is encountered,
+    processing stops before this character. An mbstate_t contains shift
+    state only (i.e., for 8-bit and UTF-8 encodings, no information at all).
+
+    The new ISO C 99 semantics is to process all available bytes of an
+    incomplete multibyte character, and store in an mbstate_t the parse
+    state of an incomplete multibyte character, as far as it has been read.
+
+    libutf8 by default implements the new semantics.
+    --with-traditional-mbstowcs enables the traditional one instead.
+
+  --with-nontraditional-wcstombs
+
+    The traditional semantics of the wcsrtombs, wcsnrtombs functions in
+    ISO C 89 Amendment 1 is to process complete multibyte characters.
+    When a multibyte character cannot be stored in the destination buffer
+    without overflowing it, conversion stops before this character. An
+    mbstate_t contains shift state only (i.e., for 8-bit and UTF-8 encodings,
+    no information at all).
+
+    The new ISO C 99 semantics is to write as many bytes as allowed, even
+    at the risk of writing an incomplete multibyte character. An mbstate_t
+    keeps track of how far the current multibyte character has been written.
+
+    libutf8 by default implements the traditional semantics.
+    --with-nontraditional-wcstombs enables the new one instead.
+
+This library can be built and installed in two variants:
+
+  - The library mode. This works on all systems, and used a library
+    `libutf8.so' and a header file `<libutf8.h>'. (Both were installed
+    through "make install".)
+
+    To use it, you will have to modify a program's source as outlined above,
+    and recompile the program.
+
+  - The libc plug/override mode. This works on GNU/Linux, Solaris and OSF/1
+    systems only. It is a way to get UTF-8 locale support without waiting
+    for glibc-2.2. Tested with glibc-2.1.1 and glibc-2.0.7pre6.
+    It installs a library `libutf8_plug.so'. This library can be used with
+    LD_PRELOAD, to override the mbs/wcs functions present in the C library.
+
+    On GNU/Linux and Solaris:
+        $ export LD_PRELOAD=/usr/local/lib/libutf8_plug.so
+
+    On OSF/1:
+        $ export _RLD_LIST=/usr/local/lib/libutf8_plug.so:DEFAULT
+
+    A program's source need not be modified, the program need not even be
+    recompiled. Just set the LD_PRELOAD environment variable, that's it!
+
+Bruno Haible <haible@clisp.cons.org>

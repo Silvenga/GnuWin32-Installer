@@ -1,0 +1,121 @@
+DLCLOSE(3P)                POSIX Programmer's Manual               DLCLOSE(3P)
+
+
+
+PROLOG
+       This  manual page is part of the POSIX Programmer's Man-
+       ual.  The Linux implementation  of  this  interface  may
+       differ  (consult the corresponding Linux manual page for
+       details of Linux behavior), or the interface may not  be
+       implemented on Linux.
+
+NAME
+       dlclose - close a dlopen object
+
+SYNOPSIS
+       #include <dlfcn.h>
+
+       int dlclose(void *handle);
+
+
+DESCRIPTION
+       The  dlclose() function shall inform the system that the
+       object referenced by a handle returned from  a  previous
+       dlopen()  invocation is no longer needed by the applica-
+       tion.
+
+       The use of dlclose() reflects a statement of  intent  on
+       the  part  of  the  process,  but  does  not  create any
+       requirement upon the implementation, such as removal  of
+       the code or symbols referenced by handle. Once an object
+       has been closed using dlclose()  an  application  should
+       assume  that  its  symbols  are  no  longer available to
+       dlsym(). All objects loaded automatically as a result of
+       invoking dlopen() on the referenced object shall also be
+       closed if this is the last reference to it.
+
+       Although a dlclose() operation is not required to remove
+       structures  from  an address space, neither is an imple-
+       mentation prohibited from doing so. The only restriction
+       on  such a removal is that no object shall be removed to
+       which references have been relocated,  until  or  unless
+       all such references are removed. For instance, an object
+       that had been loaded with a dlopen() operation  specify-
+       ing  the  RTLD_GLOBAL  flag  might  provide a target for
+       dynamic relocations performed in the processing of other
+       objects-in  such environments, an application may assume
+       that no relocation, once made, shall be undone or remade
+       unless  the  object  requiring the relocation has itself
+       been removed.
+
+RETURN VALUE
+       If  the  referenced  object  was  successfully   closed,
+       dlclose()  shall  return  0.  If the object could not be
+       closed, or if handle does not refer to an  open  object,
+       dlclose()  shall  return a non-zero value. More detailed
+       diagnostic information shall be available through  dler-
+       ror().
+
+ERRORS
+       No errors are defined.
+
+       The following sections are informative.
+
+EXAMPLES
+       The  following  example  illustrates use of dlopen() and
+       dlclose():
+
+
+              ...
+              /* Open a dynamic library and then close it ... */
+
+
+              #include <dlfcn.h>
+              void *mylib;
+              int eret;
+
+
+              mylib = dlopen("mylib.so", RTLD_LOCAL | RTLD_LAZY);
+              ...
+              eret = dlclose(mylib);
+              ...
+
+APPLICATION USAGE
+       A conforming application should employ a handle returned
+       from  a  dlopen()  invocation  only within a given scope
+       bracketed by  the  dlopen()  and  dlclose()  operations.
+       Implementations  are  free  to use reference counting or
+       other techniques such that multiple  calls  to  dlopen()
+       referencing  the  same object may return the same object
+       for handle.  Implementations are also free  to  reuse  a
+       handle. For these reasons, the value of a handle must be
+       treated as an opaque object  by  the  application,  used
+       only in calls to dlsym() and dlclose().
+
+RATIONALE
+       None.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       dlerror(),  dlopen(), dlsym(), the Base Definitions vol-
+       ume of IEEE Std 1003.1-2001, <dlfcn.h>
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+IEEE/The Open Group                  2003                          DLCLOSE(3P)

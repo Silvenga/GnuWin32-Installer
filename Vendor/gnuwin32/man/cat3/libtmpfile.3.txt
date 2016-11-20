@@ -1,0 +1,63 @@
+Netpbm subroNetpbmlsubroutine_library:)pm_tmpfile() function(3)
+
+
+
+
+
+NAME
+       pm_tmpfile() - tempfile creation routine using TMPFILE
+
+SYNOPSIS
+       #include <netpbm/pm.h>
+
+       FILE *
+       pm_tmpfile(void);
+
+
+EXAMPLE
+       This  simple  example  creates  a temporary file, writes
+       "hello world" to it, then reads back  and  prints  those
+       contents.
+
+       #include <netpbm/pm.h>
+
+       FILE * myfile;
+
+       myfile = pm_tmpfile();
+
+       fprintf(myfile, "hello world0);
+
+       fseek(myfile, 0, SEEK_SET);
+
+       fread(buffer, sizeof(buffer), 1, myfile);
+
+       fprintf(STDOUT, "temp file contains '%s'0, buffer);
+
+       fclose(myfile);
+
+
+
+DESCRIPTION
+       This library function is part of Netpbm(1).
+
+       pm_tmpfile()  creates  and  opens  an  unnamed temporary
+       file.  It is basically the same thing as the standard  C
+       library tmpfile() function, except that it uses the TMP-
+       FILE environment variable to decide where to create  the
+       temporary  file.   If  TMPFILE  is  not set or is set to
+       something unusable (e.g.  too long), pm_tmpfile()  falls
+       back  to  the  value  of  the  standard C library symbol
+       P_tmpdir, just like tmpfile().
+
+       Unlike tmpfile(), pm_tmpfile() never returns  NULL.   If
+       it  fails,  it  issues  a  message to Standard Error and
+       aborts the program, like most libnetpbm routines do.
+
+
+HISTORY
+       pm_tmpfile() was introduced  in  Netpbm  10.20  (January
+       2004).
+
+
+
+netpbm documNetpbmosubroutineJlibrary: pm_tmpfile() function(3)

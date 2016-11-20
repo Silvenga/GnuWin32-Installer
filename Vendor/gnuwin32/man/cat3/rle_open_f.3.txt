@@ -1,0 +1,75 @@
+RLE_OPEN_F(3)                                     RLE_OPEN_F(3)
+
+
+
+
+
+NAME
+       rle_open_f - Open a binary file for input or output with
+       defaults.
+       rle_open_f_noexit - Returns error code instead of  exit-
+       ing.
+
+SYNOPSIS
+       FILE *rle_open_f( prog_name, file_name, mode )
+       char *prog_name, *file_name, *mode;
+
+       FILE *rle_open_f_noexit( prog_name, file_name, mode )
+       char *prog_name, *file_name, *mode;
+
+DESCRIPTION
+       The function rle_open_f is provided to simplify the task
+       of opening files in toolkit programs.   It  works  simi-
+       larly  to  fopen(3), but it also provides error checking
+       and messages, and default values for input  and  output.
+       If  the  specified  file_name cannot be opened, an error
+       message is printed and the  program  exits.   A  variant
+       rle_open_f_noexit  is provided which will return NULL if
+       the file cannot be opened.  An error  message  is  still
+       printed.
+
+       On  those  systems  which  require  it,  a  'b'  will be
+       appended to the mode string so that  the  file  will  be
+       opened in binary mode.
+
+       If  the  file_name  is  NULL  or "-", then stdin will be
+       returned for input (mode "r") files and stdout  will  be
+       returned for output (mode "w" or "a") files.
+
+       The  following two options are available only on systems
+       supporting pipes.  If the file_name starts  with  a  "|"
+       character,  then the rest of the file name will be taken
+       as a sh(1) command.  If mode is "r",  a  pipe  from  the
+       output  of  the sh command will be returned.  If mode is
+       "w" or "a", a pipe to the input of the sh  command  will
+       be returned.
+
+       If the file_name ends with the suffix ".Z" (and does not
+       start with "|"), then the compress(1)  program  will  be
+       invoked  to  uncompress (mode "r") or compress (mode "w"
+       or "a") the  file.   The  file  descriptor  returned  by
+       rle_open_f  will  be a pipe from or to the compress pro-
+       gram.
+
+SEE ALSO
+       fopen(3), popen(3), compress(1).
+
+AUTHOR
+       Gerald Winter
+       Spencer W. Thomas
+       University of Michigan
+
+BUGS
+       If the command invoked via popen  does  not  exist,  the
+       popen  still returns successfully, and the underlying sh
+       prints an error message.
+
+       There is no  way  of  telling  that  a  particular  FILE
+       pointer  has been created by popen, so it isn't possible
+       to cleanly close the pipe with  pclose.   In  fact,  the
+       eventual  output file may not even exist by the time the
+       program exits.
+
+
+
+3                            2/2/87               RLE_OPEN_F(3)

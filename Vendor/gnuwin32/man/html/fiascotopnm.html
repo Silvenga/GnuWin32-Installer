@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Fiascotopnm User Manual</TITLE></HEAD>
+<BODY>
+<H1>fiascotopnm</H1>
+Updated: 12 July 2000
+<BR>
+<A HREF="fiascotopnm.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+fiascotopnm - Convert compressed FIASCO image to PGM, or PPM
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>fiascotopnm </B>
+[<I>option</I>]...
+[<I>filename</I>]...
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><B>fiascotopnm</B> decompresses the named FIASCO files, or the
+Standard Input if no file is named, and writes the images as PGM, or
+PPM files, depending on whether the FIASCO image is black and white or
+color.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<p>All option names may be abbreviated; for example, --output may be
+written --outp or --ou. For all options an one letter short option
+is provided. Mandatory or optional arguments to long options are
+mandatory or optional for short options, too. Both short and long
+options are case sensitive.
+
+<DL COMPACT>
+<DT><B>-o</B>[<I>name</I>], <B>--output=</B>[<I>name</I>]
+
+<DD> Write decompressed image to the file <I>name</I>.ppm (if PPM) or
+<I>name</I>.pgm (if PGM).  If <I>name</I> is <b>-</b>, then produce
+the image file on the standard output. The optional argument
+<I>name</I> can be omitted, then the input filename is used as
+basename with the suffix .ppm or .pgm. In case of video streams, the
+frames are stored in the files <I>name</I>.<B>N</B>.ppm where <B>N</B>
+is the frame number (of the form 00..0 - 99..9); output on the
+standard output is not possible with video streams.
+
+<P> If <I>name</I> is a relative path and the environment variable
+<B>FIASCO_IMAGES</B> is a (colon-separated) list of directories, then
+the output file(s) are written to the first (writable) directory of
+this list. Otherwise, the current directory is used to store the
+output file(s).
+
+<DT><B>-z</B>, <B>--fast</B>
+<DD>
+Decompress images in the 4:2:0 format; i.e., each chroma channel is
+decompressed to an image of halved width and height. Use this option
+on slow machines when the desired frame rate is not achieved; the
+output quality is only slightly decreased. 
+
+<DT><B>-d</B>, <B>--double</B><DD>
+Double the size of the X11 window both in width and height; no pixel
+interpolation is used, each pixel is just replaced by four identical
+pixels.
+
+<DT><B>-p</B>, <B>--panel</B>
+<DD>
+Show a panel with play, stop, pause, record and exit buttons to
+control the display of videos. When pressing the record button, all
+frames are decompressed and stored in memory. The other buttons work
+in the usual way.
+
+<DT><B>-m</B> <I>N</I>, <B>--magnify=</B><I>N</I>
+<DD>
+Set magnification of the decompressed image. Positive values enlarge
+and negative values reduce the image width and height by a factor of
+2^|<I>N</I>|.
+
+<DT><B>-s</B> <I>N</I>, <B>--smooth=</B><I>N</I>
+<DD>
+Smooth decompressed image(s) along the partitioning borders by the
+given amount <I>N</I>. <I>N</I> is 1 (minimum) to 100 (maximum); default
+is 70. When <I>N</I>=0, then the smoothing amount specified in the
+FIASCO file is used (defined by the FIASCO coder).
+
+<DT><B>-F</B> <I>N</I>, <B>--fps=</B><I>N</I>
+<DD>
+Set number of frames per second to <I>N</I>. When using this option,
+the frame rate specified in the FIASCO file is overridden.
+
+<DT><B>-v</B>, <B>--version</B>
+<DD>
+Print <B>fiascotopnm</B> version number, then exit.
+
+<DT><B>-f</B> <I>name</I>, <B>--config=</B><I>name</I>
+
+<DD>Load parameter file <I>name</I> to initialize the options of
+<B>fiascotopnm</B>.  See file <B>system.fiascorc</B> for an example of
+the syntax. Options of <B>fiascotopnm </B> are set by any of the
+following methods (in the specified order):
+
+<OL>
+<LI>Global ressource file <B>/etc/system.fiascorc</B>
+
+<LI>$HOME<B>/.fiascorc</B>
+
+<LI>command line
+
+<LI>--config=<I>name</I>
+</OL>
+
+<DT><B>-h</B>, <B>--info</B>
+<DD>
+Print brief help, then exit.
+
+<DT><B>-H</B>, <B>--help</B>
+<DD>
+Print detailed help, then exit.
+
+</DL>
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>EXAMPLES</H2>
+
+<PRE>
+fiascotopnm foo.wfa &gt;foo.ppm
+</PRE>
+
+<P>Decompress the FIASCO file &quot;foo.wfa&quot; and store it as
+&quot;foo.ppm&quot;.
+
+<PRE>
+fiascotopnm -o foo1.wfa foo2.wfa
+</PRE>
+
+<P>Decompress the FIASCO files &quot;foo1.wfa&quot; and
+&quot;foo2.wfa&quot; and write the frames to the image files
+&quot;foo1.wfa.ppm&quot; and &quot;foo2.wfa.ppm&quot;.
+
+<PRE>
+fiascotopnm -oimage foo1.wfa
+</PRE>
+
+<P>Decompress the FIASCO file &quot;foo1.wfa&quot; and write all 15
+frames to the image files &quot;image.00.ppm&quot;, ... ,
+&quot;image.14.ppm&quot;.
+
+<PRE>
+fiascotopnm --fast --magnify=-1 --double video.wfa &gt;stream.ppm
+</PRE>
+
+<P>Decompress the FIASCO file &quot;video.wfa&quot;.  The
+decompression speed is as fast as possible: the image is decompressed
+(in 4:2:0 format) at a quarter of its original size; then the image is
+enlarged again by pixel doubling.
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>FILES</H2>
+
+<DL COMPACT>
+<DT><B>/etc/system.fiascorc</B>
+
+<DD>The systemwide initialization file.
+
+<DT>$HOME<B>/.fiascorc</B>
+
+<DD>The personal initialization file.
+
+</DL>
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>ENVIRONMENT</H2>
+
+<DL COMPACT>
+<DT><B>FIASCO_IMAGES</B>
+
+<DD>Save path for image files. Default is &quot;./&quot;.
+
+<DT><B>FIASCO_DATA</B>
+
+<DD>Search path for FIASCO files. Default is &quot;./&quot;.
+
+</DL>
+
+
+<A NAME="lbAI">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pnmtofiasco.html">pnmtofiasco</A></B>,
+<B><A HREF="pnm.html">pnm</A></B>
+
+<P>
+Ullrich Hafner, Juergen Albert, Stefan Frank, and Michael Unger.
+<B>Weighted Finite Automata for Video Compression</B>, IEEE Journal on
+Selected Areas In Communications, January 1998
+<BR>
+
+Ullrich Hafner. <B>Low Bit-Rate Image and Video Coding with Weighted
+Finite Automata</B>, Ph.D. thesis, Mensch &amp; Buch Verlag, ISBN
+3-89820-002-7, October 1999.
+
+<A NAME="lbAJ">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Ullrich Hafner &lt;<A HREF="mailto:hafner@bigfoot.de">hafner@bigfoot.de</A>&gt;
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="fiascotopnm.html#lbAB">NAME</A>
+<LI><A HREF="fiascotopnm.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="fiascotopnm.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="fiascotopnm.html#lbAE">OPTIONS</A>
+<LI><A HREF="fiascotopnm.html#lbAF">EXAMPLES</A>
+<LI><A HREF="fiascotopnm.html#lbAG">FILES</A>
+<LI><A HREF="fiascotopnm.html#lbAH">ENVIRONMENT</A>
+<LI><A HREF="fiascotopnm.html#lbAI">SEE ALSO</A>
+<LI><A HREF="fiascotopnm.html#lbAJ">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>
+
+

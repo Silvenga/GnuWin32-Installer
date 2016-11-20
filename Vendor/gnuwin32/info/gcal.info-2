@@ -1,0 +1,1508 @@
+This is gcal.info, produced by makeinfo version 4.0 from gcal.texi.
+
+INFO-DIR-SECTION GNU packages
+START-INFO-DIR-ENTRY
+* Gcal: (gcal).                       GNU calendar program.
+* Tcal: (gcal)Invoking tcal.          Run Gcal with tomorrow's date.
+* Txt2gcal: (gcal)Invoking txt2gcal.  Calendar text to resource file.
+* Gcal2txt: (gcal)Invoking gcal2txt.  Calendar resource to text file.
+END-INFO-DIR-ENTRY
+
+  This file documents Gcal, a program for calculating and printing
+calendars.
+
+  Copyright (c) 1994, 95, 96, 1997, 2000 Thomas Esken
+
+  This edition is for Gcal version 3.01.
+
+  Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+  Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+  Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation approved by the Free Software Foundation.
+
+  Any suggestions, improvements, extensions, bug reports, donations,
+proposals for contract work, and so forth are welcome!  Please send
+them directly to my eMail address <esken@gmx.net>.  If you like my
+work, I'd appreciate a postcard from you!
+
+------------------------oOO      \\\_''/      OOo---------------------------
+Thomas Esken               O     (/o-o\)     O  eMail: esken@gmx.net
+Im Hagenfeld 84                 ((  ^  ))       Phone: +49 251 232585
+D-48147 Muenster; Germany    \____) ~ (____/    MotD : 2old2live, 2young2die
+
+
+File: gcal.info,  Node: Calendar options-Footnotes,  Up: Calendar options
+
+  (1) ISO is the abbreviation of `International Organization for
+Standardization'.
+
+  (2) Similar the BSD-`cal' program.
+
+  (3) The time which is set as system time in the computer's clock.
+
+  (4) The automatical conversion into the according Julian date is
+always done if the actual system date, that is based on the Gregorian
+calendar, is before the date of the Gregorian Reformation.
+
+  (5) But `GCAL_DATE_FORMAT' is only used in case no
+`--date-format=de|us|gb|TEXT' option is given.
+
+
+File: gcal.info,  Node: Fixed date options,  Prev: Calendar options,  Up: Options
+
+Fixed date options
+..................
+
+`-v ARGUMENT'
+`--date-variable=ARGUMENT'
+     Define "global" date variable which is visible in all referenced
+     resource files (*note Date variables::).  The option ARGUMENT must
+     either be a valid single date variable definition or a (`:')
+     colon-connected series of definitions.
+
+     A date variable name DVAR consists of a single, case-insensitive
+     letter(1) (*note Fixed date options-Footnote-1::).  In a
+     definition, this name is trailed by the assignment operator
+     character `=', and the numerical values of month MM (or a short,
+     three characters month name, e.g. `Jan', `Feb'...)  and day DD,
+     this variable has to store(2) (*note Fixed date
+     options-Footnote-2::).
+
+     For example:
+
+          `--date-variable=a=1127:c=a' respectively
+          `-v a=1127:c=a'
+          stores the 27th November into the global date variable A and
+          into the global date variable C.
+
+`--export-date-variables'
+     Causes the export of local date variables from one resource file
+     to another resource file.  *Note Date variables::, for more
+     details.
+
+`-r ARGUMENT'
+`--text-variable=ARGUMENT'
+     Define "global" text variable which is visible in all referenced
+     resource files (*note Text variables::).  The option ARGUMENT must
+     either be a valid single text variable definition or a (`:')
+     colon-connected series of definitions.
+
+     A text variable name TVAR consists of the `$' prefix and a single,
+     case-insensitive letter.
+
+     A text variable is defined as follows:
+
+        * If the name of a text variable is trailed by the assignment
+          operator character `=', all the text which appears at the
+          right side of this assignment operator is assigned to this
+          text variable.
+
+        * If the name of a text variable is trailed by the assignment
+          operator character `?', all the text which appears at the
+          right side of this assignment operator is assumed as an
+          external command and executed by Gcal.  The output, which is
+          created on the _standard output channel_ by the command run,
+          is assigned to this text variable; and that in an interpreted
+          manner.  This means, Gcal interprets all special texts and
+          references to other text variables which are contained in
+          this output.  *Note Text variables::, and *Note Special Texts
+          processed::, for further information.
+
+        * If the name of a text variable is trailed by the assignment
+          operator character `:', all the text which appears at the
+          right side of this assignment operator is assumed as an
+          external command and executed by Gcal.  The output, which is
+          created on the _standard output channel_ by the command run,
+          is assigned to this text variable; and that in an
+          uninterpreted manner.  This means, Gcal does not interpret
+          any special texts and references to other text variables
+          which are contained in this output.  See also *Note Text
+          variables::, and *Note Special Texts processed::, for further
+          details.
+
+     Indeed, Gcal executes external commands only if the
+     `--execute-command' option is given at program start-up.  *Note
+     Fixed date option `--execute-command': x-execute-command, for more
+     details.
+
+     The text which appears at the right side of one of the valid
+     assignment operator characters may reference names of already
+     defined global text variables.  These references are converted to
+     the according textual values just before the assignment is
+     performed by Gcal.
+
+     A global text variable is defined with an _empty contents_ in case
+     no text appears at the right side of one of the valid assignment
+     operator characters.
+
+     For example:
+
+          `--text-variable=$a=foo:$c=$a' respectively
+          `-r $a=foo:$c=$a'
+          stores the `foo' text into the global text variable $A and
+          into the global text variable $C.
+
+          `--text-variable=$a\:foo:$c?bar' respectively
+          `-r $a\:foo:$c?bar'
+          stores the uninterpreted output of the `foo' command into the
+          global text variable $A, and the interpreted output of the
+          `bar' command into the global text variable $C.
+
+     You may depreciate the special meaning of the `:' separator
+     character --in case this character itself is needed-- by placing a
+     `\' (backslash) character before it, e.g. `\:'.  If you need the
+     `\:' characters themselves, you have to protect the `\'
+     (backslash) character by another `\' (backslash) character, e.g.
+     `\\:'.
+
+     You may depreciate the special meaning of the `$' prefix character
+     --in case this character itself is needed in the text-- by placing
+     a `\' (backslash) character before it, e.g. `\$'.  If you need the
+     `\$' characters themselves in the text, you have to protect the
+     `\' (backslash) character by another `\' (backslash) character,
+     e.g. `\\$'.
+
+     Each time a `_' (underscore) character is found in ARGUMENT, this
+     character is replaced by a real ` ' (space) character.
+
+     You may depreciate the special meaning of the `_' (underscore)
+     character --in case this character itself is needed-- by placing a
+     `\' (backslash) character before it, e.g. `\_'.  If you need the
+     `\_' themselves, you have to protect the `\' (backslash) character
+     by another `\' (backslash) character, e.g. `\\_'.
+
+`--export-text-variables'
+     Causes the export of local text variables from one resource file
+     to another resource file.  *Note Text variables::, for more
+     details.
+
+`--adjust-value=ARGUMENT'
+     Causes on the one hand, that the number given as ARGUMENT to the
+     `--adjust-value' option is used as reference altitude to calculate
+     the rise and set times by the Sun and Moon oriented special texts.
+     The option argument must be a rational number in range
+     -90.0...+90.0, which declares the angle distance in decimal
+     degrees from the center of astronomical object to the horizon.
+     For example, you can detect the time when the center of the Sun or
+     the Moon is 20.5 decimal degrees below the horizon if you use
+     `--adjust-value=-20.5'.
+
+     And causes on the other hand, that the number that is given as
+     ARGUMENT is used as factor for computing the shadow length of a
+     vertical pole by the Sun oriented special texts.  The option
+     argument must be a rational number in range 0.0...+90.0, which
+     declares the shadow length.  For example, you can detect the time
+     when the shadow length of vertical pole is three and a half times
+     longer than the shadow length that appears at astronomical noon if
+     you use `--adjust-value=3.5'.
+
+     *Note Sun data::, and *Note Moon data::, for further information.
+
+`--atmosphere=AIR-PRESSURE[,TEMPERATURE]'
+     Set the base data of the Earth's atmosphere that is necessary to
+     calculate the amount of "refraction"(3) (*note Fixed date
+     options-Footnote-3::), that is used by the Sun and Moon oriented
+     special texts.  The option argument consists of one or two
+     rational numbers, which are separated by a `,' character.  The
+     first number denotes the air pressure in millibar, and the second
+     number specifies the air temperature in degree Celsius.  The
+     default value for the air pressure is 1013.25 millibar, and the
+     default value for the temperature is 15.0 degree Celsius.  For
+     example, if you use `--atmosphere=1010,10', you define atmospheric
+     conditions as they are existing for an air pressure of 1010
+     millibar and a temperature of 10 degree Celsius.  If you set an
+     air pressure value less or equal zero, no atmospheric refraction
+     will be respected by the Sun and Moon oriented special texts, as
+     for example done by `--atmosphere=0'.
+
+     *Note Sun data::, and *Note Moon data::, for further information.
+
+`--limit'
+     Causes when calculating the rise and set times by the Sun oriented
+     special texts for high latitudes, that a rise or set event which
+     possibly occurs on a previous or next day, is not displayed as
+     occurring on the actual day as it is done by default.  At high
+     latitudes, i.e. above the solar Arctic Circle, it is fact that no,
+     or more than one sunrise or sunset happens during a day at
+     definite dates of the year.  As a special text basically leads in a
+     single, atomical output, even it should result in several output
+     in reality, Gcal puts such an event on a previous or next day.
+     Then, data represented in this manner could be misinterpreted very
+     easily.
+
+     The following example is used to explain this.  It calculates the
+     time the astronomical twilight ends for the location Münster,
+     Germany, during some days in May 2000, and that with and without
+     the `--limit' option in each case:
+
+          $ gcal %20000506 -f/dev/null -cxl4+ \
+          >      -#'0*d1#999_%s9+5158+00738,120'
+          -|
+          -| Sun, May   7th 2000: 23:52
+          -| Mon, May   8th 2000: 23:57
+          -| Tue, May   9th 2000: 00:01
+          -| Wed, May  10th 2000: 00:06
+          $ gcal %20000506 -f/dev/null -cxl4+ --limit \
+          >      -#'0*d1#999_%s9+5158+00738,120'
+          -|
+          -| Sun, May   7th 2000: 23:52
+          -| Mon, May   8th 2000: 23:57
+          -| Tue, May   9th 2000: **:**
+          -| Wed, May  10th 2000: **:**
+
+     As one can see well in the above example, the output for the days
+     since 9th May differs in that the times shown without the
+     `--limit' option obviously exceeded the civil midnight time and
+     actually cannot happen during these days, whereas no times are
+     shown for the days since 9th May if the `--limit' option is used
+     because the time circle is exceeded.  Astronomically seen, it is
+     the case that the end of the astronomical twilight is at 23:57
+     o'clock local time on 8th May, no end of astronomical twilight
+     happens on 9th May because the center of the Sun's disk is always
+     above 18 degrees (the reference altitude of the astronomical
+     twilight) below a geometric horizon, but on 10th May at 00:01
+     o'clock local time, this reference altitude is passed again.
+     Thus, the time that is detected for the 9th May has properly to be
+     moved to the 10th May, et cetera, as it is expressed by the output
+     that is created by using the `--limit' option.
+
+     *Note Sun data::, for further information.
+
+`--cycle-end=ARGUMENT'
+     Calculates the Sun and Moon oriented special texts that are
+     dynamical, i.e. depending on the respective clocktime, for a
+     series of clocktimes for the current day, i.e. determination is
+     done for any time interval that can be individually defined by the
+     user.  Gcal is always put into such a "cycle mode" if the
+     `--cycle-end' option is given at program start-up.  The ARGUMENT
+     of the `--cycle-end' option is syntactically according to the
+     argument which may be given to the `--time-offset' option, thus
+     `t|@|[t|@][+|-]MMMM|HH:[MM]'.  *Note Calendar option
+     `--time-offset=ARGUMENT': x-time-offset, for the detailed
+     explanation of the preceding option argument.  Thus, the
+     `--cycle-end' option is used to fix the ending time of the time
+     interval, whereas the `--time-offset' option is *implicitly* used
+     to fix the starting time of the time interval, that is 0 o'clock
+     by default(4) (*note Fixed date options-Footnote-4::).
+
+     If values for the time interval are given to both above mentioned
+     options that fall short of 0 o'clock, these values are
+     automatically set to 0 o'clock.  If values for the time interval
+     are given that exceed 23:39 o'clock, these values are
+     automatically set to 23:59 o'clock.
+
+     The timestep value between the starting and the ending time of the
+     time interval that is respected by Gcal is one minute by default.
+     This value can at pleasure be changed by using the `--cycle-step'
+     option.  *Note Fixed date option `--cycle-step=ARGUMENT':
+     x-cycle-step, for more details.
+
+     You should always keep in mind that the use of the cycle mode is
+     efficient only if the current time of the time interval is also
+     part of that resource file line that has to be evaluated in this
+     manner.  Otherwise, it is difficult to find out unobjectionably
+     lateron when displaying the data and times, which Sun or Moon
+     oriented value resulted in what time.
+
+     The following example shows how the topocentric elevation angle of
+     the Sun for the location Münster, Germany, is calculated during
+     two days in April 2000, and that for the time interval 12:00
+     o'clock until 12:05 o'clock local time in each case:
+
+          $ gcal %20000420 -Hno -f/dev/null -xdt -g::: \
+          >      --here='0*d1#999_%ot+00+000_:_%oa+5158+00738,120' \
+          >      --cycle-end=12:05 --time=12:00
+          -|
+          -| Thu, Apr  20th 2000: +12h00': +045d58'
+          -| Thu, Apr  20th 2000: +12h01': +046d03'
+          -| Thu, Apr  20th 2000: +12h02': +046d07'
+          -| Thu, Apr  20th 2000: +12h03': +046d12'
+          -| Thu, Apr  20th 2000: +12h04': +046d17'
+          -| Thu, Apr  20th 2000: +12h05': +046d22'
+          -| :::
+          -| Fri, Apr  21st 2000: +12h00': +046d18'
+          -| Fri, Apr  21st 2000: +12h01': +046d23'
+          -| Fri, Apr  21st 2000: +12h02': +046d28'
+          -| Fri, Apr  21st 2000: +12h03': +046d32'
+          -| Fri, Apr  21st 2000: +12h04': +046d37'
+          -| Fri, Apr  21st 2000: +12h05': +046d42'
+
+     *Note Sun data::, and *Note Moon data::, for further information.
+
+`--cycle-step=ARGUMENT'
+     Changes the timestep value that is used between the starting and
+     ending clocktime of the time interval, in which the Sun and Moon
+     oriented special texts are calculated, that are dynamical, i.e.
+     depending on the respective clocktime.  *Note Fixed date option
+     `--cycle-end=ARGUMENT': x-cycle-end, how to define such a time
+     interval.  Without the `--cycle-end' option, a `--cycle-step'
+     option is completely ignored.  It also does not enable Gcal's
+     cycle mode.  The ARGUMENT of the `--cycle-step' option is by
+     change syntactically according to the argument which may be given
+     to the `--time-offset' option, and that relative time offset value
+     references based on the actual local time and Universal time
+     cannot be made, respectively.  Gcal always uses the amount of the
+     given timestep value.  Thus, the template for the argument that
+     may be given to the `--cycle-step' option is `[+|-]MMMM|HH:[MM]'.
+     *Note Calendar option `--time-offset=ARGUMENT': x-time-offset, for
+     the detailed explanation of the preceding option argument.
+
+     The timestep value between the starting and the ending time of the
+     time interval that is respected by Gcal is one minute by default.
+
+     The following example shows how the topocentric elevation angle of
+     the Sun for the location Münster, Germany, is calculated during
+     two days in April 2000, and that for the time interval 10:00
+     o'clock until 17:00 o'clock local time with a timestep value of
+     one hour and 15 minutes in each case:
+
+          $ gcal %20000420 -Hno -f/dev/null -xdt -g::: \
+          >      --here='0*d1#999_%ot+00+000_:_%o*a+5158+00738,120' \
+          >      --cycle-end=10:00 --time=17:00 --cycle-step=1:15
+          -|
+          -| Thu, Apr  20th 2000: +10h45': +38.038
+          -| Thu, Apr  20th 2000: +12h00': +45.962
+          -| Thu, Apr  20th 2000: +13h15': +49.665
+          -| Thu, Apr  20th 2000: +14h30': +47.882
+          -| Thu, Apr  20th 2000: +15h45': +41.267
+          -| Thu, Apr  20th 2000: +17h00': +31.633
+          -| :::
+          -| Fri, Apr  21st 2000: +10h45': +38.355
+          -| Fri, Apr  21st 2000: +12h00': +46.299
+          -| Fri, Apr  21st 2000: +13h15': +50.006
+          -| Fri, Apr  21st 2000: +14h30': +48.198
+          -| Fri, Apr  21st 2000: +15h45': +41.545
+          -| Fri, Apr  21st 2000: +17h00': +31.881
+
+     *Note Sun data::, and *Note Moon data::, for further information.
+
+`--precise'
+     The astronomical data and times that are created by the Sun and
+     Moon oriented special texts, and the geographical data that is
+     created by the distance and course angle oriented special text,
+     respectively, are displayed by using a higher precision, i.e.
+     according to the mode or style of representation and the type of
+     special text, decimal values are displayed with more decimal
+     places, or output of the time seconds part or the arcseconds part.
+
+     *Note Sun data::, and *Note Moon data::, likewise *Note
+     Geographical distance and course angle::, for further information.
+
+`--execute-command'
+     Causes on the one hand, that shell command `%![ARGUMENT]' special
+     texts are executed, and not displayed textually only.  *Note Shell
+     command `%![ARGUMENT]' special text: Shell Command, for more
+     details.  And causes on the other hand, that `TVAR?[COMMAND]' and
+     `TVAR:[COMMAND]' text variable definitions is assigned the output
+     of an external command, and not the text which contains the call
+     of the external command.  *Note Text variables::, for further
+     information.
+
+`-D ARGUMENT'
+`--filter-day=ARGUMENT'
+     Displays only those fixed dates, whose date is not excluded by the
+     given ARGUMENT.  *Note Date part of a line::, and likewise *Note
+     Exclusions without any argument `%?' special texts: Exclusions
+     without any argument.  The ARGUMENT consists of one or more
+     characters as used in the exclusion without any argument `%?'
+     special text; but without the leading `%' character in each case.
+
+     For example, it is possible to induce Gcal to display only those
+     fixed dates from the resource file `demo.rc' for the whole year
+     which are legals holidays, and moreover, Saturdays or Sundays:
+
+          gcal -f demo.rc --year --filter-day=Rv
+
+`-P ARGUMENT'
+`--filter-period=ARGUMENT'
+     Displays only those fixed dates, whose date is not excluded by the
+     given ARGUMENT.  *Note Date part of a line::, and likewise *Note
+     Exclusions with date argument `%?[DATE]' special texts: Exclusions
+     with date argument.  The ARGUMENT consists of one or more
+     expressions as used in the exclusion with date argument `%?[DATE]'
+     special text; but without the leading `%' character in each case.
+     You can use more than one of these `%?[DATE]' expressions by
+     connecting them with a `,' character.
+
+     For example, it is possible to induce Gcal to display only those
+     fixed dates from the resource file `demo.rc' for the whole year
+     which appear within the period of the 17th and the 20th of any
+     month, and which appear on the 31st of any month.
+
+          gcal -f demo.rc -y -P i00000017#00000020,i00000031#00000031
+
+`-I PATTERN'
+`--filter-text=PATTERN'
+     Displays only those fixed dates, whose completely expanded text(5)
+     (*note Fixed date options-Footnote-5::) is matched by the given
+     PATTERN.  *Note Text part of a line::, and *Note `%?'... special
+     texts for text replacement: Replacements.  The PATTERN is a
+     _regular expression_, as recognized by the Unix `ed' line-editor.
+     *Note Regular Expressions::, for further information.
+
+     For example, it is possible to induce Gcal to display all fixed
+     dates from the resource file `doctor.rc' for the current month,
+     which are defined for dentists or oculists:
+
+          gcal -f doctor.rc --month -I "[dD]entist|[oO]culist"
+
+     Each time a `_' (underscore) character is found in the PATTERN
+     argument, this character is replaced by a real ` ' (space)
+     character.
+
+     You may depreciate the special meaning of the `_' (underscore)
+     character --in case this character itself is needed-- by placing a
+     `\' (backslash) character before it, e.g. `\_'.  If you need the
+     `\_' characters themselves, you have to protect the `\'
+     (backslash) character by another `\' (backslash) character, e.g.
+     `\\_'.
+
+`--ignore-case'
+     Ignores all case distinctions in both the completely expanded text
+     and the PATTERN of the `--filter-text=PATTERN' option.  *Note
+     Fixed date option `--filter-text=PATTERN': x-filter-text.
+
+`--revert-match'
+     Displays all those fixed dates, whose completely expanded text
+     does not match the PATTERN of the `--filter-text=PATTERN' option.
+     *Note Fixed date option `--filter-text=PATTERN': x-filter-text.
+
+`-c|C[-]'
+`--today'
+`--list-of-fixed-dates[=short|long]'
+`--descending-fixed-dates[=short|long]'
+     Activate the fixed date function and display fixed date messages,
+     if any.
+
+    `-c'
+    `--today'
+    `--list-of-fixed-dates=short'
+          Activate fixed date function (use standard resource file
+          implicitly) and list all dates related to the actual system
+          date (==today), sorted in ascending order.  If no fixed dates
+          related to the current day are found, no fixed date messages
+          are displayed and the program is terminated with an error
+          code.  *Note Error Code 1: x-1-Error-code.
+
+    `-c-'
+    `--descending-fixed-dates=short'
+          Activate fixed date function (use standard resource file
+          implicitly) and list all dates related to the actual system
+          date (==today), sorted in descending order.  If no fixed
+          dates related to the current day are found, no fixed date
+          messages are displayed and the program is terminated with an
+          error code.  *Note Error Code 1: x-1-Error-code.
+
+    `-C'
+    `--list-of-fixed-dates=long'
+          Activate fixed date function (use standard resource file
+          implicitly) and list all dates related to the actual system
+          date (==today), sorted in ascending order.  If no fixed dates
+          related to the current day are found, an "empty" fixed date
+          message is displayed which is only consisting of the date.
+
+    `-C-'
+    `--descending-fixed-dates=long'
+          Activate fixed date function (use standard resource file
+          implicitly) and list all dates related to the actual system
+          date (==today), sorted in descending order.  If no fixed
+          dates related to the current day are found, an "empty" fixed
+          date message is displayed which is only consisting of the
+          date.
+
+`-f|F NAME[+...]'
+`--resource-file=NAME[+...]'
+     Activate fixed date function and use file NAME instead of the
+     standard resource file.  Then list all dates, sorted in ascending
+     order which occur in the fixed date period.  If no other fixed
+     date period is specified, the actual system date (==today) is used
+     for the fixed date period.  If the option letter `f' of the
+     short-style option is used and no dates related to the fixed date
+     period are found in NAME, no fixed date messages are displayed and
+     the program is terminated with an error code.  *Note Error Code 1:
+     x-1-Error-code.  If the option letter `F' of the short-style
+     option is used and no dates related to the fixed date period are
+     found in NAME, an "empty" fixed date message is displayed which is
+     only consisting of the date.
+
+     You can use more than one resource file NAME by connecting them
+     with a `+' character, e.g.:
+
+          `--resource-file=./foo+xyz+/data/bar+$HOME/.gcalrc' resp.,
+          `-f ./foo+xyz+/data/bar+$HOME/.gcalrc'
+
+     respects all files given in the preceding argument by using a
+     special file search mechanism.  *Note File searching mechanism:
+     x-File-searching-mechanism, for more details.  Use `/dev/null' to
+     avoid the use of the standard resource file, useful for creating
+     _empty fixed date lists_.  If a single `-' character is given as
+     file NAME, like `--resource-file=./foo+-+xyz' or `-F-', but not
+     `-F -', Gcal reads and processes all input received from the
+     _standard input channel_.
+
+     You may depreciate the special meaning of the `+' separator
+     character --in case this character itself is needed-- by placing a
+     `\' (backslash) character before it, e.g. `\+'.  If you need the
+     `\+' characters themselves, you have to protect the `\'
+     (backslash) character by another `\' (backslash) character, e.g.
+     `\\+'.
+
+     Each time a `_' (underscore) character is found in NAME, this
+     character is replaced by a real ` ' (space) character.
+
+     You may depreciate the special meaning of the `_' (underscore)
+     character --in case this character itself is needed-- by placing a
+     `\' (backslash) character before it, e.g. `\_'.  If you need the
+     `\_' characters themselves, you have to protect the `\'
+     (backslash) character by another `\' (backslash) character, e.g.
+     `\\_'.
+
+`-# LINE'
+`--here=LINE'
+     Activate fixed date function and use the LINE argument together
+     with the standard resource file respectively additional resource
+     files.  The LINE argument has to be a valid line as it may occur
+     in a Gcal resource file (*note Structure of resource file::), and
+     is always evaluated last *after* the processing of all resource
+     files, so dealing with references to exported local date or text
+     variables is enabled.  This option may be given multiple and it
+     will be processed exactly in the given order.  All dates are
+     listed, sorted in ascending order which occur in the fixed date
+     period.  If no other fixed date period is specified, the actual
+     system date (==today) is used for the fixed date period.  If no
+     dates related to the fixed date period are found in the LINE, no
+     fixed date messages are displayed and the program is terminated
+     with an error code.  *Note Error Code 1: x-1-Error-code.
+
+     For example, the call:
+
+          gcal -# "0*d1su#99su.7 ^%Z" --here="#include <foo>" -y
+
+     causes the implicit processing of the standard resource file just
+     before the further resource file line `0*d1su#99su.7 ^%Z' and
+     following `#include <foo>' are processed, and that as if these
+     lines were a physical part of the standard resource file.
+
+     Each time a `_' (underscore) character is found in LINE, this
+     character is replaced by a real ` ' (space) character.
+
+     You may depreciate the special meaning of the `_' (underscore)
+     character --in case this character itself is needed-- by placing a
+     `\' (backslash) character before it, e.g. `\_'.  If you need the
+     `\_' characters themselves, you have to protect the `\'
+     (backslash) character by another `\' (backslash) character, e.g.
+     `\\_'.
+
+*Please note:*
+If the short-style option `-c' and/or its modifiers `t|[w|m|y[+|-]', or
+the short-style option `-f' is/are given in *upper-case*, e.g.:
+
+     -C
+     -F foo.bar
+     -CeT
+     -c-aW+
+     -CeaxY-
+     -c-M
+
+Gcal displays fixed date messages for *every* day of the requested
+period.
+
+  The modifiers of a combined/complex/packed short-style fixed date
+option must be constructed according to following steps, because Gcal
+treats them as positional parameters:
+
+    First step: _Representation-of-text-modifier_
+          `a', `A', `e|E', `J', `k', `o', `Q', `U', `x', `z', `Z'
+
+    Second step: _Period-of-fixed-dates-modifier_
+          `d', `l', `t|T', `w|W|m|M|y|Y[+|-]', `N+|-', `Nd', `Nw',
+          `*dN[WWW]', `*wN[WWW]', `@e|t|DVAR[[+|-]N]',
+          `@e|t|DVAR[+|-]NWWW', `MMDD', `MMWWWN'
+
+  If you want to operate with the preceding modifiers, an *explicit*
+`-c|C[-]' short-style option must be leading on the one hand, e.g.:
+
+     -c-t
+     -cw-
+     -CZdekloQUzJaxA12+
+
+and only *one* period defining fixed date period modifier may be
+given(6) (*note Fixed date options-Footnote-6::).
+
+Or on the other hand, the modifiers must be given as single character
+options or composed into a single command line word, and additionally
+either the short-style option `-c|C[-]', `-f|F NAME[+...]' or
+`-# LINE'(7) (*note Fixed date options-Footnote-7::) must be given like:
+
+     -c -t
+     -w- -c
+     -a -Ad -e -kloQUxz -C12+
+     -F foo.bar -dJZA -l*d10
+     --here="; Comment" -dZAa
+
+If the modifiers are given as single character options or composed into
+a single command line word, and one of the `t|T|[w|W|m|M|y|Y[+|-]]'
+modifiers is used(8) (*note Fixed date options-Footnote-8::), it is
+unnecessary to give a `-c|C[-]' respectively `-f|F NAME[+...]'
+short-style option(9) (*note Fixed date options-Footnote-9::) to
+activate the fixed date function of Gcal, because it is triggered
+implicitly by means of these modifiers / alias names.
+
+  *Note Coding Scheme::, whose tables explain the relations between the
+_date part_ (YYYY...) of a resource file line and the modifiers, the
+short-style option `-c|C[]' --which is used for enabling the fixed date
+feature-- respectively the long-style option
+`--period-of-fixed-dates=ARGUMENT' may have, i.e. they point out all
+possible correspondences.  This is necessary because Gcal does not
+respect all entries found in a resource file if a _fixed date_ argument
+is given, it respects only those entries which have a definite relation
+to the _fixed date_ argument to avoid the output of redundant
+information!
+
+*Fixed date text modifiers and options:*
+
+`--biorhythm-axis=NUMBER'
+     The width of the biorhythm text graphics --which can be created by
+     means of the biorhythm text graphics `%;[DATE]' special text-- is
+     changed to NUMBER characters for each axis of the bar.  The NUMBER
+     argument must be an integer value between 1...100, the default
+     number of characters is 20.  If the NUMBER divides 100 with a
+     remainder, it is internally reduced to the nearest number that
+     divides 100 without any remainder.  This means, only the numbers
+     1, 2, 4, 5, 10, 20, 25, 50 and 100 are factually respected, so a
+     NUMBER argument of 19 is internally reduced to 10.
+
+     For example:
+
+          $ cat bio.rc
+          -| 0*d1#999 %;19620921
+          $ gcal -fbio.rc %19961212 -s0 -xw --biorhythm-axis=19
+          -|
+          -| Thu, Dec <12th>1996: 0- I       P1 E        +0
+          -| Fri, Dec  13th 1996: 0-  I   P   1          +0
+          -| Sat, Dec  14th 1996: 0-    @   E 0          +0
+          -| Sun, Dec  15th 1996: 0-  P  IE   0          +0
+          -| Mon, Dec  16th 1996: 0- P  E  I  0          +0
+          -| Tue, Dec  17th 1996: 1-P  E     I0          +0
+          -| Wed, Dec  18th 1996: 0- @        1          +0
+
+     *Note Biorhythm `%?[DATE]' special texts: Biorhythm, for more
+     details.
+
+`--moonimage-lines=NUMBER'
+     The height of the Moon phase text graphics --which can be created
+     by means of the Moon phase text graphics `%Z[DATE]' special text--
+     is changed to NUMBER lines.  The NUMBER argument must be an integer
+     value between 6...30, the default number of lines is 12.
+
+     For example:
+
+          $ gcal -f/dev/null -#0*d1#999_%Z__%O %19950407 -x --moon=8
+          -|
+          -| Fri, Apr < 7th>1995:          (    @@@@@
+          -|                          (           @@@@@@@@
+          -|                       (              @@@@@@@@@@@
+          -|                      (               @@@@@@@@@@@@
+          -|                      (               @@@@@@@@@@@@
+          -|                       (              @@@@@@@@@@@
+          -|                        (             @@@@@@@@@@
+          -|                            (        @@@@@@@ 42%+
+
+     *Note Moon phase `%[FORMAT]?[DATE]' special texts: Moon phase, for
+     more details.
+
+`a'
+`--include-resource-file-name'
+     Extend fixed date text by the name of the resource file and the
+     line number which the fixed date text comes from, e.g.:
+
+          Mon, Jan   1st 1995: (`Eternal holiday list'#00003) New Year's day
+          Mon, Jan   1st 1995: (.gcalrc#00987) No fixed dates
+          ...
+
+`A'
+`--alternative-format'
+     Instead of using the "standard" list format, e.g.:
+
+          Mon, Jan   1st 1995: New Year's day
+          Mon, Jan   1st 1995: No fixed dates
+          ...
+
+     Gcal uses the "alternative" list format, e.g.:
+
+          Mon, Jan   1st 1995:
+          New Year's day
+          No fixed dates
+          ...
+
+`e'
+`--include-holidays=long'
+     Enable inclusion of all built-in eternal holiday dates.  This
+     includes legal holidays and memorial days.
+
+`E'
+`--include-holidays=short'
+     Enable inclusion of those built-in eternal holiday dates which are
+     legal holidays only.
+
+`g[TEXT]'
+`--grouping-text[=TEXT]'
+     Group fixed dates by day by using the TEXT separator.  If TEXT is
+     not given, the built-in TEXT(10) (*note Fixed date
+     options-Footnote-10::) is used for grouping, e.g.:
+
+          $ gcal -Cxw -cg
+          -|
+          -| Sun, Nov   6th 1994: Text 1
+          -| Sun, Nov   6th 1994: Text 2
+          -|
+          -| Mon, Nov   7th 1994: Text 3
+          -|
+          -| Tue, Nov   8th 1994: Text 4
+          ...
+          
+          
+          $ gcal -Cxw -g'-A_user\_defined-~-grouping text-'
+          -|
+          -| Sun, Nov   6th 1994: Text 1
+          -| Sun, Nov   6th 1994: Text 2
+          -| -A user_defined-
+          -| -grouping text-
+          -| Mon, Nov   7th 1994: Text 3
+          -| -A user_defined-
+          -| -grouping text-
+          -| Tue, Nov   8th 1994: Text 4
+          ...
+
+     The TEXT may contain references to global date and text variables
+     (*note Fixed date option `--date-variable=ARGUMENT':
+     x-date-variable., and *Note Fixed date option
+     `--date-variable=ARGUMENT': x-text-variable).  Furthermore, all
+     special texts which cause a text replacement may be used in the
+     TEXT (*note `%?'... special texts for text replacement:
+     Replacements.).
+
+     Each time a `~' (tilde) or `^' (caret) character is found in TEXT,
+     this character is replaced by a real `\n' (newline) character.
+
+     You may depreciate the special meaning of the `~' (tilde) character
+     --in case this character itself is needed-- by placing a `\'
+     (backslash) character before it, e.g. `\~'.  If you need the `\~'
+     characters themselves, you have to protect the `\' (backslash)
+     character by another `\' (backslash) character, e.g. `\\_'.  All
+     above mentioned facts are also valid for the `^' (caret) character.
+
+     Each time a `_' (underscore) character is found in TEXT, this
+     character is replaced by a real ` ' (space) character.
+
+     You may depreciate the special meaning of the `_' (underscore)
+     character --in case this character itself is needed-- by placing a
+     `\' (backslash) character before it, e.g. `\_'.  If you need the
+     `\_' characters themselves, you have to protect the `\'
+     (backslash) character by another `\' (backslash) character, e.g.
+     `\\_'.
+
+`k'
+`--include-week-number'
+     The leading date of a fixed date message is either extended by the
+     ISO week number or the standard week number.  *Note Calendar
+     option `--starting-day=ARGUMENT': x-starting-day, *Note Calendar
+     option `--iso-week-number=yes|no': x-iso-week-number, and *Note
+     Aspects in Internationalization: Internationalization, for further
+     details.
+
+`o'
+`--omit-multiple-date-part'
+     Omit displaying the leading date of a fixed date message in case
+     more than one message refers to that date(11) (*note Fixed date
+     options-Footnote-11::), e.g.:
+
+          $ gcal -cxo
+          -|
+          -| Sun, Nov   6th 1994: Text 1
+          -|                      Text 2
+          ...
+
+`Q'
+`--suppress-fixed-dates-list-separator'
+     Suppress displaying of the blank line which is always leading a
+     fixed date list.  For example, to cause Gcal to print only the
+     number of days between 1st January 1970 and 1st January 1980, you
+     can call the program like this:
+
+          $ gcal -f /dev/null -QUx %19800101 -#0_%j-2440588
+          -| 3652
+
+`U'
+`--suppress-date-part'
+     Suppress displaying the leading date of a fixed date message, e.g.:
+
+          $ gcal -cxU
+          -|
+          -| Text 1
+          -| Text 2
+          ...
+
+`J'
+`--suppress-text-part'
+     Suppress displaying the text part of a fixed date message, e.g.:
+
+          $ gcal -cxJ
+          -|
+          -| Sun, Nov   6th 1994:
+          -| Sun, Nov   6th 1994:
+          ...
+
+`x'
+`--exclude-fixed-dates-list-title'
+     Suppress the title text line of the fixed date list.
+
+`--heading-text=TEXT'
+     Changes the title text line of the fixed date list.  Instead of
+     displaying the default `Fixed date list:' text, any other text can
+     be used as heading text of the fixed date list, e.g.:
+
+          $ gcal -cUJ --heading-text=Hello,_it_is_%K_,~%t__o'clock
+          -|
+          -| Hello, it is Sunday,
+          -| 14:32 o'clock
+          -|
+          -| Sun, Nov   6th 1994:
+          ...
+
+     The TEXT may contain references to global date and text variables
+     (*note Fixed date option `--date-variable=ARGUMENT':
+     x-date-variable., and *Note Fixed date option
+     `--date-variable=ARGUMENT': x-text-variable).  Furthermore, all
+     special texts which cause a text replacement may be used in the
+     TEXT (*note `%?'... special texts for text replacement:
+     Replacements.).
+
+     Each time a `~' (tilde) or `^' (caret) character is found in TEXT,
+     this character is replaced by a real `\n' (newline) character.
+
+     You may depreciate the special meaning of the `~' (tilde) character
+     --in case this character itself is needed-- by placing a `\'
+     (backslash) character before it, e.g. `\~'.  If you need the `\~'
+     characters themselves, you have to protect the `\' (backslash)
+     character by another `\' (backslash) character, e.g. `\\_'.  All
+     above mentioned facts are also valid for the `^' (caret) character.
+
+     Each time a `_' (underscore) character is found in TEXT, this
+     character is replaced by a real ` ' (space) character.
+
+     You may depreciate the special meaning of the `_' (underscore)
+     character --in case this character itself is needed-- by placing a
+     `\' (backslash) character before it, e.g. `\_'.  If you need the
+     `\_' characters themselves, you have to protect the `\'
+     (backslash) character by another `\' (backslash) character, e.g.
+     `\\_'.
+
+`z'
+`--include-consecutive-number'
+     Display consecutive numbers of fixed date messages.
+
+`Z'
+`--zero-dates-only'
+     Display only those dates, for which fixed dates do not exist, i.e.
+     all "empty" fixed dates only consisting of the date.
+
+*Fixed date period modifiers and options:*
+
+`--leap-day=february|march'
+     The "leap day"(12) (*note Fixed date options-Footnote-12::) is
+     observed in non-leap years.
+
+    `--leap-day=february'
+          A fixed date that appears in every year and which is related
+          to the leap day, is displayed on the 28th February in
+          non-leap years.
+
+    `--leap-day=march'
+          A fixed date that appears in every year and which is related
+          to the leap day, is displayed on the 1st March in non-leap
+          years.
+
+`d'
+`--include-today'
+     If lists of periods are generated, include the actual date into
+     the list.  *Note Fixed date option `--list-mode': x-list-mode, how
+     to create a list of periods.
+
+`l'
+`--list-mode'
+     Generate a list of periods instead of a single period.
+
+     *Please note:*
+     The following examples assumes the actual system date is the *17th
+     February of any year* (00000217), weeks start on Mondays and ISO
+     week numbers are used!
+
+`--period-of-fixed-dates=ARGUMENT'
+
+`Nd'
+`*dN'
+     Single date of absolute day N == `1...365|366|999' of the actual
+     year; the intensity level is the same as the simple `-c' option.
+     If the value 999 for N is given, the last day of the year (31st
+     December) is assumed.
+
+        * E.g. `gcal -c10d' respectively
+          `gcal --period-of-fixed-dates=10d' or `gcal -c*d10'
+          respectively `gcal --period-of-fixed-dates=*d10' displays all
+          fixed dates which occur on the 10th day of the year.
+
+`lNd'
+`l*dN'
+     List dates starting yesterday or tomorrow (depending on the given
+     day number N) and ending on the N'th absolute day of the actual
+     year; the intensity level is the same as the `-cy' option.
+
+        * E.g. `gcal -cl10d' respectively `gcal -cl*d10' displays a
+          list of all fixed dates which start on the 10th day of year
+          and end on the 16th February.
+
+`N+|-'
+     Single date of day _actual day `+/-' N days_ of the actual year;
+     the intensity level is the same as the simple `-c' option.
+
+        * E.g. `gcal -c10+' displays all fixed dates which occur 10
+          days after the 17th February (today).
+
+        * E.g. `gcal -c10-' displays all fixed dates which occur 10
+          days before the 17th February (today).
+
+`lN+|-'
+     List dates starting yesterday `-' or tomorrow `+' and ending on
+     _actual day `+/-' N days_ of the actual year; the intensity level
+     is the same as the `-cy' option.
+
+        * E.g. `gcal -cl10+' displays a list of all fixed dates which
+          start on the 18th February and end 10 days after.
+
+        * E.g. `gcal -cl10-' displays a list of all fixed dates which
+          start 10 days before the 16th February and end on the 16th
+          February.
+
+`Nw'
+     Single dates of week number N == `0|1...52|53|99' of the actual
+     year; the intensity level is the same as the `-cw' option.  *Note
+     Calendar option `--starting-day=ARGUMENT': x-starting-day, *Note
+     Calendar option `--iso-week-number=yes|no': x-iso-week-number, and
+     *Note Aspects in Internationalization: Internationalization, for
+     more details.
+
+        * E.g. `gcal -c0w' displays all fixed dates which occur in the
+          53rd week of the previous year, in case the previous year has
+          a 53rd week.  If the previous year has no 53rd week, all fixed
+          dates occurring in the 1st week of the actual year are
+          displayed.
+
+        * E.g. `gcal -c6w' displays all fixed dates which occur in the
+          6th week of year.
+
+        * E.g. `gcal -c52w' displays all fixed dates which occur in the
+          52nd week of year.
+
+        * E.g. `gcal -c53w' displays all fixed dates which occur in the
+          53rd week of the actual year, in case the actual year has a
+          53rd week.  If the actual year has no 53rd week, no fixed date
+          messages are displayed and the program is terminated with an
+          error code.  *Note Error Code 126: x-126-Error-code.
+
+        * E.g. `gcal -c99w' displays all fixed dates which occur in the
+          last week of the actual year, i.e. either the 52nd or the
+          53rd week.
+
+`lNw'
+     List dates starting yesterday or tomorrow (depending on the given
+     week number N) and ending on the first respectively last day of
+     given week number N == `0|1...52|53|99' of the actual year; the
+     intensity level is the same as the `-cy' option.  *Note Calendar
+     option `--starting-day=ARGUMENT': x-starting-day, *Note Calendar
+     option `--iso-week-number=yes|no': x-iso-week-number, and *Note
+     Aspects in Internationalization: Internationalization, for further
+     details.
+
+        * E.g. `gcal -cl12w' displays a list of all fixed dates which
+          start on the 18th February and end on the last day of the
+          12th week.
+
+        * E.g. `gcal -cl3w' displays a list of all fixed dates which
+          start on the first day of the 3rd week and end on the 16th
+          February.
+
+`MMDD'
+     Single date of day DD in month MM of the actual year; the
+     intensity level is the same as the simple `-c' option.
+
+        * E.g. `gcal -c0225' displays all fixed dates which occur on
+          the 25th February.
+
+`lMMDD'
+     List dates starting yesterday or tomorrow (depending on the value
+     given in MMDD) and ending on day DD of month MM of the actual
+     year; the intensity level is the same as the `-cy' option.
+
+        * E.g. `gcal -cl0225' displays a list of all fixed dates which
+          start on the 18th February and end on the 25th February.
+
+        * E.g. `gcal -cl0109' displays a list of all fixed dates which
+          start on the 9th January and end on the 16th February.
+
+`MMWWWN'
+     Single date of N'th == `1...5|9' weekday DD|WWW in month MM of the
+     actual year; the intensity level is the same as the simple `-c'
+     option.
+
+        * E.g. `gcal -c01mon3' displays all fixed dates which occur on
+          the 3rd Monday in January.
+
+        * E.g. `gcal -c02fri9' displays all fixed dates which occur on
+          the last Friday in February.
+
+`lMMWWWN'
+     List dates starting yesterday or tomorrow (depending on the value
+     given in MMWWWN) and ending on N'th == `1...5|9' weekday DD of
+     month MM of the actual year; the intensity level is the same as
+     the `-cy' option.
+
+        * E.g. `gcal -cl01mon3' displays a list of all fixed dates
+          which start on the 3rd Monday in January and end on the 16th
+          February.
+
+        * E.g. `gcal -cl02fri9' displays a list of all fixed dates
+          which start on the 18th February and end on the last Friday
+          in February.
+
+`*dNWWW'
+     Single date of N'th == `1...51|52|53|99' weekday WWW of the actual
+     year; the intensity level is the same as the simple `-c' option.
+
+        * E.g. `gcal -c*d16sun' displays all fixed dates which occur on
+          the 16th Sunday of the actual year.
+
+        * E.g. `gcal -c*d52sun' displays all fixed dates which occur on
+          the 52nd Sunday of the actual year.  If the actual year has
+          no 52nd Sunday, no fixed date messages are displayed and the
+          program is terminated with an error code.  *Note Error Code
+          126: x-126-Error-code.
+
+        * E.g. `gcal -c*d53sun' displays all fixed dates which occur on
+          the 53rd Sunday of the actual year.  If the actual year has
+          no 53rd Sunday, no fixed date messages are displayed and the
+          program is terminated with an error code.  *Note Error Code
+          126: x-126-Error-code.
+
+        * E.g. `gcal -c*d99sun' displays all fixed dates which occur on
+          the last Sunday(13) (*note Fixed date options-Footnote-13::)
+          of the actual year.
+
+`l*dNWWW'
+     List dates starting yesterday or tomorrow (depending on the value
+     given in N) and ending on N'th == `1...51|52|53|99' weekday WWW of
+     the actual year; the intensity level is the same as the `-cy'
+     option.
+
+        * E.g. `gcal -cl*d16sun' displays a list of all fixed dates
+          which start on the 18th February and end on the 16th Sunday
+          of the actual year.
+
+        * E.g. `gcal -cl*d52sun' displays a list of all fixed dates
+          which start on the 18th February and end on the 52nd Sunday
+          of the actual year.  If the actual year has no 52nd Sunday,
+          no fixed date messages are displayed and the program is
+          terminated with an error code.  *Note Error Code 126:
+          x-126-Error-code.
+
+        * E.g. `gcal -cl*d53sun' displays a list of all fixed dates
+          which start on the 18th February and end on the 53nd Sunday
+          of the actual year.  If the actual year has no 53nd Sunday,
+          no fixed date messages are displayed and the program is
+          terminated with an error code.  *Note Error Code 126:
+          x-126-Error-code.
+
+        * E.g. `gcal -cl*d99sun' displays a list of all fixed dates
+          which start on the 18th February and end on the last
+          Sunday(14) (*note Fixed date options-Footnote-14::) of the
+          actual year.
+
+`*wN[WWW]'
+     Single date of weekday WWW of N'th == `0|1...52|53|99' week of the
+     actual year; the intensity level is the same as the simple `-c'
+     option.  If no weekday WWW is given, the starting day of the week
+     is assumed for the weekday WWW.  *Note Calendar option
+     `--starting-day=ARGUMENT': x-starting-day, *Note Calendar option
+     `--iso-week-number=yes|no': x-iso-week-number, and *Note Aspects
+     in Internationalization: Internationalization, for more details.
+
+        * E.g. `gcal -c*w0sun' displays all fixed dates which occur on
+          the Sunday of the 52nd respectively 53rd week of the previous
+          year.  In case such a Sunday does not exist, no fixed date
+          messages are displayed and the program is terminated with an
+          error code.  *Note Error Code 126: x-126-Error-code.
+
+        * E.g. `gcal -c*w16sun' displays all fixed dates which occur on
+          the Sunday of the 16th week of the actual year.
+
+        * E.g. `gcal -c*w52sun' displays all fixed dates which occur on
+          the Sunday of the 52nd week of the actual year.  If the
+          actual year has no Sunday of the 52nd week, no fixed date
+          messages are displayed and the program is terminated with an
+          error code.  *Note Error Code 126: x-126-Error-code.
+
+        * E.g. `gcal -c*w53sun' displays all fixed dates which occur on
+          the Sunday of the 53rd week of the actual year.  If the
+          actual year has no Sunday of the 53rd week, no fixed date
+          messages are displayed and the program is terminated with an
+          error code.  *Note Error Code 126: x-126-Error-code.
+
+        * E.g. `gcal -c*w99sun' displays all fixed dates which occur on
+          the last Sunday(15) (*note Fixed date options-Footnote-15::)
+          of the actual year.
+
+`l*wN[WWW]'
+     List dates starting yesterday or tomorrow (depending on the value
+     given in N) and ending on weekday WWW of N'th == `0|1...52|53|99'
+     week of the actual year; the intensity level is the same as the
+     `-cy' option.  If no weekday WWW is given, the starting day of the
+     week is assumed for the weekday WWW.  *Note Calendar option
+     `--starting-day=ARGUMENT': x-starting-day, *Note Calendar option
+     `--iso-week-number=yes|no': x-iso-week-number, and *Note Aspects
+     in Internationalization: Internationalization, for further details.
+
+        * E.g. `gcal -cl*w0sun' displays a list of all fixed dates
+          which start on the Sunday of the 52nd respectively 53rd week
+          of the previous year and end on the 16th February.  In case
+          such a Sunday does not exist, no fixed date messages are
+          displayed and the program is terminated with an error code.
+          *Note Error Code 126: x-126-Error-code.
+
+        * E.g. `gcal -cl*w16sun' displays a list of all fixed dates
+          which start on the 18th February and end on the Sunday of the
+          16th week of the actual year.
+
+        * E.g. `gcal -cl*w52sun' displays a list of all fixed dates
+          which start on the 18th February and end on the Sunday of the
+          52nd week of the actual year.  If the actual year has no
+          Sunday of the 52nd week, no fixed date messages are displayed
+          and the program is terminated with an error code.  *Note
+          Error Code 126: x-126-Error-code.
+
+        * E.g. `gcal -cl*w53sun' displays a list of all fixed dates
+          which start on the 18th February and end on the Sunday of the
+          53rd week of the actual year.  If the actual year has no
+          Sunday of the 53rd week, no fixed date messages are displayed
+          and the program is terminated with an error code.  *Note
+          Error Code 126: x-126-Error-code.
+
+        * E.g. `gcal -cl*w99sun' displays a list of all fixed dates
+          which start on the 18th February and end on the last
+          Sunday(16) (*note Fixed date options-Footnote-16::) of the
+          actual year.
+
+`@e[[+|-]N]'
+     Single date of day N relative to the Easter Sunday's date of the
+     actual year; the intensity level is the same as the simple `-c'
+     option.
+
+        * E.g. `gcal -c@e' displays all fixed dates which occur on the
+          Easter Sunday's date.
+
+        * E.g. `gcal -c@e10' respectively `gcal -c@e+10' displays all
+          fixed dates which occur 10 days after the Easter Sunday's
+          date.
+
+        * E.g. `gcal -c@e-10' displays all fixed dates which occur 10
+          days before the Easter Sunday's date.
+
+`l@e[[+|-]N]'
+     List dates starting yesterday or tomorrow (depending on the value
+     given in N) and ending on N'th day relative to the Easter Sunday's
+     date of the actual year; the intensity level is the same as the
+     `-cy' option.
+
+        * E.g. `gcal -cl@e' displays a list of all fixed dates which
+          start on the 18th February and end on the Easter Sunday's
+          date.
+
+        * E.g. `gcal -cl@e10' respectively `gcal -cl@e+10' displays a
+          list of all fixed dates which start on the 18th February and
+          end 10 days after the Easter Sunday's date.
+
+        * E.g. `gcal -cl@e-10' displays a list of all fixed dates which
+          start on the 18th February and end 10 days before the Easter
+          Sunday's date.
+
+`@e[+|-]NWWW'
+     Single date of N'th weekday WWW relative to the Easter Sunday's
+     date of the actual year; the intensity level is the same as the
+     simple `-c' option.
+
+        * E.g. `gcal -c@e3fri' respectively `gcal -c@e+3fri' displays
+          all fixed dates which occur on the 3rd Friday after the Easter
+          Sunday's date.
+
+        * E.g. `gcal -c@e-3fri' displays all fixed dates which occur on
+          the 3rd Friday before the Easter Sunday's date.
+
+`l@e[+|-]NWWW'
+     List dates starting yesterday or tomorrow (depending on the value
+     given in N) and ending on N'th weekday WWW relative to the Easter
+     Sunday's date of the actual year; the intensity level is the same
+     as the `-cy' option.
+
+        * E.g. `gcal -cl@e3fri' respectively `gcal -cl@e+3fri' displays
+          a list of all fixed dates which start on the 18th February and
+          end on the 3rd Friday after the Easter Sunday's date.
+
+        * E.g. `gcal -cl@e-3fri' displays a list of all fixed dates
+          which start on the 18th February and end on the 3rd Friday
+          before the Easter Sunday's date.
+
+`@t[[+|-]N]'
+     Single date of day N relative to today's date of the actual year;
+     the intensity level is the same as the simple `-c' option.
+
+        * E.g. `gcal -c@t' displays all fixed dates which occur on
+          today's date (== `gcal -c').
+
+        * E.g. `gcal -c@t10' respectively `gcal -c@t+10' displays all
+          fixed dates which occur 10 days after today's date (== `gcal
+          -c10+').
+
+        * E.g. `gcal -c@t-10' displays all fixed dates which occur 10
+          days before today's date (== `gcal -c10-').
+
+`l@t[[+|-]N]'
+     List dates starting yesterday or tomorrow (depending on the value
+     given in N) and ending on N'th day relative to today's date of the
+     actual year; the intensity level is the same as the `-cy' option.
+
+        * E.g. `gcal -cl@t' displays nothing.
+
+        * E.g. `gcal -cl@t10' respectively `gcal -cl@t+10' displays a
+          list of all fixed dates which start on the 18th February and
+          end 10 days after today's date (== `gcal -cl10+').
+
+        * E.g. `gcal -cl@t-10' displays a list of all fixed dates which
+          start on the 18th February and end 10 days before today's date
+          (== `gcal -cl10-').
+
+`@t[+|-]NWWW'
+     Single date of N'th weekday WWW relative to today's date of the
+     actual year; the intensity level is the same as the simple `-c'
+     option.
+
+        * E.g. `gcal -c@t3fri' respectively `gcal -c@t+3fri' displays
+          all fixed dates which occur on the 3rd Friday after today's
+          date.
+
+        * E.g. `gcal -c@t-3fri' displays all fixed dates which occur on
+          the 3rd Friday before today's date.
+
+`l@t[+|-]NWWW'
+     List dates starting yesterday or tomorrow (depending on the value
+     given in N) and ending on N'th weekday WWW relative to today's
+     date of the actual year; the intensity level is the same as the
+     `-cy' option.
+
+        * E.g. `gcal -cl@t3fri' respectively `gcal -cl@t+3fri' displays
+          a list of all fixed dates which start on the 18th February
+          and end on the 3rd Friday after today's date.
+
+        * E.g. `gcal -cl@t-3fri' displays a list of all fixed dates
+          which start on the 18th February and end on the 3rd Friday
+          before today's date.
+
+`@DVAR[[+|-]N]'
+     Single date of the day N relative to that date of the actual year,
+     which is referenced by the date variable DVAR; the intensity level
+     is the same as the simple `-c' option.
+
+        * E.g. `gcal -v a=0422 -c@a' displays all fixed dates which
+          occur on the 22nd April.
+
+        * E.g. `gcal -v a=0422 -c@a10' respectively `gcal -v a=0422
+          -c@a+10' displays all fixed dates which occur 10 days after
+          the 22nd April.
+
+        * E.g. `gcal -v a=0422 -c@a-10' displays all fixed dates which
+          occur 10 days before the 22nd April.
+
+`l@DVAR[[+|-]N]'
+     List dates starting yesterday or tomorrow (depending on the value
+     given in N) and ending on the N'th day relative to that date of the
+     actual year, which is referenced by the date variable DVAR; the
+     intensity level is the same as the `-cy' option.
+
+        * E.g. `gcal -v a=0422 -cl@a' displays a list of all fixed
+          dates which start on the 18th February and end on the 22nd
+          April.
+
+        * E.g. `gcal -v a=0422 -cl@a10' respectively `gcal -v a=0422
+          -cl@a+10' displays a list of all fixed dates which start on
+          the 18th February and end 10 days after the 22nd April.
+
+        * E.g. `gcal -v a=0422 -cl@a-10' displays a list of all fixed
+          dates which start on the 18th February and end 10 days before
+          the 22nd April.
+
+`@DVAR[+|-]NWWW'
+     Single date of the N'th weekday WWW relative to that date of the
+     actual year, which is referenced by the date variable DVAR; the
+     intensity level is the same as the simple `-c' option.
+
+        * E.g. `gcal -v a=0122 -c@a2sat' respectively `gcal -v a=0122
+          -c@a+2sat' displays all fixed dates which occur on the 2nd
+          Saturday after the 22nd January.
+
+        * E.g. `gcal -v a=0122 -c@a-2sat' displays all fixed dates
+          which occur on the 2nd Saturday before the 22nd January.
+
+`l@DVAR[+|-]NWWW'
+     List dates starting yesterday or tomorrow (depending on the value
+     given in N) and ending on the N'th weekday WWW relative to that
+     date of the actual year, which is referenced by the date variable
+     DVAR; the intensity level is the same as the `-cy' option.
+
+        * E.g. `gcal -v a=0122 -cl@a2sat' respectively `gcal -v a=0122
+          -cl@a+2sat' displays a list of all fixed dates which start on
+          the 2nd Saturday after the 22nd January and end on the 16th
+          February.
+
+        * E.g. `gcal -v a=0122 -cl@a-2sat' displays a list of all fixed
+          dates which start on the 2nd Saturday before the 22nd January
+          and end on the 16th February.
+
+`t|T'
+`--tomorrow' long-style option
+     List dates related to tomorrow.
+
+        * E.g. `gcal -ct' displays all fixed dates which occur on the
+          18th February (tomorrow).
+
+        * E.g. `gcal -cdt' displays all fixed dates which occur on the
+          17th February (today) and on the 18th February (tomorrow).
+
+`w|W[+|-]'
+`--week' long-style option
+`--end-of-week' long-style option
+`--start-of-week' long-style option
+     Display dates related to the week.
+     *Note Calendar option `--starting-day=ARGUMENT': x-starting-day.
+
+        * `w' or `--week' long-style option
+          List dates between the _starting day_ of the current week and
+          the last day of the current week
+
+             - E.g. `gcal -cw' displays all fixed dates which occur in
+               the whole week the 17th February is part of.
+
+        * `w+' or `--end-of-week' long-style option
+          List dates between the day after the current day of the
+          current week and the last day of the current week.
+
+             - E.g. `gcal -cw+' displays all fixed dates which start on
+               the 18th February (tomorrow) and end on the last day of
+               the week.
+
+             - E.g. `gcal -cdw+' displays all fixed dates which start
+               on the 17th February (today) and end on the last day of
+               the week.
+
+        * `w-' or `--start-of-week' long-style option
+          List dates between the _starting day_ of the current week and
+          the day before the current day of the current week
+
+             - E.g. `gcal -cw-' displays all fixed dates which start on
+               the first day of the week and end on the 16th February
+               (yesterday).
+
+             - E.g. `gcal -cdw-' displays all fixed dates which start
+               on the first day of the week and end on the 17th
+               February (today).
+
+`m|M[+|-]'
+`--month' long-style option
+`--end-of-month' long-style option
+`--start-of-month' long-style option
+     Display dates related to the month.
+
+        * `m' or `--month' long-style option
+          List dates between the first day of the current month and the
+          last day of the current month.
+
+             - E.g. `gcal -cm' displays all fixed dates which occur in
+               the whole month of February.
+
+        * `m+' or `--end-of-month' long-style option
+          List dates between the day after the current day of the
+          current month and the last day of the current month.
+
+             - E.g. `gcal -cm+' displays all fixed dates which start on
+               the 18th February (tomorrow) and end on the last day of
+               the month February.
+
+             - E.g. `gcal -cdm+' displays all fixed dates which start
+               on the 17th February (today) and end on the last day of
+               the month February.
+
+        * `m-' or `--start-of-month' long-style option
+          List dates between the first day of the current month and the
+          day before the current day of the current month.
+
+             - E.g. `gcal -cm-' displays all fixed dates which start on
+               the first day of the month February and end on the 16th
+               February (yesterday).
+
+             - E.g. `gcal -cdm-' displays all fixed dates which start
+               on the first day of the month February and end on the
+               17th February (today).
+
+`y|Y[+|-]'
+`--year' long-style option
+`--end-of-year' long-style option
+`--start-of-year' long-style option
+     Display dates related to the year.
+
+        * `y' or `--year' long-style option
+          List dates between the first day of the current year and the
+          last day of the current year.
+
+             - E.g. `gcal -cy' displays all fixed dates which occur in
+               the whole year.
+
+        * `y+' or `--end-of-year' long-style option
+          List dates between the day after the current day of the
+          current year and the last day of the current year.
+
+             - E.g. `gcal -cy+' displays all fixed dates which start on
+               the 18th February (tomorrow) and end on the last day of
+               the year.
+
+             - E.g. `gcal -cdy+' displays all fixed dates which start
+               on the 17th February (today) and end on the last day of
+               the year.
+
+        * `y-' or `--start-of-year' long-style option
+          List dates between the first day of the current year and the
+          day before the current day of the current year.
+
+             - E.g. `gcal -cy-' displays all fixed dates which start on
+               the first day of the year and end on the 16th February
+               (yesterday).
+
+             - E.g. `gcal -cdy-' displays all fixed dates which start
+               on the first day of the year and end on the 17th
+               February (today).
+

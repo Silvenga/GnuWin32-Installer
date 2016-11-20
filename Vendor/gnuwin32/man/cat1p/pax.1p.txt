@@ -1,0 +1,337 @@
+PAX(1P)                    POSIX Programmer's Manual                   PAX(1P)
+
+
+
+PROLOG
+       This  manual page is part of the POSIX Programmer's Man-
+       ual.  The Linux implementation  of  this  interface  may
+       differ  (consult the corresponding Linux manual page for
+       details of Linux behavior), or the interface may not  be
+       implemented on Linux.
+
+NAME
+       pax - portable archive interchange
+
+SYNOPSIS
+       pax   [-cdnv][-H|-L][-f   archive][-s   replstr]...[pat-
+       tern...]
+
+       pax  -r[-cdiknuv][-H|-L][-f  archive][-o  options]...[-p
+       string]...
+              [-s replstr]...[pattern...]
+
+       pax -w[-dituvX][-H|-L][-b blocksize][[-a][-f archive][-o
+       options]...
+              [-s replstr]...[-x format][file...]
+
+       pax    -r     -w[-diklntuvX][-H|-L][-p     string]...[-s
+       replstr]...
+              [file...] directory
+
+
+DESCRIPTION
+       The  pax  utility  shall read, write, and write lists of
+       the members of archive files and copy directory  hierar-
+       chies.  A variety of archive formats shall be supported;
+       see the -x format option.
+
+       The action to be taken depends on the presence of the -r
+       and  -w  options. The four combinations of -r and -w are
+       referred to as the four modes of operation: list,  read,
+       write, and copy modes, corresponding respectively to the
+       four forms shown in the SYNOPSIS section.
+
+       list   In list mode (when neither -r nor -w  are  speci-
+              fied),  pax  shall write the names of the members
+              of the archive file read from the standard input,
+              with  pathnames  matching the specified patterns,
+              to standard output. If a named file  is  of  type
+              directory, the file hierarchy rooted at that file
+              shall be listed as well.
+
+       read   In read mode (when -r is  specified,  but  -w  is
+              not),  pax  shall  extract  the  members  of  the
+              archive file read from the standard  input,  with
+              pathnames  matching the specified patterns. If an
+              extracted file is of  type  directory,  the  file
+              hierarchy  rooted at that file shall be extracted
+              as well. The extracted  files  shall  be  created
+              performing pathname resolution with the directory
+              in which pax was invoked as the  current  working
+              directory.
+
+       If  an  attempt  is made to extract a directory when the
+       directory already exists, this shall not  be  considered
+       an  error.  If an attempt is made to extract a FIFO when
+       the FIFO already exists, this shall not be considered an
+       error.
+
+       The  ownership, access, and modification times, and file
+       mode of the restored files are discussed  under  the  -p
+       option.
+
+       write  In  write  mode  (when -w is specified, but -r is
+              not), pax shall write the contents  of  the  file
+              operands  to  the  standard  output in an archive
+              format. If no file operands are specified, a list
+              of  files  to  copy,  one per line, shall be read
+              from the standard input. A file of type directory
+              shall  include all of the files in the file hier-
+              archy rooted at the file.
+
+       copy   In copy mode (when both -r and -w are specified),
+              pax  shall copy the file operands to the destina-
+              tion directory.
+
+       If no file operands are specified, a list  of  files  to
+       copy,  one  per  line,  shall  be read from the standard
+       input. A file of type directory shall include all of the
+       files in the file hierarchy rooted at the file.
+
+       The  effect  of the copy shall be as if the copied files
+       were written to an archive file  and  then  subsequently
+       extracted,  except  that there may be hard links between
+       the original and the copied files.  If  the  destination
+       directory  is  a  subdirectory of one of the files to be
+       copied, the results are unspecified. If the  destination
+       directory  is a file of a type not defined by the System
+       Interfaces volume of IEEE Std 1003.1-2001,  the  results
+       are  implementation-defined;  otherwise,  it shall be an
+       error for the file named by the directory operand not to
+       exist,  not be writable by the user, or not be a file of
+       type directory.
+
+
+       In read or copy modes, if intermediate  directories  are
+       necessary  to  extract an archive member, pax shall per-
+       form actions equivalent to the mkdir() function  defined
+       in the System Interfaces volume of IEEE Std 1003.1-2001,
+       called with the following arguments:
+
+        * The intermediate directory used as the path argument
+
+
+        * The value of the  bitwise-inclusive  OR  of  S_IRWXU,
+          S_IRWXG, and S_IRWXO as the mode argument
+
+
+       If  any  specified  pattern  or  file  operands  are not
+       matched by at least one  file  or  archive  member,  pax
+       shall  write  a diagnostic message to standard error for
+       each one that did not match and  exit  with  a  non-zero
+       exit status.
+
+       The  archive  formats described in the EXTENDED DESCRIP-
+       TION section shall be automatically detected  on  input.
+       The  default  output archive format shall be implementa-
+       tion-defined.
+
+       A single archive can span multiple files. The pax  util-
+       ity  shall  determine, in an implementation-defined man-
+       ner, what file to read or write as the next file.
+
+       If the selected archive format supports  the  specifica-
+       tion  of  linked  files,  it  shall be an error if these
+       files cannot be linked when the  archive  is  extracted.
+       For archive formats that do not store file contents with
+       each name that causes a hard link, if the file that con-
+       tains the data is not extracted during this pax session,
+       either the data shall  be  restored  from  the  original
+       file,  or  a  diagnostic message shall be displayed with
+       the name of a file that can be used to extract the data.
+       In  traversing  directories,  pax  shall detect infinite
+       loops; that is, entering a previously visited  directory
+       that  is  an  ancestor of the last file visited. When it
+       detects an infinite loop, pax shall write  a  diagnostic
+       message to standard error and shall terminate.
+
+OPTIONS
+       The  pax  utility  shall conform to the Base Definitions
+       volume of IEEE Std 1003.1-2001,  Section  12.2,  Utility
+       Syntax Guidelines, except that the order of presentation
+       of the -o, -p, and -s options is significant.
+
+       The following options shall be supported:
+
+       -r     Read an archive file from standard input.
+
+       -w     Write files to the standard output in the  speci-
+              fied archive format.
+
+       -a     Append  files  to  the  end of the archive. It is
+              implementation-defined which devices on the  sys-
+              tem  support  appending.  Additional file formats
+              unspecified      by      this      volume      of
+              IEEE Std 1003.1-2001  may  impose restrictions on
+              appending.
+
+       -b  blocksize
+              Block the output at a  positive  decimal  integer
+              number  of  bytes  per write to the archive file.
+              Devices and archive formats may  impose  restric-
+              tions  on  blocking.  Blocking shall be automati-
+              cally determined on  input.  Conforming  applica-
+              tions  shall not specify a blocksize value larger
+              than  32256.  Default  blocking   when   creating
+              archives  depends on the archive format. (See the
+              -x option below.)
+
+       -c     Match all file or archive  members  except  those
+              specified by the pattern or file operands.
+
+       -d     Cause  files  of  type  directory being copied or
+              archived or archive  members  of  type  directory
+              being  extracted or listed to match only the file
+              or archive member itself and not the file hierar-
+              chy rooted at the file.
+
+       -f  archive
+              Specify  the  pathname  of  the  input  or output
+              archive, overriding the  default  standard  input
+              (in  list  or  read  modes)  or standard output (
+              write mode).
+
+       -H     If a symbolic link referencing  a  file  of  type
+              directory  is  specified on the command line, pax
+              shall archive the file hierarchy  rooted  in  the
+              file  referenced  by  the link, using the name of
+              the link as the root of the file hierarchy.  Oth-
+              erwise,  if a symbolic link referencing a file of
+              any  other  file  type  which  pax  can  normally
+              archive  is  specified  on the command line, then
+              pax shall archive  the  file  referenced  by  the
+              link,  using  the  name  of the link. The default
+              behavior shall be to archive  the  symbolic  link
+              itself.
+
+       -i     Interactively  rename  files  or archive members.
+              For  each  archive  member  matching  a   pattern
+              operand or file matching a file operand, a prompt
+              shall be  written  to  the  file  /dev/tty.   The
+              prompt  shall  contain  the  name  of the file or
+              archive  member,  but  the  format  is  otherwise
+              unspecified.  A  line  shall  then  be  read from
+              /dev/tty. If this line  is  blank,  the  file  or
+              archive  member  shall  be  skipped. If this line
+              consists of a single period, the file or  archive
+              member shall be processed with no modification to
+              its name. Otherwise, its name shall  be  replaced
+              with  the  contents  of the line. The pax utility
+              shall immediately exit with a non-zero exit  sta-
+              tus  if end-of-file is encountered when reading a
+              response or if  /dev/tty  cannot  be  opened  for
+              reading and writing.
+
+       The results of extracting a hard link to a file that has
+       been renamed during extraction are unspecified.
+
+       -k     Prevent the overwriting of existing files.
+
+       -l     (The letter ell.) In copy mode, hard links  shall
+              be  made  between the source and destination file
+              hierarchies whenever possible.  If  specified  in
+              conjunction  with  -H or -L, when a symbolic link
+              is encountered, the hard link created in the des-
+              tination file hierarchy shall be to the file ref-
+              erenced by the symbolic link. If  specified  when
+              neither  -H  nor -L is specified, when a symbolic
+              link is  encountered,  the  implementation  shall
+              create  a  hard  link to the symbolic link in the
+              source file hierarchy or copy the  symbolic  link
+              to the destination.
+
+       -L     If  a  symbolic  link  referencing a file of type
+              directory is specified on  the  command  line  or
+              encountered  during the traversal of a file hier-
+              archy,  pax  shall  archive  the  file  hierarchy
+              rooted  in the file referenced by the link, using
+              the name of the link as  the  root  of  the  file
+              hierarchy.  Otherwise,  if a symbolic link refer-
+              encing a file of any other file  type  which  pax
+              can  normally archive is specified on the command
+              line or encountered during  the  traversal  of  a
+              file hierarchy, pax shall archive the file refer-
+              enced by the link, using the name  of  the  link.
+              The default behavior shall be to archive the sym-
+              bolic link itself.
+
+       -n     Select the first archive member that matches each
+              pattern operand.  No more than one archive member
+              shall be matched for each pattern (although  mem-
+              bers of type directory shall still match the file
+              hierarchy rooted at that file).
+
+       -o  options
+              Provide information to the implementation to mod-
+              ify  the  algorithm  for  extracting  or  writing
+              files. The value of options shall consist of  one
+              or more comma-separated keywords of the form:
+
+
+              keyword[[:]=value][,keyword[[:]=value], ...]
+
+       Some  keywords  apply  only  to certain file formats, as
+       indicated with each description. Use  of  keywords  that
+       are inapplicable to the file format being processed pro-
+       duces undefined results.
+
+       Keywords in the options argument shall be a string  that
+       would  be  a valid portable filename as described in the
+       Base Definitions volume of IEEE Std 1003.1-2001, Section
+       3.276, Portable Filename Character Set.
+
+       Note:
+              Keywords are not expected to be filenames, merely
+              to follow the same character composition rules as
+              portable filenames.
+
+
+       Keywords  can  be  preceded  with white space. The value
+       field shall consist of zero or more  characters;  within
+       value,  the  application shall precede any literal comma
+       with a backslash, which shall be ignored, but  preserves
+       the comma as part of value. A comma as the final charac-
+       ter, or a comma followed solely by white  space  as  the
+       final  characters, in options shall be ignored. Multiple
+       -o options can be specified; if keywords given to  these
+       multiple  -o  options  conflict, the keywords and values
+       appearing later in  command  line  sequence  shall  take
+       precedence  and  the  earlier shall be silently ignored.
+       The following keyword values of options  shall  be  sup-
+       ported for the file formats as indicated:
+
+       delete=pattern
+
+              (Applicable only to the -x pax format.) When used
+              in write  or  copy  mode,  pax  shall  omit  from
+              extended header records that it produces any key-
+              words matching the string pattern. When  used  in
+              read  or list mode, pax shall ignore any keywords
+              matching  the  string  pattern  in  the  extended
+              header  records. In both cases, matching shall be
+              performed using  the  pattern  matching  notation
+              described in Patterns Matching a Single Character
+              and Patterns Matching Multiple Characters  .  For
+              example:
+
+
+                     -o delete=security.*
+
+              would  suppress security-related information. See
+              pax Extended Header for  extended  header  record
+              keyword usage.
+
+       exthdr.name=string
+
+              (Applicable only to the -x pax format.) This key-
+              word allows user control over the  name  that  is
+              written  into  the  ustar  header  blocks for the
+              extended header produced under the  circumstances
+              described in pax Header Block . The name shall be
+              the contents of string, after the following char-
+              acter substitutions have been made:
+
+
+
+
+IEEE/The Open Group                  2003                              PAX(1P)

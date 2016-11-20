@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pamtotga User Manual</TITLE></HEAD>
+<BODY>
+<H1>pamtotga</H1>
+Updated: 21 July 2002
+<BR>
+
+<A HREF="pamtotga.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pamtotga - convert a Netpbm image to a TrueVision Targa file
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pamtotga</B>
+[<B>-mono|-cmap|-rgb</B>]
+[<B>-norle</B>]
+[<I>pamfile</I>]
+
+<P>All options can be abbreviated to their shortest unique prefix.  You
+may use two hyphens instead of one to designate an option.  You may
+use either white space or equals signs between an option name and its
+value.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pamtotga</b> reads a PBM, PGM, PPM, or PAM image as input and
+produces a TrueVision Targa file as output.  The PAM image may be
+either a BLACKANDWHITE, GRAYSCALE, RGB, or RGB_ALPHA image.
+
+<p>To create a TGA image with transparency (i.e. with an alpha mask),
+use RGB_ALPHA PAM input.  Some Netpbm programs that generate images with
+alpha masks generate them in that format.  For another way to create
+the proper input stream, see <a href="pamstack.html"><b>pamstack</b></a>.
+
+<p>It is unclear that anything except <b>pamtotga</b> knows about TGAs
+with transparency.  The history behind this feature of <b>pamtotga</b>
+is not clear.  The format <b>pamtotga</b> produces is simply the same
+as an ordinary RGB TGA image except with a 4th plane added for
+transparency.  The PixelSize field of the TGA header specifies 32 bits
+instead of 24 and the raster has an extra byte added to each pixel, at
+the tail end.  The value of that byte has the same meaning as in a PAM
+image with maxval 255.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-cmap</B>
+<DD>
+Make output Targa file of type 24 bit colormapped.  Input must contain no
+more than 256 distinct colors. 
+
+<DT><B>-mono</B>
+<DD>
+Make output Targa file of type 8 bit monochrome.  Input must be PBM or PGM
+or a PAM with BLACKANDWHITE or GRAYSCALE tuple type.
+See <b>-cmap</b>.
+
+<p>You may specify at most one of <b>-mono</b>, <b>-cmap</b>, and
+<b>-rgb</b>.  If you specify neither, the default image type is the
+most highly constrained compatible type is used, where monochrome is
+more constrained than colormapped which is in turn more constrained
+than unmapped.
+
+<DT><B>-rgb</B>
+<DD>
+Make output Targa file of type 24 bit unmapped color.  See <b>-cmap</b>.
+
+<DT><B>-norle</B>
+<DD>Do not use run-length encoding in the output Targa file.
+Run-length encoded files are smaller, but Some Targa readers can't
+read run-length encoded files.
+
+</DL>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<A HREF="tgatoppm.html">tgatoppm</A>,
+<A HREF="pnmquant.html">pnmquant</a>,
+<A HREF="pamstack.html">pamstack</a>,
+<A HREF="pam.html">pam</A>
+<A HREF="pnm.html">pnm</A>
+
+<A NAME="history"></A>
+<H2>HISTORY</H2>
+
+<p>This program was called <b>ppmtotga</b> until Netpbm 10.6 (July 2002).
+That was always a misnomer, though, because a PPM class program would not be
+able to tell the difference between PGM and PPM input (it would all look like
+PPM), and thus could not choose the output Targa image type based on the type
+of the input.  Netpbm 10.6 also added the ability to handle an alpha channel,
+so it became a PAM class program.
+
+<p>In Netpbm 10.15 (April 2003), the program became the first in the
+Netpbm package to recognize an alpha channel in a PAM.  It recognized
+tuple type &quot;RGBA&quot;.  But when this kind of PAM image was later
+added to the PAM specification, it was specified with tuple type
+&quot;RGB_ALPHA&quot;.  So in Netpbm 10-26 (January 2005), <b>pamtotga</b>
+changed to recognize &quot;RGB_ALPHA&quot; instead of &quot;RGBA&quot;.
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1989, 1991 by Mark Shand and Jef Poskanzer.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pamtotga.html#lbAB">NAME</A>
+<LI><A HREF="pamtotga.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pamtotga.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pamtotga.html#lbAE">OPTIONS</A>
+<LI><A HREF="pamtotga.html#lbAG">SEE ALSO</A>
+<LI><A HREF="pamtotga.html#lbAH">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

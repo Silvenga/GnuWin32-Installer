@@ -1,0 +1,63 @@
+INV_CMAP(3)                                         INV_CMAP(3)
+
+
+
+
+
+NAME
+       inv_cmap - efficiently compute an inverse colormap
+
+SYNOPSIS
+       void  inv_cmap( colors, colormap, bits, dist_buf, rgbmap
+              )
+
+       int colors, bits;
+       unsigned char *colormap[3], *rgbmap;
+       unsigned long *dist_buf;
+
+DESCRIPTION
+       Inv_cmap computes an inverse colormap  to  translate  an
+       RGB  color  to  the nearest color in the given colormap.
+       The arguments are
+
+       colors The number of colors in the input colormap.  Must
+              be  256.
+
+       colormap
+              The  input  colormap.   The  ith  color  is (Col-
+              ormap[0][i], Colormap[1][i], Colormap[2][i]).
+
+       bits   Controls the size and precision  of  the  inverse
+              colormap.   The resulting colormap will be a cube
+              2^bits on a  side,  and  will  therefore  contain
+              2^(3*bits) entries.  RGB colors must be quantized
+              to bits bits before using the inverse colormap.
+
+       dist_buf
+              Temporary storage used by  inv_cmap.   It  should
+              contain at least 2^(3*bits) elements.
+
+       rgbmap The  inverse  colormap.  Should be allocated with
+              at  least  2^(3*bits)  elements.   After  calling
+              inv_cmap,  an  RGB color (r,g,b) can be mapped to
+              its closest representative in colormap by  evalu-
+              ating
+              #define quantize(p) ((p)>>(8-bits))
+              rgbmap[ (((quantize(r) << bits) | quantize(g)) <<
+              bits) | quantize(b) ]
+
+       Predicted performance is O(2^(3*bits)*log(colors)).  The
+       measured  performance  is  sublinear (but not as good as
+       log) in the number of input colors and also in the  size
+       of  the  output inverse colormap. (I.e., it goes up more
+       slowly than 2^(3*bits).)
+
+SEE ALSO
+       colorquant(3).
+
+AUTHOR
+       Spencer W. Thomas
+
+
+
+1                        Month DD, YYYY             INV_CMAP(3)

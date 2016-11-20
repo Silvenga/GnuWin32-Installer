@@ -1,0 +1,103 @@
+.TH DEROFF 1 "March 18, 2004" "" "User commands"
+.SH NAME \"{{{roff}}}\"{{{
+deroff \- remove roff, tbl, eqn, refer and pic constructs from documents
+.\"}}}
+.SH SYNOPSIS \"{{{
+.ad l
+.B deroff
+.RB [ \-w ]
+.RB [ \-s ]
+.RB [ \-ml ]
+.RB [ \-ms ]
+.RB [ \-mm ]
+.RB [ \-p ]
+.RI [ file ...
+]
+.ad b
+.br
+.ad l
+.B deroff
+.RB [ \-\-word-list ]
+.RB [ \-\-skip-headers ]
+.RB [ \-\-skip-lists ]
+.RB [ \-\-pretty-print ]
+.RI [ file ...
+]
+.ad b
+.br
+.ad l
+.B deroff
+.BR \-h | \-\-help
+.ad b
+.br
+.ad l
+.B deroff \-\-version
+.ad b
+.\"}}}
+.SH DESCRIPTION \"{{{
+.B deroff
+reads roff documents and removes all
+.IR nroff (1),
+.IR troff (1),
+.IR refer (1),
+.IR tbl (1),
+.IR eqn (1)
+and
+.IR pic (1)
+constructs.  The resulting text will be sent to standard output.
+\&\fB.so\fP and \fB.nx\fP requests are processed, but repeated requests
+to process an already read file will be ignored.
+.\"}}}
+.SH OPTIONS \"{{{
+.IP "\fB\-w\fP, \fB\-\-word-list\fP"
+Output a word list, one word per line.
+.IP "\fB\-s\fP, \fB\-\-skip-headers\fP"
+Do not output headers.  This is useful if you want to run text analysis
+tools on the output.
+.IP "\fB\-ml\fP, \fB\-\-suppress-lists\fP"
+Suppress lists.  This option is useful with \fB\-s\fP, if
+there are many incomplete sentences in lists.
+.IP "\fB\-ms\fP, \fB\-mm\fP"
+These options are accepted for compatibility, but they are being ignored.
+.IP "\fB\-i\fP"
+Ignore \fB.so\fP and \fB.nx\fP requests.
+.IP "\fB\-p\fP, \fB\-\-pretty\-print\fP"
+Format the output more pretty by omitting and adding newline characters
+at certain places.
+.IP "\fB\-h\fP, \fB\-\-help\fP"
+Print a short usage message.
+.IP \fB\-\-version\fP
+Print the version.
+.\"}}}
+.SH EXAMPLE \"{{{
+The following example does a simple spell check of a document:
+.sp
+deroff -w document.mm | sort -u |
+.br
+comm -23 - /usr/share/words/en
+.\"}}}
+.SH RESTRICTIONS \"{{{
+.B deroff
+is not a complete roff parser, so it can be confused by complicated
+constructs.  Often too much output is done in these cases.
+.\"}}}
+.SH AUTHOR \"{{{
+This program is copyright 1993\(en2004 Michael Haardt <michael@moria.de>.
+.PP
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+.PP
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+.PP
+You should have received a copy of the GNU General Public License along
+with this program.  If not, write to the Free Software Foundation, Inc.,
+59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.\"}}}
+.SH "SEE ALSO" \"{{{
+soelim(1), troff(1), nroff(1), refer(1), tbl(1), pic(1), eqn(1)
+.\"}}}

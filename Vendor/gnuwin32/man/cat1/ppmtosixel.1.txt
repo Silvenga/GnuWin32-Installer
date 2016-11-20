@@ -1,0 +1,81 @@
+Ppmtosixel User Manual(0)             Ppmtosixel User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       ppmtosixel - convert a PPM image to DEC sixel format
+
+
+SYNOPSIS
+       ppmtosixel
+
+       [-raw]
+
+       [-margin]
+
+       [ppmfile]
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       ppmtosixel reads a PPM image as input and produces sixel
+       commands (SIX) as output.  The output is  formatted  for
+       color  printing,  e.g.  for  a  DEC  LJ250  color inkjet
+       printer.
+
+       If RGB values from the PPM file do not have  maxval=100,
+       ppmtosixel  rescales them to maxval 100.  A printer con-
+       trol header and a color assignment table begin  the  SIX
+       file.   Image data is in a compressed format by default.
+       A printer control footer ends the image file.
+
+
+OPTIONS
+       -raw   If you specify this, each pixel will  be  explic-
+              itly described in the image file.  If -raw is not
+              specified, output will default to compressed for-
+              mat   in  which  identical  adjacent  pixels  are
+              replaced by 'repeat pixel' commands.  A raw  file
+              is often an order of magnitude larger than a com-
+              pressed file and prints much slower.
+
+
+       -margin
+              If you don't  specify  -margin,  the  image  will
+              start  at  the left margin (of the window, paper,
+              or whatever).  If you do specify -margin,  a  1.5
+              inch left margin will offset the image.
+
+
+
+
+PRINTING
+       Generally,  sixel  files  must  reach the printer unfil-
+       tered.   Use  the  lpr  -x  option  or  cat  filename  >
+       /dev/tty0?.
+
+
+LIMITATIONS
+       Upon rescaling, truncation of the least significant bits
+       of RGB values may result in poor color  conversion.   If
+       the  original PPM maxval was greater than 100, rescaling
+       also reduces the image depth.  While the actual RGB val-
+       ues  from  the  ppm  file are more or less retained, the
+       color palette of the LJ250 may not match the  colors  on
+       your screen.  This seems to be a printer limitation.
+
+
+SEE ALSO
+       ppm(1)
+
+
+AUTHOR
+       Copyright (C) 1991 by Rick Vinci.
+
+
+
+netpbm documentation     26 April 1991Ppmtosixel User Manual(0)

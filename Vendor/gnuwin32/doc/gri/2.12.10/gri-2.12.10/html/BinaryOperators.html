@@ -1,0 +1,230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: RPN binary operators</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile BinaryOperators.html "Gri: RPN binary operators" "Programming Gri" --> 
+
+<!-- @node   Binary Operators, Unary Operators, Tertiary Operators, rpn Mathematics -->
+<a name="BinaryOperators" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="ReversePolishMath.html#rpnMathematics" shape="rect" coords="516,2,532,24" href="ReversePolishMath.html#rpnMathematics">
+<area alt="Gri: tertiary operators" shape="rect" coords="557,2,573,24" href="TertiaryOperators.html">
+<area alt="Gri: RPN unary operators" shape="rect" coords="581,2,599,24" href="UnaryOperators.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: RPN unary operators" shape="rect" coords="581,2,599,24" href="UnaryOperators.html">
+</map>
+<h3>10.9.4: Binary Operators</h3>
+
+
+
+Binary operators act on the <b>top two</b> items on the stack.  Most
+binary operators replace two items on the stack with one item, e.g.
+`<font color="#82140F"><code>{rpn 1 2 /}</code></font>' yields 0.5.  However, a few binary operators
+replace one pair of items with a new pair of items, e.g. the
+`<font color="#82140F"><code>xyusertocm</code></font>' operator replaces an (x,y) pair in user coordinates
+with an (xcm,ycm) pair in coordinates of centimeters on the page.
+<p>
+The binary operators are illustrated below, in rough alphabetical order.
+<p>
+<dl>
+<p>
+<dt> <tt>{rpn 3 2 +}</tt>
+<dd>Add 2 to 3.
+<p>
+<dt> <tt>{rpn 3 2 -}</tt>
+<dd>Subtract 2 from 3.
+<p>
+<dt> <tt>{rpn 3 2 *}</tt>
+<dd>Multiply 3 by 2.
+<p>
+<dt> <tt>{rpn 3 2 /}</tt>
+<dd>Divide 3 by 2.
+<p>
+<dt> <tt>{rpn 3 2 <}</tt>
+<dd><p>
+Test whether 2 is less than 3, yielding 1.  Note: this convention may
+be confusing to users who are familiar with HP calculators from
+decades past.  Present-day calculators use this convention, but
+possibly older calculators used the reverse convention, using `<font color="#82140F"><code>></code></font>'
+where Gri uses `<font color="#82140F"><code><</code></font>'.
+<p>
+<p>
+<dt> <tt>{rpn 3 2 <=}</tt>
+<dd>Test whether 2 is less than or equal to 3.
+<p>
+<p>
+<dt> <tt>{rpn 3 2 >}</tt>
+<dd>Test whether 2 is greater than 3, yielding 0.
+<p>
+<p>
+<dt> <tt>{rpn 3 2 >=}</tt>
+<dd>Test whether 2 is greater than or equal to 3, yielding 0.
+<p>
+<p>
+<dt> <tt>{rpn 3 2 ==}</tt>
+<dd>Test whether 2 and 3 are equal, yielding 0.  (Do not confuse this with
+the asignment operator `<font color="#82140F"><code>=</code></font>', described next.)
+<p>
+<p>
+<dt> <tt>{rpn 10 ".ten." =}</tt>
+<dd><p>
+Assign the value `<font color="#82140F"><code>10</code></font>' to the variable named `<font color="#82140F"><code>.ten.</code></font>'.  The
+variable name must be put in quotes, or else Gri will insert the value
+of the variable (if it exists) into the expression, instead of trying
+to assign to it.
+<p>
+After the assignment is done, the stack is cleared of both the value and
+the variable name.  For example, in the following code
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+{rpn 3.1415 ".pi." =}
+show .pi.
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+the first line evaluates to a blank line, and the second prints the value of Pi.
+<p>
+NOTE: Do not confuse this with the `<font color="#82140F"><code>==</code></font>' equality operator
+described above.
+<p>
+<dt> <tt>{rpn "hello" "\\greeting" =} </tt>
+<dd>Assign the value `<font color="#82140F"><code>"hello"</code></font>' to the synonym `<font color="#82140F"><code>\greeting</code></font>'.  See
+notes at the above item.
+<p>
+<dt> <tt>{rpn 3.14159 0 "x" =}</tt>
+<dd>Assign the value Pi to the first element (at index `<font color="#82140F"><code>0</code></font>') 
+of the `<font color="#82140F"><code>x</code></font>' column.  All columns may be assigned to in this way, e.g.
+the following is a technique for plotting a quadratic function:
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.i. = 0
+.n. = 10
+while {rpn .i. .n. >}
+    {rpn .i. .n. 1 - /     .i. "x" =}
+    {rpn x .i. @ 2 power  .i. "y" =}
+    .i. += 1
+end while
+draw curve
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<dt> <tt>{rpn 0 1 &}</tt>
+<dd>Test whether 0 and 1 are both true, yielding 0.
+<p>
+<dt> <tt>{rpn 0 1 and}</tt>
+<dd>Test whether 0 and 1 are both true, yielding 0.
+<p>
+<dt> <tt>{rpn y x area}</tt>
+<dd>Calculate the area under the curve y=y(x).  For details
+(see <a href="ManipulatingColumns.html#ManipulationofColumnsetc">Manipulation of Columns etc</a>).
+<p>
+<dt> <tt>{rpn 0 1 |}</tt>
+<dd>Test whether either 0 or 1 is true, yielding 1.
+<p>
+<dt> <tt>{rpn 0 1 or}</tt>
+<dd>Test whether either 0 or 1 is true, yielding 1.
+<p>
+<dt> <tt>{rpn 2 3 exch}</tt>
+<dd>Exchange 2 and 3 on the stack, yielding `<font color="#82140F"><code>3 2</code></font>' on the stack.  (See
+also `<font color="#82140F"><code>pop</code></font>' and `<font color="#82140F"><code>dup</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn x 0 @}</tt>
+<dd>Yields the value of the first number in the x column.  A similar form
+also works for `<font color="82140F"><code>y</code></font>', etc.  (see <a href="ManipulatingColumns.html#ManipulationofColumnsetc">Manipulation of Columns etc</a>).
+<p>
+<p>
+<dt> <tt>{rpn 2 3 inf}</tt>
+<dd>Pick the smaller of two values, yielding 3.  (Opposite to `<font color="#82140F"><code>sup</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn 2 3 power}</tt>
+<dd>Take 2 to the 3rd power, yielding 8.  Note: This convention may be
+confusing to users who are familiar with HP calculators from decades
+past.  Present-day calculators use this convention, which they write as
+`<font color="#82140F"><code>y^x</code></font>', but older calculators used the reverse convention, labelling
+the key `<font color="#82140F"><code>x^y</code></font>'.
+<p>
+<p>
+<p>
+<dt> <tt>{rpn 2 3 remainder}</tt>
+<dd>Calculate the remainder after dividing 2 by 3, yielding 2.  The return value
+for `<font color="#82140F"><code>{rpn A B remainder</code></font>'} is `<font color="#82140F"><code>B - n * A</code></font>', where `<font color="#82140F"><code>n</code></font>' is
+the quotient of `<font color="#82140F"><code>A/B</code></font>', rounded towards zero to an integer.  In this
+case, `<font color="#82140F"><code>2/3</code></font>' rounds to an `<font color="#82140F"><code>n</code></font>' value of zero, yielding 2 as the
+resulting remainder.
+<p>
+<p>
+<dt> <tt>{rpn "heLLo" "s/L/l/g" sed}</tt>
+<dd>Switch all instances of `<font color="#82140F"><code>L</code></font>' into `<font color="#82140F"><code>l</code></font>', yielding the string
+`<font color="#82140F"><code>"hello"</code></font>' on the stack.  This can be helpful for working with
+filenames, etc.  The work is preformed with a system call to the
+`<font color="#82140F"><code>sed</code></font>' utility (present on unix systems), and therefore this
+command will fail if `<font color="#82140F"><code>sed</code></font>' is not installed, or if the OS cannot
+be contacted.
+<p>
+<p>
+<dt> <tt>{rpn "file" ".dat" strcat}</tt>
+<dd>Concatenate the two strings, yielding the string `<font color="#82140F"><code>"file.dat"</code></font>'.
+<p>
+<p>
+<dt> <tt>{rpn 2 3 sup}</tt>
+<dd>Pick the larger of two values, yielding 3.  (Opposite to `<font color="#82140F"><code>inf</code></font>'.)
+<p>
+</dl>
+
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

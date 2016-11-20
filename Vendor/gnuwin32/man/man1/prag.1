@@ -1,0 +1,935 @@
+.\"lf 1 prag.1
+.TH PRAG 1 "1 August 1993"
+.ds Gr prag
+.SH NAME
+.B \*(Gr
+\- compile diagrams for
+.B pic
+.if .t
+.	ps	+2
+.	vs	+2
+.	de Cw
+\\$3\f(CW\\$1\fP\\$2
+..
+.	de Cs
+\f(CW
+.ps -1
+.vs -2
+..
+.	de Ce
+.vs +2
+.ps +1
+\fP
+..
+.fi
+.SH SYNOPSIS
+.Cw \*(Gr
+[
+.I filename
+\&.\|.\|.
+]
+.SH DESCRIPTION
+.LP
+.Cw \&.G1
+[
+.I width
+[
+.I height
+]]
+.br
+.Cw \&.G2
+.RS
+.B \*(Gr
+recognizes its input only between
+.B \&.G1
+and
+.BR \&.G2 .
+All other lines are copied literal to standard output.
+Two optional arguments to
+.B \&.G1
+specify the width and the height.
+.RE
+.Cw #
+.I comment
+.RS
+Lines starting with a hash mark '#' are treated as comments.
+.RE
+.Cw draw
+.I line-style
+.RS
+The
+.Cw draw
+statement sets the line style for drawing the graphs.
+Valid arguments are the line styles as known from
+.BR pic (1)
+or the pseudo-style
+.Cw marked .
+.Cw marked
+will yield a solid graph with the data points marked.
+Up to five default marking characters
+(\e(bu \(bu, \e(*D \(*D, \e(pl \(pl, \e(sq \(sq, \e(mu \(mu)
+are used for the first five graphs.
+If you don't like these characters,
+you can override them by giving an additional drawing character
+to each data point (as second or third argument).
+Use line style
+.Cw invis
+to draw unconnected data points.
+.RE
+.Cw new
+[
+.I line-style
+]
+.I name
+[
+.I label-string
+]]]
+.RS
+This statement switches a new graph within a diagram.
+The line style of the graph is set to
+.IR line-style .
+The graph gets the name
+.IR name ,
+which can be referred in subsequent
+.B pic
+statements
+and is labeled with the string
+.IR label-string .
+.I label-string
+can be any valid
+.B pic
+string.
+.RE
+.Cw label
+[
+.Cw left
+|
+.Cw right
+|
+.Cw top
+|
+.Cw bot
+]
+.I label-string
+.RS
+.I label-string
+is placed at the specified side of the whole diagram.
+.RE
+.Cw ticks
+[
+.Cw left
+|
+.Cw right
+|
+.Cw top
+|
+.Cw bot
+]
+[
+.I where
+]
+.I position
+\&.\|.\|.
+.RS
+Tick marks for the specified side are placed at the given positions.
+.I where
+says to place the ticks inside
+.Cw in ) (
+or outside
+.Cw out ) (
+the diagram.
+.RE
+.Cw ticks
+[
+.Cw left
+| 
+.Cw right
+| 
+.Cw top
+| 
+.Cw bot
+] [
+.I where
+] 
+.Cw from 
+.I begin 
+.Cw to 
+.I end 
+[
+.Cw by
+.I step
+]
+.RS
+This second variant of the
+.Cw tick -statement
+allows the automatic generation of ticks
+in the range from
+.I begin
+to
+.I end
+with an optional distance
+.IR step .
+.RE
+.Cw frame
+.I frame-attributes
+\&.\|.\|.
+.RS
+The
+.I frame-attributes
+are given to the box, that builds the frame of the diagram.
+Valid
+.B pic
+box attributes can be used.
+The internal name of the diagram frame is
+.Cw FRAME
+and of the surrounding box
+.Cw GRAPH .
+Both can be used in
+.B pic
+statements to get special effects.
+The boxes for the top, left, right and bottom margin are
+.Cw TMARG ,
+.Cw LMARG ,
+.Cw RMARG
+and
+.Cw BMARG .
+.RE
+.Cw spline
+.br
+.Cw nospline
+.RS
+.Cw spline
+forces \*(Gr to use splines for drawing graphs, which is the default.
+.Cw nospline
+will use
+.BR pic 's
+.Cw line
+directives respectively.
+.RE
+.Cw range
+.I xmin ymin xmax ymax
+.RS
+Graphs are drawn within the range specified.
+.RE
+.Cw ht
+.I number
+.RS
+Sets the height of the diagram to
+.IR number .
+.RE
+.Cw wid
+.I number
+.RS
+Sets the width of the diagram to
+.IR number .
+.RE
+.Cw grid
+[
+.I line-style
+]
+.RS
+Draws a grid of
+.IR line-style ,
+.Cw dotted
+per default.
+.RE
+.Cw pic
+{
+.I anything
+}
+.RS
+.I Anything
+is passed literally through
+.BR pic .
+.RE
+.RS
+.RE
+.Cw next
+[
+.I graph-name
+] [
+.Cw at
+]
+.I position
+.RS
+Sets a new data point for graph
+.I graph-name
+or the current graph at position
+.IR position .
+.RE
+.I position
+.RS
+.I Position
+is described by an y coordinate and an optional x coordinate.
+If the x coordinate is missing, then x is assumed to be
+0, 1, 2, 3, etc.
+.RE
+.I position drawing-char
+.RS
+For each data point an optional (as second or third argument respectively)
+drawing character can be declared.
+Any
+.B troff
+and
+.B eqn
+character or special character or sequence of characters can be used.
+.RE
+.SH EXAMPLES
+.SS "Example 1
+.RS
+.Cs
+.nf
+.na
+frame invis
+pic { line from FRAME.sw to FRAME.se }
+pic { line from FRAME.sw to FRAME.nw }
+draw invis
+0 \e&
+2.9 NY
+7.8 NJ
+3.4 CA
+1.8 MI
+3.7 FL
+.Ce
+.RE
+will produce:
+.lf 296 prags.1
+.lf 1 ex01.prag
+.lf 297 prag.1
+.PS 4 2.66667
+# DO NOT EDIT!
+# generated from "prags.1" by prag (C) hm@GUUG.de
+GRAPH:	box invis ht 2 wid 3
+FRAME:	box invis ht 2 wid 3 with .sw at GRAPH.sw + (0, 0)
+line left 0.0625 at 0.2 <FRAME.sw, FRAME.nw>
+"2" at last line.w rjust
+line left 0.0625 at 0.4 <FRAME.sw, FRAME.nw>
+"4" at last line.w rjust
+line left 0.0625 at 0.6 <FRAME.sw, FRAME.nw>
+"6" at last line.w rjust
+line left 0.0625 at 0.8 <FRAME.sw, FRAME.nw>
+"8" at last line.w rjust
+line down 0.0625 at 0.2 <FRAME.sw, FRAME.se>
+"1" at last line.s below
+line down 0.0625 at 0.4 <FRAME.sw, FRAME.se>
+"2" at last line.s below
+line down 0.0625 at 0.6 <FRAME.sw, FRAME.se>
+"3" at last line.s below
+line down 0.0625 at 0.8 <FRAME.sw, FRAME.se>
+"4" at last line.s below
+G_OOPS: # graph no. 1
+"\s+2\(bu\s-2" at FRAME.sw + (0, 0)
+"NY" at FRAME.sw + (0.6, 0.58)
+"NJ" at FRAME.sw + (1.2, 1.56)
+"CA" at FRAME.sw + (1.8, 0.68)
+"MI" at FRAME.sw + (2.4, 0.36)
+"FL" at FRAME.sw + (3, 0.74)
+line from FRAME.sw to FRAME.se
+line from FRAME.sw to FRAME.nw
+reset
+.PE
+.lf 309 prags.1
+.SS "Example 2
+.RS
+.Cs
+.nf
+.na
+wid 4
+ht 3
+grid dotted
+label left "execution" "time / sec"
+label bot "# of msgs"
+range 0 0 5000 25
+ticks left 0 5 10 15 20 25
+ticks right 0 5 10 15 20 25
+ticks top 0 1000 2000 3000 4000 5000
+ticks bot 0 1000 2000 3000 4000 5000
+new marked MSG "\es-2MSG\es+2" above
+100 0.19 \e(*D
+\&.\|.\|.
+next TLITCP at 5000 20.09 \e(mu
+3000 18.08 \e(mu
+4000 19.12 \e(mu
+.Ce
+.RE
+will produce:
+.bp
+.lf 334 prags.1
+.lf 1 ex02.prag
+.lf 324 prag.1
+.PS 5.33333 4
+# DO NOT EDIT!
+# generated from "prags.1" by prag (C) hm@GUUG.de
+GRAPH:	box invis ht 3.5 wid 4.66667
+FRAME:	box  ht 3 wid 4 with .sw at GRAPH.sw + (0.666667, 0.5)
+MARGleft:	box wid 0.666667 ht 3 invis "execution" "time / sec" with .e at GRAPH.w
+MARGbot:	box wid 4 ht 0.5 invis "# of msgs" with .n at GRAPH.s
+line left 0.09375 at 0 <FRAME.sw, FRAME.nw>
+"0 " at last line.w rjust
+line left 0.09375 at 0.2 <FRAME.sw, FRAME.nw>
+"5 " at last line.w rjust
+line dotted from 0.2 <FRAME.sw, FRAME.nw> to 0.2 <FRAME.se, FRAME.ne>
+line left 0.09375 at 0.4 <FRAME.sw, FRAME.nw>
+"10 " at last line.w rjust
+line dotted from 0.4 <FRAME.sw, FRAME.nw> to 0.4 <FRAME.se, FRAME.ne>
+line left 0.09375 at 0.6 <FRAME.sw, FRAME.nw>
+"15 " at last line.w rjust
+line dotted from 0.6 <FRAME.sw, FRAME.nw> to 0.6 <FRAME.se, FRAME.ne>
+line left 0.09375 at 0.8 <FRAME.sw, FRAME.nw>
+"20 " at last line.w rjust
+line dotted from 0.8 <FRAME.sw, FRAME.nw> to 0.8 <FRAME.se, FRAME.ne>
+line left 0.09375 at 1 <FRAME.sw, FRAME.nw>
+"25 " at last line.w rjust
+line right 0.09375 at 0 <FRAME.se, FRAME.ne>
+" 0" at last line.e ljust
+line right 0.09375 at 0.2 <FRAME.se, FRAME.ne>
+" 5" at last line.e ljust
+line right 0.09375 at 0.4 <FRAME.se, FRAME.ne>
+" 10" at last line.e ljust
+line right 0.09375 at 0.6 <FRAME.se, FRAME.ne>
+" 15" at last line.e ljust
+line right 0.09375 at 0.8 <FRAME.se, FRAME.ne>
+" 20" at last line.e ljust
+line right 0.09375 at 1 <FRAME.se, FRAME.ne>
+" 25" at last line.e ljust
+line up 0.09375 at 0 <FRAME.nw, FRAME.ne>
+"0" at last line.n above
+line up 0.09375 at 0.2 <FRAME.nw, FRAME.ne>
+"1000" at last line.n above
+line up 0.09375 at 0.4 <FRAME.nw, FRAME.ne>
+"2000" at last line.n above
+line up 0.09375 at 0.6 <FRAME.nw, FRAME.ne>
+"3000" at last line.n above
+line up 0.09375 at 0.8 <FRAME.nw, FRAME.ne>
+"4000" at last line.n above
+line up 0.09375 at 1 <FRAME.nw, FRAME.ne>
+"5000" at last line.n above
+line down 0.09375 at 0 <FRAME.sw, FRAME.se>
+"0" at last line.s below
+line down 0.09375 at 0.2 <FRAME.sw, FRAME.se>
+"1000" at last line.s below
+line dotted from 0.2 <FRAME.sw, FRAME.se> to 0.2 <FRAME.nw, FRAME.ne>
+line down 0.09375 at 0.4 <FRAME.sw, FRAME.se>
+"2000" at last line.s below
+line dotted from 0.4 <FRAME.sw, FRAME.se> to 0.4 <FRAME.nw, FRAME.ne>
+line down 0.09375 at 0.6 <FRAME.sw, FRAME.se>
+"3000" at last line.s below
+line dotted from 0.6 <FRAME.sw, FRAME.se> to 0.6 <FRAME.nw, FRAME.ne>
+line down 0.09375 at 0.8 <FRAME.sw, FRAME.se>
+"4000" at last line.s below
+line dotted from 0.8 <FRAME.sw, FRAME.se> to 0.8 <FRAME.nw, FRAME.ne>
+line down 0.09375 at 1 <FRAME.sw, FRAME.se>
+"5000" at last line.s below
+G_MSG: # graph no. 2
+"\(*D" at FRAME.sw + (0.08, 0.0228)
+"\(*D" at FRAME.sw + (0.4, 0.0552)
+"\(*D" at FRAME.sw + (0.8, 0.0972)
+"\(*D" at FRAME.sw + (1.6, 0.1788)
+"\(*D" at FRAME.sw + (2.4, 0.2736)
+"\(*D" at FRAME.sw + (3.2, 0.3456)
+"\(*D" at FRAME.sw + (4, 0.4428)
+spline "\s-2MSG\s+2" above  from FRAME.sw + (0.08, 0.0228)	\
+	then to FRAME.sw + (0.4, 0.0552)	\
+	then to FRAME.sw + (0.8, 0.0972)	\
+	then to FRAME.sw + (1.6, 0.1788)	\
+	then to FRAME.sw + (2.4, 0.2736)	\
+	then to FRAME.sw + (3.2, 0.3456)	\
+	then to FRAME.sw + (4, 0.4428)
+G_SOCKUDP: # graph no. 3
+"\(bu" at FRAME.sw + (0.08, 0.0816)
+"\(bu" at FRAME.sw + (0.4, 0.3036)
+"\(bu" at FRAME.sw + (0.8, 0.5856)
+"\(bu" at FRAME.sw + (1.6, 1.14)
+"\(bu" at FRAME.sw + (2.4, 1.6944)
+"\(bu" at FRAME.sw + (3.2, 2.2536)
+"\(bu" at FRAME.sw + (4, 2.7912)
+spline "\s-2SOCKUDP\s+2" above  from FRAME.sw + (0.08, 0.0816)	\
+	then to FRAME.sw + (0.4, 0.3036)	\
+	then to FRAME.sw + (0.8, 0.5856)	\
+	then to FRAME.sw + (1.6, 1.14)	\
+	then to FRAME.sw + (2.4, 1.6944)	\
+	then to FRAME.sw + (3.2, 2.2536)	\
+	then to FRAME.sw + (4, 2.7912)
+G_TLIUDP: # graph no. 4
+"\(sq" at FRAME.sw + (0.08, 0.0768)
+"\(sq" at FRAME.sw + (0.4, 0.2856)
+"\(sq" at FRAME.sw + (0.8, 0.54)
+"\(sq" at FRAME.sw + (1.6, 1.0488)
+"\(sq" at FRAME.sw + (2.4, 1.5684)
+"\(sq" at FRAME.sw + (2.4, 1.5684)
+"\(sq" at FRAME.sw + (3.2, 2.0736)
+"\(sq" at FRAME.sw + (4, 2.6016)
+spline "\s-2TLIUDP\s+2" below  from FRAME.sw + (0.08, 0.0768)	\
+	then to FRAME.sw + (0.4, 0.2856)	\
+	then to FRAME.sw + (0.8, 0.54)	\
+	then to FRAME.sw + (1.6, 1.0488)	\
+	then to FRAME.sw + (2.4, 1.5684)	\
+	then to FRAME.sw + (2.4, 1.5684)	\
+	then to FRAME.sw + (3.2, 2.0736)	\
+	then to FRAME.sw + (4, 2.6016)
+G_TLITCP: # graph no. 5
+"\(mu" at FRAME.sw + (0.08, 1.8396)
+"\(mu" at FRAME.sw + (0.4, 1.8852)
+"\(mu" at FRAME.sw + (0.8, 1.9416)
+"\(mu" at FRAME.sw + (1.6, 2.0556)
+"\(mu" at FRAME.sw + (2.4, 2.1696)
+"\(mu" at FRAME.sw + (3.2, 2.2944)
+"\(mu" at FRAME.sw + (4, 2.4108)
+spline "\s-2TLITCP\s+2" above  from FRAME.sw + (0.08, 1.8396)	\
+	then to FRAME.sw + (0.4, 1.8852)	\
+	then to FRAME.sw + (0.8, 1.9416)	\
+	then to FRAME.sw + (1.6, 2.0556)	\
+	then to FRAME.sw + (2.4, 2.1696)	\
+	then to FRAME.sw + (3.2, 2.2944)	\
+	then to FRAME.sw + (4, 2.4108)
+reset
+.PE
+.lf 380 prags.1
+.SS "Example 3
+.RS
+.Cs
+.nf
+.na
+grid dotted
+draw marked
+100 0.19
+\&.\|.\|.
+5000 3.69
+new marked
+0 0
+400 0.45
+\&.\|.\|.
+5000 3.5
+.Ce
+.RE
+will produce:
+.lf 399 prags.1
+.lf 1 ex03.prag
+.lf 345 prag.1
+.PS 4 2.66667
+# DO NOT EDIT!
+# generated from "prags.1" by prag (C) hm@GUUG.de
+GRAPH:	box invis ht 2 wid 3
+FRAME:	box  ht 2 wid 3 with .sw at GRAPH.sw + (0, 0)
+line left 0.0625 at 0.2 <FRAME.sw, FRAME.nw>
+"1" at last line.w rjust
+line dotted from 0.2 <FRAME.sw, FRAME.nw> to 0.2 <FRAME.se, FRAME.ne>
+line left 0.0625 at 0.4 <FRAME.sw, FRAME.nw>
+"2" at last line.w rjust
+line dotted from 0.4 <FRAME.sw, FRAME.nw> to 0.4 <FRAME.se, FRAME.ne>
+line left 0.0625 at 0.6 <FRAME.sw, FRAME.nw>
+"3" at last line.w rjust
+line dotted from 0.6 <FRAME.sw, FRAME.nw> to 0.6 <FRAME.se, FRAME.ne>
+line left 0.0625 at 0.8 <FRAME.sw, FRAME.nw>
+"4" at last line.w rjust
+line dotted from 0.8 <FRAME.sw, FRAME.nw> to 0.8 <FRAME.se, FRAME.ne>
+line down 0.0625 at 0.2 <FRAME.sw, FRAME.se>
+"1000" at last line.s below
+line dotted from 0.2 <FRAME.sw, FRAME.se> to 0.2 <FRAME.nw, FRAME.ne>
+line down 0.0625 at 0.4 <FRAME.sw, FRAME.se>
+"2000" at last line.s below
+line dotted from 0.4 <FRAME.sw, FRAME.se> to 0.4 <FRAME.nw, FRAME.ne>
+line down 0.0625 at 0.6 <FRAME.sw, FRAME.se>
+"3000" at last line.s below
+line dotted from 0.6 <FRAME.sw, FRAME.se> to 0.6 <FRAME.nw, FRAME.ne>
+line down 0.0625 at 0.8 <FRAME.sw, FRAME.se>
+"4000" at last line.s below
+line dotted from 0.8 <FRAME.sw, FRAME.se> to 0.8 <FRAME.nw, FRAME.ne>
+G_OOPS: # graph no. 1
+"\s+2\(bu\s-2" at FRAME.sw + (0.06, 0.076)
+"\s+2\(bu\s-2" at FRAME.sw + (0.3, 0.184)
+"\s+2\(bu\s-2" at FRAME.sw + (0.6, 0.324)
+"\s+2\(bu\s-2" at FRAME.sw + (1.2, 0.596)
+"\s+2\(bu\s-2" at FRAME.sw + (1.8, 0.912)
+"\s+2\(bu\s-2" at FRAME.sw + (2.4, 1.152)
+"\s+2\(bu\s-2" at FRAME.sw + (3, 1.476)
+spline   from FRAME.sw + (0.06, 0.076)	\
+	then to FRAME.sw + (0.3, 0.184)	\
+	then to FRAME.sw + (0.6, 0.324)	\
+	then to FRAME.sw + (1.2, 0.596)	\
+	then to FRAME.sw + (1.8, 0.912)	\
+	then to FRAME.sw + (2.4, 1.152)	\
+	then to FRAME.sw + (3, 1.476)
+G_OOPS: # graph no. 2
+"\(*D" at FRAME.sw + (0, 0)
+"\(*D" at FRAME.sw + (0.24, 0.18)
+"\(*D" at FRAME.sw + (0.6, 0.24)
+"\(*D" at FRAME.sw + (1.2, 0.048)
+"\(*D" at FRAME.sw + (1.8, 0.076)
+"\(*D" at FRAME.sw + (2.4, 1)
+"\(*D" at FRAME.sw + (3, 1.4)
+spline   from FRAME.sw + (0, 0)	\
+	then to FRAME.sw + (0.24, 0.18)	\
+	then to FRAME.sw + (0.6, 0.24)	\
+	then to FRAME.sw + (1.2, 0.048)	\
+	then to FRAME.sw + (1.8, 0.076)	\
+	then to FRAME.sw + (2.4, 1)	\
+	then to FRAME.sw + (3, 1.4)
+reset
+.PE
+.lf 419 prags.1
+.SS "Example 4
+.RS
+.Cs
+.nf
+.na
+label left "execution time" "seconds"
+label right "\e(ua message size"
+label bot "messages sent"
+range 0 0 10000 25
+ticks left 0 5 10 15 20 25
+ticks bot 0 1000 5000 10000
+100	1.3
+\&.\|.\|.
+10000	24.6
+.Ce
+.RE
+will produce:
+.lf 437 prags.1
+.lf 1 ex04.prag
+.lf 365 prag.1
+.PS 4 2.66667
+# DO NOT EDIT!
+# generated from "prags.1" by prag (C) hm@GUUG.de
+GRAPH:	box invis ht 2.33333 wid 4
+FRAME:	box  ht 2 wid 3 with .sw at GRAPH.sw + (0.5, 0.333333)
+MARGleft:	box wid 0.5 ht 2 invis "execution time" "seconds" with .e at GRAPH.w
+MARGright:	box wid 0.5 ht 2 invis "\(ua message size" with .w at GRAPH.e
+MARGbot:	box wid 3 ht 0.333333 invis "messages sent" with .n at GRAPH.s
+line left 0.0625 at 0 <FRAME.sw, FRAME.nw>
+"0 " at last line.w rjust
+line left 0.0625 at 0.2 <FRAME.sw, FRAME.nw>
+"5 " at last line.w rjust
+line left 0.0625 at 0.4 <FRAME.sw, FRAME.nw>
+"10 " at last line.w rjust
+line left 0.0625 at 0.6 <FRAME.sw, FRAME.nw>
+"15 " at last line.w rjust
+line left 0.0625 at 0.8 <FRAME.sw, FRAME.nw>
+"20 " at last line.w rjust
+line left 0.0625 at 1 <FRAME.sw, FRAME.nw>
+"25 " at last line.w rjust
+line down 0.0625 at 0 <FRAME.sw, FRAME.se>
+"0" at last line.s below
+line down 0.0625 at 0.1 <FRAME.sw, FRAME.se>
+"1000" at last line.s below
+line down 0.0625 at 0.5 <FRAME.sw, FRAME.se>
+"5000" at last line.s below
+line down 0.0625 at 1 <FRAME.sw, FRAME.se>
+"10000" at last line.s below
+G_OOPS: # graph no. 1
+spline   from FRAME.sw + (0.03, 0.104)	\
+	then to FRAME.sw + (0.15, 0.144)	\
+	then to FRAME.sw + (0.3, 0.216)	\
+	then to FRAME.sw + (1.5, 0.6)	\
+	then to FRAME.sw + (1.8, 0.72)	\
+	then to FRAME.sw + (2.1, 0.824)	\
+	then to FRAME.sw + (2.4, 0.92)	\
+	then to FRAME.sw + (2.7, 1.008)	\
+	then to FRAME.sw + (3, 1.088)
+G_OOPS: # graph no. 2
+spline   from FRAME.sw + (0.03, 0.104)	\
+	then to FRAME.sw + (0.15, 0.16)	\
+	then to FRAME.sw + (0.3, 0.216)	\
+	then to FRAME.sw + (1.5, 0.712)	\
+	then to FRAME.sw + (1.8, 0.832)	\
+	then to FRAME.sw + (2.1, 0.976)	\
+	then to FRAME.sw + (2.4, 1.104)	\
+	then to FRAME.sw + (2.7, 1.4)	\
+	then to FRAME.sw + (3, 1.352)
+G_OOPS: # graph no. 3
+spline   from FRAME.sw + (0.03, 0.104)	\
+	then to FRAME.sw + (0.15, 0.168)	\
+	then to FRAME.sw + (0.3, 0.248)	\
+	then to FRAME.sw + (1.5, 0.832)	\
+	then to FRAME.sw + (1.8, 0.968)	\
+	then to FRAME.sw + (2.1, 1.152)	\
+	then to FRAME.sw + (2.4, 1.328)	\
+	then to FRAME.sw + (2.7, 1.432)	\
+	then to FRAME.sw + (3, 1.576)
+G_OOPS: # graph no. 4
+spline   from FRAME.sw + (0.03, 0.112)	\
+	then to FRAME.sw + (0.15, 0.184)	\
+	then to FRAME.sw + (0.3, 0.28)	\
+	then to FRAME.sw + (1.5, 1.024)	\
+	then to FRAME.sw + (1.8, 1.176)	\
+	then to FRAME.sw + (2.1, 1.392)	\
+	then to FRAME.sw + (2.4, 1.552)	\
+	then to FRAME.sw + (2.7, 1.728)	\
+	then to FRAME.sw + (3, 1.968)
+reset
+.PE
+.lf 485 prags.1
+.SS "Example 5
+.RS
+.Cs
+.nf
+.na
+label bot "time (in seconds)"
+label left "memory" "available"
+range 0 0 365 1800
+ticks left 200 400 600 800 1000 1200 1400 1600 
+ticks bot 40 80 120 160 200 240 280 320 360
+new
+0 141
+\&.\|.\|.
+365 1309
+new dashed
+nospline
+0 12
+150 247
+\&.\|.\|.
+new dashed
+nospline
+210 824
+360 1508
+.Ce
+.RE
+will produce:
+.lf 512 prags.1
+.lf 1 ex05.prag
+.lf 394 prag.1
+.PS 4 2.66667
+# DO NOT EDIT!
+# generated from "prags.1" by prag (C) hm@GUUG.de
+GRAPH:	box invis ht 2.33333 wid 3.5
+FRAME:	box  ht 2 wid 3 with .sw at GRAPH.sw + (0.5, 0.333333)
+MARGleft:	box wid 0.5 ht 2 invis "memory" "available" with .e at GRAPH.w
+MARGbot:	box wid 3 ht 0.333333 invis "time (in seconds)" with .n at GRAPH.s
+line left 0.0625 at 0.111111 <FRAME.sw, FRAME.nw>
+"200 " at last line.w rjust
+line left 0.0625 at 0.222222 <FRAME.sw, FRAME.nw>
+"400 " at last line.w rjust
+line left 0.0625 at 0.333333 <FRAME.sw, FRAME.nw>
+"600 " at last line.w rjust
+line left 0.0625 at 0.444444 <FRAME.sw, FRAME.nw>
+"800 " at last line.w rjust
+line left 0.0625 at 0.555556 <FRAME.sw, FRAME.nw>
+"1000 " at last line.w rjust
+line left 0.0625 at 0.666667 <FRAME.sw, FRAME.nw>
+"1200 " at last line.w rjust
+line left 0.0625 at 0.777778 <FRAME.sw, FRAME.nw>
+"1400 " at last line.w rjust
+line left 0.0625 at 0.888889 <FRAME.sw, FRAME.nw>
+"1600 " at last line.w rjust
+line down 0.0625 at 0.109589 <FRAME.sw, FRAME.se>
+"40" at last line.s below
+line down 0.0625 at 0.219178 <FRAME.sw, FRAME.se>
+"80" at last line.s below
+line down 0.0625 at 0.328767 <FRAME.sw, FRAME.se>
+"120" at last line.s below
+line down 0.0625 at 0.438356 <FRAME.sw, FRAME.se>
+"160" at last line.s below
+line down 0.0625 at 0.547945 <FRAME.sw, FRAME.se>
+"200" at last line.s below
+line down 0.0625 at 0.657534 <FRAME.sw, FRAME.se>
+"240" at last line.s below
+line down 0.0625 at 0.767123 <FRAME.sw, FRAME.se>
+"280" at last line.s below
+line down 0.0625 at 0.876712 <FRAME.sw, FRAME.se>
+"320" at last line.s below
+line down 0.0625 at 0.986301 <FRAME.sw, FRAME.se>
+"360" at last line.s below
+G_OOPS: # graph no. 2
+spline   from FRAME.sw + (0, 0.156667)	\
+	then to FRAME.sw + (0.0410959, 0.0855556)	\
+	then to FRAME.sw + (0.0821918, 0.118889)	\
+	then to FRAME.sw + (0.123288, 0.0744444)	\
+	then to FRAME.sw + (0.164384, 0.0722222)	\
+	then to FRAME.sw + (0.205479, 0.0677778)	\
+	then to FRAME.sw + (0.246575, 0.121111)	\
+	then to FRAME.sw + (0.287671, 0.101111)	\
+	then to FRAME.sw + (0.328767, 0.0955556)	\
+	then to FRAME.sw + (0.369863, 0.0855556)	\
+	then to FRAME.sw + (0.410959, 0.0622222)	\
+	then to FRAME.sw + (0.452055, 0.0677778)	\
+	then to FRAME.sw + (0.493151, 0.14)	\
+	then to FRAME.sw + (0.534247, 0.116667)	\
+	then to FRAME.sw + (0.575342, 0.102222)	\
+	then to FRAME.sw + (0.616438, 0.106667)	\
+	then to FRAME.sw + (0.657534, 0.0966667)	\
+	then to FRAME.sw + (0.69863, 0.0944444)	\
+	then to FRAME.sw + (0.739726, 0.0733333)	\
+	then to FRAME.sw + (0.780822, 0.103333)	\
+	then to FRAME.sw + (0.821918, 0.113333)	\
+	then to FRAME.sw + (0.863014, 0.0911111)	\
+	then to FRAME.sw + (0.90411, 0.11)	\
+	then to FRAME.sw + (0.945205, 0.0711111)	\
+	then to FRAME.sw + (0.986301, 0.0755556)	\
+	then to FRAME.sw + (1.0274, 0.392222)	\
+	then to FRAME.sw + (1.06849, 0.42)	\
+	then to FRAME.sw + (1.10959, 0.373333)	\
+	then to FRAME.sw + (1.15068, 0.362222)	\
+	then to FRAME.sw + (1.19178, 0.366667)	\
+	then to FRAME.sw + (1.23288, 0.291111)	\
+	then to FRAME.sw + (1.27397, 0.311111)	\
+	then to FRAME.sw + (1.31507, 0.268889)	\
+	then to FRAME.sw + (1.35616, 0.288889)	\
+	then to FRAME.sw + (1.39726, 0.264444)	\
+	then to FRAME.sw + (1.43836, 0.231111)	\
+	then to FRAME.sw + (1.47945, 0.247778)	\
+	then to FRAME.sw + (1.52055, 0.0822222)	\
+	then to FRAME.sw + (1.56164, 0.135556)	\
+	then to FRAME.sw + (1.60274, 0.0711111)	\
+	then to FRAME.sw + (1.64384, 0.145556)	\
+	then to FRAME.sw + (1.68493, 0.162222)	\
+	then to FRAME.sw + (1.72603, 0.376667)	\
+	then to FRAME.sw + (1.76712, 0.374444)	\
+	then to FRAME.sw + (1.80822, 0.354444)	\
+	then to FRAME.sw + (1.84932, 0.352222)	\
+	then to FRAME.sw + (1.89041, 0.314444)	\
+	then to FRAME.sw + (1.93151, 1.46)	\
+	then to FRAME.sw + (1.9726, 1.45889)	\
+	then to FRAME.sw + (2.0137, 1.45889)	\
+	then to FRAME.sw + (2.05479, 1.45889)	\
+	then to FRAME.sw + (2.09589, 1.45778)	\
+	then to FRAME.sw + (2.13699, 1.45778)	\
+	then to FRAME.sw + (2.17808, 1.45778)	\
+	then to FRAME.sw + (2.21918, 1.45778)	\
+	then to FRAME.sw + (2.26027, 1.45556)	\
+	then to FRAME.sw + (2.30137, 1.45556)	\
+	then to FRAME.sw + (2.34247, 1.45556)	\
+	then to FRAME.sw + (2.38356, 1.45556)	\
+	then to FRAME.sw + (2.42466, 1.45556)	\
+	then to FRAME.sw + (2.46575, 1.45556)	\
+	then to FRAME.sw + (2.50685, 1.45556)	\
+	then to FRAME.sw + (2.54795, 1.45556)	\
+	then to FRAME.sw + (2.58904, 1.45556)	\
+	then to FRAME.sw + (2.63014, 1.45556)	\
+	then to FRAME.sw + (2.67123, 1.45556)	\
+	then to FRAME.sw + (2.71233, 1.45556)	\
+	then to FRAME.sw + (2.75342, 1.45556)	\
+	then to FRAME.sw + (2.79452, 1.45556)	\
+	then to FRAME.sw + (2.83562, 1.45444)	\
+	then to FRAME.sw + (2.87671, 1.45444)	\
+	then to FRAME.sw + (2.91781, 1.45444)	\
+	then to FRAME.sw + (2.9589, 1.45444)	\
+	then to FRAME.sw + (3, 1.45444)
+G_OOPS: # graph no. 3
+line  dashed from FRAME.sw + (0, 0.0133333)	\
+	then to FRAME.sw + (1.23288, 0.274444)
+G_OOPS: # graph no. 4
+line  dashed from FRAME.sw + (0.739726, 0.0322222)	\
+	then to FRAME.sw + (1.9726, 0.594444)
+G_OOPS: # graph no. 5
+line  dashed from FRAME.sw + (1.47945, 0.19)	\
+	then to FRAME.sw + (2.71233, 1.85444)
+G_OOPS: # graph no. 6
+line  dashed from FRAME.sw + (1.72603, 0.915556)	\
+	then to FRAME.sw + (2.9589, 1.67556)
+reset
+.PE
+.lf 611 prags.1
+.SS "Example 6
+.RS
+.Cs
+.nf
+.na
+draw invis
+1896 54.2
+1900 49.4
+\&.\|.\|.
+1988 43.8
+.Ce
+.RE
+will produce:
+.lf 625 prags.1
+.lf 1 ex06.prag
+.lf 410 prag.1
+.PS 4 2.66667
+# DO NOT EDIT!
+# generated from "prags.1" by prag (C) hm@GUUG.de
+GRAPH:	box invis ht 2 wid 3
+FRAME:	box  ht 2 wid 3 with .sw at GRAPH.sw + (0, 0)
+line left 0.0625 at 0.2 <FRAME.sw, FRAME.nw>
+"43" at last line.w rjust
+line left 0.0625 at 0.4 <FRAME.sw, FRAME.nw>
+"46" at last line.w rjust
+line left 0.0625 at 0.6 <FRAME.sw, FRAME.nw>
+"49" at last line.w rjust
+line left 0.0625 at 0.8 <FRAME.sw, FRAME.nw>
+"52" at last line.w rjust
+line down 0.0625 at 0.2 <FRAME.sw, FRAME.se>
+"1914" at last line.s below
+line down 0.0625 at 0.4 <FRAME.sw, FRAME.se>
+"1933" at last line.s below
+line down 0.0625 at 0.6 <FRAME.sw, FRAME.se>
+"1952" at last line.s below
+line down 0.0625 at 0.8 <FRAME.sw, FRAME.se>
+"1971" at last line.s below
+G_OOPS: # graph no. 1
+"\s+2\(bu\s-2" at FRAME.sw + (0.0315789, 1.89333)
+"\s+2\(bu\s-2" at FRAME.sw + (0.157895, 1.25333)
+"\s+2\(bu\s-2" at FRAME.sw + (0.284211, 1.22667)
+"\s+2\(bu\s-2" at FRAME.sw + (0.410526, 1.33333)
+"\s+2\(bu\s-2" at FRAME.sw + (0.536842, 1.09333)
+"\s+2\(bu\s-2" at FRAME.sw + (0.663158, 0.973333)
+"\s+2\(bu\s-2" at FRAME.sw + (0.789474, 1.09333)
+"\s+2\(bu\s-2" at FRAME.sw + (0.915789, 0.893333)
+"\s+2\(bu\s-2" at FRAME.sw + (1.04211, 0.466667)
+"\s+2\(bu\s-2" at FRAME.sw + (1.16842, 0.76)
+"\s+2\(bu\s-2" at FRAME.sw + (1.29474, 0.826667)
+"\s+2\(bu\s-2" at FRAME.sw + (1.67368, 0.36)
+"\s+2\(bu\s-2" at FRAME.sw + (2.05263, 0.64)
+"\s+2\(bu\s-2" at FRAME.sw + (2.43158, 0.333333)
+"\s+2\(bu\s-2" at FRAME.sw + (2.93684, 0.506667)
+reset
+.PE
+.lf 644 prags.1
+.SS "Example 6
+.RS
+.Cs
+.nf
+.na
+40 72
+45 76
+\&.\|.\|.
+65 79
+.Ce
+.RE
+will produce:
+.lf 657 prags.1
+.lf 1 ex07.prag
+.lf 425 prag.1
+.PS 4 2.66667
+# DO NOT EDIT!
+# generated from "prags.1" by prag (C) hm@GUUG.de
+GRAPH:	box invis ht 2 wid 3
+FRAME:	box  ht 2 wid 3 with .sw at GRAPH.sw + (0, 0)
+line left 0.0625 at 0.2 <FRAME.sw, FRAME.nw>
+"74" at last line.w rjust
+line left 0.0625 at 0.4 <FRAME.sw, FRAME.nw>
+"78" at last line.w rjust
+line left 0.0625 at 0.6 <FRAME.sw, FRAME.nw>
+"82" at last line.w rjust
+line left 0.0625 at 0.8 <FRAME.sw, FRAME.nw>
+"86" at last line.w rjust
+line down 0.0625 at 0.2 <FRAME.sw, FRAME.se>
+"45" at last line.s below
+line down 0.0625 at 0.4 <FRAME.sw, FRAME.se>
+"50" at last line.s below
+line down 0.0625 at 0.6 <FRAME.sw, FRAME.se>
+"55" at last line.s below
+line down 0.0625 at 0.8 <FRAME.sw, FRAME.se>
+"60" at last line.s below
+G_OOPS: # graph no. 1
+spline   from FRAME.sw + (0, 0.2)	\
+	then to FRAME.sw + (0.6, 0.6)	\
+	then to FRAME.sw + (1.2, 0.4)	\
+	then to FRAME.sw + (1.8, 1.9)	\
+	then to FRAME.sw + (2.4, 1.5)	\
+	then to FRAME.sw + (3, 0.9)
+reset
+.PE
+.lf 666 prags.1
+.SH "SEE ALSO"
+AT&T Bell Laboratories, Computing Science Technical Report No.\ 116,
+GRAP \- A Graphics Language for Typesetting.
+This can be obtained by sending a mail message to netlib@research.att.com
+with a body of `send\ 116\ from\ research/cstr'.
+.SH BUGS
+Bug reports or suggested improvements should go to hm@GUUG.de.
+.SH AUTHOR
+This program was contributed by Holger Meyer at University of Rostock,
+Germany.
+It is available via anonymous ftp from ftp.informatik.uni-rostock.de in the
+directory /pub/local/software.

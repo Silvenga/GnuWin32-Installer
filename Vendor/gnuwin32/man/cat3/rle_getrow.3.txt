@@ -1,0 +1,77 @@
+RLE_GETROW(3)                                     RLE_GETROW(3)
+
+
+
+
+
+NAME
+       rle_getrow - Read a scanline of pixels from an RLE file.
+
+SYNOPSIS
+       #include <rle.h>
+
+       rle_getrow( the_hdr, rows );
+       rle_hdr * the_hdr;
+       rle_pixel ** rows;
+
+DESCRIPTION
+       Rle_getrow reads information for a single scanline  from
+       the  input  file each time it is called.  The_hdr should
+       point to the structure initialized by  rle_get_setup(3).
+       The  array  rows  should  contain  pointers to arrays of
+       characters, into which the scanline data will  be  writ-
+       ten.   There should be as many elements in rows as there
+       are primary colors in the input file (typically 1 or 3),
+       and the scanline arrays must be indexable up to the max-
+       imum  X  coordinate,  as  specified  by   the_hdr->xmax.
+       rle_getrow  returns  the  y  value  of the scanline just
+       read.  This will always be 1 greater than  the  y  value
+       from   the  scanline  previously  read,  and  starts  at
+       the_hdr->ymin.    Only   those   channels   enabled   by
+       the_hdr->bits will be returned.
+
+NOTES
+       If  an alpha channel is present in the input and enabled
+       (by  RLE_SET_BIT,  see  rle_hdr(3)),  then  rows  should
+       include  a  -1 entry.  (I.e., rows[-1] should point to a
+       valid scanline array.)  The easiest way to  ensure  this
+       is to use rle_row_alloc(3) to allocate rows.
+
+       Rle_getrow  will continue to return scanlines even after
+       the end of the input file has been reached, incrementing
+       the  return scanline number each time it is called.  The
+       calling program should use some other termination crite-
+       rion    (such    as   the   scanline   number   reaching
+       the_hdr->ymax, or explicitly testing testing for end  of
+       file  on  the  input with feof(infile).  The second test
+       may fail if rle_getrow has encountered a logical EOF  in
+       the file.  The first will always work eventually.)
+
+EXAMPLE
+       The  code below reads the first two 3 color scanlines of
+       512 pixels from an RLE file on the standard input.
+
+                 char scanline[2][3][512], *rows[3];
+                 int row, i;
+                 rle_dflt_hdr.rle_file = stdin;
+                 rle_get_setup( &rle_dflt_hdr );
+                 for ( row = 0; row < 2; row++ )
+                 {
+                      for ( i = 0; i < 3; i++ )
+                           rows[i] = scanline[row][i];
+                      rle_getrow( &rle_dflt_hdr, rows );
+                 }
+
+SEE ALSO
+       rle_hdr(3), rle_row_alloc(3), rle_row_free(3),
+       rle_get_setup(3), rle_getraw(3), rle_getskip(3),
+       rle_putrow(3), librle(3), RLE(5).
+
+AUTHOR
+       Spencer W. Thomas, Todd Fuqua
+       University of Utah
+
+
+
+
+3                            2/2/87               RLE_GETROW(3)

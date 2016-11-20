@@ -1,0 +1,95 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD><TITLE>Pamstack User Manual</TITLE></HEAD>
+<BODY>
+
+<H1>pamstack</H1>
+Updated: 01 May 2002
+<BR>
+<A HREF="pamstack.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pamstack - stack planes of multiple PAM images into one PAM image
+
+<A NAME="lbAC">&nbsp;</A>
+
+<H2>SYNOPSIS</H2>
+
+<B>pamstack</B>
+[<B>-tupletype </B><I>tupletype</I>]
+[<I>inputfilespec</I> ...]
+
+<P>All options may be abbreviated to the shortest unique prefix.  You
+may use two hyphens instead of one.  You may separate an option from
+its value with a space instead of <B>=</B>.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<P><b>pamstack</b> reads multiple PAM or PNM images as input and
+produces a PAM image as output, consisting of all the planes
+(channels) of the inputs, stacked in the order specified.
+
+<P>The output is the same dimensions as the inputs, except that the
+depth is the sum of the depths of the inputs.  It has the same maxval.
+<B>pamstack</B> fails if the inputs are not all the same width, height,
+and maxval.  The tuple type is a null string unless you specify the
+<B>-tupletype</B> option.
+
+<P><B>pamchannel</B> does the opposite of <B>pamstack</B>:  It extracts
+individual planes from a single PAM.
+
+<P>Use <a href="pamtopnm.html">pamtopnm</a> to convert a suitable PAM
+image to a more traditional PNM (PBM, PGM, or PPM) image.
+
+<P>One example of using <B>pamstack</B> is that some Netpbm programs
+accept as input a PAM that represents graphic image with transparency
+information.  Taking a color image for example, this would be a PAM
+with tupel type "RGB_ALPHA".  In Netpbm, such images were
+traditionally represented as two images - a PPM for the color and a
+PGM for the transparency.  To convert a PPM/PGM pair into
+PAM(RGB_ALPHA) input that newer programs require, do something like
+this:
+
+<pre>
+<kbd>
+$ pamstack -tupletype=RGB_ALPHA myimage.ppm myalpha.pgm | \
+      pamtouil &gt;myimage.uil
+</kbd>
+</pre>
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+
+<DT><B>-tupletype </B><I>tupletype</I>
+<DD>
+This specified the tuple type name to be recorded in the output.  You may
+use any string up to 255 characters.  Some programs recognize some names.
+If you omit this option, the default tuple type name is null.
+</DL>
+
+<A NAME="lbAF">&nbsp;</A>
+
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pam.html">pam</A></B>
+<B><A HREF="pamchannel.html">pamchannel</A></B>
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pamstack.html#lbAB">NAME</A>
+<LI><A HREF="pamstack.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pamstack.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pamstack.html#lbAE">OPTIONS</A>
+<LI><A HREF="pamstack.html#lbAF">SEE ALSO</A>
+</UL>
+</BODY>
+</HTML>

@@ -1,0 +1,349 @@
+<HTML
+><HEAD
+><TITLE
+>LibArt's overall architecture</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="The libart library"
+HREF="libart.html"><LINK
+REL="UP"
+TITLE="What is Libart ?"
+HREF="intro.html"><LINK
+REL="PREVIOUS"
+TITLE="File names"
+HREF="intro-file-names.html"><LINK
+REL="NEXT"
+TITLE="Sample code"
+HREF="sample.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The libart library</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="intro-file-names.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libart.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="intro.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="sample.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN31"
+>LibArt's overall architecture</A
+></H1
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN33"
+>Using libart</A
+></H2
+><P
+>	  Using libart to display vector graphics on screen can be a pretty difficult task
+	  for beginers: libart was not designed to draw vector graphics on screen. It was 
+	  designed to draw graphics in pixel buffers. It is up to the reader to draw those
+	  pixel buffers on screen after rendering.
+	</P
+><DIV
+CLASS="FIGURE"
+><A
+NAME="AEN36"
+></A
+><P
+><B
+>Figure 1. LibArt's Use scenarios</B
+></P
+><P
+><IMG
+SRC="art-overall-arch.png"></P
+></DIV
+><P
+>	  The diagram above shows how you could use libart: the pixel buffers can be stored
+	  -they could be also manipulated before doing so- but they can also be rendered on screen
+	  using GTK+' Gdkrgb code.
+	</P
+><P
+>	  Some sample code shows how to achieve both of those scenarios by hand, but application 
+	  developers should remember that it is pretty unlikely that they will have to do this. Higher-level
+	  APIs which deal with structured vector graphics are available and they take care of
+	  all the rendering of the vector data you feed them. The <TT
+CLASS="FUNCTION"
+>GnomeCanvas</TT
+>
+	  can be used for this: its antialiased version uses libart to render vector data in pixel
+	  buffers and Gdkrgb to render those pixel buffers in X windows.
+	</P
+></DIV
+><BR
+CLEAR="all"><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN42"
+>From vector data to pixel buffers</A
+></H2
+><P
+>	  Libart's vector input is described using 2 data structures: <TT
+CLASS="FUNCTION"
+>ArtBpath</TT
+> (short 
+	  for Bezier Paths)
+	  and <TT
+CLASS="FUNCTION"
+>ArtVPath</TT
+> (short for Vector Paths). libart provides a number of 
+	  helper functions to manipulate these data structures and instantiate specific geometric 
+	  shapes easily.
+	</P
+><P
+>	  To render these data vectors to a pixel buffer, libart wants you to transform them in 
+	  <TT
+CLASS="FUNCTION"
+>ArtSVP</TT
+>s (short for Sorted Vector Paths). Svps are a rendering-friendly
+	  version of the original vectors. I would strongly suggest against constructing your own
+	  svps by hand without using the libart's construction APIs: these SVPs need to verify a number
+	  of properties which are not trivial and I have no idea what would happen if you passed
+	  a corrupted svp to the rendering code (probably bad things)...
+	  For example, <TT
+CLASS="FUNCTION"
+>art_svp_from_vpath</TT
+> will generate the svp corresponding
+	  to your vpaths.
+	</P
+><P
+>	  Once you have constructed your svps, you can manipulate those svps before rendering them.
+	  It is thus possible to apply arbitrary affine transformations to those svps. It is also possible
+	  to intersect 2 svps and generate the svp representing the union of these svps...
+	</P
+><P
+>	  Finally, it is time for you to render your svps in a pixel buffer. This can be done 
+	  pretty easily using <TT
+CLASS="FUNCTION"
+>art_rgb_svp_aa</TT
+> and/or 
+	  <TT
+CLASS="FUNCTION"
+>art_rgb_svp_alpha</TT
+>.
+	</P
+><P
+>	  All the above steps are summarized in the following diagram:
+	</P
+><DIV
+CLASS="FIGURE"
+><A
+NAME="AEN55"
+></A
+><P
+><B
+>Figure 2. LibArt's data flow</B
+></P
+><P
+><IMG
+SRC="art-data-flow.png"></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="intro-file-names.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libart.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="intro.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="sample.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>File names</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Sample code</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

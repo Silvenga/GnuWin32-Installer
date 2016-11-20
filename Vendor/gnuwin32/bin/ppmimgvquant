@@ -1,0 +1,98 @@
+#!/bin/sh
+##
+## ppmimgvquant.sh
+##	Simple palette mangler for image viewer pgm files.
+##
+## Copyright (C) 1997 Eric A. Howe
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+##
+##   Authors:  Eric A. Howe (mu@trends.net)
+##
+## $Mu: imgvtopgm/ppmimgvquant.in 1.2 1999/05/09 07:56:09 $
+##
+MAPFILE=$TEMP/$$.ppmimgvquant.$$
+
+cleanup() {
+	[ -r $MAPFILE ] && rm -f $MAPFILE
+}
+
+trap cleanup 2 3 9 13 15 
+
+usage() {
+	NAME=`basename $1`
+	echo "$NAME [-hv] [ppmquant options]"
+	cat <<_DONE_DONE_DONE_
+	Convert the palette of a PPM image to the standard Image Viewer
+	palette. All options except -h and -v are passed to ppmquant(1).
+
+	-4	Convert to 4 depth image (for Palm IIIx/V).
+	-h	Display this usage message and exit.
+	-v	Display the version number and exit.
+_DONE_DONE_DONE_
+}
+
+version() {
+	NAME=`basename $1`
+	echo "$NAME 2.0"
+}
+
+GRAY16="no"
+DONE="no"
+while [ $DONE != "yes" ]; do
+	case X"$1" in
+	X"-h")	usage $0;	exit 0	;;
+	X"-v")	version $0;	exit 0	;;
+	X"-4")	GRAY16="yes";	shift	;;
+	X*)	DONE="yes"		;;
+	esac
+done
+
+if [ $GRAY16 = "yes" ]; then
+cat > $MAPFILE <<_DONE_DONE_DONE_
+P3
+16 1
+255
+  0   0   0
+ 17  17  17
+ 34  34  34
+ 51  51  51
+ 68  68  68
+ 85  85  85
+102 102 102
+119 119 119
+136 136 136
+153 153 153
+170 170 170
+187 187 187
+204 204 204
+221 221 221
+238 238 238
+255 255 255
+_DONE_DONE_DONE_
+else
+cat > $MAPFILE <<_DONE_DONE_DONE_
+P3
+4 1
+255
+  0   0   0
+ 85  85  85
+170 170 170
+255 255 255
+_DONE_DONE_DONE_
+fi
+
+ppmquant -map $MAPFILE "$@" | ppmtopgm
+cleanup

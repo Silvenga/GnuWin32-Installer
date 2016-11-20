@@ -1,0 +1,94 @@
+.PU
+.TH jwhois 1 "November 2001" GNU
+.SH NAME
+jwhois \- client for the whois service
+.SH SYNOPSIS
+.ll +8
+.B jwhois
+.RB
+[
+.I "OPTIONS"
+]...
+[
+.I "QUERY"
+]
+.ll -8
+.SH DESCRIPTION
+.I jwhois
+searches Whois servers for the object on the command line.
+
+The host to query is taken from a global configuration file,
+a configuration file specified on the command line, or selected
+directly on the command line.
+
+.SH OPTIONS
+.TP
+.B \--version
+display version, authors and licensing information.
+.TP
+.B \--help
+display a short help text.
+.TP
+.B \-c FILE --config=FILE
+uses FILE as a configuration file instead of the default.
+.TP
+.B \-h HOST --host=HOST
+overrides any hosts in the configuration file and queries HOST directly.
+.TP
+.B \-p PORT --port=PORT
+specifies a port number to use when querying a HOST.
+.TP
+.B \-f --force-lookup
+forces a query to be made to a host even if a current object
+is available from the cache.
+.TP
+.B \-v --verbose
+outputs verbose debugging information while running (use this before
+sending a bugreport to ensure that it's indeed a bug and not a 
+misconfiguration). You can increase the verbosity by giving several
+verbose commands to jwhois, such as -vv.
+.TP
+.B \-n --no-redirect
+disable features that redirect queries from one server to another.
+.TP
+.B \-s --no-whoisservers
+disable the built-in support for whois-servers.net.
+.TP
+.B \-a --raw
+send query verbatim to receiving hosts instead of rewriting them according
+to the configuration.
+.TP
+.B \-i --display-redirections
+display every step in a redirection (default is to display only the
+last answer).
+.TP
+.B \-d --disable-cache
+completely disable both reading and writing to cache.
+.TP
+.B \-r --rwhois
+force the query to use the rwhois protocoll instead of HTTP or whois.
+.TP
+.B \--rwhois-display=DISPLAY
+asks receiving rwhois servers to display the results in the DISPLAY display
+instead of the default dump display.
+.TP
+.B \--rwhois-limit=LIMIT
+asks receiving rwhois servers to limit their responses to LIMIT matches.
+
+.SS "RIPE EXTENSIONS"
+To use the options specified in
+.IR "RIPE Document 157" ,
+you need to change the format of the query slightly.
+If you were to search for all entries in
+the RIPE database which lists the
+.IR admin-c ", " tech-c " or " zone-c " as " CO19-RIPE ,
+you could use the following command syntax:
+
+.B jwhois -h whois.ripe.net -- \-i admin-c,tech-c,zone-c CO19-RIPE
+
+.B --
+is used to separate the RIPE options from the jwhois options.
+
+.ll -8
+.SH "SEE ALSO"
+whois(1)

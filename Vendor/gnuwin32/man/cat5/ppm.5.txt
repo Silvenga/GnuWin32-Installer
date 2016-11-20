@@ -1,0 +1,192 @@
+PPM Format Specification(5)         PPM Format Specification(5)
+
+
+
+Table Of Contents
+
+
+NAME
+       PPM - Netpbm color image format
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       The  PPM  format  is  a  lowest common denominator color
+       image file format.
+
+       It should be noted that this format is egregiously inef-
+       ficient.  It is highly redundant, while containing a lot
+       of information that the human eye  can't  even  discern.
+       Furthermore,  the  format allows very little information
+       about the image besides basic color, which means you may
+       have to couple a file in this format with other indepen-
+       dent information to get any decent use out of it.   How-
+       ever,  it  is very easy to write and analyze programs to
+       process this format, and that is the point.
+
+       It should also be noted that files often conform to this
+       format  in every respect except the precise semantics of
+       the sample values.  These files are  useful  because  of
+       the way PPM is used as an intermediary format.  They are
+       informally called PPM files, but to be  absolutely  pre-
+       cise,  you  should indicate the variation from true PPM.
+       For example, 'PPM using the red, green, and blue  colors
+       that the scanner in question uses.'
+
+       The  name  "PPM"  is  an  acronym derived from "Portable
+       Pixel Map."  Images in this format (or  a  precursor  of
+       it) were once also called "portable pixmaps."
+
+       The  format  definition  is as follows.  You can use the
+       libnetpbm(1)Csubroutinelibrarytoreadand  interpret   the
+       format conveniently and accurately.
+
+       A  PPM  file  consists  of a sequence of one or more PPM
+       images.  There  are  no  data,  delimiters,  or  padding
+       before, after, or between images.
+
+       Each PPM image consists of the following:
+
+
+
+       o      A  'magic  number' for identifying the file type.
+              A ppm image's magic number is the two  characters
+              'P6'.
+
+       o       Whitespace (blanks, TABs, CRs, LFs).
+
+       o        A width, formatted as ASCII characters in deci-
+              mal.
+
+       o       Whitespace.
+
+       o       A height, again in ASCII decimal.
+
+       o       Whitespace.
+
+       o       The maximum color value (Maxval), again in ASCII
+              decimal.   Must  be less than 65536 and more than
+              zero.
+
+       o       Newline or other single whitespace character.
+
+
+       o      A raster of Height rows, in  order  from  top  to
+              bottom.   Each  row  consists of Width pixels, in
+              order from  left  to  right.   Each  pixel  is  a
+              triplet  of red, green, and blue samples, in that
+              order.  Each sample is represented in pure binary
+              by  either  1  or 2 bytes.  If the Maxval is less
+              than 256, it is  1  byte.   Otherwise,  it  is  2
+              bytes.  The most significant byte is first.
+
+              A  row  of  an  image is horizontal.  A column is
+              vertical.  The pixels in the image are square and
+              contiguous.
+
+
+       o        In  the  raster, the sample values are 'nonlin-
+              ear.'  They are proportional to the intensity  of
+              the  CIE  Rec.  709  red,  green, and blue in the
+              pixel, adjusted by the CIE Rec. 709 gamma  trans-
+              fer  function.  (That transfer function specifies
+              a gamma number of 2.2 and has  a  linear  section
+              for  small  intensities).   A value of Maxval for
+              all three samples represents CIE  D65  white  and
+              the  most  intense color in the color universe of
+              which the image is part (the  color  universe  is
+              all  the colors in all images to which this image
+              might be compared).  CIE Rec. 709 is  also  known
+              as ITU-R BT.709.
+
+              Note  that  another  popular  color  space is the
+              newer sRGB.  A common variation on PPM is to sub-
+              situte this color space for the one specified.
+
+       o        Note  that a common variation on the PPM format
+              is to have the sample values be 'linear,' i.e. as
+              specified  above except without the gamma adjust-
+              ment.  pnmgamma
+
+              takes such a PPM variant as input and produces  a
+              true PPM as output.
+
+
+       o      Characters  from  a  '#' to the next end-of-line,
+              before the maxval  line,  are  comments  and  are
+              ignored.
+
+
+
+       Note that you can use pnmdepth
+
+       to  convert  between a the format with 1 byte per sample
+       and the one with 2 bytes per sample.
+
+       There is actually another version of the PPM format that
+       is  fairly  rare: 'plain' PPM format.  The format above,
+       which generally considered the normal one, is  known  as
+       the 'raw' PPM format.  See pbm(1)
+
+       for  some commentary on how plain and raw formats relate
+       to one another.
+
+       The difference in the plain format is:
+
+
+       -      There is exactly one image in a file.
+
+       -      The magic number is P3 instead of P6.
+
+       -      Each sample in the raster is  represented  as  an
+              ASCII decimal number (of arbitrary size).
+
+       -      Each  sample in the raster has white space before
+              and after it.  There must be at least one charac-
+              ter  of  white space between any two samples, but
+              there is no maximum.  There is no particular sep-
+              aration  of  one  pixel  from another -- just the
+              required separation between the  blue  sample  of
+              one  pixel from the red sample of the next pixel.
+
+       -      No line should be longer than 70 characters.
+
+
+       Here is an example of a small pixmap in this format:
+       P3
+       # feep.ppm
+       4 4
+       15
+        0  0  0    0  0  0    0  0  0   15  0 15
+        0  0  0    0 15  7    0  0  0    0  0  0
+        0  0  0    0  0  0    0 15  7    0  0  0
+       15  0 15    0  0  0    0  0  0    0  0  0
+
+       Programs that read this format should be as  lenient  as
+       possible,  accepting anything that looks remotely like a
+       pixmap.
+
+
+COMPATIBILITY
+       Before April 2000, a raw format PPM file could not  have
+       a  maxval  greater  than  255.  Hence, it could not have
+       more than one byte per sample.  Old programs may  depend
+       on this.
+
+       Before  July 2000, there could be at most one image in a
+       PPM file.  As a result, most tools to process PPM  files
+       ignore  (and don't read) any data after the first image.
+
+
+SEE ALSO
+       pnm(1),   pgm(1),   pbm(1),   pam(1),   programsthatpro-
+       cessPPM(1)
+
+
+
+AUTHOR
+       Copyright (C) 1989, 1991 by Jef Poskanzer.
+
+
+
+netpbm documentation    03 October 2PPM Format Specification(5)

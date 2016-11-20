@@ -1,0 +1,308 @@
+SHAR(1)                                                 SHAR(1)
+
+
+
+
+
+NAME
+       shar - create shell archives
+
+SYNOPSIS
+       shar [ options ] file ...
+       shar -S [ options ]
+
+DESCRIPTION
+       Shar  creates "shell archives" (or shar files) which are
+       in text format and can be mailed.  These  files  may  be
+       unpacked  later  by  executing  them  with /bin/sh.  The
+       resulting archive is sent to standard out unless the  -o
+       option  is  given.   A  wide  range  of features provide
+       extensive flexibility  in  manufacturing  shars  and  in
+       specifying  shar "smartness".  Archives may be "vanilla"
+       or comprehensive.
+
+OPTIONS
+       Options have a one letter version starting with -  or  a
+       long version starting with --.  The exception is --help,
+       --version, --no-i18n and  --print-text-domain-dir  which
+       does  not  have  short versions.  Mandatory arguments to
+       long  options  are  mandatory  for  short  options  too.
+       Options  can be given in any order.  Some options depend
+       on each other:
+            The -o option is required if the -l or -L option is used.
+            The -n option is required if the -a option is used.
+            See -V below.
+
+   Giving feedback:
+       --help Print a help summary  on  standard  output,  then
+              immediately exits.
+
+       --version
+              Print  the version number of the program on stan-
+              dard output, then immediately exits.
+
+       -q --quiet --silent
+              Do not output verbose messages locally when  pro-
+              ducing the archive.
+
+   Selecting files:
+       -p  --intermix-type
+              Allow  positional parameter options.  The options
+              -B, -T, -z and -Z may be embedded, and  files  to
+              the  right of the option will be processed in the
+              specified mode.
+
+       -S  --stdin-file-list
+              Read list of files to be packed from the standard
+              input  rather  than from the command line.  Input
+              must be in a form similar to  that  generated  by
+              the  find  command,  one filename per line.  This
+              switch is especially useful when the command line
+              will  not  hold  the  list of files to be packed.
+              For example:
+
+              find . -type f -print | sort | shar -S -Z -L50 -o /tmp/big
+
+              If -p is specified on the command line, then  the
+              options  -B, -T, -z and -Z may be included in the
+              standard input (on a  line  separate  from  file-
+              names).   The maximum number of lines of standard
+              input, file names and  options,  may  not  exceed
+              1024.
+
+   Splitting output:
+       -o XXX  --output-prefix=XXX
+              Save  the  archive  to  files  XXX.01 thru XXX.nn
+              instead of sending it to standard out.   Must  be
+              used when the -l or the -L switches are used.
+
+       -l XX  --whole-size-limit=XX
+              Limit the output file size to XXk bytes but don't
+              split input files.
+
+       -L XX  --split-size-limit=XX
+              Limit output file size to  XXk  bytes  and  split
+              files  if  necessary.   The archive parts created
+              with this option  must  be  unpacked  in  correct
+              order.
+
+   Controlling the shar headers:
+       -n name  --archive-name=name
+              Name  of  archive to be included in the header of
+              the shar files.  See the -a switch.
+
+       -s who@where  --submitter=who@where
+              Override automatically determined submitter name.
+
+       -a  --net-headers
+              Allows automatic generation of headers:
+                   Submitted-by: who@where
+                   Archive-name: <name>/part##
+              The  <name> must be given with the -n switch.  If
+              name includes a '/' "/part" isn't used.  Thus:
+                 -n xyzzy                      produces:
+                                               xyzzy/part01
+                                               xyzzy/part02
+
+                 -n xyzzy/patch                produces:
+                                               xyzzy/patch01
+                                               xyzzy/patch02
+
+                 -n xyzzy/patch01.             produces:
+                                               xyzzy/patch01.01
+                                               xyzzy/patch01.02
+
+              The who@where can be explicitly stated  with  the
+              -s  switch  if  the  default  isn't  appropriate.
+              Who@where     is     essentially     built     as
+              `whoami`@`uname`.
+
+       -c  --cut-mark
+              Start  the  shar  with a cut line.  A line saying
+              'Cut here' is placed at the start of each  output
+              file.
+
+   Selecting how files are stocked:
+       -M  --mixed-uuencode
+              Mixed  mode.   Determine if the files are text or
+              binary and archive  correctly  (default).   Files
+              found to be binary are uudecoded prior to packing
+              (USE OF UUENCODE IS NOT APPRECIATED  BY  MANY  ON
+              THE NET).
+
+       -T  --text-files
+              Treat all files as text.
+
+       -B  --uuencode
+              Treat  all files as binary, use uuencode prior to
+              packing.  This increases the size of the archive.
+              The  recipient  must  have  uudecode  in order to
+              unpack.  (USE OF UUENCODE IS NOT  APPRECIATED  BY
+              MANY ON THE NET).
+
+       -z  --gzip
+              Gzip  and  uuencode  all  files prior to packing.
+              The recipient must  have  uudecode  and  gzip  in
+              order  to unpack (USE OF UUENCODE AND GZIP IS NOT
+              APPRECIATED BY MANY ON THE NET).
+
+       -g LEVEL  --level-for-gzip=LEVEL
+              When doing compression, use '-LEVEL' as a parame-
+              ter  to gzip.  Default is 9.  The -g option turns
+              on the -z option by default.
+
+       -Z  --compress
+              Compress and uuencode all files prior to packing.
+              The  recipient must have uudecode and compress in
+              order to unpack (USE OF UUENCODE AND COMPRESS  IS
+              NOT  APPRECIATED  BY MANY ON THE NET).  Option -C
+              is synonymous to -Z, but is being deprecated.
+
+       -b BITS  --bits-per-code=BITS
+              When doing compression, use '-bBITS' as a parame-
+              ter  to  compress.  The -B option turns on the -Z
+              option by default.  Default value is 12.
+
+   Protecting against transmission errors:
+       -w  --no-character-count
+              Do NOT check each file with 'wc -c' after unpack.
+              The default is to check.
+
+       -D  --no-md5-digest
+              Do NOT use 'md5sum' digest to verify the unpacked
+              files. The default is to check.
+
+       -F  --force-prefix
+              Forces the prefix character (normally 'X'  unless
+              the  parameter  to the -d option starts with 'X')
+              to  be  prepended  to  every  line  even  if  not
+              required.   This option may slightly increase the
+              size of the archive, especially if -B  or  -Z  is
+              used.
+
+       -d XXX  --here-delimiter=XXX
+              Use  XXX to delimit the files in the shar instead
+              of SHAR_EOF.  This is for those who want to  per-
+              sonalize their shar files.
+
+   Producing different kinds of shars:
+       -V  --vanilla-operation
+              Produce  "vanilla" shars which rely only upon the
+              existence of sed and echo in the unsharing  envi-
+              ronment.   In  addition,  "if  test" must also be
+              supported unless the -x option is used.   The  -V
+              silently  disables options offensive to the "net-
+              work cop" (or "brown shirt"), but does  warn  you
+              if it is specified with -B, -z, -Z, -p or -M (any
+              of which does or might require uudecode, gzip  or
+              compress in the unsharing environment).
+
+       -P  --no-piping
+              Use  temporary files instead of pipes in the shar
+              file.
+
+       -x  --no-check-existing
+              Overwrite existing files  without  checking.   If
+              neither  -x  nor -X is specified, the unpack will
+              check for and not overwrite existing  files  when
+              unpacking  the  archive.   If  -c  is passed as a
+              parameter to the script when unpacking:
+
+                 sh archive -c
+
+              then existing files will be overwritten  uncondi-
+              tionally.
+
+       -X  --query-user
+              When  unpacking,  interactively  ask  the user if
+              files should be overwritten.   (DO  NOT  USE  FOR
+              SHARS SUBMITTED TO THE NET).
+
+       -m  --no-timestamp
+              Avoid  generating 'touch' commands to restore the
+              file modification dates when unpacking files from
+              the archive.
+
+       -Q  --quiet-unshar
+              Verbose  OFF.  Disables the inclusion of comments
+              to be output when the archive is unpacked.
+
+       -f  --basename
+              Restore by filename only, rather than path.  This
+              option  causes  only file names to be used, which
+              is useful  when  building  a  shar  from  several
+              directories,  or another directory.  Note that if
+              a directory name is passed to shar, the substruc-
+              ture  of  that directory will be restored whether
+              -f is specified or not.
+
+   Internationalization:
+       --no-i18n
+              Do not produce internationalized shell  archives,
+              use  default  english messages.  By default, shar
+              produces archives that will try  to  output  mes-
+              sages  in  the  unpackers  preferred language (as
+              determined by the LANG/LC_MESSAGES  environmental
+              variables) when they are unpacked.  If no message
+              file for  the  unpackers  language  is  found  at
+              unpack time, messages will be in english.
+
+       --print-text-domain-dir
+              Prints  the  directory shar looks in to find mes-
+              sages files for different languages, then immedi-
+              ately exits.
+
+EXAMPLES
+       shar *.c > cprog.shar                # all C prog sources
+       shar -Q *.[ch] > cprog.shar          # non-verbose, .c and .h files
+       shar -B -l28 -oarc.sh *.arc          # all binary .arc files, into
+                                            # files arc.sh.01 thru arc.sh.NN
+       shar -f /lcl/src/u*.c > u.sh         # use only the filenames
+
+WARNINGS
+       No chmod or touch is ever generated for directories cre-
+       ated when unpacking.  Thus, if a directory is  given  to
+       shar,  the  protection  and modification dates of corre-
+       sponding unpacked directory may not match those  of  the
+       original.
+
+       If a directory is passed to shar, it may be scanned more
+       than once.  Therefore, one should be careful not  change
+       the directory while shar is running.
+
+       Be  careful  that the output file(s) are not included in
+       the inputs or shar may loop until the disk fills up.  Be
+       particularly  careful when a directory is passed to shar
+       that the output files are not in that  directory  (or  a
+       subdirectory of that directory).
+
+       Use of the -B, -z or -Z, and especially -M, may slow the
+       archive process considerably, depending on the number of
+       files.
+
+       Use  of -X produces shars which WILL cause problems with
+       many unshar procedures.  Use this feature only  for  ar-
+       chives to be passed among agreeable parties.  Certainly,
+       -X is NOT for shell archives which are to  be  submitted
+       to  Usenet.   Usage  of  -B,  -z or -Z in net shars will
+       cause you to be flamed off the earth.  Not using  -m  or
+       not using -F may also get you occasional complaints.
+
+SEE ALSO
+       unshar(1)
+
+DIAGNOSTICS
+       Error  messages for illegal or incompatible options, for
+       non-regular,  missing  or  inaccessible  files  or   for
+       (unlikely) memory allocation failure.
+
+AUTHORS
+       The  shar  and unshar programs is the collective work of
+       many authors.   Many  people  contributed  by  reporting
+       problems,  suggesting various improvements or submitting
+       actual code.  A list of these people is  in  the  THANKS
+       file in the sharutils distribution.
+
+
+
+                       September 10, 1995               SHAR(1)

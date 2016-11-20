@@ -1,0 +1,640 @@
+
+
+			    Image Processing Tools
+			       For The IRIS
+
+			     Paul Haeberli - 1990
+
+
+
+	
+
+ abs - usage: abs inimage outimage
+    outimage gets the absolute value of the input image.  This treats input 
+    values as signed 8-bit quantities.  Input values of 0 map to white. 255 
+    also maps to white.  128 maps into black.
+
+
+ add - usage: add inimage1 inimage2 outimage
+    inimage1 and inimage2's intensities are added and stored in outimage.  If 
+    the sum is greater than 255 the result is set to 255. 
+
+
+ addborder - usage: addborder inimage borderimage outimage
+    Surrounds the input image with the border image.  This can be used to add
+    registration marks to an image.
+
+
+ addframe - usage: addframe inimage outimage [[width] [r g b]]
+    Adds a constant width border to a monochrome or color image.  The default 
+    width is 1 pixel, and the default color is black.
+
+
+ addnoise - usage: addnoise inimage outimage noiseimage mag
+
+    Adds noise from the noise image to the input image.  The noise image tiles
+    the input image.  The magnitude of the noise is scaled by a floating point
+    magnitude mag.
+
+
+ assemble - usage: assemble nx ny outimage imgfiles . . .      		<*>
+    Assemble an nx by ny array of smaller images.  The catch here is that all
+    images being assembled have to have the same x/y dimensions.  The nx by ny
+    array  works like this:   nx is the number of images that are going to be 
+    sitting side by side in the horizontal  direction, and ny is the number
+    of images side by  side in  the  vertical direction.  Order imgfiles so 
+    that the first image will be the one sitting in the bottom left-hand cor-
+    ner of outimage, with the second sitting either above it or to its right.
+    If fewer than nx times ny images are given on the command line, the
+    last image is used repeatedly.
+
+
+ bgpaste - usage: bgpaste [-t r g b] inimage
+    paste an image onto the root.  the image is always centered regardless of
+    its size.
+
+
+ blend - usage: blend inimage1 inimage2 outimage param
+    blend linearly interpolates two images.  param is a floating point number 
+    that controls the weighting of the two input images.  A value of 0.0 will
+    use only imimage1, while a value of 1.0 will use only inimage2.  Values 
+    outside the range [0.0...1.0] will extrapolate instead of interpolate 
+    between the two images.
+
+
+ blur - usage: blur inimage outimage [pix] or [xpix ypix]
+    This low pass filters the input image.  This is done by izooming the 
+    image down and then izooming it back up with filtering.  The amount of 
+    blurring is controled by pix or xpix and ypix.  A pix value of 10 will
+    cause the blur to zoom the image down until it is about 10 pixels
+    across, and then zoom it back up to the original size.  Large pix
+    values end up making the result less blurry.
+
+
+ btree - usage: btree inimage
+    Display an image using a b-tree.
+
+
+ cglue - usage: cglue red.bw grn.bw blu.bw outimage.rgb        		<*>
+    This constructs an rgb image by combining three black and white (bw) 
+    images. 
+
+ 
+ conimg - usage: conimg outimage xsize ysize [bwval] [r g b]
+    Creates a constant image.  If only bwval is specified, a one channel
+    image is created.  If the values are specified, a color image is 
+    created.  The image values are given in the range 0..255.
+
+
+ convolve - usage: convolve inimage outimage kernelimage [-m -d -g -e -q -h]
+    This convolves the input image with a kernel image.  Kernel images can 
+    be created with the program greyscale.  To do a convolution, the kernel 
+    image is stepped across the surface of the input image.  At each position,
+    all the image values under the kernel are multiplied by the corresponding
+    kernel values.  The sum of all these products is divided by the sum of
+    all the values in the kernel.  The result is put into the output image.
+    If the -m option is given, the maximum value of all the multiplies is 
+    put into the output image instead of the normalized sum of the products.
+    If the -d option is given, a delta value is calculated wherever
+    the kernel is greater than 128.  If the -g option is given, the direction
+    of the gradient is calculated.  If the -e option is given median 
+    filter is calculated over the area of the kernel.  If the -q option is
+    given, source pixels are quantized into between the two most popular
+    colors in the area of the kernel.  If the -h option is given a local
+    histogram equlization is performed.
+
+ 
+ cscale - usage: cscale inimage.rgb outimage.rgb r g b [-d]
+    Scales the r, g, and b channels of a color image file by the factors 
+    r, g, b.  If the -d option is given, the input colors are divided by
+    the given factors.
+
+
+ dotgen - usage: dotgen outimage size scalex scaley [-a]
+    Generates an image of two crossed sinusoidal wave patterns.  The result
+    image can be used as input to thresh to create halftoned images.  The 
+    output of dotgen is a square image size pixels on a side.  scalex and
+    scaley are floating point values that can be used to change the density
+    and rotation of the dot pattern.  If they are both integers, the output
+    image will will match up with its self when it tiles the plane.  The 
+    -a option causes dotgen to take the absolute value of the sum of the two
+    sinusoids.
+
+
+ duotone - usage: duotone inimage.bw outimage.rgb r g b 
+    Creates a duotoned color image from a single channel image.  The r g b
+    aguments specify a base color for the image.  Try 200 120 80. 
+
+
+ fieldmerge - usage: fieldmerge inimage0 inimage1 outimage		<*>
+    Standard NTSC Video displays 30 frames per second.  Each frame is composed 
+    of two fields that are interlaced.  When recording video animations it is
+    sometimes good to record 60 fields per second, but to do this two fields
+    must be merged together into a single frame by interleaving scanlines
+    from two images.  fieldmerge interleaves two images in this way.
+
+
+ fitimg - usage: fitimg inimage outimage xsize ysize
+     Uniformly scale a picture to a specific size.
+
+
+ fromalias - usage: fromalias aliasimage outimage.rgb
+    Converts an Alias image to an IRIS image.
+
+
+ frombin - usage: frombin binfile outimage.rgb xsize ysize
+    This is a short example program that shows how to read a binary dump
+    of some image data, and create an RGB IRIS image file.
+
+
+ fromcmap - usage: fromcmap colors.map outimage.rgb
+    Convert a color map into an image with one row.  
+
+
+ fromcube - usage: fromcc cubicomp.pic outimage.rgb
+    Convert a Cubicomp/Vertigo Image to an Iris image.
+
+
+ fromdi - usage: fromdi inimage.di outimage.rgb
+    Convert an old .di dithered image into an RGB image.
+
+
+ fromface - usage: fromface in.face out.bw
+    Convert a faceserver image into IRIS image file format.
+
+
+ fromgif - usage: fromgif in.gif out.bw
+    Convert a Compuserve GIF image file into an IRIS image file.
+
+
+ frommac - usage: frommac in.mac out.bw
+    Convert a MacPaint image into a black and white image IRIS file.
+
+
+ frompic - usage: frompic input.PIC out.rgb
+    Convert a MOVIE BYU .PIC image file to IRIS image file format.
+
+ 
+ fromppm - usage: fromppm image.ppm outimage.rgb
+    Convert PPM file to an IRIS image file.
+
+
+ fromrla - usage: fromrla inimage.rla outimage.rgb
+    Converts a WaveFront rla image into IRIS image format.
+
+
+ fromsun - usage: fromsun inimage.ras outimage.rgb
+    Converts any sun rasterfile image type into an IRIS image file.
+
+
+ fromtarga - usage: fromtarga inimage.tga outimage.rgb
+    Convert from a type 2 RGB TARGA image into an IRIS image.   This will
+    read RGB targa images with 15, 16, 24 or 32 bits per pixel.  Most targa 
+    images are displayed  directly on monitors with no gamma correction.  The 
+    typical gamma is about 2.2, so you gotta  gammawarp  the  output image by 
+    2.2 to get it into a linear intensity space.
+
+
+ fromxbm - usage: fromxbm xbitmap outimage.bw
+    Convert an X Bitmap file into an IRIS image file.
+
+
+ fromxwd - fromxwd in.xwd out.rgb [-debug]
+    Convert an xwd file to IRIS image file format.
+
+
+ fromyuv - usage: fromyuv inimage.yuv outimage.rgb
+    Convert an Abekas .yuv image file into IRIS image file format.
+
+
+ gammawarp - usage: gammawarp inimage outimage gamma
+    Lighten or darken an image by changing the gamma.  Typical gamma is about
+    2.2.   A gamma value that is less than 1.0 will lighten grey tones, 
+    while a gamma value that is greater that 1.0 will darken grey tones.
+
+
+ gendit - usage: gendit inimage.rgb outimage.rgb nr ng nb [-s]
+    General image dithering.
+
+
+ greyscale - usage: greyscale outimage.bw xsize ysize patternno
+    Generate a variety of different patterns.  A monochrome image is created
+    that is xsize by ysize pixels in size.  patternno selects what kind
+    of image is created.
+
+	Patternno		Description
+    ----------------------------------------------------------------
+	0	ramp [0...255] in the X direction
+	1	ramp [0...255] in the y direction
+	2	circular ramp pattern
+	3	all white image of 255
+	4	horizontail stripes white and black
+	5	All black except 1% of pixels are in the range [128...255]
+	6	black and white checker board pattern
+	7	grid pattern
+	8	gamma test pattern
+	9	gaussian in the x direction
+	10	gaussian in the y direction
+	11	contrast test image
+	12	all black image
+	13	all white image
+	14	random noise image
+	15 	circle
+	16 	rolf
+	17 	sinusoidal line test image
+	18 	Bayer threshold image for dithering
+	19 	Direction cone
+	20 	Print test pattern
+
+
+ halftone - usage:  halftone inimage outimage freq angle [patternno]
+    Halftone an image, using Hollaway's technique.  The density of the 
+    halftone screen is controlled by the floating point value freq.  The 
+    angle of the halftone patterns is controlled by the argument "angle".  
+    "patternno" selects the halftone pattern.  0 is the default and 
+    creates a dot pattern.  
+
+
+ hipass3 - usage: hipass3 inimage outimage mag
+    High pass filter an image using a 3 by 3 filter kernel.  mag specifies 
+    how much to increase the hi frequencies.  A value of 0.0 will not 
+    change the image.  1.0 will significantly change the image.
+
+
+ hist - usage: hist inimage
+    Compute and display the histogram of an image file.  The red hashmarks in-
+    dicate the  boundaries of the range of intensities for a given image.  The
+    black line  starting in the bottom left corner & going up to the top right
+    is the indicator of the distribution function of the histogram.  The input
+    image should be in the [0..255].
+
+
+ histeq - usage: histeq inimage outimage [-r]
+    Perform histogram equalization on an image file.  Thie -r option
+    causes noise to be added to reduce quatization artifacts.
+
+
+ iavg - usage: iavg outimage imgfiles . . . 				<*>
+    Average a set of images.  All the input images must be the same size
+
+
+ iblend - usage: iblend inimage1 inimage2 outimage matimg.bw
+    Blends between inimage1 and inimage2 to create outimage.  The image 
+    matimg.bw is used to select how much of inimage1 and inimage2 to
+    use for each pixel.
+
+
+ iflip - usage: iflip inimage outimage [x y xy yx 90 180 or 270]
+    Flip an image  about the x, y, xy or yx axis, or rotate an image 90, 180, 
+    or 270  degrees.   
+ 
+
+ imean - usage: imean inimage
+    Find the average pixel value of an image.
+
+
+ imgexp - usage: imgexp inimage outimage [min max]
+    Expand the range of pixel values in an image.  Pixel values less than or
+    equal to min are mapped to 0, while pixels vvalues greater than or equal 
+    to max are mapped to 255.  If min and max are not provided on the command
+    line, then the minimum and maximum pixel values in the image are used.
+
+
+ imgsize - usage: imgsize inimage [-2]
+    print the xsize, ysize, and zsize of the named image.  If the -2 option
+    is given, only the xsize and ysize are printed.
+
+
+ imgwrap - usage: imgwrap inimage outimage
+    Shift image pixels values left one bit.
+
+
+ invert - usage: invert inimage outimage
+    Invert an  image.   pixel value 0 becomes 255 and pixel value 255 maps
+    to 0.  The result is to invert the tonal scale of an image.
+
+
+ ipaste - usage: ipaste inimage [-sx] [-o xorg yorg]
+    Display an image on  the  IRIS.   This program will display RGB, BW or
+    screen images on any machine with any number of bitplanes.  On machines
+    with few bit planes ipaste dithers the image into the colormap.
+
+
+ iroll - usage: iroll inimage outimage xroll yroll
+    Rotationaly roll an image.  The integers xroll and yroll specify how 
+    many pixels to roll the image.
+
+
+ iset - usage: iset newtype imgfiles
+    Set the type of an image.  This determines which part of the color map
+    ipaste uses to display the image.  
+  
+
+ istat - usage: istat imagefiles . . .
+    Print the header information of list of image files.
+
+
+ izoom - izoom inimage outimage xscale yscale [-i -b -t -m or -q]
+					      [-w blurfactor]
+    Magnify or minify a picture  with or without filtering (xscale and yscale 
+    are floating point values).  The filtered method is one pass, uses 2-d 
+    convolution, and is optimized by integer arithmetic and precomputation 
+    of filter coefficients.  Normally izoom uses a triangle filter kernel
+    in both x and y directions.  The -i (impulse) option causes izoom to do 
+    no filtering as the image is resized.  The -b (box) option causes izoom
+    to use a box as the filter kernel.  The -t (triangle) option is the 
+    default. The -m (mitchell) option uses a cubic filter kernel.  The -q 
+    (quadratic) indicates that a quadradic function should be used as the 
+    filter kernel.
+
+
+ loadmap - usage: loadmap in.map
+    Load the IRIS color map from a file. The color indices and the color 
+    map entries must be in a file written or created by "savemap".
+
+
+ mapimg - usage: mapimg inimage.sc outimage.rgb file.map
+    Use a color map to transform a screen image into an rgb image. 
+
+
+ max - usage: max inimage1 inimage2 outimage
+    Calculate the max of two images.  
+
+
+ min - usage: min inimage1 inimage2 outimage
+    Calculate the minimum of two images.  
+
+
+ movie - usage: movie images . . . [-sx]                       		<*>
+    Show a series of images as a movie.  The -sx option causes the movie
+    to be surounded by a white frame.
+
+
+ mult - usage: mult inimage1 inimage2 outimage
+    Multiply two images.  The value 255 is used to represent 1.0 while 0.0
+    represents 0.0.
+
+
+ noblack - usage: noblack inimage.rgb outimage.rgb
+    Scale each pixel in an RGB image so at least one of its components is
+    255.  This has the effect of removing all the black from an image.
+
+
+ nullimg - usage nullimg outimage xsize ysize [zsize]
+    Make a black image that is xsize by ysize pixels.   To make an RGB 
+    image version, make the third optional argument--zsize--be three.
+
+
+ oneband - usage: oneband inimage.rgb outimage.bw band
+    Extract a single band of a color image.  Normally band should be a
+    number in the range [0...2].  Band 0 is the red part of and RGB image,
+    while band 1 and 2 are the green and blue bands.
+
+
+ over - usage: over underimage overimage outimage xpos ypos
+    Place one image over(on top of) another image.  xpos and ypos gives the
+    position on underimage that the overimage's origin will be glued to.
+
+
+ perhist - usage: perhist inimage [minpercent maxpercent] [-3]
+    Analyze the histogram of an image and print the minpercent and maxpercent
+    pixel values
+
+
+ postcard - usage: makecard inimage outimage
+    Create a postcard image by adding a black frame to the input image and
+    placing this on a white rectangle that has the exact same aspect ratio
+    as a standard postcard.
+
+
+ quant - usage: quant inimage outimage nlevels
+    Quantify an image to have n levels. 
+
+
+ randimg - usage: randimg outimage xsize ysize [seed]
+    Make a noise image.  seed initializes the randow number generator.  A
+    seed value of 0 makes randimg use its process id as the seed.
+
+
+ readimg - usage: readimg inimage.rgb
+    This is an example of how to use the IRIS image library.  This reads an
+    RGB image file but doesn't do anything with it!
+
+ rectimg - usage: rectimg inimage
+    Display a color or black and white image on the iris.  Simple version for
+    demo use.  This will only work on machines that support RGB mode.
+
+
+ repcolor - usage: repcolor inimage.rgb outimage.rgb ir ig ib or og ob dist
+    Replace colors in the input image that are within dist of ir ig ib with
+    the color or og ob.
+
+
+ rle - usage: rle inimage outimage
+    Force an image to be stored using run length encoding.  
+
+
+ saturate - usage: saturate inimage.rgb outimage.rgb warp
+    Change the saturation of an image.  This applies a gammawarp to the 
+    saturation of colors in an image file.  If warp is less than 1.0,
+    the saturation will be increased.
+
+
+ savemap - usage: savemap out.map [-r min max]
+    Save part or all of the color map into a data file.
+
+
+ scope - usage: scope inimage
+    Roam across a very high resolution image.  This displays a small version
+    of the input image on the right hand side of the window.  You can use the 
+    mouse to point at any part of this small image to be displayed in the 
+    right hand part of the window.   The current x and y position is also
+    displayed along with the RGB color of the center pixel.
+
+
+ scrsave - usage: scrsave outimage.rgb [x1 x2 y1 y2] [-b]
+    Save a portion of the screen into an image file.  scrsave with no arguments
+    will save the contents of the entire screen to an IRIS image file.  By
+    giving additional arguments a smaller region of the screen can be saved.
+    scrsave dump.rgb 0 99 0 99 will save a 100 pixel by 100 pixel square
+    in the lower left hand corner of the screen.  If the -b option is used,
+    the output image is saved as a black and white image.
+
+
+ setlum - usage: setlum inimage.rgb inimage.bw outimage.rgb
+    This modifies the luminance (brightness) of each pixel in the first
+    input image (inimage.rgb) to be the same as the pixel value in inimage.bw.
+
+
+ shear - usage: inimage outimage slope
+    Diagonally shear an image.  If slope is 1.0, the shear will make vertical
+    lines in 45 degree diagonal lines.
+
+
+ showimg - usage: showimg inimage
+    This simple example will display an RGB or BW IRIS image file on any 4D 
+    machine that has enough bitplanes to support RGB mode.  This is mostly
+    included as an example of how to open and read image files.
+
+
+ slide - usage: slide inimage
+    Zoom an image up to full screen size for display.
+
+
+ snapshot - usage:  snapshot [-b]
+    Create a snapshot image from the screen and save it into an image file.
+    Snapshot enables the user to interactively sweep out a red rectangle
+    via LEFTMOUSE.  This rectangle denotes the current "area of interest"
+    which, whenever the "Save as imagefilename" menu entry is selected, will
+    save that area of the screen into an image file.
+
+   
+ sub - usage: sub inimage1 inimage2 outimage
+    Subtract two images.  Caculates 128+(inimage2-inimage1).
+
+
+ subimg - usage: subimg inimage outimage x1 x2 y1 y2
+    Extract a region  from an image.  The region to be extracted is specified 
+    by x1 x2, y1 and y2.  These coordinates are given from the bottom left
+    corner of the image.  Negative values may be used to give coordinates
+    from the upper right corner.
+
+
+ thresh - usage: thresh inimage outimage threshimage
+    Threshold one image with another.  The threshimage is repeated to tile 
+    the entire surface of the input image.  Whenever the input image is 
+    greater than the threshimage, the output pixel is made 255 otherwise
+    the output pixel is made 0.  This can be used to halftone or dither
+    images.
+
+
+ tile - usage: tile inimage outimage xsize ysize
+    Repeat an image in two dimensions.  An output image that is xsize by
+    ysize pixels is created by repeating the input image.
+
+
+ toalias - usage: toalias inimage.rgb aliasimage
+    Convert an IRIS image to an Alias image. 
+
+
+ toascii - usage: toascii inimage.bw 
+    Print text that represents the image.
+
+
+ tobin - usage: tobin inimage out.bin
+    Convert an Iris image to binary dump of pixel data.
+
+
+ tobw - usage: tobw inimage.rgb outimage.bw
+    Convert a color image into a b/w image by  combining the three bands. Red 
+    contibutes 30%, green 59% and blue 11%.   
+
+
+ togif - usage: togif inimage.rgb outimage.gif
+    Convert an IRIS image file to Compuserve GIF image file format.
+
+
+ tomac - usage: tomac inimage.bw outimage.mac
+     Convert an IRIS image file to MacPaint format.
+
+
+ tonews - usage: tonews irisimage outfile.im8
+    Convert an iris image into news format.  After it has been converted,
+    it can be displayed by NeWS using showimage.
+
+
+ topict - usage: topict inimage out.pict
+    Convert an Iris image to APPLE pict format.
+
+
+ toppm - usage toppm inimage.rgb outimage.ppm
+    Convert an IRIS image file into Jef Poskanzer's ppm image format.
+    PBMPLUS, is by Jef Poskanzer.  It is a comprehensive format 
+    conversion and image manipulation package.  The latest version is 
+    always available via anonymous FTP as 
+
+	       expo.lcs.mit.edu:contrib/pbmplus.tar.Z 
+      and
+               ftp.ee.lbl.gov:pbmplus.tar.Z
+
+    The version of 22nov89 (which currently is still the latest, except 
+    for the one official patch so far) was posted to comp.sources.misc, 
+    and is therefore accessible via mail to one of the archive servers.  
+    This version is also available in the X.V11R4 release tape.
+
+
+ tops - usage: tops inimage [-l screendensity]
+                    	    [-p pixelsperinch]
+                    	    [-a screenangle]
+                    	    [-b bitsperpixel]
+                    	    [-x xpixelsperinch]
+                    	    [-y ypixelsperinch]
+                    	    [-t scaletrim
+                    	    [-m maxxinches maxyinches]
+                    	    [-h horrizontal line screen]
+                    	    [-o xorg yorg]
+                    	    [-color ]
+                    	    [-eps ]
+
+    Convert an IRIS image file into Postscript.  This program can generate
+    color PostScript and also Encapsulated PostScript.
+
+
+ toscitex - usage: toscitex imagefiles . . .
+    Convert a bunch of IRIS images into a Scitex CT2T images.
+
+
+ tosun - usage: tosun inimge.rgb  outimage.ras
+    Convert an IRIS image into a sun raster file.
+
+
+ totarga - usage: totarga inimage.rgb outimage.tga
+    Convert  from  an  IRIS image to a a type 2 (RGB) targa image.  Most targa 
+    images  are  displayed directly on monitors with no gamma correction.  The 
+    typical gamma is about  2.2,  so  you  gotta  gammawarp the input image by 
+    0.454545 to get it out of the  linear  intensity  space,  and into monitor 
+    space.  
+
+
+ toyuv - usage: toyuv inimage.rgb outimage.yuv
+     Convert an IRIS image to yuv format so it can be sent to an Abekas 
+     digital video frame store.
+
+
+ verbatim - usage: verbatim inimage outimage
+    Force an image to be stored in verbatum format. 
+ 
+
+ vhist - usage: vhist inimage.rgb
+    Display the histogram of a color image using a 3 dimensional 
+    representation.
+
+
+ writeimg - usage: writeimg name xsize ysize
+    Example to write out an  RGB  image file.  This example uses three 
+    functions from the image library: iopen, putrow, and iclose.  The 
+    function iopen is called to describe the xsize and ysize of the RGB image 
+    to be written out. The function  putrow  writes a row of image  data to 
+    the image file.  It is called with an array of shorts  with  values in the 
+    range [0..255].  The function iclose is  called to close the image file. 
+
+
+ xzoom - xzoom inimage outimage xscale yscale [-i -b -t -m or -q] 
+					      [-w blurfactor]
+    Magnify or minify a picture in the x direction with or without filtering 
+    (xscale and yscale are floating point values).  The filtering method is 
+    one pass, uses 1-d convolution, and is optimized by integer arithmetic 
+    and precomputation of filter coefficients.  Normally xzoom uses a triangle
+    filter kernel in the x direction.  The -i (impulse) option causes xzoom 
+    to do no filtering as the image is resized.  The -b (box) option causes 
+    xzoom to use a box as the filter kernel.  The -t (triangle) option is the 
+    default. The -m (mitchell) option uses a cubic filter kernel.  The -q 
+    (quadratic) indicates that a quadradic function should be used as the 
+    filter kernel.
+
+
+
+NOTE: All the programs with <*> on the usage line require all
+the source images be the same x y size.
+
+

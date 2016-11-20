@@ -1,0 +1,177 @@
+Ppmlabel User Manual(0)                 Ppmlabel User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       ppmlabel - add text to a PPM image
+
+
+SYNOPSIS
+       ppmlabel
+
+       [-angle angle]
+
+       [-background { transparent | color } ]
+
+       [-color color]
+
+       [-file filename]
+
+       [-size
+
+       textsize]
+
+       [-text text_string]
+
+       [-x column]
+
+       [-y row]
+
+       ...
+
+       [ppmfile]
+
+
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       ppmlabel  uses the text drawing facilities of ppmdraw to
+       add text to a PBM  image.   You  control  the  location,
+       size,  baseline angle, color of the text, and background
+       color (if any) with command  line  arguments.   You  can
+       specify  the  text  on  the command line or supply it in
+       files.
+
+       You can add any number of separate labels  in  a  single
+       invocation of ppmlabel, limited only by any restrictions
+       your environment has on the number and size  of  program
+       arguments (e.g. a shell's command size limit).
+
+       If  you  don't  specify ppmfile, ppmdraw reads its input
+       PPM image from Standard Input.
+
+       The output image goes to Standard Output.
+
+       A more sophisticated way to add a label to an  image  is
+       to  use  pbmtext  or pbmtextps to create an image of the
+       text, then pamcomp to overlay it onto the base image.
+
+
+
+OPTIONS
+       The arguments on  the  ppmlabel  command  line  are  not
+       options  in  the  strict  sense; they are commands which
+       control the placement and appearance of the  text  being
+       added  to  the  input pixmap.  They are executed left to
+       right, and any number of arguments may appear.
+
+       You can abbreviate any "option" to its  shortest  unique
+       prefix.
+
+
+
+       -angle angle
+              This  option  sets  the  angle of the baseline of
+              subsequent text.  angle is an integral number  of
+              degrees,  measured  counterclockwise from the row
+              axis of the image.
+
+
+       -background { transparent | color }
+              If the argument is  transparent,  ppmlabel  draws
+              the  text over the existing pixels in the pixmap.
+              If you specify a color  (see  the  -color  option
+              below  for information on how to specify colors),
+              ppmlabel generates background rectangles  enclos-
+              ing  subsequent  text,  and  those rectangles are
+              filled with that color.
+
+
+       -color color
+              This option sets the color for subsequent text.
+
+              Specify the color (color) as  described  for  the
+              argument  of the ppm_parsecolor() library routine
+              .
+
+              -colour is an acceptable alternate spelling.
+
+
+       -file filename
+              This option causes ppmlabel to read lines of text
+              from  the file named filename and draw it on suc-
+              cessive lines.
+
+
+       -size textsize
+              This option sets the height of the tallest  char-
+              acters above the baseline to textsize pixels.
+
+
+       -text text_string
+              This option causes ppmlabel to draw the specified
+              text string.  It advances the location for subse-
+              quent  text  by  1.75 times the current textsize,
+              which allows drawing multiple lines of text in  a
+              reasonable manner without specifying the position
+              of each line.
+
+              Note that if you invoke ppmlabel via a shell com-
+              mand and your text string contains spaces, you'll
+              have to quote it so the shell  treats  the  whole
+              string as a single token.  E.g.
+                $ ppmlabel -text "this is my text" baseimage.ppm >annotatedimage.ppm
+
+
+
+       -x column
+              This option sets the pixel column at which subse-
+              quent text will be left justified.  Depending  on
+              the shape of the first character, the actual text
+              may begin a few  pixels  to  the  right  of  this
+              point.
+
+
+       -y row This  option  sets  the pixel row which will form
+              the baseline of subsequent text.  Characters with
+              descenders,  such  as "y," will extend below this
+              line.
+
+
+
+
+LIMITATIONS
+       Text strings are restricted to 7 bit  ASCII.   The  text
+       font  used  by ppmdraw doesn't include definitions for 8
+       bit ISO 8859/1 characters.
+
+       When drawing multiple lines of text with a non-transpar-
+       ent  background,  it  should  probably  fill  the  space
+       between the lines with the background  color.   This  is
+       tricky  to  get right when the text is rotated to a non-
+       orthogonal angle.
+
+
+SEE ALSO
+       ppmmake(1), pbmtext(1), pbmtextps(1), pamcomp(1), ppm(1)
+
+
+
+AUTHOR
+       Copyright  (C) 1995 by John Walker (kelvin@fourmilab.ch)
+       WWW home page: http://www.fourmilab.ch/
+
+       Permission to use, copy,  modify,  and  distribute  this
+       software and its documentation for any purpose and with-
+       out fee is hereby granted,  without  any  conditions  or
+       restrictions.  This software is provided ``as is'' with-
+       out express or implied warranty.
+
+
+
+netpbm documentation   12 September 2003Ppmlabel User Manual(0)

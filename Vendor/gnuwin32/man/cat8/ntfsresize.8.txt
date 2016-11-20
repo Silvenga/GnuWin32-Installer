@@ -1,0 +1,196 @@
+NTFSRESIZE(8)                                     NTFSRESIZE(8)
+
+
+
+
+
+NAME
+       ntfsresize - resize an NTFS filesystem without data loss
+
+SYNOPSIS
+       ntfsresize [OPTIONS] --info device
+       ntfsresize [OPTIONS] [--size size[k|M|G]] device
+
+DESCRIPTION
+       The ntfsresize program non-destructively resizes Windows
+       XP/2000/NT4,  Windows  Server 2003 or Longhorn Beta NTFS
+       filesystems. It can be used to  shrink  or  enlarge  any
+       NTFS  filesystem located on an unmounted device (usually
+       a disk partition). The new  filesystem  will  have  size
+       bytes.   The size parameter may have one of the optional
+       modifiers k, M, G, which means  the  size  parameter  is
+       given  in kilo-, mega- or gigabytes respectively.  ntfs-
+       resize conforms to the SI, ATA, IEEE standards  and  the
+       disk manufacturers by using k=10^3, M=10^6 and G=10^9.
+
+       If  both  --info  and  --size  are omitted then the NTFS
+       filesystem will be enlarged  to  the  underlying  device
+       size.
+
+       The  ntfsresize  program  doesn't manipulate the size of
+       partitions.  To do that you have to use  a  disk  parti-
+       tioning tool, for example fdisk(8).
+
+       IMPORTANT!   Generally it's a good practice making regu-
+       lar backups of your  valuable  data,  especially  before
+       using  any  partitioning  tools.  To do so for NTFS, you
+       could use ntfsclone(8).  It's also included in the  ntf-
+       sprogs(8) package.
+
+SHRINKAGE
+       If you wish to shrink an NTFS partition, first use ntfs-
+       resize to shrink the size of the  filesystem.  Then  you
+       may  use fdisk(8) to shrink the size of the partition by
+       deleting  the  partition  and  recreating  it  with  the
+       smaller size.  But be careful, do not make the partition
+       smaller than the new size of the NTFS filesystem  other-
+       wise  you  won't be able to boot and you might lose your
+       data.
+
+ENLARGEMENT
+       To enlarge an NTFS filesystem, first  you  must  enlarge
+       the  size  of the underlying partition. This can be done
+       using fdisk(8) by deleting the partition and  recreating
+       it  with  a  larger size.  Make sure it will not overlap
+       with an other existing partition.   Then   you  may  use
+       ntfsresize to enlarge the size of the filesystem.
+
+PARTITIONING
+       When  recreating  the  partition  by a disk partitioning
+       tool, make sure you create it  with  the  same  starting
+       disk  cylinder  (sector)  and  partition type as before.
+       Otherwise you may lose your entire filesystem.
+
+       Also make sure you set the bootable flag for the  parti-
+       tion  if  it  existed before. Failing to do so you might
+       not be able to boot your computer from the disk.
+
+OPTIONS
+       Below is a summary of all the  options  that  ntfsresize
+       accepts.  All  options  have  two  equivalent names. The
+       short name is preceded by - and the long  name  is  pre-
+       ceded by --.  Any single letter options, that don't take
+       an argument, can be combined into a single command, e.g.
+       -fi is equivalent to -f -i.
+
+       -i, --info
+              By  using  this  option ntfsresize will determine
+              the theoretically  smallest  shrunken  filesystem
+              size  supported.  Most  of the time the result is
+              the space already used on the filesystem. Ntfsre-
+              size will refuse shrinking to a smaller size than
+              what you got by this option and depending on sev-
+              eral  factors  it  might be unable to shrink very
+              close to  this  theoretical  size.  Although  the
+              integrity  of  your data should be never in risk,
+              it's still strongly recommended to  make  a  test
+              run  by  using the --no-action option before real
+              resizing.
+
+              Practically the smallest shrunken size  generally
+              is  at  around "used space" + (20-200 MB). Please
+              also take into account that  Windows  might  need
+              about 50-100 MB free space left to boot safely.
+
+              This  option  never  causes  any  changes  to the
+              filesystem, the partition is opened read-only.
+
+       -s, --size size[k|M|G]
+              Resize  filesystem  to  size[k|M|G]  bytes.   The
+              optional  modifiers k, M, G mean the size parame-
+              ter is given in kilo-, mega- or gigabytes respec-
+              tively.   Conforming to standards, k=10^3, M=10^6
+              and G=10^9.  Use  this  option  with  --no-action
+              first.
+
+       -f, --force
+              Forces  ntfsresize  to  proceed  with  the resize
+              operation if the filesystem is marked "dirty" for
+              consistency check.
+
+              Please note, ntfsresize always marks the filesys-
+              tem "dirty" before a real resize operation and it
+              leaves  that  way  for extra safety. Thus if NTFS
+              was marked by ntfsresize then it's  safe  to  use
+              this  option. If you need to resize several times
+              without booting into Windows between each  resiz-
+              ing steps then you must use this option.
+
+       -n, --no-action
+              Use  this  option to make a test run before doing
+              the real resize operation.  Volume will be opened
+              read-only  and  ntfsresize displays what it would
+              do if it were to resize the filesystem.  Continue
+              with  the  real  resizing  only  if  the test run
+              passed.
+
+       -P, --no-progress-bar
+              Don't show progress bars.
+
+       -v, --verbose
+              More output.
+
+       -h, --help
+              Display help and exit.
+
+EXIT CODES
+       The exit code is 0 on success, non-zero otherwise.
+
+KNOWN ISSUES
+       No reliability problems are known or has been  reported.
+       If  you  need  help  please try the ntfsresize FAQ first
+       (see below) and if you don't find your answer then  send
+       your  question,  comment  or  bug report to <linux-ntfs-
+       dev@lists.sourceforge.net>.  No subscription  is  needed
+       but  the  mailing list is moderated and it can take some
+       time to approve your post.
+
+       There are some very rarely met limitations  at  present:
+       filesystems having bad sectors, highly fragmented Master
+       File Table (MFT), relocation of the first MFT extent and
+       resizing  in  the  middle of some metadata in some cases
+       aren't supported  yet.  These  cases  are  detected  and
+       resizing  is  refused,  restricted to a safe size or the
+       closest safe size is displayed.
+
+       ntfsresize schedules an NTFS consistency check and after
+       the  first boot into Windows you must see chkdsk running
+       on a blue background. This is intentional.  Windows  may
+       force a quick reboot after the consistency check.  More-
+       over after repartitioning your disk and depending on the
+       hardware  configuration, the Windows message System Set-
+       tings Change may also appear. Just  acknowledge  it  and
+       reboot again.
+
+AUTHOR
+       ntfsresize  has  been  written  by  Szabolcs  Szakacsits
+       <szaka@sienet.hu>.
+
+ACKNOWLEDGEMENT
+       Many thanks to Anton Altaparmakov and Richard Russon for
+       libntfs,  the  excellent  documentation and comments, to
+       Gergely Madarasz, Dewey M. Sasser and Miguel Lastra  and
+       his  colleagues  at  the University of Granada for their
+       continuous and highly valuable help, furthermore to Erik
+       Meade,  Martin  Fick,  Sandro  Hawke, Dave Croal, Lorrin
+       Nelson, Geert Hendrickx,  Robert  Bjorkman  and  Richard
+       Burdick  for  beta  testing  and  to Theodore Ts'o whose
+       resize2fs(8) man page formed the basis of this page.
+
+AVAILABILITY
+       ntfsresize is part of the ntfsprogs(8)  package  and  is
+       available   from  http://linux-ntfs.sourceforge.net/  as
+       source and precompiled binary.  ntfsresize related news,
+       example  of  usage,  troubleshooting,  statically linked
+       binary and FAQ (frequently  asked  questions)  is  main-
+       tained at
+       http://mlf.linux.rulez.org/mlf/ezaz/ntfsresize.html
+
+SEE ALSO
+       fdisk(8),  cfdisk(8),  sfdisk(8),  parted(8), mkntfs(8),
+       ntfsclone(8), ntfsprogs(8)
+
+
+
+
+ntfsprogs version 1.9.0     Mar 2004              NTFSRESIZE(8)

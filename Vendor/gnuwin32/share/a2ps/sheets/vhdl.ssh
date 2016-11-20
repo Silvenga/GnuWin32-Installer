@@ -1,0 +1,64 @@
+style VHDL is
+written by "Thomas Parmelan <Thomas.Parmelan@efrei.fr>"
+version is 1.2
+requires a2ps version 4.9.7
+
+documentation is
+   "Non-textual operators are not highlighted."
+   "Some logical operators are printed as graphical symbols"
+   "in the second level of pretty-printing."
+end documentation
+
+alphabets are
+   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_"
+
+keywords in Keyword_strong are
+   abs, access, after, alias, all, and, architecture, array, assert,
+   attribute, begin, block, body, buffer, bus, "case", component,
+   configuration, constant, disconnect, downto, else, elsif, "end",
+   entity, exit, file, for, function, generate, generic, guarded, if,
+   inout, "in", "is", label, library, linkage, loop, map, mod, nand,
+   new, next, nor, not, null, of, on, open, or, others, out, package,
+   port, procedure, process, range, record, register, rem, report,
+   return, select, severity, signal, subtype, then, to, transport,
+   type, units, until, use, variable, wait, when, while, with, xor
+end keywords
+
+operators are
+  # Handling of Ada-like character literals
+  (/'(.)'/ "'" Plain, \1 String, "'" Plain)
+end operators
+
+keywords in Keyword are
+   std_ulogic, std_ulogic_vector, signed, unsigned
+end keywords
+
+optional keywords are
+   not \not,
+   or \vee,
+   and \wedge,
+   implies \Rightarrow
+end keywords
+
+sequences are
+    -- Comment,
+
+    # Strings (escaping is a` la ada, not as in C)
+    "\"" Plain String "\"" Plain
+       exceptions are
+          "\"\""
+       end exceptions,
+
+    # Protect the << ' >> of the attributes
+    /'[a-z][a-z_]*/ Plain /[^a-z_]/ Plain,
+
+    # Libraries
+    "library" Keyword_strong Label ";" Plain,
+
+    # Entities
+    /(entity|architecture|function)/ Keyword_strong 
+    Label 
+    /[ \t]*(is|of)/ Keyword_strong
+end sequences
+
+end style

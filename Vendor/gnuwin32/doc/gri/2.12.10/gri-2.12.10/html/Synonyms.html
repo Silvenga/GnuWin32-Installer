@@ -1,0 +1,623 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: synonyms</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile Synonyms.html "Gri: synonyms" "Programming Gri" --> 
+
+<!-- @node   Synonyms, Naming Convention, Built-in Variables, Programming -->
+<a name="Synonyms" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Programming.html#Programming" shape="rect" coords="516,2,532,24" href="Programming.html#Programming">
+<area alt="Gri: variables" shape="rect" coords="557,2,573,24" href="Variables.html">
+<area alt="Gri: if statements" shape="rect" coords="581,2,599,24" href="IfStatements.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: if statements" shape="rect" coords="581,2,599,24" href="IfStatements.html">
+</map>
+<h2>10.5: Synonyms</h2>
+
+Synonyms are used by Gri to store character strings.  Gri denotes
+synonyms with words beginning with backslash (e.g., `<font color="#82140F"><code>\syn</code></font>'),
+following the TeX convention.  
+<p>
+<UL>
+<LI><a href="Synonyms.html#NamingConvention">Naming Convention</a>: Their names with a backslash, e.g. `<font color="82140F"><code>\syn</code></font>'
+<LI><a href="Synonyms.html#UsingSynonyms">Using Synonyms</a>: Some usage examples
+<LI><a href="Synonyms.html#ImportantBuiltinSynonyms">Important Builtin Synonyms</a>: e.g. `<font color="82140F"><code>\.command_file.</code></font>'
+<LI><a href="Synonyms.html#AliasSynonyms">Alias Synonyms</a>: e.g. `<font color="82140F"><code>\@alias</code></font>'
+<LI><a href="Synonyms.html#LocalSynonyms">Local Synonyms</a>: Working with the arguments of newcommands
+</UL>
+
+
+<!-- @node   Naming Convention, Using Synonyms, Synonyms, Synonyms -->
+<a name="NamingConvention" ></a>
+<h3>10.5.1: Naming convention for synonyms</h3>
+
+
+Synonym names begin with a backslash (e.g., `<font color="#82140F"><code>\filename</code></font>').  After
+the backslash, Gri expects a letter (upper or lower case) or one or more
+periods.  Following this is an arbitrary string of letters, numbers, or
+underscores.  If there are periods at the start, then the same number of
+periods must be used at the end.  The following are some examples
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\simple = "Howdie"
+\.longer_example. = "Dots and underscores are ok too"
+\a2 = "OK for number at end ..."
+\a3bb = "... and inside"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Gri defines several synonyms for its own use, so that if you modify
+these, you may get strange results.  Each of these starts and ends with
+a single period.
+<p>
+There is an exception to the above rule, one which mostly comes up when
+using netCDF files which may have variable names that may contain
+punctuation.  Gri permits synonym names to have punctuation characters
+(but not blanks or tabs) in synonym names, provided that the second
+character in the name is an opening brace and that the last character is
+a closing brace, e.g.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\{foo.bar} = "Foo bar"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+  This is used particularly for files in the netCDF format,
+for reading variable attributes, which by netCDF convention use a colon
+(`<font color="82140F"><code>:</code></font>') to separate variable name and attribute name (see <a href="Read.html#ReadSynonymorVariable">Read Synonym or Variable</a>).  For more information on netCDF format, see
+<p>
+`<font color="#82140F"><code>http://www.unidata.ucar.edu/packages/netcdf/index.html</code></font>'
+<a href="http://www.unidata.ucar.edu/packages/netcdf/index.html"> 
+here </a>. 
+<p>
+Synonyms may be freely embedded in strings (a common example is
+`<font color="#82140F"><code>draw title "Data from file `\datafile'"</code></font>'.  They may also appear
+anywhere in commands (e.g., `<font color="#82140F"><code>open \filename</code></font>').  The exception to
+this rule is that Gri ignores your synonyms within math mode, in order
+to prevent clashes (e.g. you might define `<font color="#82140F"><code>\alpha</code></font>' as a synonym
+storing the value `<font color="#82140F"><code>"foo bar"</code></font>', but Gri will ignore this within
+math-mode, so that `<font color="#82140F"><code>$\alpha$</code></font>' will still mean the Greek letter
+alpha).
+<p>
+To get a backslash in a string without Gri thinking it is part of a
+synonym, use two backslashes (e.g., 
+`<font color="#82140F"><code>show "The backslash character \\ is used for synonyms."</code></font>').  This
+may sometimes be required in 
+`<font color="#82140F"><code>system</code></font>'
+commands (see <a href="System.html#System">System</a>), to prevent Gri from converting
+substrings like `<font color="#82140F"><code>\n</code></font>' (which many system commands use to represent
+the newline character).  For example, the command 
+`<font color="#82140F"><code>system perl -e 'print "foo\nbar";'</code></font>' will be mangled if Gri has
+already been told that
+`<font color="#82140F"><code>\nbar</code></font>' is a synonym.  (There will be no problem if `<font color="#82140F"><code>\nbar</code></font>' is
+not an existing synonym, since Gri will then just leave it in place.)
+To be sure that no mangling can occur, replace each backslash with two
+backslashes.  This tells Gri not to try to substitute a synonym at that
+location.  In the example below, the first system call prints
+`<font color="#82140F"><code>fooled you!</code></font>' on one line line, because Gri substituted for what it
+thought was a synonym called `<font color="#82140F"><code>\nbar</code></font>'; the second (correctly) prints
+`<font color="#82140F"><code>foo</code></font>' on one line and `<font color="#82140F"><code>bar</code></font>' on the next.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\nbar = "led you!"
+system perl -e 'print "foo\nbar\n";'
+system perl -e 'print "foo\\nbar\\n";'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Similarly, if your system command is expecting to see `<font color="#82140F"><code>\t</code></font>' (for a
+tab character), then you must write `<font color="#82140F"><code>\\t</code></font>' to prevent Gri from
+trying to substitute a synonym named `<font color="#82140F"><code>\t</code></font>'.
+<p>
+The `<font color="#82140F"><code>show</code></font>' command has a special syntax for permitting newlines and
+tabs in strings (see <a href="Show.html#Show">Show</a>).
+<p>
+
+<!-- @node   Using Synonyms, Generalizing Code, Naming Convention, Synonyms -->
+<a name="UsingSynonyms" ></a>
+<h3>10.5.2: Some uses for synonyms</h3>
+
+
+Synonyms store strings and are useful for anything strings are useful
+for, e.g. filenames, plot labels, names of variables, etc.
+<p>
+<UL>
+<LI><a href="Synonyms.html#GeneralizingCode">Generalizing Code</a>: 
+<LI><a href="Synonyms.html#StoringOSOutput">Storing OS Output</a>: 
+<LI><a href="Synonyms.html#StoringUserResponses">Storing User Responses</a>: 
+<LI><a href="Synonyms.html#StoringFileContents">Storing File Contents</a>: 
+<LI><a href="Synonyms.html#ExtractingWordsFromStrings">Extracting Words From Strings</a>: 
+</UL>
+
+<!-- @node   Generalizing Code, Storing OS Output, Using Synonyms, Using Synonyms -->
+<a name="GeneralizingCode" ></a>
+<h4>10.5.2.1: Using synonyms to generalize code</h4>
+
+
+Synonyms are often used to store filenames, since then only a single
+line of a file may need to be altered, in order to work with another
+file, e.g.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\filename = "columns.dat"
+open \filename
+# a lot more code using the file name
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+<!-- @node   Storing OS Output, Storing User Responses, Generalizing Code, Using Synonyms -->
+<a name="StoringOSOutput" ></a>
+
+<h4>10.5.2.2: Using synonyms to store OS output</h4>
+
+Synonyms provided a convenient way to store information from the OS.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+# Show the date.
+\date = system date
+show "Time is \date"
+<p>
+# Show the command file name, then use the system
+# to construct a filename with the same beginning
+# but ".dat" as the ending instead of ".gri".
+show "The commandfile name is \.command_file."
+\fn = system echo `basename \.command_file. .gri`.dat
+show "A filename constructed from this is \fn"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+This example uses the Unix system commands `<font color="#82140F"><code>echo</code></font>' and
+`<font color="#82140F"><code>basename</code></font>' to  construct a filename ending in `<font color="#82140F"><samp>.dat</samp></font>', from the
+command file name (stored in the builtin string `<font color="#82140F"><code>\.command_file.</code></font>'),
+assuming that the command file name ends in `<font color="#82140F"><samp>.gri</samp></font>'.
+<p>
+NOTE: As usual, if the system command contains the Gri comment
+designator (the string `<font color="#82140F"><code>#</code></font>'), protect it with double-quotes
+(see <a href="System.html#System">System</a>).
+<p>
+
+<!-- @node   Storing User Responses, Storing File Contents, Storing OS Output, Using Synonyms -->
+<a name="StoringUserResponses" ></a>
+
+<h4>10.5.2.3: Storing user responses via `<font color="#82140F"><code>query</code></font>'</h4>
+
+
+You can ask the user for the contents of strings:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+query \filename "What's the data file?" ("file.dat")
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+The prompt `<font color="#82140F"><code>What's the name of the data file?</code></font>' is typed to the
+terminal, and whatever string the user types is inserted into the
+synonym `<font color="#82140F"><code>\filename</code></font>'. If the user types nothing, but simply presses
+carriage return, the (optional) default string (which must be enclosed
+in parentheses as shown) is put into `<font color="#82140F"><code>\filename</code></font>'. Note that the
+default is ignored if it is not written properly: it must be enclosed in
+double quotes enclosed in parentheses, with no intervening spaces.
+<p>
+
+<!-- @node   Storing File Contents, Extracting Words From Strings, Storing User Responses, Using Synonyms -->
+<a name="StoringFileContents" ></a>
+
+<h4>10.5.2.4: Storing File Contents</h4>
+
+You can read the contents of synonyms from a file:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open \directory_file
+read \file_name
+close
+open \file_name
+read columns x y
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+The first (space-separated) word is read into the the first synonym after
+the `<font color="#82140F"><code>read</code></font>' command, the second word into the second synonym, and so on.
+If the word you want is not near the front of the line, you can use the command 
+`<font color="#82140F"><code>read line</code></font>' to get the whole line, then use the method described above 
+to extract the word you want.  Indexing begins with 0, remember.
+<p>
+
+<!-- @node   Extracting Words From Strings, Important Builtin Synonyms, Storing File Contents, Using Synonyms -->
+<a name="ExtractingWordsFromStrings" ></a>
+
+<h4>10.5.2.5: Working with words within strings</h4>
+
+
+Sometimes a synonym will contain several words that you need to work
+with indidually (e.g. it might contain a list of files that should be
+processed).  There are two ways to do this.
+<p>
+<dl>
+<p>
+<p>
+<dt> <i>The `<font color="#82140F"><code>word of</code></font>' syntax.</i>
+<dd><TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\sentence = "This sentence has five words"
+\first_word = word 0 of "\sentence"
+\last_word = word 4 of "This sentence has five words"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<p>
+<dt> <i>The `<font color="#82140F"><code>[]</code></font>' syntax</i>
+<dd>Individual words of synonyms may be accessed by prefixing the synonym
+name with the index number of the word (starting at 0) enclosed in
+square brackets.  
+<p>
+The number in the square brackets may be a constant, a variable, or a
+synonym, but not a more complicated expression.  If the index value is a
+floating-point number, it is first rounded to the nearest integer.  If
+the index value is negative or exceeds the number of words minus 1, then
+an empty string is retrieved.
+<p>
+If <b>no number</b> appears in the square brackets, the result is the
+number of words in a synonym.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\syn = "This has 4 words in it"
+show "\[0]syn   ... gives 'This'"
+show "\[1]syn   ... gives 'has'"
+.i. = 3
+show \[.i.]syn  ... gives 'words'"
+\i = "3"
+show \[\i]syn   ... gives 'words'"
+show "\[]syn    ... gives '6', i.e. number of words"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+</dl>
+
+
+
+
+<!-- @node   Important Builtin Synonyms, Alias Synonyms, Extracting Words From Strings, Synonyms -->
+<a name="ImportantBuiltinSynonyms" ></a>
+<h3>10.5.3: Some important builtin synonyms</h3>
+
+<!-- latex: \index{@code{\.return_value.}, Return value} -->
+<!-- latex: \index{@code{\.ps_file.}, PostScript file name} -->
+<!-- latex: \index{@code{\.readfrom_file.}, data file name} -->
+<!-- latex: \index{@code{\.command_file.}, command-file name} -->
+<!-- latex: \index{@code{\.missingvalue.}, command-file name} -->
+<!-- latex: \index{@code{\.home.}, home directory} -->
+<!-- latex: \index{@code{\.system.}, operating system name} -->
+<!-- latex: \index{@code{\.user.}, user's login name} -->
+<!-- latex: \index{@code{\.time.}, time and date} -->
+<!-- latex: \index{@code{\.wd.}, working directory} -->
+<!-- latex: \index{@code{\.version.}, version of Gri} -->
+<!-- latex: \index{@code{\.pid.}, process ID of job} -->
+Within mathematics mode (portions of strings enclosed within
+dollar-signs), Gri stores the definitions of many Greek letters and
+mathematical symbols as math-mode synonyms (see <a href="MathematicalText.html#MathematicalText">Mathematical Text</a>).
+<p>
+Global synonyms are shared among commands.  To see the built-in global
+synonyms (see <a href="BuiltinIndex.html#IndexofBuiltins">Index of Builtins</a>)
+use `<font color="#82140F"><code>show synonyms</code></font>', which
+produces output that looks something like the following.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+Synonyms...
+    \.missingvalue.           = "10000000000000000000000.000000"
+    \.return_value.           = ""
+    \.version.                = "2.7.0"
+    \.pid.                    = "3043"
+    \.wd.                     = "/home/kelley"
+    \.time.                   = "Sun May 20 13:18:32 2001"
+    \.user.                   = "kelley"
+    \.host.                   = "Intrusion.phys.ocean.dal.ca"
+    \.system.                 = "unix"
+    \.home.                   = "/home/kelley"
+    \.lib_dir.                = "/usr/share/gri"
+    \.command_file.           = "stdin"
+    \.readfrom_file.          = "stdin"
+    \.ps_file.                = "gri-00.ps"
+    \.path_data.              = "."
+    \.path_commands.          = "."
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+These things will be obvious to unix users; for example
+`<font color="#82140F"><code>\.pid.</code></font>' is the process ID of the job (often used in names for
+temporary files), and `<font color="#82140F"><code>\.wd.</code></font>' is the working directory (often used
+in `<font color="#82140F"><code>draw title</code></font>' commands to indicate in which directory the gri job
+was run.  
+<p>
+Some commands set `<font color="#82140F"><code>\.return_value.</code></font>' to non-blank; the
+meaning of the return value varies from command to command.
+<p>
+
+
+
+
+<!-- @node   Alias Synonyms, Local Synonyms, Important Builtin Synonyms, Synonyms -->
+<a name="AliasSynonyms" ></a>
+<h3>10.5.4: Alias synonyms: the `<font color="#82140F"><code>\@alias</code></font>' syntax</h3>
+
+
+Sometimes you need to work with a variable or a synonym whose name can
+only be determined at run-time, perhaps through interaction with the
+user, examination of a datafile, or examination of the command provided
+to the OS when invoking Gri.
+<p>
+Gri handles this by so-called "alias" synonyms, which store the names of
+other items.
+<p>
+The syntax is simple.  Suppose that a synonym, called `<font color="#82140F"><code>\pointer</code></font>'
+say, contains the <b>name of</b> another synonym, or a variable.  Then
+you may use `<font color="#82140F"><code>\@pointer</code></font>' anyplace you would normally use the item
+named.
+<p>
+<dl>
+<p>
+<dt> <i>Illustrations of using the value of a named item</i>
+<dd>The following prints an approximation to Pi followed by the name of
+movie star.
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.pi. = 3.14
+\pi_pointer = ".pi."
+show \@pi_pointer  # just like 'show .pi.'
+<p>
+\hero = "Gregory Peck"
+\our_hero = "\\hero"
+show "\@our_hero"  # just like 'show "\hero"'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<p>
+<dt> <i>Illustrations of assigning to a named item</i>
+<dd>The following prints an approximation to 2*Pi and yet another star; the
+point is that the alias appears to the left of an assignment operator.
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+# Print approximation to 2*Pi
+.pi. = 3.14
+\pi_pointer = ".pi."
+\@pi_pointer *= 2
+show .pi.
+<p>
+# Stars don't shine alone
+\hero = "Gregory Peck"
+\our_hero = "\\hero"
+\@our_hero = "Harrison Ford"
+show "\hero"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+</dl>
+
+
+
+<!-- @node   Local Synonyms, If Statements, Alias Synonyms, Synonyms -->
+<a name="LocalSynonyms" ></a>
+<h3>10.5.5: Local synonyms</h3>
+
+<!-- latex: \index{@code{\.proper_usage.}} -->
+<!-- latex: \index{@code{\.words.}} -->
+<!-- latex: \index{@code{\.word0.}} -->
+<!-- latex: \index{@code{\.word1.}} -->
+Local synonyms are created by Gri upon entry to a Gri command.  You use
+them to parse the command line that was used in calling the new command,
+to look for options, gather filenames, etc.  Local synonyms are known
+only from within the local Gri command.  They are not listed by
+`<font color="#82140F"><code>show synonyms</code></font>', but they can be used freely in commands like
+`<font color="#82140F"><code>show "Number of words is \.words."</code></font>'.
+<p>
+<ul>
+<li>
+Within any new Gri command, the number of words in the line that called
+the command is available in `<font color="#82140F"><code>\.words.</code></font>'.  The RPN operator `<font color="#82140F"><code>wordc</code></font>' 
+also yields the same value (see <a href="SolitaryOperators.html#SolitaryOperators">Solitary Operators</a>).
+<li>
+The first word in the calling line is `<font color="#82140F"><code>\.word0.</code></font>', the second
+`<font color="#82140F"><code>\.word1.</code></font>', etc.  (Note that this is the C convention, <b>not</b> the
+FORTRAN convention.  If `<font color="#82140F"><code>\.words.</code></font>' is 2, then `<font color="#82140F"><code>\.word0.</code></font>' and
+`<font color="#82140F"><code>\.word1.</code></font>' are defined, but `<font color="#82140F"><code>\.word2.</code></font>', which FORTRAN programmers
+expect, will not be defined.)  If you don't know the place of the synonym
+in advance (i.e. 0 versus 1, for `<font color="#82140F"><code>\.word0.</code></font>' versus `<font color="#82140F"><code>\.word1.</code></font>'), 
+then use the RPN operator `<font color="82140F"><code>wordv</code></font>' instead (see <a href="UnaryOperators.html#UnaryOperators">Unary Operators</a>).
+<li>
+Within any new Gri command, the proper calling usage is available in
+`<font color="#82140F"><code>\.proper_usage.</code></font>'.  This is useful in tests of syntax 
+(see <a href="NewCommands.html#AddingNewCommands">Adding New Commands</a>).  For example:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw depths from \file'
+Draw depth data stored in indicated file.  If the 
+filename contains periods or slashes, you'll
+have to enclose it in double quotes, as
+in the second example:
+  draw depths from file upper_cove
+  draw depths from file ../old_data/upper_cove
+{
+  if {rpn \.words. 4 !=}
+    show "FATAL ERROR in `\.proper_usage.':"
+    show "  Need 4 words; got \.words. words."
+    quit
+  end if
+  # Right number of words, so continue onward...
+}
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+</ul>
+These synonyms help you scan for optional words in commands.  Suppose
+you have defined a new command `<font color="#82140F"><code>New Thing [option]</code></font>'.  If you call
+it with `<font color="#82140F"><code>New Thing</code></font>', then (within `<font color="#82140F"><code>New Thing</code></font>') `<font color="#82140F"><code>\.words.</code></font>'
+will be `<font color="#82140F"><code>"2"</code></font>', `<font color="#82140F"><code>\.word0.</code></font>' will be `<font color="#82140F"><code>"New"</code></font>' and `<font color="#82140F"><code>\.word1.</code></font>'
+will be `<font color="#82140F"><code>"Thing"</code></font>'.  On the other hand, if you call it with
+`<font color="#82140F"><code>New Thing 22.3</code></font>' then `<font color="#82140F"><code>\.words.</code></font>' will be `<font color="#82140F"><code>3</code></font>',
+`<font color="#82140F"><code>\.word0.</code></font>' will be `<font color="#82140F"><code>"New"</code></font>', `<font color="#82140F"><code>\.word1.</code></font>' will be
+`<font color="#82140F"><code>"Thing"</code></font>' as before, and `<font color="#82140F"><code>\.word2.</code></font>' will be `<font color="#82140F"><code>"22.3"</code></font>'.
+<p>
+<b>EXAMPLE</b>  Here is a new command to label lines drawn by 
+`<font color="#82140F"><code>draw curve</code></font>': 
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`Draw Label For Last Curve "label"'
+Draw a label for the last curve drawn, using
+..xlast.. and ..ylast.. built-in variables.
+{
+  new .draw_label_for_last_curve_graylevel.
+  .draw_label_for_last_curve_graylevel. = ..graylevel..
+  set graylevel 0
+  draw label "\.word5." at \
+      {rpn ..xlast.. xusertocm 0.1 + xcmtouser} \
+      {rpn ..ylast.. yusertocm \
+          ..fontsize.. pttocm 2 / -
+          ycmtouser}
+  set graylevel .draw_label_for_last_curve_graylevel.
+  delete .draw_label_for_last_curve_graylevel.
+}
+open file.dat
+read columns x y
+draw curve
+\label = "Illustration"
+Draw Label For Last Curve "\label"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+(Note that Gri has a built-in command 
+`<font color="#82140F"><code>draw label for last curve "\label"</code></font>' written much as above, so
+there is no need for you to enter 
+this new command into your `<font color="#82140F"><samp>.grirc</samp></font>' file.  But you might want to
+check `<font color="#82140F"><samp>gri.cmd</samp></font>' to see how a full
+command does checking of the calling syntax
+(see <a href="InvokingGri.html#InvokingGri">Invoking Gri</a>).
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

@@ -1,0 +1,79 @@
+RLE_GETRAW(3)                                     RLE_GETRAW(3)
+
+
+
+
+
+NAME
+       rle_getraw  -  Read  run length encoded data from an RLE
+       file.
+       rle_freeraw  -   Free   pixel   storage   allocated   by
+       rle_getraw.
+
+SYNOPSIS
+       #include <rle.h>
+       #include <rle_raw.h>
+
+       unsigned int rle_getraw( the_hdr, scanraw, nraw )
+       rle_hdr * the_hdr;
+       rle_op ** scanraw;
+       int * nraw;
+
+       void rle_freeraw( the_hdr, scanraw, nraw );
+       rle_hdr * the_hdr;
+       rle_op ** scanraw;
+       int * nraw;
+
+DESCRIPTION
+       Rle_getraw  can  be used to read information from an RLE
+       file in the "raw" form.
+
+       The scanraw argument is an array of pointers  to  arrays
+       of  rle_op(3)  structures.  Each rle_op structure speci-
+       fies a run or sequence of pixel values.  The array  nraw
+       gives  the number of rle_op structures for each channel.
+       I.e., nraw[i] is the length of the array pointed  to  by
+       scanraw[i].
+
+       Return  value  is  the current scanline number.  Returns
+       32768 at EOF.
+
+       Sufficient space must be  allocated  in  the  arrays  of
+       rle_op  structures  to hold the data read from the file.
+       A function, rle_raw_alloc(3), is provided to  make  this
+       easier.   The storage required by any pixel sequences in
+       the input will be dynamically allocated by rle_getraw.
+
+       The pixel storage allocated dynamically by rle_getraw(3)
+       must  be freed to avoid memory leaks.  This is most eas-
+       ily accomplished by calling rle_freeraw.   The  argument
+       scanraw  points  to  an array of rle_op structures, with
+       nraw indicating the number of structures in  each  chan-
+       nel.  All pixel data arrays will be freed by the call to
+       rle_freeraw.
+
+EXAMPLE
+       The usual code looks something like
+            rle_hdr in_hdr, out_hdr;
+            rle_op **raw;
+            int *nraw;
+            while ( rle_getraw( &in_hdr, raw, nraw ) != 32768 )
+            {
+                 /* Process data. */
+                 rle_putraw( &out_hdr, raw, nraw );
+                 rle_freeraw( &in_hdr, raw, nraw );
+            }
+
+SEE ALSO
+       rle_hdr(3), rle_op(3), rle_putraw(3), rle_raw_alloc(3),
+       rle_raw_free(3), rle_getrow(3), rle_getskip(3),
+       librle(3), RLE(5).
+
+AUTHOR
+       Spencer W. Thomas
+       University of Utah
+
+
+
+
+3                            2/2/87               RLE_GETRAW(3)

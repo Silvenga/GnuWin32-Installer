@@ -1,0 +1,74 @@
+#!/usr/bin/perl -wl
+use strict;
+use Getopt::Long;
+
+my ($FALSE, $TRUE) = (0,1);
+
+(my $myname = $0) =~ s#\A.*/##;
+
+my ($Twid, $Thgt, $tmpdir, $norepeat, $verbose);
+
+# set defaults
+$Twid = 600;
+$Thgt = 8;
+$tmpdir = $ENV{"TMPDIR"} || ".tmp";
+$norepeat = $FALSE;
+$verbose = $FALSE;
+
+GetOptions("width=i"   => \$Twid,
+           "height=i"  => \$Thgt,
+           "tmpdir=s"  => \$tmpdir,
+           "norepeat!" => \$norepeat,
+           "verbose!"  => \$verbose);
+
+die "invalid width and/or height\n" unless $Twid >= 1 && $Thgt >= 1;
+
+my $verboseCommand = $verbose ? "set -x;" : "";
+
+if (@ARGV < 1) {
+    die("You must specify at least one color as an argument");
+} elsif (@ARGV < 2 && $norepeat) {
+    die("With the -norepeat option, you must specify at least two colors " .
+        "as arguments.");
+}
+
+my @colorlist;
+
+@colorlist = @ARGV;
+if (!$norepeat) {
+    push @colorlist, $ARGV[0];
+}
+
+my $tmpprefix = $tmpdir . "/$myname.$$.";
+
+my $widthRemaining;
+my $n;
+my @outlist;
+
+$n = 0;
+$widthRemaining = $Twid;
+@outlist = ();
+
+while (@colorlist >= 2) {
+    my $outfile = sprintf("%s%03u.ppm", $tmpprefix, $n);
+    push(@outlist, $outfile);
+
+    my $w = int(($widthRemaining-1)/(@colorlist-1))+1;
+    my $rc = system("$verboseCommand pgmramp -lr $w $Thgt | " .
+                    "pgmtoppm \"$colorlist[0]-$colorlist[1]\" >$outfile");
+    if ($rc != 0) {
+        die("pgmramp|pgmtoppm failed.");
+    }
+    $widthRemaining -= $w;
+    $n++;
+    shift @colorlist;
+}
+
+0 == system qq{$verboseCommand pnmcat -lr @outlist}
+    or exit 1;
+
+exit 0;
+
+END {
+    unlink @outlist if @outlist;
+}

@@ -1,0 +1,85 @@
+RLECOMP(1)                                           RLECOMP(1)
+
+
+
+
+
+NAME
+       rlecomp - Digital image compositor
+
+SYNOPSIS
+       rlecomp [ -o outfile ] Afile operator Bfile
+
+DESCRIPTION
+       rlecomp implements an image compositor based on presence
+       of an alpha, or matte channel  the  image.   This  extra
+       channel  usually  defines a mask which represents a sort
+       of a cookie-cutter for the image.  This is the case when
+       alpha  is  255  (full  coverage)  for  pixels inside the
+       shape, zero outside, and between zero  and  255  on  the
+       boundary.   If  Afile  or Bfile is just a single -, then
+       rlecomp reads that file from the standard input.
+
+       The operations behave as follows (assuming the operation
+       is "A operator B"):
+
+       over   The  result  will  be  the union of the two image
+              shapes, with A obscuring B in the region of over-
+              lap.
+
+       in     The result is simply the image A cut by the shape
+              of B.  None of the image data of B will be in the
+              result.
+
+       atop   The  result  is the same shape as image B, with A
+              obscuring B where the image shapes overlap.  Note
+              this  differs  from over because the portion of A
+              outside B's shape does not appear in the  result.
+
+       out    The  result  image is image A with the shape of B
+              cut out.
+
+       xor    The result is the image  data  from  both  images
+              that  is outside the overlap region.  The overlap
+              region will be blank.
+
+       plus   The result is just the sum  of  the  image  data.
+              Output  values  are clipped to 255 (no overflow).
+              This operation is  actually  independent  of  the
+              alpha channels.
+
+       minus  The  result  of  A - B, with underflow clipped to
+              zero.  The alpha channel is ignored (set to  255,
+              full coverage).
+
+       diff   The  result  of  abs(A  - B).  This is useful for
+              comparing two very similar images.
+
+       add    The result of  A  +  B,  with  overflow  wrapping
+              around (mod 256).
+
+       subtract
+              The  result  of  A  -  B, with underflow wrapping
+              around (mod 256).  The add and subtract operators
+              can  be  used  to  perform reversible transforma-
+              tions.
+
+
+SEE ALSO
+       urt(1), RLE(5),
+       "Compositing   Digital   Images",   Porter   and   Duff,
+       Proceedings of SIGGRAPH '84 p.255
+
+AUTHORS
+       Rod Bogart and John W. Peterson
+
+BUGS
+       The  other operations could be optimized as much as over
+       is.
+
+       Rlecomp assumes both input files have the same number of
+       channels.
+
+
+
+1                      December 20, 1986             RLECOMP(1)

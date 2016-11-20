@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: `new' command</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile New.html "Gri: `new' command" "Gri Commands" --> 
+
+<!-- @node   New, Newpage, Mask, List Of Gri Commands -->
+<a name="New" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="ListOfGriCommands.html#ListOfGriCommands" shape="rect" coords="516,2,532,24" href="ListOfGriCommands.html#ListOfGriCommands">
+<area alt="Gri: `mask' command" shape="rect" coords="557,2,573,24" href="Mask.html">
+<area alt="Gri: `newpage' command" shape="rect" coords="581,2,599,24" href="Newpage.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: `newpage' command" shape="rect" coords="581,2,599,24" href="Newpage.html">
+</map>
+<h3>9.3.25: `<font color="#82140F"><code>new</code></font>'</h3>
+
+<!-- latex: \index{new} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+new .variable_name. | \synonym_name \
+   [.variable_name. | \synonym_name \
+   [...]]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+`<font color="#82140F"><code>new</code></font>' sets aside storage for new version of the named variable(s)
+and/or synonym(s).  Any number of variables and synonyms may be
+specified.  If a given variable/synonym already exists, this will create
+a new version of it, and future assignments will be stored in this new
+version <b>without</b> affecting the pre-existing version.  If the
+variable/synonym is `<font color="#82140F"><code>delete</code></font>'ed, the new version is deleted, making
+the old, unaltered, version accessible again.
+<p>
+This command is used mostly for temporary use, to prevent clashing with
+existing values.  Suppose you want to change the font size inside a new
+command or an if block.  Then you might do the following, where the
+variable `<font color="#82140F"><code>.tmp.</code></font>' is used to store the old font size.  Note that the
+use of the `<font color="#82140F"><code>new/delete</code></font>' statements prevents the assignment to the
+local version of the variable `<font color="#82140F"><code>.tmp.</code></font>' from affecting the value
+known outside the `<font color="#82140F"><code>if</code></font>' block, if in fact `<font color="#82140F"><code>.tmp.</code></font>' happened to
+exist outside the block.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+set font size 10
+draw label "This is in fontsize 10" at 10 2 cm
+if .want_title.
+  new .tmp.
+  .tmp. = ..fontsize..
+  set font size 22
+  draw label "This is 22 font" at 10 5 cm
+  set font size .tmp.
+  delete .tmp.
+end if
+draw label "This is 10 font" at 10 8 cm
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<b>Special case</b>: for local synonyms (e.g. `<font color="#82140F"><code>\.word1.</code></font>', etc.),
+the `<font color="#82140F"><code>new</code></font>' operator checks to see whether the synonym is standing
+for an "ampersand" argument, signalling a changeable argument that is a
+variable or a synonym.  In such a case, `<font color="#82140F"><code>new</code></font>' creates a new
+instance of the item in the calling context.  The test suite has
+examples (see <a href="TestSuite.html#TestSuite">Test Suite</a>).
+<p>
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

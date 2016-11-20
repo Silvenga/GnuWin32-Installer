@@ -1,0 +1,48 @@
+GNU hello --- TODO
+
+Todo:
+
+    * remove README-alpha from the distribution.
+    * submit a new hello.pot.
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=- cut here -=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+Subject:      grep-2.0b: close stdout and make sure it succeeds
+From:         meyering@eng.ascend.com (Jim Meyering)
+Date:         1997/07/16
+Message-ID:   <yzq4t9ucuz5.fsf@boom.eng.ascend.com>
+Newsgroups:   gnu.utils.bug
+
+
+Hi Alain,
+
+Thanks for taking up the reins!
+
+Almost every program that writes a single byte to stdout should
+do the following just before exiting: close stdout and give a
+diagnostic if the close fails.
+
+Otherwise, write errors can go unreported.  You can provoke this
+by e.g. making grep generate lots of output and redirect that output
+to a floppy or to any file system that's nearly full.
+
+GNU hello should set a good example and do this, too.
+
+Here's a patch I've been using for a long time:
+
+        * src/grep.c: Cause grep to fail if `fclose (stdout)' fails.
+
+--- grep.c.orig Wed Jul 16 20:44:20 1997
++++ grep.c      Wed Jul 16 20:44:30 1997
+@@ -846,5 +846,8 @@ main(argc, argv)
+        printf(_("(standard input)\n"));
+     }
+
++  if (fclose (stdout) == EOF)
++    error (_("writing output", errno));
++
+   exit(errseen ? 2 : status);
+ }
+
+
+end of file TODO

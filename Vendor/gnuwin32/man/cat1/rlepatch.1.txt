@@ -1,0 +1,57 @@
+RLEPATCH(1)                                         RLEPATCH(1)
+
+
+
+
+
+NAME
+       rlepatch  - patch smaller RLE files over a larger image.
+
+SYNOPSIS
+       rlepatch [ -o outfile ] infile patchfiles...
+
+
+DESCRIPTION
+       Rlepatch puts smaller RLE files on top of a  larger  RLE
+       image.   One  use  for  rlepatch is to place small "fix"
+       images on top of a larger image that took a long time to
+       compute.  Along with repos(1), rlepatch can also be used
+       as a simple way to build image mosaics.
+
+       Unlike rlecomp(1), rlepatch does not perform any  arith-
+       metic  on  the pixels.  If the patch images overlap, the
+       patches specified last cover those specified first.
+
+       If the input files each contain  multiple  images,  they
+       are  treated  as  streams  of  images  merging to form a
+       stream of output images.  I.e., the nth  image  in  each
+       input  file  becomes part of the nth image in the output
+       file.  The process ceases as  soon  as  any  input  file
+       reaches its end.
+
+OPTIONS
+       infile The background image will be read from this file.
+              If input is to be taken from stdin, "-"  must  be
+              specified here.
+
+       -o outfile
+              If  specified,  output  will  be  written to this
+              file, otherwise it will go to stdout.
+
+SEE ALSO
+       rlecomp(1), crop(1), repos(1), urt(1), RLE(5).
+
+AUTHOR
+       John W. Peterson, University of Utah.
+
+BUGS
+       Rlepatch uses the "row" interface to  the  RLE  library.
+       It would run much faster using the "raw" interface, par-
+       ticularly for placing small patches over a large  image.
+       Even  fixing  it  to work like rlecomp (which uses "raw"
+       mode only for non-overlapping images) would make a major
+       improvement.
+
+
+
+1                         Nov 8, 1987               RLEPATCH(1)

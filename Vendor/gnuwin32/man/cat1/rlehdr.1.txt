@@ -1,0 +1,81 @@
+RLEHDR(1)                                             RLEHDR(1)
+
+
+
+
+
+NAME
+       rlehdr - Prints the header of an RLE file
+
+SYNOPSIS
+       rlehdr [ -b ] [ -ccomment-names ] [ -d ] [ -m ] [ -v ] [
+       files ...  ]
+
+DESCRIPTION
+       This program prints the header  of  RLE(5)  files  in  a
+       human  readable form.  If the optional files argument is
+       not supplied, input is read from standard input.
+
+OPTIONS
+       -b     Print the information in a "brief" one-line form.
+              The form of the output line is
+              name: [l,b]+[xs,ys]xnc+A, BG=color, map=NxL, (C)
+              Where  [l,b]  is  the  position of the lower-left
+              corner of the image, [xs,ys] is the size  of  the
+              image  in  pixels,  nc  is the number of channels
+              saved, +A is  present  if  an  alpha  channel  is
+              saved.   BG=  or  OV=  indicate that a background
+              color was saved;  OV=  means  that  the  existing
+              background is not cleared to the background color
+              before the image is read (this  was  used  for  a
+              cheap form of compositing, but is basically obso-
+              lete now).  color is the saved background  color.
+              The  map=  entry  will be present only if a color
+              map was saved; N is the number of channels in the
+              color  map  and  L  is  the  length  of  the map.
+              Finally (C) is appended  if  there  are  comments
+              present.
+
+       -c comment-names
+              If  a  comment  identified by any of the words in
+              the comma-separated list comment-names is present
+              in  the  input  file,  its  first  line  will  be
+              printed.  Each name is tried, in turn,  and  only
+              the  first  match  is  printed.   If  no match is
+              found, but comments  are  present,  (C)  will  be
+              printed.  The -c flag implies -b.
+
+       -d     Dump a very verbose version of the image contents
+              as text to the standard error output stream.
+
+       -m     Print out the color map information.   -v  Prints
+              the  raster  toolkit version and patch level.  No
+              input files will be processed if this  option  is
+              given.
+
+EXAMPLES
+       rlehdr image.rle
+              Print  the  header  information for all images in
+              the file image.rle.
+
+       rlehdr -m image.rle
+              Also print the color  map  contents,  if  one  is
+              present.
+
+       rlehdr -b *.rle
+              Print one line summaries of all the images in the
+              directory.
+
+       rlehdr -c title,TITLE *.rle
+              Print one line summaries of all the  images,  and
+              print the title of any that have a title comment.
+
+SEE ALSO
+       urt(1), RLE(5).
+
+AUTHOR
+       Spencer W. Thomas, University of Utah
+
+
+
+1                         Jan 22, 1987                RLEHDR(1)

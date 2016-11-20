@@ -1,0 +1,59 @@
+TIFFReadTile(3TIFF)                         TIFFReadTile(3TIFF)
+
+
+
+
+
+NAME
+       TIFFReadTile  -  read  and decode a tile of data from an
+       open TIFF file
+
+SYNOPSIS
+       #include <tiffio.h>
+
+       tsize_t TIFFReadTile(TIFF *tif, tdata_t buf,  uint32  x,
+       uint32 y, uint32 z, tsample_t sample)
+
+DESCRIPTION
+       Return  the  data  for the tile containing the specified
+       coordinates. The data placed in buf are returned  decom-
+       pressed  and,  typically,  in  the native byte- and bit-
+       ordering, but are otherwise packed (see further  below).
+       The  buffer  must be large enough to hold an entire tile
+       of data. Applications should call the routine  TIFFTile-
+       Size  to  find out the size (in bytes) of a tile buffer.
+       The x and y parameters are always used by  TIFFReadTile.
+       The  z  parameter  is used if the image is deeper than 1
+       slice (ImageDepth>1).  The sample parameter is used only
+       if data are organized in separate planes (PlanarConfigu-
+       ration=2).
+
+NOTES
+       The library attempts to hide bit- and byte-ordering dif-
+       ferences  between  the  image  and the native machine by
+       converting data to the native machine order.  Bit rever-
+       sal  is  done  if  the  FillOrder tag is opposite to the
+       native machine bit order. 16-  and  32-bit  samples  are
+       automatically  byte-swapped if the file was written with
+       a byte order opposite to the native machine byte order,
+
+RETURN VALUES
+       TIFFReadTile returns -1 if it detects an  error;  other-
+       wise  the  number  of  bytes  in  the  decoded  tile  is
+       returned.
+
+DIAGNOSTICS
+       All error messages are directed to the  TIFFError(3TIFF)
+       routine.
+
+SEE ALSO
+       TIFFCheckTile(3TIFF),            TIFFComputeTile(3TIFF),
+       TIFFOpen(3TIFF),  TIFFReadEncodedTile(3TIFF),  TIFFRead-
+       RawTile(3TIFF), libtiff(3TIFF)
+
+       Libtiff   library   home   page:  http://www.remotesens-
+       ing.org/libtiff/
+
+
+
+libtiff                December 16, 1991    TIFFReadTile(3TIFF)

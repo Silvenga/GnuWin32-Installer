@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pngtopnm User Manual</TITLE></HEAD>
+<BODY>
+<H1>pngtopnm</H1>
+Updated: 24 March 2005
+<BR>
+<A HREF="pngtopnm.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pngtopnm - convert a PNG image into a PNM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pngtopnm</B>
+[<b>-verbose</b>]
+[<b>-alpha</b> | <b>-mix</b>]
+[<b>-background</b>=<i>color</i>]
+<BR>
+[<b>-gamma</b>=<i>value</i>]
+[<b>-text</b>=<i>filename</i>]
+[<b>-time</b>]
+[<I>pngfile</I>]
+
+<P>Minimum unique abbreviation of option is acceptable.  You may use double
+hyphens instead of single hyphen to denote options.  You may use white
+space in place of the equals sign to separate an option name from its value.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pngtopnm</b> reads a PNG image (Portable Network Graphics) as
+input and produces a PPM image as output.  The type of the output file
+depends on the input file - if it's black &amp; white, <b>pngtopnm</b>
+creates a PBM file.  If it's grayscale, <b>pngtopnm</b> creates a PGM
+file.  Otherwise, it creates a PPM file.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-verbose</B>
+
+<DD>Display various information about the input PNG image and the
+conversion process.
+
+<p>If you want even more information about the PNG image, use
+<b>pngcheck</b> (not part of Netpbm).
+     
+<DT><B>-alpha</B>
+
+<DD>Output the alpha channel or transparency mask of the image. The
+result is either a PBM file or a PGM file, depending on whether
+different levels of transparency appear.
+
+<DT><B>-mix</B>
+
+<DD>Compose the image with the transparency or alpha mask against a
+background.  The background color is determined by the bKGD chunk in
+the PNG, except that you can override it with <b>-background</b>.
+If the PNG has no bKGD chunk and you don't specify <b>-background</b>,
+the background color is white.
+
+<DT><B>-background=</b><i>color</i>
+
+<DD>
+This option specifies the background color with which to mix the image
+when you specify <b>-mix</b>.  
+
+<P><i>color</i> is as described for the <a
+href="libppm.html#colorname">argument of the <b>ppm_parsecolor()</b>
+library routine</a>.
+
+<p>Examples:
+
+<ul>
+<li><tt>-background=rgb:01/ff/80</tt>
+<li><tt>-background=rgbi:1/255/128</tt>
+</ul>
+
+<p>If you don't specify <b>-background</b>, the background color is what
+is specified in the PNG image, and if the PNG doesn't specify anything,
+white.
+
+<p>You cannot specify <b>-background</b> unless you also specify
+<b>-mix</b>.  Before Netpbm 10.27 (March 2005), you could specify
+<b>-background</b> with <b>-mix</b> and it was just ignored.  (This caused
+a usability problem).
+
+
+<DT><B>-gamma=</b> <i>value</i>
+
+<DD>Converts the image to a new display-gamma value.  If a gAMA chunk
+is present in the <I>png-file</I>, <b>pngtopnm</b> uses the specified
+image-gamma value.  If not, <b>pngtopnm</b> considers the image-gamma
+to be 1.0.  Based on the image-gamma and the display-gamma given with
+this option, <b>pngtopnm</b> adjusts the colors written to the
+<I>pnm-file</I>.
+
+<p>Because the gammas of uncompensated monitors are around 2.6, which results 
+in an image-gamma of 0.45, some typical situations are: 
+when the image-gamma is 0.45 (use -verbose to check) and the picture is too 
+light, your system is gamma-corrected, so convert with &quot;-gamma 1.0&quot;. 
+When no gAMA chunk is present or the image-gamma is 1.0, use 2.2 to make the 
+picture lighter and 0.45 to make the picture darker.
+
+<DT><B>-text=</b><i>file</i>
+
+<DD>Writes the tEXt and zTXt chunks to a file, in a format as
+described in the <b>pnmtopng</b> user manual.  These chunks contain
+text comments or annotations.
+
+<DT><B>-time</B>
+
+<DD>Prints the tIME chunk to stderr.
+
+</DL>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<A HREF="pnmtopng.html">pnmtopng</A>,
+<b>ptot</b>,
+<A HREF="pnmgamma.html">pnmgamma</A>, 
+<A HREF="pnm.html">pnm</A>
+
+<p>For information on the PNG format, see <a
+href="http://schaik.com/png">http://schaik.com/png</a>.
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>NOTE</H2>
+
+<p>A PNG image contains a lot of information that can't be represented in 
+Netpbm formats.  Therefore, you lose information when you convert to 
+another format with "pngtopnm | pnmtoxxx".  If there is a specialized 
+converter that converts directly to the other format, e.g. <b>ptot</b>
+to convert from PNG to TIFF, you'll get better results using that.
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>LIMITATIONS</H2>
+
+There could be an option to read the comment text from pnm comments instead
+of a separate file.
+
+<P>The program could be much faster, with a bit of code optimizing.
+As with any Netpbm program, speed always takes a back seat to quick
+present and future development.
+
+<A NAME="lbAI">&nbsp;</A>
+<H2>AUTHORS</H2>
+
+Copyright (C) 1995-1997 by Alexander Lehmann and Willem van Schaik.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pngtopnm.html#lbAB">NAME</A>
+<LI><A HREF="pngtopnm.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pngtopnm.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pngtopnm.html#lbAE">OPTIONS</A>
+<LI><A HREF="pngtopnm.html#lbAF">SEE ALSO</A>
+<LI><A HREF="pngtopnm.html#lbAG">NOTE</A>
+<LI><A HREF="pngtopnm.html#lbAH">LIMITATIONS</A>
+<LI><A HREF="pngtopnm.html#lbAI">AUTHORS</A>
+</UL>
+</BODY>
+</HTML>

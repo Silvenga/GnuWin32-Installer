@@ -1,0 +1,58 @@
+COMPFACE(3)                                         COMPFACE(3)
+
+
+
+
+
+NAME
+       compface,  uncompface - compress and expand 48x48x1 face
+       image files
+
+SYNOPSIS
+       compface (buf)
+
+       uncompface (buf)
+
+       char *buf
+
+DESCRIPTION
+       compface is a function for generating highly  compressed
+       representations of 48x48x1 face image files.  uncompface
+       is an inverse function which performs an inverse  trans-
+       formation  with  no loss of data.  The algorithm used is
+       highly tuned for its purpose and achieves better than  a
+       five to one compression ratio on average.  In both func-
+       tions, input is via a NULL terminated string and a  NULL
+       terminated  output  string  is  written  over  the input
+       string.  Buf should therefore point to  a  block  of  2K
+       size or more to avoid buffer overruns during output gen-
+       eration.
+
+       The input format for compface (and the output format for
+       uncompface)  is 48 lines each of 3 sixteen bit hexadeci-
+       mal integers, comma terminated in C  initialiser  style.
+       The  output format of compface (and the input format for
+       uncompface) is some number of lines made up of  a  space
+       followed  by printable characters (in the range ``!'' to
+       ``~'' inclusive).  The first line contains 72 characters
+       and  following  lines  contain 79 characters except that
+       the last line may be short.
+
+       The amount of compression obtained varies  between  face
+       image  files  but  the  output of compface averages less
+       than 200 characters.  The average number of output lines
+       is three.
+
+DIAGNOSTICS
+       The  return  value is normally 0.  1 will be returned if
+       extra input has been ignored during  a  compress  opera-
+       tion.   -1  is  returned in the case of an invalid input
+       format.  -2 is returned if an  internal  buffer  overrun
+       occurs.
+
+SEE ALSO
+       Compface(1)
+
+
+
+                        25 January 1990             COMPFACE(3)

@@ -1,0 +1,840 @@
+<html>
+
+<head>
+<title>GCC Frequently Asked Questions</title>
+</head>
+
+<body>
+
+<h1 align="center">GCC Frequently Asked Questions</h1>
+
+<p>The latest version of this document is always available at 
+<a href="http://gcc.gnu.org/faq.html">http://gcc.gnu.org/faq.html</a>.</p>
+
+<p>This FAQ tries to answer specific questions concerning GCC. For
+general information regarding C, C++, resp. Fortran please check the 
+<a href="http://www.eskimo.com/~scs/C-faq/top.html">comp.lang.c FAQ</a>,
+<a href="http://www.cerfnet.com/~mpcline/On-Line-C++-FAQs/">
+comp.lang.c++ FAQ</a>,
+<a href="http://reality.sgi.com/austern_mti/std-c++/faq.html">
+comp.std.c++ FAQ</a>, and the <a
+href="http://www.fortran.com/fortran/info.html">Fortran Information
+page</a>.</p>
+
+<p>Other GCC-related FAQs: 
+   <a href="http://gcc.gnu.org/onlinedocs/libstdc++/faq/index.html">
+     libstdc++-v3</a>, and 
+   <a href="http://gcc.gnu.org/java/faq.html">GCJ</a>.</p>
+
+<hr>
+<h1>Questions</h1>
+<ol>
+  <li><a href="#general">General information</a>
+  <ol>
+     <li><a href="#gcc">What is the relationship between GCC and EGCS?</a></li>
+     <li><a href="#cygnus">What is the relationship between GCC and Cygnus / Red Hat?</a></li>
+     <li><a href="#open-development">What is an open development model?</a></li>
+     <li><a href="#bugreport">How do I report a bug?</a></li>
+     <li><a href="#support">How do I get a bug fixed or a feature added?</a></li>
+     <li><a href="#noncvs">How can I get a development environment for GCC without using CVS?<a/></li>
+  </ol></li> 
+
+  <li><a href="#installation">Installation</a>
+  <ol>
+    <li><a href="#fortran">Problems building the Fortran compiler</a></li>
+    <li><a href="#multiple">How to install multiple versions of GCC</a></li>
+    <li><a href="#rpath">Dynamic linker is unable to find GCC libraries</a></li>
+    <li><a href="#rpath">libstdc++/libio tests fail badly with --enable-shared</a></li>
+    <li><a href="#gas">GCC can not find GNU as/GNU ld</a></li>
+    <li><a href="#environ">cpp: Usage:... Error</a></li>
+    <li><a href="#optimizing">Optimizing the compiler itself</a></li>
+  </ol></li>
+
+  <li><a href="#testsuite">Testsuite problems</a>
+  <ol>
+    <li><a href="#dejagnu">Unable to run the testsuite</a></li>
+    <li><a href="#testoptions">How do I pass flags like
+        <code>-fnew-abi</code> to the testsuite?</a></li>
+    <li><a href="#multipletests">How can I run the test suite with multiple options?</a></li>
+  </ol></li>
+
+  <li><a href="#bugs">Bugs and Non-Bugs</a>
+  <ol>
+    <li><a href="#stdin">Why can't I initialize a static variable with <tt>stdin</tt>?</a></li>
+    <li><a href="#macarg">Why can't I use #if here?</a></li>
+    <li><a href="#rounding">Problems with floating point computations</a></li>
+  </ol></li>
+
+  <li><a href="#old">Older versions of GCC or EGCS</a></li>
+  <ol>
+    <li><a href="#2.95suite">Why is there no testsuite in GCC 2.95?</a></li>
+    <li><a href="#2.95sstream">Is there a stringstream / sstream for gcc 2.95.2?</a></li> 
+  </ol></li>
+
+  <li><a href="#misc">Miscellaneous</a>
+  <ol>
+    <li><a href="#memexhausted">Virtual memory exhausted</a></li>
+    <li><a href="#friend">Friend Templates</a></li>
+    <li><a href="#generated_files">Why do I need autoconf, bison, xgettext, automake, etc?</a></li>
+    <li><a href="#gdb">Problems debugging GCC code</a></li>
+    <li><a href="#gnat">Using GCC with GNAT/Ada</a></li>
+    <li><a href="#picflag-needed">Why can't I build a shared library?</a></li>
+    <li><a href="#squangle">How to work around too long C++ symbol names? 
+	 (<tt>-fsquangle</tt>)</a></li>
+    <li><a href="#vtables">When building C++, the linker says my constructors, destructors or virtual tables are undefined, but I defined them</a></li>
+    <li><a href="#libstdc++">What is libstdc++-v3 and how can I use it with g++?</a></li>
+    <li><a href="#incremental">Will GCC someday include an incremental linker?</a></li>
+  </ol></li>
+</ol>
+
+
+<hr>
+<a name="general"></a>
+<h1>General information</h1>
+
+<h2><a name="gcc">What is the relationship between GCC and EGCS?</a></h2>
+
+<p>In 1990/1991 gcc version 1 had reached a point of stability.  For the
+targets it could support, it worked well.  It had limitations inherent in
+its design that would be difficult to resolve, so a major effort was made
+to resolve those limitiations and gcc version 2 was the result.</p>
+
+<p>When we had gcc2 in a useful state, development efforts on gcc1 stopped
+and we all concentrated on making gcc2 better than gcc1 could ever be.  This
+is the kind of step forward we wanted to make with the EGCS project when it
+was formed in 1997.</p>
+
+<p>In April 1999 the Free Software Foundation officially halted
+development on the gcc2 compiler and appointed the EGCS project as the
+official GCC maintainers. The net result was a single project which
+carries forward GCC development under the ultimate control of the
+<a href="steering.html">GCC Steering Committee</a>.</p>
+
+
+<hr>
+<h2><a name="cygnus">What is the relationship between GCC and Cygnus / Red Hat?</a></h2>
+
+<p>It is a common mis-conception that Red Hat controls GCC either
+directly or indirectly.</p>
+
+<p>While Red Hat does donate hardware, network connections, code and
+developer time to GCC development, Red Hat does not control GCC.
+
+<p>Overall control of GCC is in the hands of the
+<a href="steering.html">GCC Steering Committee</a>
+which includes people from a variety of different organizations and
+backgrounds.  The purpose of the steering committee is to make
+decisions in the best interest of GCC and to help ensure that no
+individual or company has control over the project.</p>
+
+<p>To summarize, Red Hat contributes to the GCC project, but does not exert
+a controlling influence over GCC.</p>
+
+<hr>
+<h2><a name="open-development">What is an open development model?</a></h2>
+
+<p>We are using a bazaar style
+<a href="#cathedral-vs-bazaar"><b>[1]</b></a> 
+approach to GCC development: we make snapshots publicly available to
+anyone who wants to try them; we welcome anyone to join
+the development mailing list.  All of the discussions on the
+development mailing list are available via the web.  We're going to be
+making releases with a much higher frequency than they have been made
+in the past.</p>
+
+<p>In addition to weekly snapshots of the GCC development sources, we
+have the sources readable from a CVS server by anyone.  Furthermore we
+are using remote CVS to allow remote maintainers write access to the
+sources.</p>
+
+<p>There have been many potential GCC developers who were not able to
+participate in GCC development in the past.  We want these people to
+help in any way they can; we ultimately want GCC to be the best compiler
+in the world.</p>
+
+<p>A compiler is a complicated piece of software, there will still be
+strong central maintainers who will reject patches, who will demand
+documentation of implementations, and who will keep the level of
+quality as high as it is today.  Code that could use wider testing may
+be integrated--code that is simply ill-conceived won't be.</p>
+
+<p>GCC is not the first piece of software to use this open development
+process; FreeBSD, the Emacs lisp repository, and the Linux kernel are
+a few examples of the bazaar style of development.</p>
+
+<p>With GCC, we are adding new features and optimizations at a
+rate that has not been done since the creation of gcc2; these
+additions inevitably have a temporarily destabilizing effect.
+With the help of developers working together with this bazaar style
+development, the resulting stability and quality levels will be better
+than we've had before.</p>
+
+<blockquote>
+<a name="cathedral-vs-bazaar"><b>[1]</b></a> 
+  We've been discussing different development models a lot over the
+  past few months.  The paper which started all of this introduced two
+  terms:  A <b>cathedral</b> development model versus a <b>bazaar</b>
+  development model.  The paper is written by Eric S. Raymond, it is
+  called ``<a
+  href="http://www.tuxedo.org/~esr/writings/cathedral-bazaar/">The
+  Cathedral and the Bazaar</a>''.  The paper is a useful starting point
+  for discussions.
+</blockquote>
+
+
+<hr>
+<h2><a name="bugreport">How do I report a bug?</a></h2>
+
+<p>There are complete instructions <a href="bugs.html">here</a>.</p>
+
+
+<hr>
+<h2><a name="support">How do I get a bug fixed or a feature added?</a></h2>
+
+<p>There are lots of ways to get something fixed.  The list below may be
+incomplete, but it covers many of the common cases.  These are listed
+roughly in order of increasing difficulty for the average GCC user,
+meaning someone who is not skilled in the internals of GCC, and where
+difficulty is measured in terms of the time required to fix the bug.
+No alternative is better than any other; each has its benefits and
+disadvantages.</p>
+
+<ul>
+<li>Hire someone to fix it for you.  There are various companies and
+    individuals providing support for GCC.  This alternative costs
+    money, but is relatively likely to get results.</li>
+
+<li>Report the problem to gcc-bugs and hope that someone will be kind
+    enough to fix it for you.  While this is certainly possible, and
+    often happens, there is no guarantee that it will.  You should
+    not expect the same response from gcc-bugs that you would see
+    from a commercial support organization since the people who read
+    gcc-bugs, if they choose to help you, will be volunteering their
+    time.  This alternative will work best if you follow the directions
+    on <a href="bugs.html">submitting bugreports</a>.</li>
+
+<li>Fix it yourself.  This alternative will probably bring results,
+    if you work hard enough, but will probably take a lot of time,
+    and, depending on the quality of your work and the perceived
+    benefits of your changes, your code may or may not ever make it
+    into an official release of GCC.</li>
+</ul>
+
+<hr>
+
+<h2><a name="noncvs">How can I get a development environment for GCC
+without using CVS?</a></h2>
+
+<p>GCC snapshots are available from the FTP server and its mirrors;
+see the <a href="mirrors.html">GCC mirror list</a>.
+
+
+<hr>
+<a name="installation"></a>
+<h1>Installation</h1>
+
+<h2><a name="fortran">Problems building the Fortran compiler</a></h2>
+
+<p>The Fortran front end can not be built with most vendor compilers;
+it must be built with GCC.  As a result, you may get an error if you
+do not follow the install instructions carefully.</p>
+
+<p>In particular, instead of using "make" to build GCC, you should use
+"make bootstrap" if you are building a native compiler or "make cross"
+if you are building a cross compiler.</p>
+
+<p>It has also been reported that the Fortran compiler can not be built     
+on Red Hat 4.X GNU/Linux for the Alpha.  Fixing this may require upgrading
+binutils or to Red Hat 5.0; we'll provide more information as it becomes  
+available.</p>
+
+<hr>
+<h2><a name="multiple">How to install multiple versions of GCC</a></h2>
+
+<p>It may be desirable to install multiple versions of the compiler on
+the same system.  This can be done by using different prefix paths at
+configure time and a few symlinks.</p>
+
+<p>Basically, configure the two compilers with different --prefix options,
+then build and install each compiler.  Assume you want "gcc" to be the latest
+compiler and available in /usr/local/bin; also assume that you want "gcc2"
+to be the older gcc2 compiler and also available in /usr/local/bin.</p>
+
+<p>The easiest way to do this is to configure the new GCC with
+--prefix=/usr/local/gcc
+and the older gcc2 with --prefix=/usr/local/gcc2.  Build and install both
+compilers.  Then make a symlink from /usr/local/bin/gcc to
+/usr/local/gcc/bin/gcc and from /usr/local/bin/gcc2 to /usr/local/gcc2/bin/gcc.
+Create similar links for the "g++", "c++" and "g77" compiler drivers.</p>
+
+<p>An alternative to using symlinks is to configure with a
+--program-transform-name option. This option specifies a sed command to
+process installed program names with. Using it you can, for instance,
+have all the new GCC programs installed as "new-gcc" and the like. You
+will still have to specify different --prefix options for new GCC and
+old GCC, because it is only the executable program names that are
+transformed. The difference is that you (as administrator) do not have
+to set up symlinks, but must specify additional directories in your (as
+a user) PATH. A complication with --program-transform-name is that the
+sed command invariably contains characters significant to the shell,
+and these have to be escaped correctly, also it is not possible to use
+"^" or "$" in the command. Here is the option to prefix "new-" to the
+new GCC installed programs
+"--program-transform-name='s,\\\\(.*\\\\),new-\\\\1,'". With the above
+--prefix option, that will install the new GCC programs into
+/usr/local/gcc/bin with names prefixed by "new-". You can use
+--program-transform-name if you have multiple versions of GCC, and
+wish to be sure about which version you are invoking.</p>
+
+<p>If you use --prefix, GCC may have difficulty locating a GNU
+assembler or linker on your system, <a href="#gas">GCC can not find GNU
+as/GNU ld</a> explains how to deal with this.</p>
+
+<p>Another option that may be easier is to use the --program-prefix= or
+--program-suffix= options to configure. So if you're installing GCC
+2.95.2 and don't want to disturb the current version of GCC in
+/usr/local/bin/, you could do 'configure --program-suffix=-2.95.2
+<other cofigure options>'. This should result in GCC being installed
+as /usr/local/bin/gcc-2.95.2 instead of /usr/local/bin/gcc.</p>
+
+<hr>
+<h2><a name="rpath">Dynamic linker is unable to find GCC libraries</a></h2>
+
+<p>This problem manifests itself by programs not finding shared
+libraries they depend on when the programs are started.  Note this
+problem often manifests itself with failures in the libio/libstdc++
+tests after configuring with --enable-shared and building GCC.</p>
+
+<p>GCC does not specify a runpath so that the dynamic linker can find
+dynamic libraries at runtime.</p>
+
+<p>The short explanation is that if you always pass a -R option to the
+linker, then your programs become dependent on directories which
+may be NFS mounted, and programs may hang unnecessarily when an
+NFS server goes down.</p>
+
+<p>The problem is not programs that do require the directories; those
+programs are going to hang no matter what you do.  The problem is
+programs that do not require the directories.</p>
+
+<p>SunOS effectively always passed a -R option for every -L option;
+this was a bad idea, and so it was removed for Solaris.  We should
+not recreate it.</p>
+
+<p>However, if you feel you really need such an option to be passed
+automatically to the linker, you may add it to the GCC specs file.
+This file can be found in the same directory that contains cc1 (run
+<code>gcc -print-prog-name=cc1</code> to find it).  You may add linker
+flags such as <code>-R</code> or <code>-rpath</code>, depending on
+platform and linker, to the <code>*link</code> or <code>*lib</code>
+specs.</p>
+
+<p>Another alternative is to install a wrapper script around gcc, g++
+or ld that adds the appropriate directory to the environment variable
+<code>LD_RUN_PATH</code> or equivalent (again, it's
+platform-dependent).</p>
+
+<p>Yet another option, that works on a few platforms, is to hard-code
+the full pathname of the library into its soname.  This can only be
+accomplished by modifying the appropriate <tt>.ml</tt> file within
+<tt>libstdc++/config</tt> (and also <tt>libg++/config</tt>, if you are
+building libg++), so that <code>$(libdir)/</code> appears just before
+the library name in <code>-soname</code> or <code>-h</code> options.</p>
+
+<hr>
+<h2><a name="gas">GCC can not find GNU as/GNU ld</a></h2>
+<p>GCC searches the PATH for an assembler and a loader, but it only
+does so after searching a directory list hard-coded in the GCC
+executables.  Since, on most platforms, the hard-coded list includes
+directories in which the system asembler and loader can be found, you
+may have to take one of the following actions to arrange that GCC uses
+the GNU versions of those programs.</p>
+
+<p>To ensure that GCC finds the GNU assembler (the GNU loader), which
+are required by <a href="install/specific.html">some configurations</A>,
+you should configure these with the same --prefix option as you used
+for GCC.  Then build &amp; install GNU as (GNU ld) and proceed with
+building GCC.</p>
+
+<p>Another alternative is to create links to GNU as and ld in any of
+the directories printed by the command `<tt>gcc -print-search-dirs |
+grep '^programs:'</tt>'.  The link to `<tt>ld</tt>' should be named
+`<tt>real-ld</tt>' if `<tt>ld</tt>' already exists.  If such links do
+not exist while you're compiling GCC, you may have to create them in
+the build directories too, within the <tt>gcc</tt> directory
+<em>and</em> in all the <tt>gcc/stage*</tt> subdirectories.</p>
+
+<p>GCC 2.95 allows you to specify the full pathname of the assembler
+and the linker to use.  The configure flags are
+`<tt>--with-as=/path/to/as</tt>' and `<tt>--with-ld=/path/to/ld</tt>'.
+GCC will try to use these pathnames before looking for `<tt>as</tt>'
+or `<tt>(real-)ld</tt>' in the standard search dirs.  If, at
+configure-time, the specified programs are found to be GNU utilities,
+`<tt>--with-gnu-as</tt>' and `<tt>--with-gnu-ld</tt>' need not be
+used; these flags will be auto-detected.  One drawback of this option
+is that it won't allow you to override the search path for assembler
+and linker with command-line options <tt>-B/path/</tt> if the
+specified filenames exist.</p>
+
+<hr>
+<h2><a name="environ">cpp: Usage:... Error</a></h2>
+
+<p>If you get an error like this when building GCC (particularly when building
+__mulsi3), then you likely have a problem with your environment variables.</p>
+<pre>
+  cpp: Usage: /usr/lib/gcc-lib/i586-unknown-linux-gnulibc1/2.7.2.3/cpp
+  [switches] input output
+</pre>
+<p>First look for an explicit '.' in either LIBRARY_PATH or GCC_EXEC_PREFIX
+from your environment.  If you do not find an explicit '.', look for 
+an empty pathname in those variables.  Note that ':' at either the start
+or end of these variables is an implicit '.' and will cause problems.</p>
+
+<p>Also note '::' in these paths will also cause similar problems.</p>
+
+
+<hr>
+<h2><a name="optimizing">Optimizing the compiler itself</a></h2>
+
+<p>If you want to test a particular optimization option, it's useful to try
+bootstrapping the compiler with that option turned on.  For example, to 
+test the <code>-fssa</code> option, you could bootstrap like this:
+
+<pre>make BOOT_CFLAGS="-O2 -fssa" bootstrap</pre>
+</p>
+
+
+<hr>
+<a name="testsuite"></a>
+<h1>Testsuite problems</h1>
+
+<h2><a name="dejagnu">Unable to run the testsuite</a></h2>
+
+<p>If you get a message about unable to find "standard.exp" when trying to
+run the GCC testsuites, then your dejagnu is too old to run the GCC tests.
+You will need to get a newer version of dejagnu from
+<a href="http://www.gnu.org/software/dejagnu/dejagnu.html">
+  http://www.gnu.org/software/dejagnu/dejagnu.html</a>.</p>
+
+<hr>
+<h2><a name="testoptions">How do I pass flags like
+  <code>-fnew-abi</code> to the testsuite?</a></h2>
+
+<p>If you invoke <code>runtest</code> directly, you can use the
+<code>--tool_opts</code> option, e.g:</p>
+<pre>
+  runtest --tool_opts "-fnew-abi -fno-honor-std" &lt;other options&gt;
+</pre>
+<p>Or, if you use <code>make check</code> you can use the
+<code>make</code> variable <code>RUNTESTFLAGS</code>, e.g:</p>
+<pre>
+  make RUNTESTFLAGS="--tool_opts '-fnew-abi -fno-honor-std'" check-g++
+</pre>
+
+<hr>
+<h2><a name="multipletests"> How can I run the test suite with multiple options? </a></h2>
+
+<p>If you invoke <code>runtest</code> directly, you can use the
+<code>--target_board</code> option, e.g:</p>
+<pre>
+  runtest --target_board "unix{-fPIC,-fpic,}" &lt;other options&gt;
+</pre>
+<p>Or, if you use <code>make check</code> you can use the
+<code>make</code> variable <code>RUNTESTFLAGS</code>, e.g:</p>
+<pre>
+  make RUNTESTFLAGS="--target_board 'unix{-fPIC,-fpic,}'" check-gcc
+</pre>
+<p>Either of these examples will run the tests three times.   Once 
+with <code>-fPIC</code>, once with <code>-fpic</code>, and once with 
+no additional flags.</p>
+
+<p>This technique is particularly useful on multilibbed targets.</p>
+
+<hr>
+<a name="bugs"></a>
+<h1>Bugs and Non-Bugs</h1>
+
+<p>Unfortunately, improvements in tools that are widely used are
+sooner or later bound to break <em>something</em>.  Sometimes, the
+code that breaks was wrong, and then that code should be fixed, even
+if it works for earlier versions of GCC or other compilers.  The
+following problems with some releases of widely used packages have
+been identified:</p>
+
+<p>There is a separate <a href="bugs.html#known">list of well-known bugs</a>
+describing known deficiencies. Naturally we'd like that list to be of
+zero length.</p>
+
+<p>To report a bug, see <a href="bugs.html">How to report bugs</a>.</p>
+
+<hr>
+<h2><a name="stdin">Why can't I initialize a static variable with <tt>stdin</tt>?</a></h2>
+
+<p>This has nothing to do with GCC, but people ask us about it a
+lot.  Code like this:</p>
+
+<pre>
+  #include &lt;stdio.h&gt;
+
+  FILE *yyin = stdin;
+</pre>
+
+<p>will not compile with GNU libc (Linux libc6), because
+<tt>stdin</tt> is not a constant.  This was done deliberately, in
+order for there to be no limit on the number of open FILE objects.  It
+is surprising for people used to traditional Unix C libraries, but it
+is permitted by the C standard.</p>
+
+<p>This construct commonly occurs in code generated by old versions of
+lex or yacc.  We suggest you try regenerating the parser with a
+current version of flex or bison, respectively.  In your own code, the
+appropriate fix is to move the initialization to the beginning of
+main.</p>
+
+<p>There is a common misconception that the GCC developers are
+responsible for GNU libc.  These are in fact two entirely separate
+projects.  The appropriate place to ask questions relating to GNU libc
+is <a href="mailto:libc-alpha@sources.redhat.com">libc-alpha@sources.redhat.com</a>.
+</p>
+
+<hr>
+<h2><a name="macarg">Why can't I use #if here?</a></h2>
+
+<p>Let me guess... you wrote code that looks something like this:</p>
+<pre>
+  memcpy(dest, src,
+#ifdef PLATFORM1
+	 12
+#else
+	 24
+#endif
+	);
+</pre>
+<p>and you got a whole pile of error messages:</p>
+<pre>
+test.c:11: warning: preprocessing directive not recognized within macro arg
+test.c:11: warning: preprocessing directive not recognized within macro arg
+test.c:11: warning: preprocessing directive not recognized within macro arg
+test.c: In function `foo':
+test.c:6: undefined or invalid # directive
+test.c:8: undefined or invalid # directive
+test.c:9: parse error before `24'
+test.c:10: undefined or invalid # directive
+test.c:11: parse error before `#'
+</pre>
+
+<p>The problem, simply put, is that GCC's preprocessor does not allow
+you to put #ifdef (or any other directive) inside the arguments of a
+macro.  Your C library's <tt>string.h</tt> happens to define
+<tt>memcpy</tt> as a macro - this is perfectly legitimate.  The code
+therefore will not compile.</p>
+
+<p>We have two good reasons for not allowing directives inside
+macro arguments.  First, it is not portable.  It is "undefined
+behavior" according to the C standard; that means different
+compilers will do different things with it.  Some will give you
+errors.  Some will dump core. Some will silently mangle your code -
+you could get the equivalent of</p>
+<pre>
+	memcpy(dest, src, 1224);
+</pre>
+<p>from the above example.  A very few might do what you expected it
+to.  We therefore feel it is most useful for GCC to reject this
+construct immediately so that it is found and fixed.</p>
+
+<p>Second, it is extraordinarily difficult to implement the
+preprocessor such that it does what you would expect for every
+possible directive found inside a macro argument.  The best example is
+perhaps</p>
+<pre>
+#define foo(arg) ... arg ...
+foo(blah
+#undef foo
+blah)
+</pre>
+<p>which is <emph>impossible</emph> to implement in portable C without
+leaking memory.  Allowing only a subset of directives would be
+confusing.</p>
+
+<p>It is always possible to rewrite code which uses conditionals
+inside macros so that it doesn't.  You could write the above
+example</p>
+<pre>
+#ifdef PLATFORM1
+   memcpy(dest, src, 12);
+#else
+   memcpy(dest, src, 24);
+#endif
+</pre>
+<p>This is a bit more typing, but I personally think it's better style
+in addition to being more portable.
+
+<p>In recent versions of glibc, <code>printf</code> is among the
+functions which are implemented as macros.
+
+<h2><a name="rounding">Problems with floating point computations</a></h2>
+
+<p>In a number of cases, GCC appears to perform floating point
+computations incorrectly. For example, the program</p>
+<pre>
+#include &lt;iostream&gt;
+
+int main() {
+
+ double min = 0.0;
+ double max = 0.5;
+ double width = 0.01;
+ std::cout &lt;&lt;  (int)(((max - min) / width) - 1) &lt;&lt; std::endl;
+
+}
+</pre>
+<p>might print 50 on some systems and optimization levels, and 51 on
+others.</p>
+
+<p>The is the result of <em>rounding</em>: The computer cannot
+represent all real numbers exactly, so it has to use
+approximations. When computing with approximation, the computer needs
+to round to the nearest representable number.</p>
+
+<p>This is not a bug in the compiler, but an inherent limitation of
+the float and double types. Please study 
+<a href="http://www.validgh.com/goldberg/paper.ps">this paper</a>
+for more information.</p>
+
+<hr>
+<a name="old"></a>
+<h1>Older versions of GCC and EGCS</h1>
+
+<h2><a name="2.95suite">Why is there no testsuite in GCC 2.95?</a></h2>
+
+<p>The GCC testsuite is not included in the GCC 2.95 release due to the
+uncertain copyright status of some tests.</p>
+
+<p>The GCC team has reviewed the entire testsuite to find and remove
+any tests with uncertain copyright status, following guidelines from
+Prof. Eben Moglen.  The testsuite is included in GCC 3.0 and
+subsequent releases.  Only a few tests needed to be removed from the
+testsuite.</p>
+
+<hr>
+<h2><a name="2.95sstream">Is there a stringstream / sstream for gcc 2.95.2?</a></h2>
+
+<p>Yes, it's at: 
+<a href="http://gcc.gnu.org/ml/libstdc++/2000-q2/msg00700/sstream">
+  http://gcc.gnu.org/ml/libstdc++/2000-q2/msg00700/sstream</a>.<p>
+
+<hr>
+<a name="misc"></a>  
+<h1>Miscellaneous</h1>
+
+<h2><a name="memexhausted">Virtual memory exhausted error</a></h2>
+
+<p> This error means your system ran out of memory; this can happen for large
+files, particularly when optimizing.  If you're getting this error you should
+consider trying to simplify your files or reducing the optimization level.</p>
+
+<p>Note that using -pedantic or -Wreturn-type can cause an explosion in the
+amount of memory needed for template-heavy C++ code, such as code that uses
+STL.  Also note that -Wall includes -Wreturn-type, so if you use -Wall you
+will need to specify -Wno-return-type to turn it off.</p>
+
+
+<hr>
+<h2><a name="friend">Friend Templates</a></h2>
+
+<p>In order to make a specialization of a template function a friend
+of a (possibly template) class, you must explicitly state that the
+friend function is a template, by appending angle brackets to its
+name, and this template function must have been declared already.
+Here's an example:</p>
+<pre>
+template &lt;typename T&gt; class foo {
+  friend void bar(foo&lt;T&gt;);
+}
+</pre>
+<p>The above declaration declares a non-template function named
+<TT>bar</TT>, so it must be explicitly defined for <B>each</B>
+specialization of <TT>foo</TT>.  A template definition of <TT>bar</TT>
+won't do, because it is unrelated with the non-template declaration
+above.  So you'd have to end up writing:</p>
+<pre>
+void bar(foo&lt;int&gt;) { /* ... */ }
+void bar(foo&lt;void&gt;) { /* ... */ }
+</pre>
+<p>If you meant <TT>bar</TT> to be a template function, you should
+have forward-declared it as follows.  Note that, since the template
+function declaration refers to the template class, the template class
+must be forward-declared too:</p>
+<pre>
+template &lt;typename T&gt;
+class foo;
+
+template &lt;typename T&gt;
+void bar(foo&lt;T&gt;);
+
+template &lt;typename T&gt;
+class foo {
+  friend void bar&lt;&gt;(foo&lt;T&gt;);
+};
+
+template &lt;typename T&gt;
+void bar(foo&lt;T&gt;) { /* ... */ }
+</pre>
+<p>In this case, the template argument list could be left empty,
+because it can be implicitly deduced from the function arguments, but
+the angle brackets must be present, otherwise the declaration will be
+taken as a non-template function.  Furthermore, in some cases, you may
+have to explicitly specify the template arguments, to remove
+ambiguity.</p>
+
+<p>An error in the last public comment draft of the ANSI/ISO C++
+Standard and the fact that previous releases of GCC would accept such
+friend declarations as template declarations has led people to believe
+that the forward declaration was not necessary, but, according to the
+final version of the Standard, it is.</p>
+
+
+<hr>
+<h2><a name="generated_files">Why do I need autoconf, bison, xgettext, automake, etc?</a></h2>
+
+<p>If you're using diffs up dated from one snapshot to the next, or
+if you're using the CVS repository, you may need several additional programs
+to build GCC.</p>
+
+<p>These include, but are not necessarily limited to autoconf, automake,
+bison, and xgettext.</p>
+
+<p>This is necessary because neither diff nor cvs keep timestamps
+correct.  This causes problems for generated files as "make" may think
+those generated files are out of date and try to regenerate them.</p>
+
+<p>An easy way to work around this problem is to use the <CODE>gcc_update
+</CODE> script in the contrib subdirectory of GCC, which handles this
+transparently without requiring installation of any additional tools.
+(Note: Up to and including GCC 2.95 this script was called <CODE>egcs_update
+</CODE>.)</p>
+
+
+<p>When building from diffs or CVS or if you modified some sources,
+you may also need to obtain development versions of some GNU tools, as
+the production versions do not necessarily handle all features needed
+to rebuild GCC.</p>
+
+<p>In general, the current versions of these tools from <a
+href="ftp://ftp.gnu.org/gnu/">ftp://ftp.gnu.org/gnu/</a> will work.
+At present, Autoconf 2.50 is not supported, and you will need to use
+Autoconf 2.13; work is in progress to fix this problem.  Also look at
+<a href="ftp://gcc.gnu.org/pub/gcc/infrastructure/">
+ftp://gcc.gnu.org/pub/gcc/infrastructure/</a> for any special versions
+of packages.</p>
+
+
+<hr>
+<h2><a name="gdb">Problems debugging GCC code</a></h2>
+
+<p>On some systems GCC will produce dwarf debug records by default; however
+the gdb-4.16 release may not be able to read such debug records.</p>
+
+<p>You can either use the argument "-gstabs" instead of "-g" or pick up
+a copy of gdb-4.17 to work around the problem.
+
+<hr>
+<h2><a name="gnat">Using GCC with GNAT/Ada </a></h2>
+<p>The GNU Ada front-end is not currently supported by GCC, but work
+is in progress to integrate GNU Ada into the GCC CVS repository and
+produce new releases based on current versions of GCC.</p>
+
+
+<hr>
+<h2><a name="picflag-needed">Why can't I build a shared library?</a></h2>
+
+<p>When building a shared library you may get an error message from the
+linker like `assert pure-text failed:' or `DP relative code in file'.</p>
+
+<p>This kind of error occurs when you've failed to provide proper flags
+to gcc when linking the shared library. </p>
+
+<p>You can get this error even if all the .o files for the shared library were
+compiled with the proper PIC option.  When building a shared library, gcc will
+compile additional code to be included in the library.  That additional code
+must also be compiled with the proper PIC option.</p>
+
+<p>Adding the proper PIC option (<tt>-fpic</tt> or <tt>-fPIC</tt>) to the link
+line which creates the shared library will fix this problem on targets that
+support PIC in this manner.  For example:</p>
+<pre>
+	gcc -c -fPIC myfile.c
+	gcc -shared -o libmyfile.so -fPIC myfile.o
+</pre>
+
+
+<hr>
+<h2><a name="squangle">How to work around too long C++ symbol names
+(<tt>-fsquangle</tt>)</a></h2>
+
+<p>This question does not apply to GCC 3.0 or later versions, which
+have a new C++ ABI with much shorter mangled names.</p>
+
+<p>If the standard assembler of your platform can't cope with the
+large symbol names that the default g++ name mangling mechanism
+produces, your best bet is to use GNU as, from the GNU binutils
+package.</p>
+
+<p>Unfortunately, GNU as does not support all platforms supported by
+GCC, so you may have to use an experimental work-around: the
+<tt>-fsquangle</tt> option, that enables compression of symbol names.</p>
+
+<p>Note that this option is still under development, and subject to
+change.  Since it modifies the name mangling mechanism, you'll need to
+build libstdc++ and any other C++ libraries with this option enabled.
+Furthermore, if this option changes its behavior in the future, you'll
+have to rebuild them all again. :-(</p>
+
+<p>This option can be enabled by default by initializing
+`flag_do_squangling' with `1' in `gcc/cp/decl2.c' (it is not
+initialized by default), then rebuilding GCC and any C++ libraries.</p>
+
+
+<hr>
+<h2><a name="vtables">When building C++, the linker says my constructors, destructors or virtual tables are undefined, but I defined them</a></h2>
+
+<p>The ISO C++ Standard specifies that all virtual methods of a class
+that are not pure-virtual must be defined, but does not require any
+diagnostic for violations of this rule [class.virtual]/8.  Based on
+this assumption, GCC will only emit the implicitly defined
+constructors, the assignment operator, the destructor and the virtual
+table of a class in the translation unit that defines its first such
+non-inline method.</p>
+
+<p>Therefore, if you fail to define this particular method, the linker
+may complain about the lack of definitions for apparently unrelated
+symbols.  Unfortunately, in order to improve this error message, it
+might be necessary to change the linker, and this can't always be
+done.</p>
+
+<p>The solution is to ensure that all virtual methods that are not
+pure are defined.  Note that a destructor must be defined even if it
+is declared pure-virtual [class.dtor]/7.</p>
+
+<hr>
+<h2><a name="libstdc++">What is libstdc++-v3 and how can I use it with g++?</a></h2>
+
+<p>From the
+<a href="http://gcc.gnu.org/onlinedocs/libstdc++/faq/index.html">libstdc++-v3 FAQ</a>:
+"The GNU Standard C++ Library v3, or libstdc++-2.9x, is an ongoing
+project to implement the ISO 14882 Standard C++ library as described
+in chapters 17 through 27 and annex D."</p>
+
+<p>libstdc++-v3 is enabled by default in 3.x releases of GCC.</p>
+
+<hr>
+<h2><a name="incremental">Will GCC someday include an incremental linker?</a></h2>
+
+<p>Incremental linking is part of the linker, not the compiler. As
+such, GCC doesn't have anything to do with incremental linking.
+Depending on what platform you use, it may be possible to tell GCC to
+use the platform's native linker (e.g., Solaris' ild(1)).</p>
+
+
+</body>
+</html>

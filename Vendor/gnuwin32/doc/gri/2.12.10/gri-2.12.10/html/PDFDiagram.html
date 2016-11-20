@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: PDF Diagram</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile PDFDiagram.html "Gri: PDF Diagram" "Examples" --> 
+
+
+<!-- @node   PDF Diagram,  Running Means, TS Diagram, Examples -->
+<a name="PDFDiagram" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Examples.html#Examples" shape="rect" coords="516,2,532,24" href="Examples.html#Examples">
+<area alt="Gri: drawing TS diagrams" shape="rect" coords="557,2,573,24" href="TSDiagram.html">
+<area alt="Gri: running means" shape="rect" coords="581,2,599,24" href="RunningMeans.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: running means" shape="rect" coords="581,2,599,24" href="RunningMeans.html">
+</map>
+<h2>8.9: Probability Density Function Diagram</h2>
+
+A common application is to draw the probability density function for
+(x,y) data.  Gri has no builtin facility to do this, but the following
+example shows how to create the gridded PDF data using a call to the
+`<font color="#82140F"><code>perl</code></font>' system command.  The gridded data thus generated are
+contoured, creating a PDF diagram.  As the comments in the program
+state, the first call to Perl is specific to a particular dataset, and
+can be ignored on first reading; it just creates the file
+`<font color="#82140F"><samp>tmp-xy.\.pid.</samp></font>'.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+# Draw prob-density-function TS diagram for Bravo data
+<p>
+# This first call to perl is specific to the
+# particular (weird) dataset.  All that matters
+# is that a file of (x,y) data is created, and
+# stored in the file called `tmp-xy.\.pid.'
+system perl &lt;&lt;"EOF"
+#
+# Slurp in x[], y[] data
+$dir = "/users/dek/kelley/Labrador/bravo/data";
+$Sfile = "$dir/S_25db_1day";
+$Tfile = "$dir/T_25db_1day";
+open(S, "$Sfile") || die "Can't open input $Sfile";
+open(T, "$Tfile") || die "Can't open input $Tfile";
+open(ST, "&gt;tmp-xy.\.pid.") 
+    || die "Can't open tmp-xy.\.pid.";
+$day = 5;
+$year = 1964;
+while(&lt;S&gt;) {
+    @S = split;
+    $_ = &lt;T&gt;;
+    @T = split;
+    if (240 &lt; $day &amp;&amp; $day &lt; 360) {
+        for ($i = 0; $i &lt; $#S; $i++) { #all depths
+            print ST "$S[$i] $T[$i]\n";
+        }
+    }
+    $day += 1;
+    if ($day &gt; 365) {
+        $year++;
+        $day = 0;
+    }
+    if ($year &gt; 1967) { last; }
+}
+EOF
+<p>
+#
+# Create 2D PDF for (x,y) data in file \infile
+# storing the results in \outfile.  X ranges
+# between the indicated limits, with the indicated
+# binsize, as does y.  The synonyms defined
+# on the next 4 lines are the only input this
+# perlscript needs; the perlscript itself is
+# quite general.  For details of what it does,
+# particularly the scaling of the PDF, see
+# the perl comments.
+\xmin = "33.5"; \xmax = "35.5"; \xinc = "0.05";
+\ymin = "-2.0"; \ymax = "11.0"; \yinc = "0.25";
+\infile = "tmp-xy.\.pid."
+\outfile = "tmp-grid.\.pid."
+system perl &lt;&lt;"EOF"
+#
+# Prepare 2 dimensional probability-density-function
+# dataset for contouring by Gri.  This reads (x,y)
+# data from a file called $infile (defined below)
+# and creates an output file called $outfile 
+# (also defined below) containing the
+# x-grid, the y-grid, and then the grid data, 
+# suitable for reading/contouring by the Gri
+# commands
+#       open tmp-grid.\.pid.
+#       read .number_of_data.
+#       read grid x
+#       read grid y
+#       read grid data
+#       draw contour
+# 
+# The values in the output grid are defined so
+# that they sum to the reciprocal of the 
+# product of the x binsize and y binsize (see
+# definition of $factor below).
+#
+$xmin = \xmin; $xmax = \xmax; $xinc = \xinc;
+$ymin = \ymin; $ymax = \ymax; $yinc = \yinc;
+$infile = "\infile";
+$outfile = "\outfile";
+#
+# Slurp in the x[], y[] data, storing 
+# the total number of data in $n.
+open(IN,  "$infile")   || die "Can't open infile";
+open(OUT, "&gt;$outfile") || die "Can't open outfile";
+$n = 0;
+while(&lt;IN&gt;) {
+    ($x[$n], $y[$n]) = split;
+    $n++;
+}
+#
+# Zero out matrix (stored in a linear array scanned 
+# as one reads a book).
+$cols = int(1 + ($xmax - $xmin) / $xinc);
+$rows = int(1 + ($ymax - $ymin) / $yinc);
+for ($y = $ymax; $y &gt; $ymin; $y -= $yinc) {
+    for ($x = $xmin; $x &lt; $xmax; $x += $xinc) {
+        $l = int(($x - $xmin) / $xinc 
+            + $cols * int(($y - $ymin) / $yinc));
+        $sum[$l] = 0;
+    }
+}
+#
+# Cumulate (x,y) data into the matrix
+$inside = 0;
+for ($i = 0; $i &lt; $n; $i++) {
+    if ($ymin &lt;= $y[$i] &amp;&amp; $y[$i] &lt;= $ymax 
+        &amp;&amp; $xmin &lt;= $x[$i] &amp;&amp; $x[$i] &lt;= $xmax) {
+        $l = int(($x[$i] - $xmin) / $xinc 
+            + $cols * int(($y[$i] - $ymin) / $yinc));
+        $sum[$l]++;
+        $inside++;
+    } else {
+        print STDERR "($y[$i], $x[$i]) clipped\n";
+    }
+}
+#
+# Print number of points (to allow renormalization
+# if the user wishes)
+print OUT "$inside\n";
+#
+# Print x grid, y grid, then grid itself
+for ($x = $xmin; $x &lt; $xmax; $x += $xinc) {
+    printf OUT "%lg\n", $x;
+}
+print OUT "\n";
+for ($y = $ymax; $y &gt; $ymin; $y -= $yinc) {
+    printf OUT "%lg\n", $y;
+}
+print OUT "\n";
+#
+# The $factor variable scales the PDF.
+$factor = 1 / $xinc / $yinc / $inside;
+for ($y = $ymax; $y &gt; $ymin; $y -= $yinc) {
+    for ($x = $xmin; $x &lt; $xmax; $x += $xinc) {
+        $l = int(($x - $xmin) / $xinc 
+            + $cols * int(($y - $ymin) / $yinc));
+        printf OUT "%lg ", $factor * $sum[$l];
+    }
+    print OUT "\n";
+}
+EOF
+<p>
+# Axes
+set x margin 3
+set x margin 6
+set x name "Salinity [PSU]"
+set y name "Potential Temperature [$\circ$C]"
+set x axis 34.5 34.8 0.1
+set y axis 5 9 1
+draw axes
+<p>
+# PDF
+open tmp-grid.\.pid.
+read .number_of_data.
+read grid x
+read grid y
+read grid data
+.smooth. = 0
+<p>
+# Contours.  Use clipping, since the axes are
+# zooming in on part of the PDF.
+set font size 8
+set contour label position centered
+set clip postscript on
+set line width rapidograph 4x0
+draw contour 0.2 2.2 0.4 unlabelled
+set line width rapidograph 0
+draw contour 0.4 2.4 0.4 
+set clip postscript off
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

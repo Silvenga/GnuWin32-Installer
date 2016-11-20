@@ -1,0 +1,110 @@
+Pamgauss User Manual(0)                 Pamgauss User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       pamgauss - create a two dimensional gaussian function as
+       a PAM image
+
+
+SYNOPSIS
+       pamgauss -width -height  -sigma=number  [-maxval=number]
+       [-tupletype=string]
+
+       Minimum  unique  abbreviation  of  option is acceptable.
+       You may use double hyphens instead of single  hyphen  to
+       denote options.  You may use white space in place of the
+       equals sign to separate an option name from its value.
+
+
+
+
+EXAMPLES
+            pamgauss 3 3 -sigma=.5 -tupletype=GRAYSCALE | pamtopnm >gauss.pgm
+            pnmconvol -nooffset gauss.pgm myimage.ppm >blurred.ppm
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       pamgauss generates a one-plane PAM image  whose  samples
+       are  a gaussian function of their distance from the cen-
+       ter of the image.  I.e.  the sample value is highest  in
+       the  center and goes down, in a bell curve shape, as you
+       move away from the center.
+
+       The values are scaled so that the area under the surface
+       of  the  two-dimensional Gaussian function is the maxval
+       of the image.
+
+       You can use this image, converted to PGM, as a  convolu-
+       tion  kernel  with  pnmconvol  to  blur an image.  (This
+       technique is known as Gaussian blurring).
+
+       width and height are the dimensions of  the  image  that
+       pamgauss  generates.   Mathematically speaking, they are
+       the domain of the two dimensional gaussian function.
+
+       The sum of all the samples is equal to the image's  max-
+       val  (within  rounding error).  This is true even if you
+       clip the Gaussian  function  by  making  the  image  too
+       small.   If you want to be sure you get a whole Gaussian
+       function, make sure that you choose a  sigma  and  image
+       dimensions so that if you made it any larger, the sample
+       values at the edges would be zero.
+
+       The output image is PAM.  To turn it into a PGM that you
+       can use with pnmconvol, specify -tupletype=GRAYSCALE and
+       pass the output through  pamtopnm.   You  must  use  the
+       -nooffset option on pnmconvol because zero means zero in
+       the PAM that pamgauss generates.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+
+
+       -sigma=number
+              This is the sigma parameter of the Gaussian func-
+              tion (if it were a Gaussian probability function,
+              this would be its the standard  deviation).   The
+              higher  the number, the more spread out the func-
+              tion is.  Normally, you want to make this  number
+              low  enough  that the function reaches zero value
+              before the edge of your image.
+
+              number is in units of pixels.
+
+              This option is required.  There is no default.
+
+
+       -maxval=number
+              This is the maxval  for  the  output  image.   It
+              defaults to 255.
+
+
+       -tupletype=string
+              This  is  the value of the "tuple_type" attribute
+              of the created PAM image.  It can be  any  string
+              up to 255 characters.  If you don't specify this,
+              pamgauss generates a PAM with  unspecified  tuple
+              type.
+
+
+
+
+SEE ALSO
+       pnmconvol(1),   pamtopnm(1),   pgmkernel(1),  pamseq(1),
+       pam(1)
+
+
+HISTORY
+       pamgauss was new in Netpbm 10.23 (July 2004).
+
+
+
+netpbm documentation       8 May 2004   Pamgauss User Manual(0)

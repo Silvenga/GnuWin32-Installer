@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: How synonyms are parsed</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile ParsingSynonyms.html "Gri: How synonyms are parsed" "Programming Gri" --> 
+<!-- @node   Parsing, Simple New Command, Purpose, Adding New Commands -->
+<a name="Parsing" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="NewCommands.html#AddingNewCommands" shape="rect" coords="516,2,532,24" href="NewCommands.html#AddingNewCommands">
+<area alt="Gri: Purpose of Synonyms" shape="rect" coords="557,2,573,24" href="PurposeOfSynonyms.html">
+<area alt="Gri: creating a simple new command" shape="rect" coords="581,2,599,24" href="SimpleNewCommand.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: creating a simple new command" shape="rect" coords="581,2,599,24" href="SimpleNewCommand.html">
+</map>
+<h3>10.11.2: How Gri parses commands</h3>
+
+Whenever Gri reads a command line, it compares it with its list of
+commands.  This list is searched in this order: (1) the universal
+`<font color="82140F"><samp>gri.cmd</samp></font>' file (see <a href="InvokingGri.html#InvokingGri">Invoking Gri</a>), (2) your resource
+file (see <a href="ResourceFile.html#ResourceFile">Resource File</a>), if it exists, and then (3) your command
+file itself.  Gri stops searching when it finds a Gri command that
+matches the command line.  "Matching" means that the command line is
+identical in all words in a Gri command, scanning from the left, until
+it encounters a word containing
+<ul>
+<li>
+A quote (e.g. `<font color="#82140F"><code>"string"</code></font>')
+<li>
+A synonym name (e.g. `<font color="#82140F"><code>\file</code></font>')
+<li>
+A variable name (e.g. `<font color="#82140F"><code>.number.</code></font>')
+<li>
+An opening square bracket (e.g. `<font color="#82140F"><code>[option]</code></font>')
+<li>
+An opening brace (e.g.  `<font color="#82140F"><code>{a|b}</code></font>')
+<li>
+A choice between two items (e.g.  `<font color="#82140F"><code>first|second</code></font>')
+<li>
+A variable-name with a `<font color="#82140F"><code>&amp;</code></font>' character immediately to the left 
+(e.g. `<font color="#82140F"><code>&amp;.var.</code></font>').  This is a signal that the variable may be 
+changed inside the newcommand (see <a href="ChangeableCommandArguments.html#TheAmpersandSyntax">The Ampersand Syntax</a>).
+<li>
+A synonym-name with a `<font color="#82140F"><code>&amp;</code></font>' character immediately to the left 
+(e.g. `<font color="#82140F"><code>&amp;\syn</code></font>').  This is a signal that the synonym may be 
+changed inside the newcommand (see <a href="ChangeableCommandArguments.html#TheAmpersandSyntax">The Ampersand Syntax</a>).
+</ul>
+<p>
+When Gri finds a command that matches your command line, it assumes that
+this is the intended command, and searches no further.  This means that
+you must be careful not to have your command hidden by other commands.
+For example, if your resource file contained these lines, Gri would
+<b>never</b> execute the second new command, because calls to it match
+the first command.  To avoid this, you may either reverse the order of
+the definitions, so that Gri will find the proper routine, or rename one
+of the routines.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`Draw foo'
+Draw a foo.
+{
+  show "drawing a foo"
+}
+`Draw foo bar'
+Draw a foo bar.
+{
+  show "drawing a foo bar"
+}
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Gri searches the `<font color="#82140F"><samp>gri.cmd</samp></font>' file first, so any new command that you
+create that clashes with built-in commands will be ignored by Gri
+(see <a href="InvokingGri.html#InvokingGri">Invoking Gri</a>).  Gri will warn you of this, and proceed,
+ignoring your newer definition.  To get around this, 
+you can use capital letters
+to begin the words of your new command.  By convention, Gri never uses
+capital letters in this way, so a clash is impossible (except with any
+similar command you might have defined previously, such as in your
+`<font color="#82140F"><samp>~/.grirc</samp></font>' file).
+<p>
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

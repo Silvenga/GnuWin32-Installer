@@ -1,0 +1,447 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: RPN unary operators</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile UnaryOperators.html "Gri: RPN unary operators" "Programming Gri" --> 
+
+<!-- @node   Unary Operators, Solitary Operators, Binary Operators, rpn Mathematics -->
+<a name="UnaryOperators" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="ReversePolishMath.html#rpnMathematics" shape="rect" coords="516,2,532,24" href="ReversePolishMath.html#rpnMathematics">
+<area alt="Gri: RPN binary operators" shape="rect" coords="557,2,573,24" href="BinaryOperators.html">
+<area alt="Gri: RPN solitary operators" shape="rect" coords="581,2,599,24" href="SolitaryOperators.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: RPN solitary operators" shape="rect" coords="581,2,599,24" href="SolitaryOperators.html">
+</map>
+<h3>10.9.5: Unary Operators</h3>
+
+
+Unary operators replace the last item on the stack with another item.
+For example, the `<font color="#82140F"><code>sin</code></font>' operator takes the sine of the number on the
+top of the stack; e.g., `<font color="#82140F"><code>{rpn 45 sin}</code></font>' yields the sine of 45 degrees.
+<p>
+The unary operators are illustrated below, in rough alphabetical order.
+<p>
+<dl>
+<p>
+<dt> <tt>{rpn 0 !}</tt>
+<dd>Replace 0 (false) with its logical negation 1 (true).
+<p>
+<dt> <tt>{rpn 0 not}</tt>
+<dd>Replace 0 (false) with its logical negation 1 (true).
+<p>
+<dt> <tt>{rpn -3 abs}</tt>
+<dd>Calculate the absolute value of `<font color="#82140F"><code>-3</code></font>'.
+<p>
+<p>
+<dt> <tt>{rpn 0.5 acos}</tt>
+<dd>Calculate the inverse cosine of 0.5, yielding 60 (degrees).
+<p>
+<dt> <tt>{rpn 2 acosh}</tt>
+<dd>Calculate the inverse hyperbolic cosine of 2, yielding 1.317.  (Note:
+argument must equal or exceed 1, or an error results.)
+<p>
+<a name="age-rpn-operator"></a> 
+<dt> <tt>{rpn "filename" age}</tt>
+<dd>Calculate the ``age'' of the indicated file, in seconds.  An age of
+zero indicates that the file was created, or last modified, within 1
+second of the execution of the `<font color="#82140F"><code>age</code></font>' operator.
+<p>
+<p>
+On unix (and similar) machines, the calculation is done on unix
+machines with the `<font color="#82140F"><code>stat()</code></font>' subroutine.  On other machines, the
+`<font color="#82140F"><code>age</code></font>' operator may cause an error.
+<p>
+The age of a non-existent file is reported as the number of seconds
+since the system clock's reference time, i.e. since 1970-jan-1 on unix
+machines.  This convention is so that scripts like that in the example
+below will work as intended.
+<p>
+A typical use of this command is the creation of data-files from shell
+scripts, as illustrated below.  The idea is to update (or create) the
+file `<font color="#82140F"><samp>file.dat</samp></font>' using the system-executable script
+`<font color="#82140F"><samp>creator.pl</samp></font>', but only to do so if `<font color="#82140F"><samp>creator.pl</samp></font>' is younger
+than `<font color="#82140F"><samp>file.dat</samp></font>'.
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+if {rpn "file.dat" age "creator.pl" age <}
+   system "./creator.pl > file.dat"
+end if
+open file.dat
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+For the convenience in such usage, a non-existent file is assigned the
+maximum possible file age on the given OS, e.g. on a unix machine, the
+age is reported as though the non-existent file had been created on
+January 1, 1970 on a unix machine.
+<p>
+<p>
+<dt> <tt>{rpn 0.5 asin}</tt>
+<dd>Calculate the inverse sine of 0.5, yielding 30 (degrees).
+<p>
+<p>
+<dt> <tt>{rpn 1 atan}</tt>
+<dd>Calculate the inverse tangent of 1, yielding 45 (degrees).
+<p>
+<p>
+<dt> <tt>{rpn 0.5 atanh}</tt>
+<dd>Calculate the inverse hyperbolic tangent of 0.5, yielding 0.549306
+(radians).
+<p>
+<p>
+<dt> <tt>{rpn 0 argv}</tt>
+<dd>Returns the name of the Gri command-file, which is considered as the first
+"optional" argument.  (It may seem odd that the name of the command-file
+is considered an option, but Gri does this for consistency with C and
+other languages.  It is useful.)  Other arguments provided when Gri
+was invoked are provided as `<font color="#82140F"><code>rpn 1 argv</code></font>', etc.
+<p>
+A string consisting of a single blank character results if one tries to
+access beyond the list of arguments that were actually supplied.  See
+also the `<font color="82140F"><code>argc</code></font>' solitary operator (see <a href="SolitaryOperators.html#SolitaryOperators">Solitary Operators</a>), which
+returns the number of optional arguments.
+<p>
+For example, if Gri is invoked as
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+gri myscript.gri file1.dat file2.dat
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<p>
+and if `<font color="#82140F"><samp>myscript.gri</samp></font>' contained
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.n. = {rpn argc}
+.i. = 0
+while {rpn .n. .i. <}
+    show "argument " .i. " is " {rpn .i. argv}
+    .i. += 1
+end while
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<p>
+then the output would be
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+argument 0 is myscript.gri
+argument 1 is file1.dat
+argument 2 is file2.dat
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+For usage within the Emacs gri-mode, see 
+see <a href="Emacs5.html#Filenameargumentswhenrunninggri">Filename arguments when running gri</a>.
+<p>
+<p>
+<dt> <tt>{rpn "hi" ascent}</tt>
+<dd>Determine ascent of this string (in cm), in the present font and
+fontsize.  (See also `<font color="#82140F"><code>descent</code></font>' and `<font color="#82140F"><code>width</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn "3.1" atof}</tt>
+<dd>Calculate the numerical value contained in indicated string.
+<p>
+<p>
+<dt> <tt>{rpn 1.5 ceil}</tt>
+<dd>Calculate the next higher integer, yielding 2.  (Opposite of `<font color="#82140F"><code>floor</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn 45 cos}</tt>
+<dd>Calculate the cosine of 45 degrees, yielding 0.707.
+<p>
+<p>
+<dt> <tt>{rpn 1 cosh}</tt>
+<dd>Calculate the hyperbolic cosine of 1 (radian), yielding 1.543.
+<p>
+<p>
+<dt> <tt>{rpn 1 cmtopt}</tt>
+<dd>Convert from 1 centimeter to so-called ``point'' units, yielding 28.45.
+(Opposite of `<font color="#82140F"><code>pttocm</code></font>'.)
+<p>
+<dt> <tt>{rpn 170 dec2hex}</tt>
+<dd>Convert a number into a string which is its hexadecimal
+representation.  Before the conversion, the number is rounded to the
+nearest integer, and if the result is negative, an error results.  The
+string is double-quoted, with letters (if there are any) being in
+upper case.  
+<p>
+For example
+`<font color="#82140F"><code>\hex = {rpn  63  dec2hex</code></font>'}
+is equivalent to
+`<font color="#82140F"><code>\hex = "3F"</code></font>'.
+<p>
+Compare with `<font color="#82140F"><code>hex2dec</code></font>', the inverse.
+<p>
+<dt> <tt>{rpn "\\syn" defined}</tt>
+<dd>Test whether the synonym is defined at the moment, returning 1 if
+so and 0 if not.  (Note the double-backslash in the synonym name, which
+is required.)
+<p>
+<p>
+<dt> <tt>{rpn ".var." defined}</tt>
+<dd>Test whether the variable is defined at the moment, returning 1 if
+so and 0 if not.
+<p>
+<p>
+<dt> <tt>{rpn "\\@alias" defined}</tt>
+<dd>Test whether the variable/synonym item that is named by the alias
+(see <a href="Synonyms.html#AliasSynonyms">Alias Synonyms</a>) is defined at the moment, returning 1 if so and 0
+if not.
+<p>
+<p>
+<p>
+<p>
+<dt> <tt>{rpn "hi" descent}</tt>
+<dd>Calculate the descent (below the baseline in cm) for the given string,
+in the present font and fontsize.  (See also `<font color="#82140F"><code>ascent</code></font>' and
+`<font color="#82140F"><code>width</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn "/home/me/data/timeseries" directory_exists}</tt>
+<dd>Determine whether indicate directory exists, yielding `<font color="#82140F"><code>1</code></font>' if it does
+and `<font color="#82140F"><code>0</code></font>' otherwise.  (See also `<font color="#82140F"><code>file_exists</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn 2 dup}</tt>
+<dd>Duplicate the top item on stack, yielding `<font color="#82140F"><code>2 2</code></font>' on the stack.
+(See also `<font color="#82140F"><code>exch</code></font>' and `<font color="#82140F"><code>pop</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn 1 exp}</tt>
+<dd>Calculate the value of `<font color="#82140F"><code>e</code></font>' raised to the indicated power, yielding 2.71828.
+<p>
+<p>
+<dt> <tt>{rpn 2 exp10}</tt>
+<dd>Calculate the value of `<font color="#82140F"><code>10</code></font>' raised to the indicated power, yielding 100.
+<p>
+<p>
+<dt> <tt>{rpn "foo.dat" file_exists}</tt>
+<dd>Determine whether the indicate file exists, yielding `<font color="#82140F"><code>1</code></font>' if it does
+and `<font color="#82140F"><code>0</code></font>' otherwise.  (See also `<font color="#82140F"><code>directory_exists</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn 1.5 floor}</tt>
+<dd>Calculate the nearest smaller integer, yielding 1.  (Opposite of
+`<font color="#82140F"><code>ceil</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn "AA" hex2dec}</tt>
+<dd>Convert a string, representing a hexadecimal value, into an integer.
+The string must be double-quoted, and it may contain either lower- or
+upper-case letters; this is in contrast to the inverse function,
+`<font color="#82140F"><code>dec2hex</code></font>', which returns upper-case.  
+<p>
+This operator is most often used in working with colours, since Gri
+handles colour components in decimal terms, whereas many other
+applications refer to the components in hexadecimal notation.
+<p>
+Compare with `<font color="#82140F"><code>dec2hex</code></font>', the inverse.
+<p>
+<p>
+<dt> <tt>{rpn 3 ismissing}</tt>
+<dd>Yields 1 if the indicated value is a ``missing value'' or 0 otherwise. 
+<p>
+<p>
+<dt> <tt>{rpn 100 log}</tt>
+<dd>Calculate the base-10 logarithm of 100, yielding 2.
+<p>
+<p>
+<dt> <tt>{rpn 10 ln}</tt>
+<dd>Calculate the natural logarithm of 10, yielding 2.30259.
+<p>
+<p>
+<dt> <tt>{rpn x mean}</tt>
+<dd>Yields the mean value of the (non-missing) numbers in the x column.  A
+similar form also works for `<font color="#82140F"><code>y</code></font>', etc. 
+(see <a href="ManipulatingColumns.html#ManipulationofColumnsetc">Manipulation of Columns etc</a>).
+<p>
+<p>
+<dt> <tt>{rpn x max}</tt>
+<dd>Yields the largest value of the (non-missing) numbers in the x column.  A
+similar form also works for `<font color="#82140F"><code>y</code></font>', etc. 
+(see <a href="ManipulatingColumns.html#ManipulationofColumnsetc">Manipulation of Columns etc</a>).
+<p>
+<p>
+<dt> <tt>{rpn x min}</tt>
+<dd>Yields the smallest value of the (non-missing) numbers in the x column.  A
+similar form also works for `<font color="#82140F"><code>y</code></font>', etc. 
+(see <a href="ManipulatingColumns.html#ManipulationofColumnsetc">Manipulation of Columns etc</a>).
+<p>
+<p>
+<dt> <tt>{rpn 28.45 pttocm}</tt>
+<dd>Calculate the number of centimeters in 28.45 printers points, yielding 1.
+(Opposite of `<font color="#82140F"><code>cmtopt</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn 1 2 pop}</tt>
+<dd>Remove the top item from the stack, yielding `<font color="#82140F"><code>1</code></font>' on the stack.
+Generates an error if the stack is empty.  (See also `<font color="#82140F"><code>exch</code></font>' and
+`<font color="#82140F"><code>dup</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn 4 sqrt}</tt>
+<dd>Calculate the square root of 4, yielding 2.  (Negative arguments yield
+errors.)
+<p>
+<p>
+<dt> <tt>{rpn 45 sin}</tt>
+<dd>Calculate the sine of 45 (degrees), yielding 0.707107.
+<p>
+<p>
+<dt> <tt>{rpn 2 sinh}</tt>
+<dd>Calculate the hyperbolic sine of 2, yielding 3.62686.
+<p>
+<p>
+<dt> <tt>{rpn "hello" strlen}</tt>
+<dd>Determine the number of characters in string, e.g. 6 here.
+<p>
+<p>
+<dt> <tt>{rpn "date" system}</tt>
+<dd>Call the indicated system function and insert its ouput on the stack,
+yielding the date as a character string.
+<p>
+<p>
+<dt> <tt>{rpn 45 tan}</tt>
+<dd>Calculate the tangent of 45 (degrees), yielding 1.
+<p>
+<p>
+<dt> <tt>{rpn tanh}</tt>
+<dd>Calculate the hyperbolic tangent of 2, yielding 0.964028.
+<p>
+<p>
+<dt> <tt>{rpn "hi" width}</tt>
+<dd>Determine width of this string (in cm), in the present font and fontsize.
+(See also `<font color="#82140F"><code>ascent</code></font>' and `<font color="#82140F"><code>descent</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn 0 wordv}</tt>
+<dd>Returns the first word used in invoking the present command.  Similar
+to the `<font color="82140F"><code>\.word0.</code></font>' synonym (see <a href="Synonyms.html#LocalSynonyms">Local Synonyms</a>).  Example:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`let us test .it.'
+{
+  .w. = 0
+  while {rpn .w. wordc >}
+    show "The " .w. "-th word is `" {rpn .w. wordv} "'."
+    .w. += 1
+  end while
+}
+let us test "this thing"
+let us test "this" "thing"
+let us test "Pi is" {rpn 3.14}
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+If you are using this to parse options given to the command, it is up to
+you to skip the non-optional words in the command.  In this case, for
+example, we skipped the first three words (`<font color="#82140F"><code>let</code></font>', `<font color="#82140F"><code>us</code></font>', and
+`<font color="#82140F"><code>test</code></font>').
+<p>
+<p>
+<dt> <tt>{rpn 1 xusertocm}</tt>
+<dd>Calculate the x coordinate, in centimeters measured from left-hand side of
+page, corresponding to a user-value of x=1.  (Opposite of
+`<font color="#82140F"><code>xcmtouser</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn 1 xcmtouser}</tt>
+<dd>Calculate the x value, in user units, for a point that is 1 centimeter from
+the left-hand edge of the paper.  (Opposite of `<font color="#82140F"><code>xusertocm</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn 1 yusertocm}</tt>
+<dd>Calculate the y coordinate, in centimeters measured from bottom side of
+page, corresponding to a user-value of x=1.  (Opposite of
+`<font color="#82140F"><code>ycmtouser</code></font>'.)
+<p>
+<p>
+<dt> <tt>{rpn 1 ycmtouser}</tt>
+<dd>Calculate the y value, in user units, for a point that is 1 centimeter from
+the bottom edge of the paper.  (Opposite of `<font color="#82140F"><code>yusertocm</code></font>'.)
+<p>
+<p>
+</dl>
+
+
+
+
+
+
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

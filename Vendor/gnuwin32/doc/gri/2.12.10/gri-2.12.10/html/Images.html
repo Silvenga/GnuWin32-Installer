@@ -1,0 +1,268 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: image plots</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile Images.html "Gri: image plots" "Image Plots" --> 
+
+<!-- @node   Images, Reading and Creating Image Data, Ungridded Data, Top -->
+<a name="Images" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="index.html#Top" shape="rect" coords="516,2,532,24" href="index.html#Top">
+<area alt="Gri: contour plots" shape="rect" coords="557,2,573,24" href="ContourPlots.html">
+<area alt="Gri: extra examples" shape="rect" coords="581,2,599,24" href="Examples.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: extra examples" shape="rect" coords="581,2,599,24" href="Examples.html">
+</map>
+<h1>7: Image Plots</h1>
+
+
+Gri can read in images stored in various formats.  It can also create
+image data internally, by converting gridded data, which is quite handy
+in some contouring applications.
+<p>
+
+Note: if your diagram is to be reproduced by a journal, it is unlikely
+that the reproduction will be able to distinguish between any two
+graylevels which differ by less than 0.2.  Also, graylevels less than
+0.2 may appear as pure black, while those of 0.8 or more may appear as
+pure white.  These guidelines are as specified by American Geophysical
+Union (publishers of J. Geophysical Res.), as of 1998.
+<p>
+
+<UL>
+<LI><a href="Images.html#ReadingandCreatingImageData">Reading and Creating Image Data</a>: Reading image, and creating from grid data
+<LI><a href="Images.html#ImagePostScriptOutput">Image PostScript Output</a>: How the image is embedded in the PostScript
+<LI><a href="Images.html#ExampleImage">Example Image</a>: How to plot a satellite image
+</UL>
+
+<!-- @node Reading and Creating Image Data, Image PostScript Output, Images, Images -->
+<a name="ReadingandCreatingImageData" ></a>
+<h2>7.1: Reading and Creating Image Data</h2>
+
+
+Gri can do black and white image plots, such as satellite images.  There
+are several ways to create image data in Gri
+<ul>
+<li>
+Create images from gridded data using `<font color="#82140F"><code>convert grid to image</code></font>'.  For
+examples see see <a href="ImageExample.html#GrayscaleImages">Grayscale Images</a>),
+see <a href="ImageWithContours.html#Combination">Combination</a>,
+and see <a href="ContouringExample.html#Contouring">Contouring</a>.
+<li>
+Read raw ascii image data files.  Use `<font color="#82140F"><code>read grid</code></font>'.
+<li>
+Read PGM (portable graymap) ascii files.  (That is, a file with magic
+characters `<font color="#82140F"><code>P1</code></font>' or `<font color="#82140F"><code>P3</code></font>' at the start.)  Use the 
+`<font color="#82140F"><code>read image pgm</code></font>' command, for a file opened in ascii mode with
+`<font color="#82140F"><code>open filename</code></font>'. 
+<li>
+Read raw binary data, with or without headers.  Use `<font color="#82140F"><code>read image</code></font>',
+after skipping any header bytes using the `<font color="#82140F"><code>skip</code></font>' command, for a
+file opened in binary mode with `<font color="#82140F"><code>open filename binary</code></font>'.
+<li>
+Read a Sun ``rasterfile'' file (but only in uncompressed form).  Use
+`<font color="#82140F"><code>read image rasterfile</code></font>' for a file opened in binary mode with
+`<font color="#82140F"><code>open filename binary</code></font>'.
+<li>
+Read a PGM (portable graymap) binary file.  (A file with magic
+characters `<font color="#82140F"><code>P2</code></font>' or `<font color="#82140F"><code>P4</code></font>' at the start.)  Use the 
+`<font color="#82140F"><code>read image pgm</code></font>' for a file opened in binary mode with
+`<font color="#82140F"><code>open filename binary</code></font>'. 
+<li>
+Aside: Images can be converted to grids (for contouring) using
+`<font color="#82140F"><code>convert image to grid</code></font>'
+(see <a href="Convert.html#Convert">Convert</a>).
+</ul>
+<p>
+Once the image is created, its grayscale/colorscale may be manipulated
+with the commands `<font color="#82140F"><code>set image grayscale</code></font>' and 
+`<font color="#82140F"><code>set image colorscale</code></font>', which permit linear and histogram-equalized
+blendings over the grayscale or color range, or with
+`<font color="#82140F"><code>read image grayscale</code></font>' and 
+`<font color="#82140F"><code>read image colorscale</code></font>', which permit reading in the grayscale or
+color values individually, one for each of the 256 pixel values.
+<p>
+It is important to understand the structure of image data.  Gri works
+only with 8-bit image data.  This means that a given pixel of the image
+may have only one of 256 possible values.  The example below uses a
+satellite image of surface temperature.  The suppliers of the data
+dictate that pixel value 0 corresponds to a temperature of 5C, and a
+pixel value of 255 corresponds to 30.5C, so the resolution is 0.1C per
+pixel value.  This resolution will be apparent if the output of the
+example below is previewed on a grayscale/color monitor --- notice the
+quantization in the palette.  This resolution issue is not very
+important with satellite images, since you have to use what you are
+given by the suppliers of the data.  However, the issue is very important
+when you are converting grid data to images.  When Gri converts grid
+data to image data, it neccessarily discards information, because the
+grid data have resolution to about 6 digits, whereas the image data have
+only 8-bit (2-3 digit) resolution.  The `<font color="#82140F"><code>set image range</code></font>' commands
+determines the range of this 8-bit resolution in terms of user units.
+All other things being equal, it would be preferable to use the smallest
+range consistent with the range of your data.  If your grid data ranged
+from 0 to 1, say, you might `<font color="#82140F"><code>set image range 0 1</code></font>'.  This would give
+a resolution in the image of 1/255 in the user units.  But, when Gri
+converts the grid into an image, it will <b>clip</b> all data outside
+the indicated range.  In this case, any data greater than 1 in the grid
+would translate to <b>exactly</b> 1 in the image.  Naturally there is a
+tradeoff between having a range large enough to encompass any data in
+the grid, and a range small enough to yield adequate resolution.  In
+most cases, 8-bit resolution will be adequate, but it is good to be
+aware of the limitations.  One should always `<font color="#82140F"><code>draw image palette</code></font>',
+and check it on a color monitor for bandedness, which is a sign of
+resolution problems.
+<p>
+
+
+<!-- @node  Image PostScript Output, Example Image, Reading and Creating Image Data, Images -->
+<a name="ImagePostScriptOutput" ></a>
+<h2>7.2: About The PostScript Output</h2>
+
+
+Programmers Note: Gri inserts some special comments in the PostScript
+file, to help programmers extract the image data; to extract the
+information, you'll have to understand how PostScript handles images.
+Gri inserts a single comment line before a line ending in the token
+`<font color="#82140F"><code>im</code></font>':
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+%BEGIN_IMAGE
+170.70 170.70 534.86 534.86 128 128 im
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+The first four numbers are the (x,y) locations of the lower-left and
+upper-right corners of the image, in units of points on the page (72
+points = 1 inch).  The fifth and sixth numbers are the width of the
+image and the height of the image.  The keyword `<font color="#82140F"><code>im</code></font>' is always
+present on this line.  Gri inserts the following comment line at the end
+of the image data
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+%END_IMAGE
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<!-- @node  Example Image, Examples, Image PostScript Output, Images -->
+<a name="ExampleImage" ></a>
+<h2>7.3: Example (Satellite image)</h2>
+
+
+Here's an example that will plot different types of images, depending on
+your answers to `<font color="#82140F"><code>query</code></font>' questions.  The file called
+`<font color="#82140F"><samp>\filename</samp></font>' is the data file, in binary format with one byte
+(`<font color="#82140F"><code>unsigned char</code></font>' in C) for each pixel, stored with the northwest
+pixel first, and the pixel to the east of that next. The file called
+`<font color="#82140F"><code>\mask</code></font>' is in the same format, and the numbers are 0 if the point
+is over the sea and 1 if over land.  The mask file is used in computing
+the histograms, which is done if `<font color="#82140F"><code>\histo</code></font>' is 1.
+<p>
+The file in this example covers 128 * 128 pixels over the Gulf of
+Maine. The numbers in `<font color="#82140F"><code>\filename</code></font>' correspond to surface
+temperatures according to the equation 
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+T = 5 + 0.1 * pixel_value
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+which explains the following lines in the command file:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\0val = "5"             # 0 in image
+\255val = "30.5"        # 255 in image
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Depending on `<font color="#82140F"><code>\histo</code></font>', the graymap will be linear or
+histogram-enhanced. The histogram method
+consists of dividing the cumulative histogram for the values in the
+image up into 256 levels, and assigning a graylevel to each.  This has
+the effect of creating maximal contrast in all ranges of graylevel. It
+points up features really well, but it is a nonlinear mapping, so it is
+not good for telling you where gradients are strong or weak.
+<p>
+
+<A HREF="example6.png"> 
+<IMG ALT="Example 6" SRC="example6-tiny.png" 
+ALIGN=top> 
+</A> 
+<A HREF="example6.html">The command-file.</A> <P> 
+
+
+
+
+
+
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

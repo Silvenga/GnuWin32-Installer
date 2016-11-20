@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: Hints for Gri programming</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile Hints.html "Gri: Hints for Gri programming" "Programming Gri" --> 
+
+<!-- @node   Hints, Debugging, Implementation of Ampersand Syntax, Programming -->
+<a name="Hints" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Programming.html#Programming" shape="rect" coords="516,2,532,24" href="Programming.html#Programming">
+<area alt="Gri: making a newcommand change its arguments" shape="rect" coords="557,2,573,24" href="ChangeableCommandArguments.html">
+<area alt="Gri: Debugging Gri programs" shape="rect" coords="581,2,599,24" href="Debugging.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: Debugging Gri programs" shape="rect" coords="581,2,599,24" href="Debugging.html">
+</map>
+<h2>10.12: Hints for Gri Programming</h2>
+
+
+Here are some hints for good Gri programs:
+<p>
+<ul>
+<li>
+Whenever working with grids (for contouring) or images, make use of the
+`<font color="#82140F"><code>show grid</code></font>' or `<font color="#82140F"><code>show image</code></font>' commands.  They will give you
+useful information about the statistics (min/max/histogram) of the items. 
+<li>
+Use the operating system, not Gri, to manipulate your data.  For
+example, if you have a file whose first column is x times 100, and third
+is the arcsin of y, you could do:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "gawk '{print $1/100, sin($3)}' |"
+read columns x y
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+If you have x and y in a non-decimal geographical format
+(e.g. hour.minute-second format), use the operating system to convert
+for you (see <a href="Open.html#Open">Open</a>).
+<li>
+Use the `<font color="#82140F"><code>pstack</code></font>' operator liberally in your rpn expressions
+to see what is going on (see <a href="ReversePolishMath.html#rpnMathematics">rpn Mathematics</a>).
+<li>
+While developing programs, put a `<font color="#82140F"><code>show columns statistics</code></font>' command
+after every `<font color="#82140F"><code>read column</code></font>' command, to check that the data have been
+read correctly.
+<li>
+Development time can be minimized by limiting the number of data being
+processed.  For example, in a multi-panel plot, it is often necessary to
+try various alternatives before aesthetic scales and page layout is
+achieved.  The process can be speeded up by limiting the number of data
+being processed, as shown below.  (If Gri finds fewer data in the file
+than specified, it will simply use the data that it found; so when the
+program works, just change `<font color="#82140F"><code>.n.</code></font>' into something large.)
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.n. = 100 # 10000 for later
+...
+# Panel 1
+read columns .n. x y
+...
+# Panel 2
+read columns .n. x y
+...
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+Create new commands to do repetitive work.
+<li>
+Use `<font color="#82140F"><code>draw time stamp</code></font>' on all plots except for publication versions:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+if !..publication..
+  draw time stamp
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+For multiple panels on one page, do `<font color="#82140F"><code>delete x scale</code></font>' 
+or `<font color="#82140F"><code>delete y scale</code></font>' before each
+new panel, so you will start afresh.  Clearly identify 
+code for particular panels with
+comments.  This reduces errors you might get if you shuffle things
+later.
+<li>
+Use the `<font color="#82140F"><code>..num_col_data..</code></font>' built-in variable to see how many data
+have passed the `<font color="#82140F"><code>set input data window</code></font>' data window in the last
+`<font color="#82140F"><code>read columns</code></font>' command.  The following example shows how to
+avoid drawing an unwanted curve:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open \f
+read columns x y
+close
+if ..num_col_data..
+  draw curve
+  draw label "\f" at \
+      {rpn ..xlast.. xusertocm 0.5} \
+      {rpn ..ylast.. yusertocm 0.2} cm
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+Use synonyms and `<font color="#82140F"><code>query</code></font>' for filenames.  This makes programs much
+more flexible.  Note that you can string synonyms together:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\dir = "~/EOS/iso0/"
+query \file "Give file in directory \dir" ("1.dat")
+open \dir/\file
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+It is also a good idea to give a restrictive list of possibilities in
+your `<font color="#82140F"><code>query</code></font>' command, to avoid complicated `<font color="#82140F"><code>if</code></font>' commands later
+(see <a href="Query.html#Query">Query</a>).
+<li>
+Use multiple `<font color="#82140F"><code>draw title</code></font>' commands:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw title "Atlantic water entering Arctic Ocean"
+draw title "\.command_file. \.time."
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+Use the `<font color="82140F"><code>query</code></font>' command to interact with the user (see <a href="Query.html#Query">Query</a>).  The results can be stored in variables and synonyms.
+<p>
+</ul>
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

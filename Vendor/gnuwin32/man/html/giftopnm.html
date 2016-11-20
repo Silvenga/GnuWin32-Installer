@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Giftopnm User Manual</TITLE></HEAD>
+<BODY>
+<H1>giftopnm</H1>
+Updated: 16 June 2003
+<BR>
+
+<A HREF="giftopnm.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+giftopnm - convert a GIF file into a PNM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>giftopnm</B>
+[<B>--alphaout=</B>{<I>alpha-filename</I>,<B>-</B>}]
+[<B>-verbose</B>]
+[<B>-comments</B>]
+[<B>-image=</B>{<I>N</I>,<B>all</b>}]
+[<I>GIFfile</I>]
+
+<p>Minimum unique abbreviation of option is acceptable.  You may use double
+hyphens instead of single hyphen to denote options.  You may use white
+space in place of the equals sign to separate an option name from its value.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p>This is a graphics format converter from the GIF format to the PNM 
+(i.e. PBM, PGM, or PPM) format.
+
+<P>If the image contains only black and maximally bright white, the
+output is PBM.  If the image contains more than those two colors, but
+only grays, the output is PGM.  If the image contains other colors,
+the output is PPM.
+
+<P> A GIF image contains rectangular pixels.  They all have the same
+aspect ratio, but may not be square (it's actually quite unusual for
+them not to be square, but it could happen).  The pixels of a Netpbm
+image are always square.  Because of the engineering complexity to do
+otherwise, <B>giftopnm</B> converts a GIF image to a Netpbm image
+pixel-for-pixel.  This means if the GIF pixels are not square, the
+Netpbm output image has the wrong aspect ratio.  In this case,
+<B>giftopnm</B> issues an informational message telling you to run
+<B>pamscale</B> to correct the output.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>--alphaout=</B><I>alpha-filename</I>
+
+<DD><B>giftopnm </B> creates a PGM (portable graymap) file containing
+the alpha channel values in the input image.  If the input image
+doesn't contain an alpha channel, the <I>alpha-filename</I> file
+contains all zero (transparent) alpha values.  If you don't specify
+<B>--alphaout</B>, <B>giftopnm</B> does not generate an alpha file,
+and if the input image has an alpha channel, <B>giftopnm</B> simply
+discards it.
+
+<P>If you specify <B>-</B> as the filename, <B>giftopnm</B> writes the
+alpha output to Standard Output and discards the image.
+
+<P>See <B><A HREF="pamcomp.html">pamcomp</A></B> for one way to use
+the alpha output file.  
+
+<DT><B>-verbose</B>
+
+<DD>Produce verbose output about the GIF file input.
+
+<DT><B>-comments</B>
+
+<DD>
+Only output GIF89 comment fields.
+
+<DT><B>-image=</B>{<I>N</I>,<B>all</b>}
+
+<DD>
+This option identifies which image from the GIF stream you want.  
+You can select either one image or all the images.  Select al the 
+images with <b>all</b>.  Select one image by specifying its sequence
+number in the stream: <b>1</b>, <b>2</b>, <b>3</b>, etc.
+
+<p>The default is just Image 1.
+
+<p>A GIF stream normally contains only one image, so you don't need
+this option.  But some streams, including animated GIFs, have multiple
+images.
+
+<p>When you select multiple GIF images, the output is a PNM stream with
+multiple images.
+
+<p>The <b>all</b> value was added in Netpbm 10.16 (June 2003).  Earlier
+<b>giftopnm</b> can extract only one image.
+     
+</DL>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>RESTRICTIONS</H2>
+
+<p>This does not correctly handle the Plain Text Extension of the
+GIF89 standard, since I did not have any example input files
+containing them.
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="ppmtogif.html">ppmtogif</A></B>,
+<B><A HREF="ppmcolormask.html">ppmcolormask</A></B>,
+<B><A HREF="pamcomp.html">pamcomp</A></B>,
+&lt;<A
+HREF="http://www.lcdf.org/gifsicle">http://www.lcdf.org/gifsicle</A>&gt;,
+<B><A HREF="ppm.html">ppm</A></B>.
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+<p>Copyright (c) 1993 by David Koblas (<A
+HREF="mailto:koblas@netcom.com">koblas@netcom.com</A>)
+
+<A NAME="lbAI">&nbsp;</A>
+<H2>LICENSE</H2>
+
+<p>As a historical note, for a long time if you used <B>giftopnm</B>,
+you were using a patent on the LZW compression method which was owned
+by Unisys, and in all probability you did not have a license from
+Unisys to do so.  Unisys typically asked $5000 for a license for
+trivial use of the patent.  Unisys never enforced the patent against
+trivial users, and made statements that it is much less concerned
+about people using the patent for decompression (which is what
+<B>giftopnm</B> does than for compression.  The patent expired in
+2003.
+
+<P>Rumor has it that IBM also owns a patent covering <B>giftopnm</B>.
+
+<P>A replacement for the GIF format that has never required any patent
+license to use is the PNG format.
+
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="giftopnm.html#lbAB">NAME</A>
+<LI><A HREF="giftopnm.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="giftopnm.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="giftopnm.html#lbAE">OPTIONS</A>
+<LI><A HREF="giftopnm.html#lbAF">RESTRICTIONS</A>
+<LI><A HREF="giftopnm.html#lbAG">SEE ALSO</A>
+<LI><A HREF="giftopnm.html#lbAH">AUTHOR</A>
+<LI><A HREF="giftopnm.html#lbAI">LICENSE</A>
+</UL>
+</BODY>
+</HTML>

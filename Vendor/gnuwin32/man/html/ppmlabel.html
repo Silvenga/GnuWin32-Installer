@@ -1,0 +1,191 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Ppmlabel User Manual</TITLE></HEAD>
+<BODY>
+
+<H1>ppmlabel</H1>
+Updated: 12 September 2003
+<BR>
+<A HREF="ppmlabel.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+ppmlabel - add text to a PPM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>ppmlabel</B>
+
+[<B>-angle</B> <I>angle</I>]
+
+[<B>-background</B> { <B>transparent</B> | <I>color</I> } ]
+
+[<B>-color</B> <I>color</I>]
+
+[<B>-file</B> <I>filename</I>]
+
+[<B>-size</B>
+
+<I>textsize</I>]
+
+[<B>-text</B> <I>text_string</i>]
+
+[<B>-x</B> <I>column</I>]
+
+[<B>-y</B> <I>row</I>]
+
+...
+
+[<I>ppmfile</I>]
+
+
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<B>ppmlabel</B> uses the text drawing facilities of <B>ppmdraw</B> to
+add text to a PBM image.  You control the location, size, baseline
+angle, color of the text, and background color (if any) with command
+line arguments.  You can specify the text on the command line or
+supply it in files.
+
+<p>You can add any number of separate labels in a single invocation of
+<B>ppmlabel</B>, limited only by any restrictions your environment has
+on the number and size of program arguments (e.g. a shell's command 
+size limit).
+
+<P>If you don't specify <I>ppmfile</I>, <B>ppmdraw</B> reads its input
+PPM image from Standard Input.
+
+<P>The output image goes to Standard Output.
+
+<P>A more sophisticated way to add a label to an image is to use
+<b>pbmtext</b> or <b>pbmtextps</b> to create an image of the text, then
+<b>pamcomp</b> to overlay it onto the base image.
+
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<p>The arguments on the <B>ppmlabel</B> command line are not options in
+the strict sense; they are commands which control the placement and
+appearance of the text being added to the input pixmap.  They are
+executed left to right, and any number of arguments may appear.
+
+<P>You can abbreviate any "option" to its shortest unique prefix.
+
+<DL COMPACT>
+<DT><B>-angle</B><I> angle</I>
+
+<DD>This option sets the angle of the baseline of subsequent text.
+<I>angle</I> is an integral number of degrees, measured
+counterclockwise from the row axis of the image.
+
+<DT><B>-background</b> { <b>transparent</b> | <I>color</I> }
+
+<DD>If the argument is <B>transparent</B>, <b>ppmlabel</b> draws the
+text over the existing pixels in the pixmap.  If you specify a
+<I>color</I> (see the <B>-color</B> option below for information on
+how to specify colors), <b>ppmlabel</b> generates background rectangles
+enclosing subsequent text, and those rectangles are filled with that
+color.
+
+<DT><B>-color</B> <I>color</I>
+
+<DD>This option sets the color for subsequent text.
+
+<P>Specify the color (<i>color</i>) as described for the <a
+href="libppm.html#colorname">argument of the <b>ppm_parsecolor()</b>
+library routine</a>.
+
+<p><b>-colour</b> is an acceptable alternate spelling.
+
+<DT><B>-file</B> <I>filename</I>
+
+<DD>This option causes <b>ppmlabel</b> to read lines of text from the file
+named <I>filename</I> and draw it on successive lines.
+
+<DT><B>-size</B> <I>textsize</I>
+
+<DD>This option sets the height of the tallest characters above the
+baseline to <I>textsize</I> pixels.
+
+<DT><B>-text</B> <I>text_string</I>
+
+<DD>This option causes <b>ppmlabel</b> to draw the specified text
+string.  It advances the location for subsequent text by 1.75 times
+the current <i>textsize</i>, which allows drawing multiple lines of
+text in a reasonable manner without specifying the position of each
+line.
+<p>
+Note that if you invoke <b>ppmlabel</b> via a shell command and your
+text string contains spaces, you'll have to quote it so the shell treats
+the whole string as a single token.  E.g.
+<pre>
+  $ ppmlabel -text "this is my text" baseimage.ppm &gt;annotatedimage.ppm
+</pre>
+
+
+<DT><B>-x</B> <I>column</I>
+
+<DD>This option sets the pixel column at which subsequent text will
+be left justified.  Depending on the shape of the first character, the
+actual text may begin a few pixels to the right of this point.
+
+<DT><B>-y</B> <I>row</I>
+
+<DD>This option sets the pixel row which will form the baseline of
+subsequent text.  Characters with descenders, such as "y," will extend
+below this line.  
+
+</DL>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>LIMITATIONS</H2>
+
+<P>Text strings are restricted to 7 bit ASCII.  The text font used by
+<B>ppmdraw</B> doesn't include definitions for 8 bit ISO 8859/1 characters.
+
+<P>When drawing multiple lines of text with a non-transparent
+background, it should probably fill the space between the lines with
+the background color.  This is tricky to get right when the text is
+rotated to a non-orthogonal angle.
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+
+<B><A HREF="ppmmake.html">ppmmake</A></B>,
+<B><A HREF="pbmtext.html">pbmtext</A></B>,
+<B><A HREF="pbmtextps.html">pbmtextps</A></B>,
+<B><A HREF="pamcomp.html">pamcomp</A></B>,
+<B><A HREF="ppm.html">ppm</A></B>
+
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1995 by John Walker (<A HREF="mailto:kelvin@fourmilab.ch">kelvin@fourmilab.ch</A>)<BR>
+WWW home page: <A HREF="http://www.fourmilab.ch/">http://www.fourmilab.ch/</A><BR>
+
+<P>Permission to use, copy, modify, and distribute this software and
+its documentation for any purpose and without fee is hereby granted,
+without any conditions or restrictions.  This software is provided
+``as is'' without express or implied warranty.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="ppmlabel.html#lbAB">NAME</A>
+<LI><A HREF="ppmlabel.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="ppmlabel.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="ppmlabel.html#lbAE">OPTIONS</A>
+<LI><A HREF="ppmlabel.html#lbAF">LIMITATIONS</A>
+<LI><A HREF="ppmlabel.html#lbAG">SEE ALSO</A>
+<LI><A HREF="ppmlabel.html#lbAH">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

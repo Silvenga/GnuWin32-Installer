@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pamtohdiff User Manual</TITLE></HEAD>
+<BODY>
+<H1>pamtohdiff</H1>
+Updated: 15 April 2002
+<BR>
+<A HREF="pamtohdiff.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pamtohdiff - convert PAM image to horizontal difference image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pamtohdiff</B>
+[<I>pamfile</I>]
+[<B>-verbose</B>]
+
+<P>
+Minimum unique abbreviation of option is acceptable.  You may use double
+hyphens instead of single hyphens to denote options.  You may use white
+space in place of the equals sign to separate an option name from its value.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<P><B>pamtohdiff</B> takes a PAM (or PNM) image as input and produced a
+horizontal difference image version of it as output.  A horizontal
+difference image is one where the samples in each row indicate the
+difference between the sample value in the corresponding sample of the
+input image and the sample directly above it (in the previous row) in
+the input image.  The horizontal difference image has the property
+that if a row of the original image is identical to the row above it
+over a long extent, the corresponding row in the horizontal difference
+image will contain all zeroes.  That makes it compress better than the
+original image.
+
+<P>Because the horizontal difference samples can be positive or
+negative, but PAM samples are unsigned integers, the samples in the
+horizontal difference image PAM are defined to be the difference
+modulus the range of the input (maxval + 1).  This doesn't lose any
+information, as it might seem, because: of the two differences that
+could result in the same <b>pamtohdiff</b> output value (e.g. if
+maxval is 99, +20 and -80 would both result in "20" in the output),
+only one is possible in context and the other would result, when
+reconstructing the original image, in a value less than 0 or greater
+than maxval.
+
+<p>Before the modulus operation, the values <b>pamtohdiff</b>
+computes are also biased by half the maxval.  This is to make the
+results easier to inspect visually.  Because of the bias, you can
+display the <b>pamtohdiff</b> output as if it were a PNM image.  As
+long as none of your differences are more than half the maxval, large
+negative differences show up as dark spots, smaller negative
+differences are lighter, zero differences are medium intensity, and
+positive differences are light.  If you want this to work even for
+images that have differences that exceed half the maxval, just use
+<b>ppmdim 50</b> on the original image.  To avoid losing information,
+though, do a <b>pnmdepth</b> to double the maxval first.
+
+<p>Note that because of the transfer function just described, a 
+difference of zero, which is most common, is represented by a PAM sample
+value in the output of one half the maxval.
+
+<P>The output PAM has a tuple type of "hdiff".
+
+<P>You can use <B>hdifftopam</B> to recover the original image from a
+horizontal difference image PAM.
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="hdifftopam.html">hdifftopam</A></B>,
+<B><A HREF="pnmdepth.html">pnmdepth</A></B>,
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Bryan Henderson
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pamtohdiff.html#lbAB">NAME</A>
+<LI><A HREF="pamtohdiff.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pamtohdiff.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pamtohdiff.html#lbAF">SEE ALSO</A>
+<LI><A HREF="pamtohdiff.html#lbAG">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

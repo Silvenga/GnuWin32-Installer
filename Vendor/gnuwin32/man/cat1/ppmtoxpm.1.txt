@@ -1,0 +1,173 @@
+Ppmtoxpm User Manual(0)                 Ppmtoxpm User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       ppmtoxpm - convert a PPM image to an X11 pixmap
+
+
+SYNOPSIS
+       ppmtoxpm  [-name=xpmname] [-hexonly] [-rgb=rgb-textfile]
+       [-alphamask=pgmfile] [ppmfile]
+
+       Minimum unique abbreviation  of  option  is  acceptable.
+       You  may  use double hyphens instead of single hyphen to
+       denote options.  You may use white space in place of the
+       equals sign to separate an option name from its value.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       ppmtoxpm  reads  a  PPM  image as input and produces X11
+       pixmap (version 3) as output.  This format can be loaded
+       by the XPM library.
+
+       In  the  XPM  output,  colors may be identified by name,
+       such as "Red", or in hexadecimal, for example "#FF0000".
+       In the hexadecimal format, there may be from 1 through 4
+       hexadecimal digits per RGB component.
+
+       By default, ppmtoxpbm tries to  find  a  name  for  each
+       color  in the image in the system color dictionary , and
+       if it finds one, uses it.  If it doesn't it  uses  hexa-
+       decimal.   You  can  force  ppmtoxpbm to use hexadecimal
+       only with the -hexonly option.  You can specify  a  dif-
+       ferent color dictionary with the -rgb option.
+
+       When  ppmtoxpm uses the hexadecimal format for identify-
+       ing a color, it uses the one that uses the least  number
+       of  hexadecimal  digits  that  it takes to represent the
+       maxval of the input PPM.  E.g.  if  the  maxval  of  the
+       input  PPM is 100, ppmtoxpm uses 2 digits per component,
+       as in "#FF0000".
+
+       Some programs do not properly handle  one-digit-per-com-
+       ponent hexadecimal color specifiers.  They see the wrong
+       colors.  To produce an XPM that such a program can  han-
+       dle,  make  sure  the maxval of the input PPM is greater
+       than 15, such as by running it through pnmdepth 255.
+
+
+   Color Code Lengths - Image Size
+       In the XPM format, there is a palette ('color map') that
+       assigns  each color in the image to a unique sequence of
+       printable characters called a color code, and  a  raster
+       that  identifies  the  color  of each pixel of the image
+       with one of those color codes.  The length of the  color
+       code affects the size of the image stream.
+
+       All  color  codes  in  an image are the same length, and
+       ppmtoxpm tries to make it as short  as  possible.   That
+       length is, of course, determined by the number of colors
+       in the image.  ppmtoxpm counts the colors in the  image,
+       excluding  those  that will be transparent in the output
+       due to your alpha mask, and chooses a color code  length
+       accordingly.  There are 92 printable characters that can
+       be used in a color code.  Therefore, if you have  92  or
+       fewer  colors,  your  color codes will be one character.
+       If you have more than 92 but not more than 92 * 92, your
+       color codes will be two characters.  And so on.
+
+       There's  one  exception  to the above: If you specify an
+       alpha mask (the -alpha option,  one  unique  color  code
+       represents  'transparent.'   This  is  true  even if the
+       alpha mask doesn't actually produce any transparent pix-
+       els.  So subtract one from the number of possible colors
+       if you use -alpha.
+
+
+
+OPTIONS
+       -name=xpmname
+              This option specifies the prefix string which  is
+              specified  in  the  resulting XPM output.  If you
+              don't use the -name otpion, ppmtoxpm defaults  to
+              the  filename  (without extension) of the ppmfile
+              parameter.  If you do not specify -name  or  ppm-
+              file  (i.e.  your  input is from Standard Input),
+              the prefix string defaults to the string  noname.
+
+
+       -hexonly
+              This  option says never to put color names in the
+              XPM file, but rather to identify names  by  hexa-
+              decimal strings that explicitly identify RGB com-
+              ponent intensities.  This means the reader of the
+              file  need  not  have  access to a suitable color
+              dictionary to interpret it.
+
+              This option was introduced in Netpbm 10.15 (April
+              2003).  Before that, it was the default, overrid-
+              den by specifying -rgb.
+
+
+       -rgb=rgb-textfile
+              This option names the file  in  which  the  color
+              dictionary  you want to use resides.  By default,
+              ppmtoxpm uses the system color dictionary .
+
+              This option in meaningless when you specify -hex-
+              only.
+
+              Before  Netpbm  10.15  (April 2003), ppmtoxpm did
+              not default to the system color  dictionary.   If
+              you didn't specify -rgb, ppmtoxpbm would use only
+              hexadecimal color specifiers.
+
+
+       -alphamask=pgmfile
+               This option names a PGM file to use as an  alpha
+              (transparency)  mask.   The  file must contain an
+              image the same dimensions  as  the  input  image.
+              ppmtoxpm  marks  as  transparent  any pixel whose
+              position in the alpha mask image is at most  half
+              white.
+
+              If  you  don't specify -alphamask, ppmtoxpm makes
+              all pixels in the output opaque.
+
+              ppmcolormask is one way to generate an alpha mask
+              file.   You  might also generate it by extracting
+              transparency information from an  XPM  file  with
+              the -alphaout option to xpmtoppm.
+
+              There  are  similar  options on other Netpbm con-
+              verters that convert from  formats  that  include
+              transparency information too.
+
+
+
+SEE ALSO
+       ppmcolormask(1),  xpmtoppm(1),  pnmdepth(1),  ppm(1) XPM
+       Manual by Arnaud Le Hors lehors@mirsa.inria.fr
+
+
+AUTHOR
+       Copyright (C) 1990 by Mark W. Snitily.
+
+       Permission to use, copy,  modify,  and  distribute  this
+       software and its documentation for any purpose and with-
+       out fee is hereby granted, provided that the above copy-
+       right  notice  appear  in  all copies and that both that
+       copyright notice and this permission  notice  appear  in
+       supporting documentation.  This software is provided 'as
+       is' without express or implied warranty.
+
+       This tool was developed for  Schlumberger  Technologies,
+       ATE  Division,  and  with their permission is being made
+       available to the public with the above copyright  notice
+       and permission notice.
+
+       Upgraded  to  XPM2 by Paul Breslaw, Mecasoft SA, Zurich,
+       Switzerland (paul@mecazh.uu.ch), November 8, 1990.
+
+       Upgraded   to   XPM   version    3    by    Arnaud    Le
+       Hors(lehors@mirsa.inria.fr), April 9, 1991.
+
+
+
+netpbm documentation      Feb 22 2003   Ppmtoxpm User Manual(0)

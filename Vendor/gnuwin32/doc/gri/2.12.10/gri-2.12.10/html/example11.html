@@ -1,0 +1,180 @@
+<html>
+<head>
+<title>../../../gri-2.12.10-src/doc/examples/example11.gri</title>
+</head>
+<body bgcolor="#FFFFFF">
+<i># This html document was prepared by gri2html based on the Gri script named</i>
+<br><i>#    <a href="../../../gri-2.12.10-src/doc/examples/example11.gri">../../../gri-2.12.10-src/doc/examples/example11.gri</a></i>
+<br># <i>Gri is available for free at <a href="http://gri.sourceforge.net">http://gri.sourceforge.net</a></i>
+<pre>
+<font color=#B22222># Example 11 -- Fancy plot</font>
+
+<font color=#0000EE>.thin. =</font> 0.5			<font color=#B22222># for whole data set</font>
+<font color=#0000EE>.thick. =</font> 2			<font color=#B22222># for bravo time period</font>
+<font color=#0000EE>.gray_for_guiding_lines. =</font> 0.75	<font color=#B22222># for guiding lines</font>
+<font color=#0000EE>.tmin. =</font> 1964			<font color=#B22222># time axis</font>
+<font color=#0000EE>.tmax. =</font> 1974
+<font color=#0000EE>.tinc. =</font> 5
+<font color=#0000EE>.tincinc. =</font> 1
+<font color=#0000EE>.missing_value. =</font> -9
+<font color=#0000EE>\file =</font> <font color=#2F4F4F>"./example11.dat"</font>
+<font color=#B22222>#</font>
+<font color=#B22222># Guiding lines to draw on both panels.</font>
+<font color=#B22222>#</font>
+<font color=#0000EE>.1xl. =</font> 1962
+<font color=#0000EE>.1yb. =</font> -3
+<font color=#0000EE>.1xr. =</font> 1968
+<font color=#0000EE>.1yt. =</font> 3
+<font color=#0000EE>.1slope. =</font> {<font color=#9400D3>rpn</font><font color=#CDAD00> .1yt.</font><font color=#CDAD00> .1yb.</font> -<font color=#CDAD00> .1xr.</font><font color=#CDAD00> .1xl.</font> - /}
+<font color=#0000EE>.1intercept. =</font> {<font color=#9400D3>rpn</font><font color=#CDAD00> .1yb.</font><font color=#CDAD00> .1slope.</font><font color=#CDAD00> .1xl.</font> * -}
+<font color=#0000EE>.2xl. =</font> 1966.4
+<font color=#0000EE>.2yb. =</font> 3
+<font color=#0000EE>.2xr. =</font> 1980
+<font color=#0000EE>.2yt. =</font> -1
+<font color=#0000EE>.2slope. =</font> {<font color=#9400D3>rpn</font><font color=#CDAD00> .2yt.</font><font color=#CDAD00> .2yb.</font> -<font color=#CDAD00> .2xr.</font><font color=#CDAD00> .2xl.</font> - /}
+<font color=#0000EE>.2intercept. =</font> {<font color=#9400D3>rpn</font><font color=#CDAD00> .2yb.</font><font color=#CDAD00> .2slope.</font><font color=#CDAD00> .2xl.</font> * -}
+<font color=#B22222>#</font>
+<font color=#B22222># PANEL 1: Bravo time period.</font>
+<font color=#B22222>#</font>
+set x margin 3
+set x size 15
+set y margin 3
+set y size 5
+<font color=#B22222># Draw border big enough for this and next panel.</font>
+draw border box {<font color=#9400D3>rpn</font> <font color=#006400>..xmargin..</font> 2 -} {<font color=#9400D3>rpn</font> <font color=#006400>..ymargin..</font> 2 -} {<font color=#9400D3>rpn</font> <font color=#006400>..xmargin..</font> <font color=#006400>..xsize..</font> + 2 +} {<font color=#9400D3>rpn</font> <font color=#006400>..ymargin..</font> <font color=#006400>..ysize..</font> 2 * 3 + + 2 +} 0.2 0.75
+set missing value<font color=#CDAD00> .missing_value.</font>
+set ignore error eof
+set x name <font color=#2F4F4F>"Year"</font>
+set x axis<font color=#CDAD00> .tmin.</font><font color=#CDAD00> .tmax.</font><font color=#CDAD00> .tinc.</font><font color=#CDAD00> .tincinc.</font>
+set y name <font color=#2F4F4F>"Area / 10$^5$km$^2$"</font>
+set y axis -3 3 1
+draw axes
+<font color=#B22222>#</font>
+<font color=#B22222># Draw index lines 1 and 2.</font>
+<font color=#B22222># </font>
+<font color=#B22222># Upward sloped line.</font>
+set line width<font color=#CDAD00> .thin.</font>
+set graylevel<font color=#CDAD00> .gray_for_guiding_lines.</font>
+<font color=#9400D3>if</font> {<font color=#9400D3>rpn</font><font color=#CDAD00> .1intercept.</font> <font color=#006400>..xright..</font><font color=#CDAD00> .1slope.</font> * + <font color=#006400>..ytop..</font> &lt;}
+    draw line from             <font color=#0000EE> \
+</font>	<font color=#006400>..xleft..</font>              <font color=#0000EE> \
+</font>	{<font color=#9400D3>rpn</font><font color=#CDAD00> .1intercept.</font> <font color=#006400>..xleft..</font><font color=#CDAD00> .1slope.</font> * +}<font color=#0000EE> \
+</font>	to                     <font color=#0000EE> \
+</font>	{<font color=#9400D3>rpn</font> <font color=#006400>..ytop..</font><font color=#CDAD00> .1intercept.</font> -<font color=#CDAD00> .1slope.</font> /}<font color=#0000EE> \
+</font>	<font color=#006400>..ytop..</font>
+<font color=#9400D3>else</font>
+    draw line from             <font color=#0000EE> \
+</font>	<font color=#006400>..xleft..</font>              <font color=#0000EE> \
+</font>	{<font color=#9400D3>rpn</font><font color=#CDAD00> .1intercept.</font> <font color=#006400>..xleft..</font><font color=#CDAD00> .1slope.</font> * +}<font color=#0000EE> \
+</font>	to                     <font color=#0000EE> \
+</font>	<font color=#006400>..xright..</font>             <font color=#0000EE> \
+</font>	{<font color=#9400D3>rpn</font><font color=#CDAD00> .1intercept.</font> <font color=#006400>..xright..</font><font color=#CDAD00> .1slope.</font> * +}
+<font color=#9400D3>end if</font>
+set graylevel 0
+<font color=#B22222># </font>
+<font color=#B22222># Downward sloped line.</font>
+set line width<font color=#CDAD00> .thin.</font>
+set graylevel<font color=#CDAD00> .gray_for_guiding_lines.</font>
+<font color=#9400D3>if</font> {<font color=#9400D3>rpn</font><font color=#CDAD00> .2intercept.</font> <font color=#006400>..xleft..</font><font color=#CDAD00> .2slope.</font> * + <font color=#006400>..ytop..</font> &lt;}
+    draw line from             <font color=#0000EE> \
+</font>	{<font color=#9400D3>rpn</font> <font color=#006400>..ytop..</font><font color=#CDAD00> .2intercept.</font> -<font color=#CDAD00> .2slope.</font> /}<font color=#0000EE> \
+</font>	<font color=#006400>..ytop..</font>               <font color=#0000EE> \
+</font>	to                     <font color=#0000EE> \
+</font>	<font color=#006400>..xright..</font>             <font color=#0000EE> \
+</font>	{<font color=#9400D3>rpn</font><font color=#CDAD00> .2intercept.</font> <font color=#006400>..xright..</font><font color=#CDAD00> .2slope.</font> * +}  
+<font color=#9400D3>else</font>
+    draw line from             <font color=#0000EE> \
+</font>	<font color=#006400>..xleft..</font>              <font color=#0000EE> \
+</font>	{<font color=#9400D3>rpn</font><font color=#CDAD00> .2intercept.</font> <font color=#006400>..xleft..</font><font color=#CDAD00> .2slope.</font> * +}<font color=#0000EE> \
+</font>	to                     <font color=#0000EE> \
+</font>	<font color=#006400>..xright..</font>             <font color=#0000EE> \
+</font>	{<font color=#9400D3>rpn</font><font color=#CDAD00> .2intercept.</font> <font color=#006400>..xright..</font><font color=#CDAD00> .2slope.</font> * +}
+<font color=#9400D3>end if</font>
+set graylevel 0
+<font color=#B22222>#</font>
+<font color=#B22222># Finally, draw the data curve on top, after first</font>
+<font color=#B22222># whiting out a background.</font>
+set input data window x<font color=#CDAD00> .tmin.</font><font color=#CDAD00> .tmax.</font>
+open<font color=#0000EE> \file
+</font>read columns x y
+close
+y /= 1e5
+set line width <font color=#006400>..linewidthaxis..</font>
+draw zero line
+set line width {<font color=#9400D3>rpn</font><font color=#CDAD00> .thick.</font> 3 *}
+set graylevel 1
+draw curve
+set graylevel 0
+set line width<font color=#CDAD00> .thick.</font>
+draw curve
+
+<font color=#B22222>#</font>
+<font color=#B22222># PANEL 2: Longer timescale.</font>
+<font color=#B22222>#</font>
+delete x scale
+set x margin bigger 5
+set x size 10
+set x name <font color=#2F4F4F>""</font>
+set y name <font color=#2F4F4F>""</font>
+set y margin bigger {<font color=#9400D3>rpn</font> <font color=#006400>..ysize..</font> 3 +}
+<font color=#B22222>#</font>
+<font color=#B22222># Draw long data set in thin pen.</font>
+set input data window x off
+open<font color=#0000EE> \file
+</font>read columns x y
+close
+y /= 1e5
+<font color=#B22222>#</font>
+<font color=#B22222># Draw guiding lines, axes, etc.</font>
+set x axis 1952 1980 5 1
+draw axes frame
+set line width<font color=#CDAD00> .thin.</font>
+set graylevel<font color=#CDAD00> .gray_for_guiding_lines.</font>
+draw line from<font color=#CDAD00> .1xl.</font><font color=#CDAD00> .1yb.</font> to<font color=#CDAD00> .1xr.</font><font color=#CDAD00> .1yt.</font>
+draw line from<font color=#CDAD00> .2xl.</font><font color=#CDAD00> .2yb.</font> to<font color=#CDAD00> .2xr.</font><font color=#CDAD00> .2yt.</font>
+set graylevel 0
+set line width <font color=#006400>..linewidthaxis..</font>
+draw zero line
+
+
+draw x axis at bottom
+<font color=#0000EE>.old. =</font> <font color=#006400>..fontsize..</font>
+set font size 0
+draw y axis at left
+set font size<font color=#CDAD00> .old.</font>
+delete<font color=#CDAD00> .old.</font>
+<font color=#B22222>#</font>
+<font color=#B22222># Draw full curve (first whiting out region around it).</font>
+set line width {<font color=#9400D3>rpn</font><font color=#CDAD00> .thin.</font> 4 *}
+set graylevel 1
+draw curve
+set graylevel 0
+set line width<font color=#CDAD00> .thin.</font>
+draw curve
+<font color=#B22222>#</font>
+<font color=#B22222># Draw bravo time period (first whiting out region around it).</font>
+set input data window x<font color=#CDAD00> .tmin.</font><font color=#CDAD00> .tmax.</font>
+open<font color=#0000EE> \file
+</font>read columns x y
+close
+y /= 1e5
+set line width {<font color=#9400D3>rpn</font><font color=#CDAD00> .thick.</font> 3 *}
+set graylevel 1
+draw curve
+set graylevel 0
+set line width<font color=#CDAD00> .thick.</font>
+draw curve
+<font color=#B22222>#</font>
+<font color=#B22222># Done</font>
+set font size 20
+<font color=#0000EE>\label =</font> <font color=#2F4F4F>"Example 11 (Arctic ice anomaly)"</font>
+draw label <font color=#2F4F4F>"\label"</font> at         <font color=#0000EE> \
+</font>    {<font color=#9400D3>rpn</font> 8.5 2.54 * <font color=#2F4F4F>"\label"</font> width - 2 /}<font color=#0000EE> \
+</font>    {<font color=#9400D3>rpn</font> <font color=#006400>..ytop..</font> yusertocm 0.7 +}<font color=#0000EE> \
+</font>    cm
+<font color=#9400D3>if</font> !<font color=#006400>..publication..</font>
+    draw time stamp
+<font color=#9400D3>end if</font>
+</pre>
+</body>
+</html>

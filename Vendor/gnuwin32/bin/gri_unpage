@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+$usage = "
+PURPOSE: Chop multipage Gri PostScript file into one file per page.
+USAGE:   gri_unpage name.ps -- create files name-1.ps, name-2.ps, etc, one
+                               for each page of name.ps.
+         gri_unpage -h      -- print this help message
+                    -l      -- set bounding box to letter page 612x792
+
+BUGS:    1. Bounding box is always the same for all pages.
+         2. Assumes that all Gri fonts are used even if they aren't.
+";
+
+eval { require 'getopts.pl' ; };
+my $use_getopts = $@ ? 0 : 1;
+
+if ($use_getopts) {
+    &Getopts('hl');
+    if ($opt_h) {
+        print "$usage";
+        exit 0;
+    }
+}
+
+if ($#ARGV != 0) {
+    die "Wrong number of arguments.\n$usage\n";
+}
+
+# Scan for BoundingBox to use that for each page.
+if (! $use_getopts || ! $opt_l) {
+    open(IN, $ARGV[0]) || die "Cannot open input file `$ARGV[0]'\n";
+    while(<IN>) {
+        if (/%%BoundingBox: [0-9 ]+/) {
+            $boundingBox = $_;
+            chop($boundingBox);
+            last;
+        }
+    }
+    close(IN);
+}
+if (! defined($boundingBox)) {
+    $boundingBox = "%%BoundingBox: 0 0 612 792";
+}
+
+$file = $ARGV[0];
+$file =~ s/\.ps$//;
+
+open(IN, $ARGV[0]) || die "Cannot open input file `$ARGV[0]'\n";
+$prologue = "";
+while(<IN>) {
+    $prologue .= $_;
+    last if (/%%EndProlog/);
+}
+$epilog = "
+%%Trailer
+$boundingBox
+%%DocumentFonts: Courier Helvetica Palatino-Roman Palatino-Italic Symbol Times-Roman
+%%Pages: 1
+";
+
+$page = 0;
+
+while(<IN>) {
+    if (/%%Page:/) {
+	$page++;
+	if ($page < 10) {
+	    $name = sprintf("$file-0%d.ps", $page);
+	} else {
+	    $name = sprintf("$file-%d.ps", $page);
+	}
+	if ($page != 1) {
+	    print OUT $epilog;
+	    close(OUT);
+	}
+	print STDERR "Creating file $name\n";
+	open(OUT, ">$name") || die "Cannot open output file `$name'\n";
+	print OUT $prologue;
+    } else {
+	print OUT;
+    }
+}
+close OUT if ($page != 0);

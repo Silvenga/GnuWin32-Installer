@@ -1,0 +1,81 @@
+UNEXP(1)                                               UNEXP(1)
+
+
+
+
+
+NAME
+       unexp - Convert "exponential" files into normal files.
+
+SYNOPSIS
+       unexp  [ -m maxval ] [ -o outfile ] [ -p ] [ -s ] [ -v ]
+       infile
+
+DESCRIPTION
+       Unexp Converts a file of  "exponential"  floating  point
+       values  into  an  RLE(5)  file containing integer valued
+       bytes.  Exponential files have N-1 channels of eight bit
+       data,  with the Nth channel containing a common exponent
+       for the other channels.  This allows the  values  repre-
+       sented by the pixels to have a wider dynamic range.
+
+       If  no maximum value is specified, unexp first reads the
+       RLE file to find the dynamic range of  the  whole  file.
+       It  then  rewinds  the file and scales the output to fit
+       within that dynamic range.  If a maximum value is speci-
+       fied,  unexp  runs  in  one  pass, and clamps any values
+       exceeding the maximum.
+
+       Files containing exponential data are expected to have a
+       "exponential_data"  comment;  unexp  prints a warning if
+       such a  comment  doesn't  exist.   An  exponential  file
+       should  be  unexp'ed  before attempting to use any tools
+       that perform arithmetic  on  pixels  (e.g.,  rlecomp(1),
+       avg4(1),  fant(1),  or  applymap(1))  or  displaying the
+       image.
+
+       Unexp does not allow piped input.  The infile must be  a
+       real file; the special filenames described in urt(1) are
+       not allowed.  ("-" does work, as long as  the  input  is
+       coming  from  a  real  file; this is of minimal utility,
+       therefore, as typing unexp -  <foo.rle  is  harder  than
+       typing unexp foo.rle.)
+
+OPTIONS
+       -m maxval
+              Specify  the maximum value (i.e., the data in the
+              file is assumed to be in  the  range  0..maxval).
+              Only  the conversion pass is executed, and values
+              found exceeding the maximum are clamped.
+
+       -o outfile
+              If specified, the output will be written to  this
+              file.   If outfile is "-", or if it is not speci-
+              fied, the output will be written to the  standard
+              output stream.
+
+       -p     Print the maximum value found during the scanning
+              phase
+
+       -s     Just scan the file to  find  the  maximum,  don't
+              generate any output.
+
+       -v     Verbose  mode,  print  a  message to stderr after
+              scanning or converting every hundred scanlines.
+
+SEE ALSO
+       float_to_exp(3), urt(1), RLE(5).
+
+AUTHOR
+       John W. Peterson
+
+BUGS
+       Unexp is provided because of the lack of floating  point
+       or extended precision RLE files.
+
+       The  -v  flag  is  a historical relict from the slow CPU
+       days.
+
+
+
+1                       November 8, 1987               UNEXP(1)

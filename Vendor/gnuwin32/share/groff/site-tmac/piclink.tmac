@@ -1,0 +1,73 @@
+.\" Groff Presentation Macros
+.\" date: October 5, 2002
+.\" version: 2.0
+.\" author: Bob Diertens, <bobd@science.uva.nl>
+.ig
+    Copyright (C) 2001, 2002  Bob Diertens
+
+    This macro package is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This macro package is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this macro package; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+..
+.\"*** Initialisation
+.\" depending on present.tmac
+.if !r .mpresent \{\
+'   tm ERROR: no present macros loaded
+.   ab "aborted"
+.\}
+.nr .mpiclink 1
+.\" Defaults
+.\" *** PIC Links
+.\" usage: LINKPIC x y width height label
+.\" x,y is the position of the center of the rectangle
+.\" used by piclink
+.de LINKPIC
+.gp-link@set
+.nr gp-linkpic*w (\\$3)
+.nr gp-linkpic*h (\\$4)
+.nr gp-linkpic*x (\\$1)+\\n[.i]+\\n[.o]-\\n[gp-pic*x1]-(\\n[gp-linkpic*w]/2)
+.nr gp-linkpic*y 0-(\\$2)+\\n[nl]-\\n[gp-pic*y2]+1v-(\\n[gp-linkpic*h]/2)
+\X'ps: exec %%%%LINK \\n[gp-linkpic*x] \\n[gp-linkpic*y] \\n[gp-linkpic*w] \\n[gp-linkpic*h] \\$5'\c
+..
+.\" define a macro for PIC
+.\" usage: LINK name (box|circle|ellipse)
+.PS
+define LINK {
+command "\!.LINKPIC " $2.c.x "i " $2.c.y "i " $2.wid "i " $2.ht "i $1 $3"
+}
+.PE
+.\" Redefine PS so we can define a new PS that first read a comment-line
+.\" left by gpic.
+.\" The trick to read a comment-line is to define a macro \" and turning
+.\" the escape mechanism off.
+.\" The macro \" is created and removed every time a PS is encountered, so
+.\" this trick does not process other comments and can be used elsewhere.
+.rn PS NEWPS
+.de PS
+.ds gp-ps*w \\$1
+.ds gp-ps*h \\$2
+.de \\\\"
+.ec
+.nr gp-pic*x1 (i;\\\\$1)
+.nr gp-pic*y1 (i;\\\\$2)
+.nr gp-pic*x2 (i;\\\\$3)
+.nr gp-pic*y2 (i;\\\\$4)
+.NEWPS \\*[gp-ps*w] \\*[gp-ps*h]
+.rm \\\\"
+.\"ie d\\\\\\\\" .tm removed
+.\"el .tm still there
+\\..
+.\"ie d\\\\" .tm defined
+.\"el .tm not defined
+.eo
+..

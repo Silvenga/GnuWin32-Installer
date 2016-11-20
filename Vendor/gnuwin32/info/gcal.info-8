@@ -1,0 +1,1053 @@
+This is gcal.info, produced by makeinfo version 4.0 from gcal.texi.
+
+INFO-DIR-SECTION GNU packages
+START-INFO-DIR-ENTRY
+* Gcal: (gcal).                       GNU calendar program.
+* Tcal: (gcal)Invoking tcal.          Run Gcal with tomorrow's date.
+* Txt2gcal: (gcal)Invoking txt2gcal.  Calendar text to resource file.
+* Gcal2txt: (gcal)Invoking gcal2txt.  Calendar resource to text file.
+END-INFO-DIR-ENTRY
+
+  This file documents Gcal, a program for calculating and printing
+calendars.
+
+  Copyright (c) 1994, 95, 96, 1997, 2000 Thomas Esken
+
+  This edition is for Gcal version 3.01.
+
+  Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+  Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+  Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation approved by the Free Software Foundation.
+
+  Any suggestions, improvements, extensions, bug reports, donations,
+proposals for contract work, and so forth are welcome!  Please send
+them directly to my eMail address <esken@gmx.net>.  If you like my
+work, I'd appreciate a postcard from you!
+
+------------------------oOO      \\\_''/      OOo---------------------------
+Thomas Esken               O     (/o-o\)     O  eMail: esken@gmx.net
+Im Hagenfeld 84                 ((  ^  ))       Phone: +49 251 232585
+D-48147 Muenster; Germany    \____) ~ (____/    MotD : 2old2live, 2young2die
+
+
+File: gcal.info,  Node: Moon data,  Next: Contents of Environment variable,  Prev: Sun data,  Up: Replacements with other argument
+
+Moon data `%[FORMAT]?ARGUMENT' special texts
+............................................
+
+  `%[FORMAT]([*][MODE]ISO-6709:1983-CO-ORDINATE[,[+|-]MMMM|HH:[MM]]'
+references the approximate time of *moonrise* by default,
+`%[FORMAT])[*][MODE]ISO-6709:1983-CO-ORDINATE[,[+|-]MMMM|HH:[MM]]'
+references the approximate time of *moonset* by default,
+`%[FORMAT][[*][MODE]ISO-6709:1983-CO-ORDINATE[,[+|-]MMMM|HH:[MM]]'
+references the approximate period of *visibility* of the Moon (lunar
+day length) by default,
+`%[FORMAT]][*][MODE]ISO-6709:1983-CO-ORDINATE[,[+|-]MMMM|HH:[MM]]'
+references the approximate period of *non-visibility* of the Moon
+(lunar night length) by default.
+
+  All these special texts can be used for at pleasure any geographic
+point location, i.e. it is possible to determine different astronomical
+values for any location on the globe, and that for at pleasure any
+clocktime with a resolution of a single minute within the period of the
+years AD 1 until AD 9999, that is respected by Gcal.
+
+  The selection which value has to be calculated by these special texts
+is done by specifying the MODE part of the preceding argument.
+Actually, exactly 61 different modes can be used that are represented
+by the `0'...`9', `a'...`z' and `A'...`Y' characters, and which create
+different kind of results that are depending on the special text used.
+First of all, here is a table in which all usable modes are described
+and explained sufficiently.  You can also see from this table, which
+Moon oriented special text or texts are corresponding to which mode,
+i.e. cause the determination of an astronomical value as it is
+described in the table:
+
+*Mode*  *Special      *Description*
+        text*         
+
+`0'     `(', `)'      Calculates the approximate midnight time of the
+                      Moon.  The astronomical midnight time of the Moon
+                      is at that clocktime, when the Moon holds an
+                      "azimuth" (horizontal angular distance between the
+                      vertical circle, that passes the Moon, and the
+                      North point) of either precisely 0 degrees of
+                      precisely 180 degrees, which depends on the season
+                      and the geographical location.  At that clocktime,
+                      the Moon is close its "lowest culmination point",
+                      i.e. close the lowest point below or above the
+                      horizontal plane the Moon transits during this day.
+                      Nevertheless, there is exactly one day during a
+                      "synodic month" (or lunation) --i.e. the mean time
+                      between two consecutive "conjunctions" (or New Moon
+                      phases)-- at which no lunar midnight happens,
+                      because the Moon revolves the Earth within 24 hours
+                      and 50 minutes on the average -- which also means,
+                      that the Moon rises on the average 50 minutes later
+                      each day.
+
+`1'     `(', `)'      Calculates the approximate noon time of the Moon.
+                      The astronomical noon time of the Moon is at that
+                      clocktime, when the Moon holds an azimuth of either
+                      precisely 180 degrees of precisely 0 degrees, which
+                      depends on the season and the geographical location.
+                      At that clocktime, the Moon is close its "highest
+                      culmination point", i.e. close the highest point
+                      above or below the horizontal plane the Moon
+                      transits during this day.  Nevertheless, there is
+                      exactly one day during a synodic month at which no
+                      lunar noon happens.
+
+`2'     `('           Calculates the approximate time when the center of
+                      the Moon passes a reference altitude which is
+                      between about 54 and 61 arcminutes above a
+                      "mathematical-geocentric" horizon before lunar noon
+                      time; thus rising.  A mathematical horizon is a
+                      purely geometrically-built horizon which disregards
+                      the phenomenon of refraction as it arises in
+                      reality by the influence of the Earth's atmosphere.
+                      A geocentrical horizon is the horizontal plane
+                      that passes through the Earth's center, orthogonal
+                      to the observer's local vertical.  In the further
+                      context, the shorter term _mathematical horizon_ is
+                      used which actually means the
+                      mathematical-geocentric horizon.  The above
+                      mentioned reference altitude is computed from the
+                      value of the Moon's parallax as it appear at that
+                      clocktime.  Nevertheless, there is exactly one day
+                      during a synodic month at which no such moonrise
+                      happens.
+
+`2'     `)'           Calculates the approximate time when the center of
+                      the Moon passes a reference altitude which is
+                      between about 54 and 61 arcminutes above a
+                      mathematical horizon after lunar noon time; thus
+                      setting.  The above mentioned reference altitude is
+                      computed from the value of the Moon's parallax as
+                      it appear at that clocktime.  Nevertheless, there
+                      is exactly one day during a synodic month at which
+                      no such moonset happens.
+
+`2'     `['           Calculates the approximate period while the center
+                      of the Moon is above a reference altitude which is
+                      between about 54 and 61 arcminutes above a
+                      mathematical horizon; thus is visible.
+
+`2'     `]'           Calculates the approximate period while the center
+                      of the Moon is below a reference altitude which is
+                      between about 54 and 61 arcminutes above a
+                      mathematical horizon; thus is non-visible.
+
+`3'     `('           Calculates the approximate time when the upper limb
+                      of the Moon passes a reference altitude which is
+                      between about 54 and 61 arcminutes above a
+                      mathematical horizon before lunar noon time; thus
+                      rising.  The above mentioned reference altitude is
+                      computed from the respective values of the Moon's
+                      semidiameter and Moon's parallax as they appear at
+                      that clocktime.  If the reference altitude that is
+                      referring to the Moon's upper limb is converted to
+                      a reference altitude that is referring to the
+                      Moon's center, this results in a value which is
+                      between about 39 and 44 arcminutes above the
+                      geocentric horizon.  Nevertheless, there is exactly
+                      one day during a synodic month at which no such
+                      moonrise happens.
+
+`3'     `)'           Calculates the approximate time when the upper limb
+                      of the Moon passes a reference altitude which is
+                      between about 54 and 61 arcminutes above a
+                      mathematical horizon after lunar noon time; thus
+                      setting.  The above mentioned reference altitude is
+                      computed from the respective values of the Moon's
+                      semidiameter and Moon's parallax as they appear at
+                      that clocktime.  Nevertheless, there is exactly one
+                      day during a synodic month at which no such moonset
+                      happens.
+
+`3'     `['           Calculates the approximate period while the upper
+                      limb of the Moon is above a reference altitude
+                      which is between about 54 and 61 arcminutes above a
+                      mathematical horizon; thus is visible.
+
+`3'     `]'           Calculates the approximate period while the upper
+                      limb of the Moon is below a reference altitude
+                      which is between about 54 and 61 arcminutes above a
+                      mathematical horizon; thus is non-visible.
+
+`4'     `('           Calculates the approximate time when the center of
+                      the Moon passes a reference altitude which is
+                      between about 20 and 27 arcminutes above the
+                      geocentric horizon before lunar noon time; thus
+                      rising.  The phenomenon of refraction is already
+                      respected in this as it arises in reality by the
+                      influence of the Earth's atmosphere, and that with
+                      the standard value of 34 arcminutes, which can
+                      indirectly be changed by using the `--atmosphere'
+                      option.  *Note Fixed dates option
+                      `--atmosphere=AIR-PRESSURE[,TEMPERATURE]':
+                      x-atmosphere, how to change the base data of the
+                      atmosphere, so that the atmospheric conditions as
+                      defined by it are used to calculate the amount of
+                      refraction.  The above mentioned reference altitude
+                      is computed from the respective values of the
+                      Moon's parallax and (standard) refraction as they
+                      appear at that clocktime.  Nevertheless, there is
+                      exactly one day during a synodic month at which no
+                      such moonrise happens.
+
+`4'     `)'           Calculates the approximate time when the center of
+                      the Moon passes a reference altitude which is
+                      between about 20 and 27 arcminutes above the
+                      geocentric horizon after lunar noon time; thus
+                      setting.  The phenomenon of refraction is already
+                      respected in this as it arises in reality by the
+                      influence of the Earth's atmosphere, and that with
+                      the standard value of 34 arcminutes, which can
+                      indirectly be changed by using the `--atmosphere'
+                      option.  The above mentioned reference altitude is
+                      computed from the respective values of the Moon's
+                      parallax and (standard) refraction as they appear
+                      at that clocktime.  Nevertheless, there is exactly
+                      one day during a synodic month at which no such
+                      moonset happens.
+
+`4'     `['           Calculates the approximate period while the center
+                      of the Moon is above a reference altitude which is
+                      between about 20 and 27 arcminutes above the
+                      geocentric horizon; thus is visible.
+
+`4'     `]'           Calculates the approximate period while the center
+                      of the Moon is below a reference altitude which is
+                      between about 20 and 27 arcminutes above the
+                      geocentric horizon; thus is non-visible.
+
+`5'     `('           Calculates the approximate time when the upper limb
+                      of the Moon passes a reference altitude which is
+                      between about 20 and 27 arcminutes above the
+                      geocentric horizon before lunar noon time; thus
+                      rising.  This kind of rise time calculation is done
+                      according to the standard calculation method as it
+                      is commonly used internationally.  The phenomenon
+                      of refraction is already respected in this as it
+                      arises in reality by the influence of the Earth's
+                      atmosphere, and that with the standard value of 34
+                      arcminutes, which can indirectly be changed by
+                      using the `--atmosphere' option.  *Note Fixed dates
+                      option `--atmosphere=AIR-PRESSURE[,TEMPERATURE]':
+                      x-atmosphere, how to change the base data of the
+                      atmosphere, so that the atmospheric conditions as
+                      defined by it are used to calculate the amount of
+                      refraction.  The above mentioned reference altitude
+                      is computed from the respective values of the
+                      Moon's semidiameter, Moon's parallax and (standard)
+                      refraction as they appear at that clocktime.  If
+                      the reference altitude that is referring to the
+                      Moon's upper limb is converted to a reference
+                      altitude that is referring to the Moon's center,
+                      this results in a value which is between about 5
+                      and 10 arcminutes above the geocentric horizon.
+                      Nevertheless, there is exactly one day during a
+                      synodic month at which no such moonrise happens.
+
+`5'     `)'           Calculates the approximate time at which the upper
+                      limb of the Moon passes a reference altitude which
+                      is between about 20 and 27 arcminutes above the
+                      geocentric horizon after lunar noon time; thus
+                      setting.  This kind of set time calculation is done
+                      according to the standard calculation method as it
+                      is commonly used internationally.  The phenomenon
+                      of refraction is already respected in this as it
+                      arises in reality by the influence of the Earth's
+                      atmosphere, and that with the standard value of 34
+                      arcminutes, which can indirectly be changed by
+                      using the `--atmosphere' option.  The above
+                      mentioned reference altitude is computed from the
+                      respective values of the Moon's semidiameter,
+                      Moon's parallax and (standard) refraction as they
+                      appear at that clocktime.  Nevertheless, there is
+                      exactly one day during a synodic month at which no
+                      such moonset happens.
+
+`5'     `['           Calculates the approximate period while the upper
+                      limb of the Moon is above a reference altitude
+                      which is between about 20 and 27 arcminutes above
+                      the geocentric horizon; thus is visible.  This kind
+                      of visibility period calculation is done according
+                      to the standard calculation method as it is
+                      commonly used internationally.
+
+`5'     `]'           Calculates the approximate period while the upper
+                      limb of the Moon is below a reference altitude
+                      which is between about 20 and 27 arcminutes above
+                      the geocentric horizon; thus is non-visible.  This
+                      kind of non-visibility period calculation is done
+                      according to the standard calculation method as it
+                      is commonly used internationally.
+
+`6'     `(', `)'      Calculates the approximate "topocentric", apparent
+                      "horizontal parallax" of the Moon in degrees and
+                      arcminutes as it happen at civil midnight time.
+                      The Moon's parallax states the diameter of the
+                      Earth as it is seen from the surface of the Moon.
+                      Observations of celestial objects that are done
+                      from the surface of the Earth yield in
+                      topocentrically based data.  The locations of the
+                      celestial bodies are often at another place if the
+                      data is topocentrically determined instead of
+                      determine it "geocentrically", i.e. at the
+                      fictitious center of the Earth.  This is mainly
+                      caused by the refraction, which raises a celestial
+                      body to another location as it is been in reality.
+                      Because the terrestrial globe flattens towards the
+                      pole caps and therefore cannot be taken as an
+                      ideally shaped sphere, the individual Earth radius
+                      between the observer's location and the center of
+                      the Earth also affects the computation of
+                      topocentrically based data.
+
+`7'     `(', `)'      Calculates the approximate topocentric, apparent
+                      semidiameter of the Moon in degrees and arcminutes
+                      as it happen at civil midnight time.
+
+`8'     `(', `)'      Calculates the approximate topocentric, apparent
+                      brightness of the Moon in "magnitude units" as it
+                      happen at civil midnight time.  The magnitude
+                      (Latin term `magnitudo', abbreviated m) is used to
+                      define the brightness of a star, and is a
+                      non-metrical value.  The difference between two
+                      consecutive magnitudes is 1 to 2.512.  Therefore, a
+                      star with the brightness of 1m is 2.512 times
+                      brighter than a star of 2m.  A negative magnitude
+                      denotes a very bright star, for example almost -27m
+                      for the Sun, whereas the hardly visible planet
+                      Pluto has a magnitude of a bit more than +14m.  The
+                      Full Moon has a visual brightness of about -12m.55.
+
+`9'     `(', `)'      Calculates the approximate topocentric, apparent
+                      phase angle of the Moon in range 0.0...1.0 as it
+                      happen at civil midnight time.
+
+`a'     `(', `)'      Calculates the approximate topocentric, apparent
+                      "elevation" of the Moon, thus the vertical angular
+                      distance between the Moon's center and the horizon,
+                      in degrees and arcminutes as it happen at civil
+                      midnight time.  Results with a negative sign
+                      signify that the Moon's center is below the horizon
+                      at the moment, and results with a positive sign
+                      mean that the momentary center of the Moon is above
+                      the horizon.
+
+`b'     `(', `)'      Calculates the approximate topocentric, apparent
+                      azimuth of the Moon in degrees and arcminutes as it
+                      happen at civil midnight time.
+
+`c'     `(', `)'      Calculates the approximate topocentric, apparent
+                      "declination" of the Moon, thus the vertical
+                      angular distance between the Moon's center and the
+                      celestial equator, in degrees and arcminutes as it
+                      happen at civil midnight time.  Results with a
+                      negative sign signify that the Moon's center is
+                      below the celestial equator at the moment, and
+                      results with a positive sign mean that the
+                      momentary center of the Moon is above the celestial
+                      equator.
+
+`d'     `(', `)'      Calculates the approximate topocentric, apparent
+                      "ecliptic longitude" of the Moon, thus the
+                      horizontal angular distance between the Moon's
+                      center and the vernal equinox point on the
+                      "ecliptic" (the zodiacal line or Sun's orbit), in
+                      degrees and arcminutes as it happen at civil
+                      midnight time.
+
+`e'     `(', `)'      Calculates the approximate topocentric, apparent
+                      "ecliptic latitude" of the Moon, thus the vertical
+                      angular distance between the Moon's center and the
+                      ecliptic (zodiacal line/Sun's orbit), in degrees
+                      and arcminutes as it happen at civil midnight time.
+                      Results with a negative sign signify that the
+                      Moon's center is North of the ecliptic at the
+                      moment, and results with a positive sign mean that
+                      the momentary center of the Moon is South of the
+                      ecliptic.
+
+`f'     `(', `)'      Calculates the approximate topocentric, apparent
+                      "right ascension" of the Moon, thus the horizontal
+                      angular distance between the Moon's center and the
+                      hour circle that passes through the vernal equinox
+                      point on the ecliptic, as time value in hours and
+                      minutes as it happen at civil midnight time.
+
+`g'     `(', `)'      Calculates the approximate topocentric, apparent
+                      distance of the Moon from the Earth in mean "Earth
+                      equator radii" as it happen at civil midnight time.
+                      The mean radius of Earth at the equator is about
+                      6,378.137 kilometer.
+
+`h'     `(', `)'      Calculates the approximate topocentric, apparent
+                      "elongation" of the Moon, thus the horizontal
+                      angular distance between the Moon's center and the
+                      Sun's center, in degrees and arcminutes as it
+                      happen at civil midnight time.
+
+`i'     `(', `)'      Calculates the approximate refraction of the
+                      Earth's atmosphere in degrees and arcminutes as it
+                      happen at civil midnight time.
+
+`j'     `(', `)'      Calculates the approximate geocentric, apparent
+                      horizontal parallax of the Moon in degrees and
+                      arcminutes as it happen at civil midnight time.
+
+`k'     `(', `)'      Calculates the approximate geocentric, apparent
+                      semidiameter of the Moon in degrees and arcminutes
+                      as it happen at civil midnight time.
+
+`l'     `(', `)'      Calculates the approximate geocentric, apparent
+                      brightness of the Moon in magnitude units as it
+                      happen at civil midnight time.
+
+`m'     `(', `)'      Calculates the approximate geocentric, apparent
+                      phase angle of the Moon in range 0.0...1.0 as it
+                      happen at civil midnight time.
+
+`n'     `(', `)'      Calculates the approximate geocentric, apparent
+                      elevation of the Moon in degrees and arcminutes as
+                      it happen at civil midnight time.  Results with a
+                      negative sign signify that the Moon's center is
+                      below the horizon at the moment, and results with a
+                      positive sign mean that the momentary center of the
+                      Moon is above the horizon.
+
+`o'     `(', `)'      Calculates the approximate geocentric, apparent
+                      azimuth of the Moon in degrees and arcminutes as it
+                      happen at civil midnight time.
+
+`p'     `(', `)'      Calculates the approximate geocentric, apparent
+                      declination of the Moon in degrees and arcminutes
+                      as it happen at civil midnight time.  Results with
+                      a negative sign signify that the Moon's center is
+                      below the celestial equator at the moment, and
+                      results with a positive sign mean that the
+                      momentary center of the Moon is above the celestial
+                      equator.
+
+`q'     `(', `)'      Calculates the approximate geocentric, apparent
+                      ecliptic longitude of the Moon in degrees and
+                      arcminutes as it happen at civil midnight time.
+
+`r'     `(', `)'      Calculates the approximate geocentric, apparent
+                      ecliptic latitude of the Moon in degrees and
+                      arcminutes as it happen at civil midnight time.
+                      Results with a negative sign signify that the
+                      Moon's center is North of the ecliptic at the
+                      moment, and results with a positive sign mean that
+                      the momentary center of the Moon is South of the
+                      ecliptic.
+
+`s'     `(', `)'      Calculates the approximate geocentric, apparent
+                      right ascension of the Moon as time value in hours
+                      and minutes as it happen at civil midnight time.
+
+`t'     `(', `)'      Calculates the approximate geocentric, apparent
+                      distance of the Moon from the Earth in mean Earth
+                      equator radii as it happen at civil midnight time.
+
+`u'     `(', `)'      Calculates the approximate geocentric, apparent
+                      elongation of the Moon in degrees and arcminutes as
+                      it happen at civil midnight time.
+
+`v'     `(', `)'      Calculates the approximate "delta-t" in seconds as
+                      it happen at civil midnight time.  Delta-t is the
+                      difference between the Terrestrial Dynamical time
+                      (abbreviated by TDT), that was formerly known as
+                      _Ephemeris time_ (abbreviated by ET), and the
+                      Universal time (UT).  Thus, `delta-t == TDT - UT'.
+
+`w'     `(', `)'      Calculates the approximate, apparent location
+                      oriented "sidereal time" (local sidereal time
+                      (LAST), also known as _local star time_) in hours
+                      and minutes as it happen at civil midnight time.  A
+                      "star day" is the period between two consecutive
+                      upper culminations of the vernal equinox point on
+                      the ecliptic in the meridian of the observer's
+                      location.  Therefore, the local "star time" is the
+                      momentary period, which is past between the last
+                      upper culmination of the vernal equinox point in
+                      the meridian of the observer's location (the
+                      momentary hour angle of the vernal equinox point),
+                      thus the right ascension of the stars in the
+                      observer's meridian at the moment.
+
+`x'     `(', `)'      Outputs the base time as time value in hours and
+                      minutes, for which the dynamical, i.e. depending on
+                      the respective clocktime, astronomical data and
+                      times of the Moon are calculated.  Without a given
+                      `--time-offset=ARGUMENT' option, the astronomical
+                      data and times of the Moon are always calculated
+                      for 0 o'clock Universal time (UTC/GMT).  *Note
+                      Calendar option `--time-offset=ARGUMENT':
+                      x-time-offset, for further details.
+
+`y'     `(', `)'      Calculates the approximate Julian date in days as
+                      it happen at civil midnight time.  *Note Julian day
+                      number::, for further information about the Julian
+                      date.
+
+`z'     `(', `)'      Calculates the approximate "Julian Ephemeris date",
+                      thus a Julian date that is corrected by _delta-t_,
+                      in days as it happen at civil midnight time.
+
+`A'     `(', `)'      Calculates the difference of the approximate
+                      topocentric, apparent elevation of Moon and Sun
+                      (delta), at which the Moon is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      civil midnight time.  Results with a negative sign
+                      signify that the momentary center of the Moon is at
+                      an elevation that is below the momentary elevation
+                      of the Sun's center; thus the Moon is lower than
+                      the Sun.  Results with a positive sign signify that
+                      the momentary center of the Moon is at an elevation
+                      that is above the momentary elevation of the Sun's
+                      center; thus the Moon is higher than the Sun.
+
+`B'     `(', `)'      Calculates the difference of the approximate
+                      topocentric, apparent azimuth of Moon and Sun
+                      (delta), at which the Moon is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      civil midnight time.  The result specifies the
+                      horizontal angular distance, by which the momentary
+                      center of the Moon is distant from the momentary
+                      Sun's center, and that measured at the vertical
+                      circles that pass the Moon and the North point and
+                      the Sun and the North point.  Results with a
+                      negative sign signify that the Sun is to the right
+                      (clockwise) of the Moon if one looks to the Moon --
+                      or alternatively expressed, that the Moon is to the
+                      left (anti-clockwise) of the Sun.  Results with a
+                      positive sign signify that the Sun is to the left
+                      (anti-clockwise) of the Moon if one looks to the
+                      Moon -- or alternatively expressed, that the Moon
+                      is to the right (clockwise) of the Sun.
+
+`C'     `(', `)'      Calculates the difference of the approximate
+                      geocentric, apparent elevation of Moon and Sun
+                      (delta), at which the Moon is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      civil midnight time.
+
+`D'     `(', `)'      Calculates the difference of the approximate
+                      geocentric, apparent azimuth of Moon and Sun
+                      (delta), at which the Moon is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      civil midnight time.
+
+`E'     `('           Calculates the difference of the approximate
+                      topocentric, apparent elevation of Moon and Sun
+                      (delta), at which the Moon is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard rise time of the Moon.  *Note Standard
+                      rise time of the Moon: x-Moon-standard-rise, for
+                      further details.
+
+`E'     `)'           Calculates the difference of the approximate
+                      topocentric, apparent elevation of Moon and Sun
+                      (delta), at which the Moon is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard set time of the Moon.  *Note Standard set
+                      time of the Moon: x-Moon-standard-set, for further
+                      details.
+
+`F'     `('           Calculates the difference of the approximate
+                      topocentric, apparent azimuth of Moon and Sun
+                      (delta), at which the Moon is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard rise time of the Moon.  *Note Standard
+                      rise time of the Moon: x-Moon-standard-rise, for
+                      further details.
+
+`F'     `)'           Calculates the difference of the approximate
+                      topocentric, apparent azimuth of Moon and Sun
+                      (delta), at which the Moon is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard set time of the Moon.  *Note Standard set
+                      time of the Moon: x-Moon-standard-set, for further
+                      details.
+
+`G'     `('           Calculates the difference of the approximate
+                      geocentric, apparent elevation of Moon and Sun
+                      (delta), at which the Moon is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard rise time of the Moon.  *Note Standard
+                      rise time of the Moon: x-Moon-standard-rise, for
+                      further details.
+
+`G'     `)'           Calculates the difference of the approximate
+                      geocentric, apparent elevation of Moon and Sun
+                      (delta), at which the Moon is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard set time of the Moon.  *Note Standard set
+                      time of the Moon: x-Moon-standard-set, for further
+                      details.
+
+`H'     `('           Calculates the difference of the approximate
+                      geocentric, apparent azimuth of Moon and Sun
+                      (delta), at which the Moon is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard rise time of the Moon.  *Note Standard
+                      rise time of the Moon: x-Moon-standard-rise, for
+                      further details.
+
+`H'     `)'           Calculates the difference of the approximate
+                      geocentric, apparent azimuth of Moon and Sun
+                      (delta), at which the Moon is used as the reference
+                      point, in degrees and arcminutes as it happen at
+                      standard set time of the Moon.  *Note Standard set
+                      time of the Moon: x-Moon-standard-set, for further
+                      details.
+
+`I'     `(', `)'      Calculates the difference of the approximate
+                      astronomical midnight times of Moon and Sun (delta),
+                      at which the Moon is used as the reference point,
+                      as time value in hours and minutes as it happen at
+                      astronomical midnight time of the Moon.  Results
+                      with a negative sign signify that the astronomical
+                      midnight time of the Moon is earlier than the
+                      astronomical midnight time of the Sun; thus the
+                      lunar midnight is before the solar midnight.
+                      Results with a positive sign signify that the
+                      astronomical midnight time of the Moon is later
+                      than the astronomical midnight time of the Sun;
+                      thus the lunar midnight is after the solar midnight.
+                      *Note Astronomical midnight time of the Moon:
+                      x-Moon-midnight, and *Note Astronomical midnight
+                      time of the Sun: x-Sun-midnight, for further
+                      details.
+
+`J'     `(', `)'      Calculates the difference of the approximate
+                      astronomical noon times of Moon and Sun (delta), at
+                      which the Moon is used as the reference point, as
+                      time value in hours and minutes as it happen at
+                      astronomical noon time of the Moon.  Results with a
+                      negative sign signify that the astronomical noon
+                      time of the Moon is earlier than the astronomical
+                      noon time of the Sun; thus the lunar noon is before
+                      the solar noon.  Results with a positive sign
+                      signify that the astronomical noon time of the Moon
+                      is later than the astronomical noon time of the Sun;
+                      thus the lunar noon is after the solar noon.  *Note
+                      Astronomical noon time of the Moon: x-Moon-noon, and
+                      *Note Astronomical noon time of the Sun: x-Sun-noon,
+                      for further details.
+
+`K'     `('           Calculates the difference of the approximate
+                      standard rise times of Moon and Sun (delta), at
+                      which the Moon is used as the reference point, as
+                      time value in hours and minutes as it happen at
+                      standard rise time of the Moon.  Results with a
+                      negative sign signify that the standard rise time
+                      of the Moon is earlier than the standard rise time
+                      of the Sun; thus the moonrise is before the sunrise.
+                      Results with a positive sign signify that the
+                      standard rise time of the Moon is later than the
+                      standard rise time of the Sun; thus the moonrise is
+                      after the sunrise.  *Note Standard rise time of the
+                      Moon: x-Moon-standard-rise, and *Note Standard rise
+                      time of the Sun: x-Sun-standard-rise, for further
+                      details.
+
+`K'     `)'           Calculates the difference of the approximate
+                      standard set times of Moon and Sun (delta), at
+                      which the Moon is used as the reference point, as
+                      time value in hours and minutes as it happen at
+                      standard set time of the Moon.  Results with a
+                      negative sign signify that the standard set time of
+                      the Moon is earlier than the standard set time of
+                      the Sun; thus the moonset is before the sunset.
+                      Results with a positive sign signify that the
+                      standard set time of the Moon is later than the
+                      standard set time of the Sun; thus the moonset is
+                      after the sunset.  *Note Standard set time of the
+                      Moon: x-Moon-standard-set, and *Note Standard set
+                      time of the Sun: x-Sun-standard-set, for further
+                      details.
+
+`L'     `(', `)'      Calculates the approximate topocentric, apparent
+                      elevation of the Moon in degrees and arcminutes as
+                      it happen at astronomical midnight time of the Moon
+                      (topocentric "midnight height").  *Note
+                      Astronomical midnight time of the Moon:
+                      x-Moon-midnight, for further details.
+
+`M'     `(', `)'      Calculates the approximate topocentric, apparent
+                      phase angle of the Moon in range 0.0...1.0 as it
+                      happen at astronomical midnight time of the Moon
+                      (topocentric "midnight phase angle").  *Note
+                      Astronomical midnight time of the Moon:
+                      x-Moon-midnight, for further details.
+
+`N'     `(', `)'      Calculates the approximate topocentric, apparent
+                      elevation of the Moon in degrees and arcminutes as
+                      it happen at astronomical noon time of the Moon
+                      (topocentric "noon height").  *Note Astronomical
+                      noon time of the Moon: x-Moon-noon, for further
+                      details.
+
+`O'     `(', `)'      Calculates the approximate topocentric, apparent
+                      phase angle of the Moon in range 0.0...1.0 as it
+                      happen at astronomical noon time of the Moon
+                      (topocentric "noon phase angle").  *Note
+                      Astronomical noon time of the Moon: x-Moon-noon,
+                      for further details.
+
+`P'     `('           Calculates the approximate topocentric, apparent
+                      elevation of the Moon in degrees and arcminutes as
+                      it happen at standard rise time of the Moon
+                      (topocentric "rise height").  *Note Standard rise
+                      time of the Moon: x-Moon-standard-rise, for further
+                      details.
+
+`P'     `)'           Calculates the approximate topocentric, apparent
+                      elevation of the Moon in degrees and arcminutes as
+                      it happen at standard set time of the Moon
+                      (topocentric "set height").  *Note Standard set
+                      time of the Moon: x-Moon-standard-set, for further
+                      details.
+
+`Q'     `('           Calculates the approximate topocentric, apparent
+                      azimuth of the Moon in degrees and arcminutes as it
+                      happen at standard rise time of the Moon
+                      (topocentric "rise azimuth").  The horizontal
+                      angular distance between the topocentric rise
+                      azimuth and the East direction is also known as the
+                      topocentric "rise width" of the Moon.  *Note
+                      Standard rise time of the Moon:
+                      x-Moon-standard-rise, for further details.
+
+`Q'     `)'           Calculates the approximate topocentric, apparent
+                      azimuth of the Moon in degrees and arcminutes as it
+                      happen at standard set time of the Moon
+                      (topocentric "set azimuth").  The horizontal
+                      angular distance between the topocentric set
+                      azimuth and the West direction is also known as the
+                      topocentric "set width" of the Moon.  *Note
+                      Standard set time of the Moon: x-Moon-standard-set,
+                      for further details.
+
+`R'     `('           Calculates the approximate topocentric, apparent
+                      phase angle of the Moon in range 0.0...1.0 as it
+                      happen at standard rise time of the Moon
+                      (topocentric "rise phase angle").  *Note Standard
+                      rise time of the Moon: x-Moon-standard-rise, for
+                      further details.
+
+`R'     `)'           Calculates the approximate topocentric, apparent
+                      phase angle of the Moon in range 0.0...1.0 as it
+                      happen at standard set time of the Moon
+                      (topocentric "set phase angle").  *Note Standard
+                      set time of the Moon: x-Moon-standard-set, for
+                      further details.
+
+`S'     `(', `)'      Calculates the approximate geocentric, apparent
+                      elevation of the Moon in degrees and arcminutes as
+                      it happen at astronomical midnight time of the Moon
+                      (geocentric "midnight height").  *Note Astronomical
+                      midnight time of the Moon: x-Moon-midnight, for
+                      further details.
+
+`T'     `(', `)'      Calculates the approximate geocentric, apparent
+                      phase angle of the Moon in range 0.0...1.0 as it
+                      happen at astronomical midnight time of the Moon
+                      (geocentric "midnight phase angle").  *Note
+                      Astronomical midnight time of the Moon:
+                      x-Moon-midnight, for further details.
+
+`U'     `(', `)'      Calculates the approximate geocentric, apparent
+                      elevation of the Moon in degrees and arcminutes as
+                      it happen at astronomical noon time of the Moon
+                      (geocentric "noon height").  *Note Astronomical
+                      noon time of the Moon: x-Moon-noon, for further
+                      details.
+
+`V'     `(', `)'      Calculates the approximate geocentric, apparent
+                      phase angle of the Moon in range 0.0...1.0 as it
+                      happen at astronomical noon time of the Moon
+                      (geocentric "noon phase angle").  *Note
+                      Astronomical noon time of the Moon: x-Moon-noon,
+                      for further details.
+
+`W'     `('           Calculates the approximate geocentric, apparent
+                      elevation of the Moon in degrees and arcminutes as
+                      it happen at standard rise time of the Moon
+                      (geocentric "rise height").  *Note Standard rise
+                      time of the Moon: x-Moon-standard-rise, for further
+                      details.
+
+`W'     `)'           Calculates the approximate geocentric, apparent
+                      elevation of the Moon in degrees and arcminutes as
+                      it happen at standard set time of the Moon
+                      (geocentric "set height").  *Note Standard set time
+                      of the Moon: x-Moon-standard-set, for further
+                      details.
+
+`X'     `('           Calculates the approximate geocentric, apparent
+                      azimuth of the Moon in degrees and arcminutes as it
+                      happen at standard rise time of the Moon
+                      (geocentric "rise azimuth").  The horizontal
+                      angular distance between the geocentric rise
+                      azimuth and the East direction is also known as the
+                      geocentric "rise width" of the Moon.  *Note
+                      Standard rise time of the Moon:
+                      x-Moon-standard-rise, for further details.
+
+`X'     `)'           Calculates the approximate geocentric, apparent
+                      azimuth of the Moon in degrees and arcminutes as it
+                      happen at standard set time of the Moon (geocentric
+                      "set azimuth").  The horizontal angular distance
+                      between the geocentric set azimuth and the West
+                      direction is also known as the geocentric "set
+                      width" of the Moon.  *Note Standard set time of the
+                      Moon: x-Moon-standard-set, for further details.
+
+`Y'     `('           Calculates the approximate geocentric, apparent
+                      phase angle of the Moon in range 0.0...1.0 as it
+                      happen at standard rise time of the Moon
+                      (geocentric "rise phase angle").  *Note Standard
+                      rise time of the Moon: x-Moon-standard-rise, for
+                      further details.
+
+`Y'     `)'           Calculates the approximate geocentric, apparent
+                      phase angle of the Moon in range 0.0...1.0 as it
+                      happen at standard set time of the Moon (geocentric
+                      "set phase angle").  *Note Standard set time of the
+                      Moon: x-Moon-standard-set, for further details.
+
+  If no MODE is given, Gcal automatically uses that mode, which is
+enabled by the mode character `5'.  If a mode character is given that
+is not according to one of the `0'...`9', `a'...`z' and `A'...`Y'
+characters, Gcal also automatically uses that mode, which is enabled by
+the mode character `5'.
+
+  Depending on the selected mode, Gcal represents the Moon oriented
+special texts using the same types and styles as they are used by the
+Sun oriented special texts, these are analogously valid!  *Note
+Representation of the Sun oriented special texts: x-Sun-representation,
+for the detailed description of the different types of representation
+used by the Sun oriented special texts, which are likewise valid for
+the Moon oriented special texts.
+
+  The ARGUMENT the Moon oriented special texts must have is exactly
+equivalent the argument the Sun oriented special texts must have!
+*Note Arguments of the Sun oriented special texts: x-Sun-arguments, for
+the detailed description of the components of the ARGUMENT which also
+has to be given to the Moon oriented special texts.
+
+  The following table informs you about which type of representation is
+caused by a mode.  The previously defined numbering scheme, as it has
+been used for the introduction of the types of representation, is used
+as key value in the column that holds the type of representation.  The
+table also contains a column that shows whether a mode enables
+dynamical values, i.e. values that are depending on the respective
+clocktime (if you use the `--time-offset=ARGUMENT' option, you can
+change the respective clocktime that is used for calculating such
+values).  In a next table column, it is listed whether the given
+co-ordinate of the location influences the determination of a value,
+and the last column of the table gives you the information whether a
+given timezone value affects the values determination:
+
+*Mode*  *Representation Type*  *Dynamical*    *Co-ordinate*  *Timezone*
+
+`0'     3                      No             Yes            Yes
+`1'     3                      No             Yes            Yes
+`2'     3 or 4                 No             Yes            Yes
+`3'     3 or 4                 No             Yes            Yes
+`4'     3 or 4                 No             Yes            Yes
+`5'     3 or 4                 No             Yes            Yes
+`6'     6                      Yes            Yes            Yes
+`7'     6                      Yes            Yes            Yes
+`8'     2                      Yes            Yes            Yes
+`9'     1 or 1b                Yes            Yes            Yes
+`a'     7                      Yes            Yes            Yes
+`b'     6                      Yes            Yes            Yes
+`c'     7                      Yes            Yes            Yes
+`d'     6                      Yes            Yes            Yes
+`e'     7                      Yes            Yes            Yes
+`f'     4                      Yes            Yes            Yes
+`g'     1 or 1a                Yes            Yes            Yes
+`h'     6                      Yes            Yes            Yes
+`i'     6                      Yes            No             No
+`j'     6                      Yes            Yes            Yes
+`k'     6                      Yes            Yes            Yes
+`l'     2                      Yes            Yes            Yes
+`m'     1 or 1b                Yes            Yes            Yes
+`n'     7                      Yes            Yes            Yes
+`o'     6                      Yes            Yes            Yes
+`p'     7                      Yes            Yes            Yes
+`q'     6                      Yes            Yes            Yes
+`r'     7                      Yes            Yes            Yes
+`s'     4                      Yes            Yes            Yes
+`t'     1 or 1a                Yes            Yes            Yes
+`u'     6                      Yes            Yes            Yes
+`v'     2                      Yes            No             No
+`w'     3                      Yes            Yes            Yes
+`x'     3                      Yes            No             No
+`y'     1                      Yes            No             No
+`z'     1                      Yes            No             No
+`A'     7                      Yes            Yes            Yes
+`B'     7                      Yes            Yes            Yes
+`C'     7                      Yes            Yes            Yes
+`D'     7                      Yes            Yes            Yes
+`E'     7                      No             Yes            Yes
+`F'     7                      No             Yes            Yes
+`G'     7                      No             Yes            Yes
+`H'     7                      No             Yes            Yes
+`I'     5                      No             Yes            Yes
+`J'     5                      No             Yes            Yes
+`K'     5                      No             Yes            Yes
+`L'     7                      No             Yes            Yes
+`M'     1 or 1b                No             Yes            Yes
+`N'     7                      No             Yes            Yes
+`O'     1 or 1b                No             Yes            Yes
+`P'     7                      No             Yes            Yes
+`Q'     6                      No             Yes            Yes
+`R'     1 or 1b                No             Yes            Yes
+`S'     7                      No             Yes            Yes
+`T'     1 or 1b                No             Yes            Yes
+`U'     7                      No             Yes            Yes
+`V'     1 or 1b                No             Yes            Yes
+`W'     7                      No             Yes            Yes
+`X'     6                      No             Yes            Yes
+`Y'     1 or 1b                No             Yes            Yes
+
+And now some examples to these special texts:
+
+     The text `Moonrise at %(+5158+00738,120  in MS, BRD' will be
+     expanded to
+     ==> `Moonrise at 12:21 in MS, BRD', in case the actual system date
+     is the 1st June 1998.
+
+     The text `Moonset at %)*5+5158+00738,120  in MS, BRD' will be
+     expanded to
+     ==> `Moonset at 01:53am in MS, BRD', in case the actual system
+     date is the 1st June 1998.
+
+     The text `Moon visible %[5+5158+00738,120  in MS, BRD' will be
+     expanded to
+     ==> `Moon visible 13h32' in MS, BRD', in case the actual system
+     date is the 1st June 1998.
+
+     The text `Moon non-visible %]*+5158+00738,120  in MS, BRD' will be
+     expanded to
+     ==> `Moon non-visible 10.469 in MS, BRD', in case the actual
+     system date is the 1st June 1998.
+
+     The text `Moon azimuth 0 o'clock=%(*a+5158+00738,120  in MS, BRD'
+     will be expanded to
+     ==> `Moon azimuth 0 o'clock=267d37' in MS, BRD', in case the
+     actual system date is the 1st June 1998.
+
+     The text `Moonphase %(x+00+000 =%(*m+5158+00738,120 % in MS, BRD'
+     will be expanded to
+     ==> `Moonphase +16h00'=45.248% in MS, BRD', in case you call Gcal
+     with the `--time-offset=16:' option and the actual system date is
+     the 1st June 1998.
+
+     The text `Julian date at %(x+00+000 =%(y+00+000' will be expanded
+     to
+     ==> `Julian date at +10h15'=2450965.927', in case you call Gcal
+     with the `--time-offset=10:15' option and the actual system date
+     is the 1st June 1998.
+
+  Here is a list that reports about the used reference systems in a
+short manner, describes other aspects that are unmentioned now, and
+informs about the lacks and limitations that are existing for the Moon
+oriented special texts:
+
+   * All astronomical calculations are based on methods that use
+     --astronomically seen-- low-precision elements, which of course is
+     shown in the precision of the results that are caused by them.
+     Nevertheless in most cases, these results can be treated as more
+     as sufficiently precise if one measures their practical use.
+
+   * All azimuth and elevation values are always referring to the
+     center of the respective astronomical object, except the case, it
+     is stated otherwise.
+
+   * The base point of azimuth values, right ascension values and other
+     ecliptic co-ordinate values is always measured clockwise relative
+     to the geographical, true North (not the magnetic North as shown
+     by a compass), where angular values for the North direction are
+     both denoted as 0 degree and 360 degree.
+
+   * All topocentrically based azimuth and elevation values are always
+     corrected by the amount of atmospheric refraction.  Such a kind of
+     correction is always done if the center of the respective
+     astronomical object is above 2 degrees below the horizon.
+
+   * Generally, the rise and set times of the Moon cannot be precisely
+     predicted, because depending on unpredictable atmospheric
+     conditions, i.e. the local weather conditions as they appear
+     during these times change the amount of atmospheric refraction at
+     the horizon, so that the precalculated rise and set times may
+     throughout be in error by a minute or more.
+
+   * The accuracy of rise and set computations decreases again at high
+     latitudes, i.e. within in the lunar Arctic Circle.  There, small
+     variations in atmospheric refraction can change the time of
+     moonrise or moonset by many minutes, since the Moon intersects the
+     horizon at a very shallow angle.  For the same reason, at high
+     latitudes, the effects of observer height and local topography are
+     magnified and can substantially change the times of the phenomena
+     actually observed, or even whether the phenomena are observed to
+     occur at all.
+
+   * It is possible that calculations, which are done for locations
+     within the lunar Arctic Circle, sometimes result in the wrongly
+     **.** text instead of the more precisely ++:++ or -:- texts that
+     are used for marking special events.  Unfortunately, therefore,
+     then the reason why the Moon does not rise or set is no longer
+     clearly evident, respectively, it is possible to get the false
+     suggestion that the reason for non-rising or non-setting of the
+     Moon is caused by just the one day within a synodic month, at which
+     the Moon does not rise or set anyhow.  Unfortunately, it is just
+     only obvious *that* the Moon does not rise or set during this day.
+
+*Please also note the following references:*
+
+   * *Note Fixed dates option `--precise': x-precise, how to obtain a
+     more precise representation of the values which are cause by these
+     special texts.
+
+   * And note *Note Calendar option `--time-offset=ARGUMENT':
+     x-time-offset, how to change the clocktime, for which the
+     dynamical, i.e. depending on the respective clocktime, Moon
+     oriented special texts are calculated.
+
+   * Likewise, see *Note Fixed dates option `--cycle-end=ARGUMENT':
+     x-cycle-end, how the dynamical, i.e. depending on the respective
+     clocktime, Moon oriented special texts are calculated for a series
+     of clocktimes for the current day.
+
+   * Furthermore, see *Note Fixed dates option
+     `--adjust-value=ARGUMENT': x-adjust-value, how to change the
+     reference altitude that is used to calculate the rise and set
+     times.
+
+   * And last, note *Note Fixed dates option
+     `--atmosphere=AIR-PRESSURE[,TEMPERATURE]': x-atmosphere, how to
+     change the base data of the atmosphere that affects the calculation
+     of the Moon oriented special texts.
+
+  All Moon oriented special texts *must* always be trailed by a
+_whitespace_ character which is removed in output!
+

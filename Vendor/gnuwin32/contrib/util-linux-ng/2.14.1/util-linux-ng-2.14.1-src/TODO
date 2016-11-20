@@ -1,0 +1,71 @@
+v2.15:
+=====
+
+ * add libfsprobe (see topic/fsprobe branch)
+
+ * swapon -s  -- LABELs support
+
+   Although mkswap has recently been -L option to create a label nothing appears to
+   have been change to swapon to display said labels. (rh#430386)
+
+ * try improve compilation against others libc:
+	- klibc
+	- ???
+
+ * use rpmatch() for all Y/N questions
+
+ * mount -a -- reorder fstab entries by paths before mount (just idea only)
+
+ * mount -a  (just idea only)
+
+        Date:   Sun, 3 Jun 2007 18:04:24 +0300 (MET DST)
+        From: Szabolcs Szakacsits <szaka@sienet.hu>
+
+	In the past the right record order could be figured out easily by just
+	checking out fstab (if one knew what to look for) but considering the
+	fastly increasing number of user space file systems and their usage, with
+	their path, library, etc dependencies, it's getting trickier and is a black
+	magic for most users because they simply expect drives to be mounted
+	independently of their order in fstab.
+
+	One typical, wrongly edited fstab example is:
+
+	  /dev/hda2 /             ext3      defaults  1 1
+	  /dev/hda1 /mnt/windows  ntfs-3g   defaults  0 0
+	  /dev/hda3 /usr          ext3      defaults  0 0
+
+	The events:
+
+	  mount  ->  /sbin/mount.ntfs-3g  ->
+		 ->  resolves to <path1>/ntfs-3g via a symlink ->
+		 ->  ntfs-3g requires at least <path2>/libfuse*
+
+	There are many potential solutions. For example installing everything on
+	the root file system which may be needed for successful mount. But this
+	is not always feasible or practical since we could end up putting almost
+	everything on the root file system in the end.
+
+	Another idea is an improved mount strategy:
+
+	  do {
+		try to mount all unmounted entries
+	  } while (not all mounted && at least one new was successfully mounted)
+
+v2.??:
+=====
+
+ * rewrite ipcs to use /proc/sys/kernel rather than unreliable syscalls
+   (there are problems with 32bit userspace on 64bit kernel)
+
+ * minix v3
+
+	From: Matthias Koenig <mkoenig@suse.de>
+	Date:   Tue, 25 Sep 2007 12:00:01 +0200
+
+	It seems that the kernel has support for minix fs v3
+	(though I have not tried it, just inspected some code when
+	trying to find a mkfs.minix issue).
+	It might be worth a thought implementing v3 support
+	(though I am not really sure how much people us minix fs ;-)
+	This might require some major code cleanup in mkfs.minix.
+

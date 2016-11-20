@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: Reverse Polish Mathematics</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile ReversePolishMath.html "Gri: Reverse Polish Mathematics" "Programming Gri" --> 
+
+
+<!-- @node   rpn Mathematics, Stack Operators, Mathematics, Programming -->
+<a name="rpnMathematics" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Programming.html#Programming" shape="rect" coords="516,2,532,24" href="Programming.html#Programming">
+<area alt="Gri: Mathematics" shape="rect" coords="557,2,573,24" href="Mathematics.html">
+<area alt="Gri: RPN stack operators" shape="rect" coords="581,2,599,24" href="StackOperators.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: RPN stack operators" shape="rect" coords="581,2,599,24" href="StackOperators.html">
+</map>
+<h2>10.9: Rpn (reverse-polish notation) Calculator</h2>
+
+Gri can do simple mathematics on numbers.  The syntax is reverse-polish
+notation (`<font color="#82140F"><code>rpn</code></font>'), which is used in some calculators.  Most users
+can learn rpn in a few minutes, so don't worry if you don't know RPN
+yet.
+<p>
+<b>Syntax</b>: rpn expressions can be used anywhere Gri expects a number.
+RPN expressions start with a opening curly brace (`<font color="#82140F"><code>{</code></font>') which is
+immediately followed by the word `<font color="#82140F"><code>rpn</code></font>'.  rpn expressions end with a
+closing curly brace (`<font color="#82140F"><code>}</code></font>').  Instead of `<font color="#82140F"><code>set x size 10</code></font>' you
+could write `<font color="#82140F"><code>set x size {rpn 20 2 /}</code></font>', where the expression
+`<font color="#82140F"><code>{rpn 20 2 /}</code></font>' tells Gri to insert the number 20 onto a stack,
+then insert the number 2 above it on the stack, and then divide the top
+two items on the stack.  The following are equivalent:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+set x size {rpn 20 2 /}           # 10 = 20/2
+set x size {rpn 30 2 / 5 -}       # 10 = (30/2-5)
+set x size {rpn pi 3.1415 / 10 *} # 10 = 10*pi/pi
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+If an rpn expression contains a variable whose value is ``missing'',
+then the value of the result of the expression will also be missing
+(unless the value of the missing variable is thrown away with a
+``pop'' operator).  However, if a missing value just happens to occur
+as the result of an intermediate calculation, then the result is not
+considered to be missing.
+<p>
+RPN operations can be divided roughly into the following groups.
+<p>
+<UL>
+<LI><a href="StackOperators.html#StackOperators">Stack Operators</a>: Operate on the rpn stack
+<LI><a href="RpnFunction.html#RpnFunctions">Rpn Functions</a>: Define a new rpn operator
+<LI><a href="TertiaryOperators.html#TertiaryOperators">Tertiary Operators</a>: Act on top three items on stack
+<LI><a href="BinaryOperators.html#BinaryOperators">Binary Operators</a>: Act on top two items on stack
+<LI><a href="UnaryOperators.html#UnaryOperators">Unary Operators</a>: Act on top item on stack
+<LI><a href="SolitaryOperators.html#SolitaryOperators">Solitary Operators</a>: Act alone
+<LI><a href="ManipulatingColumns.html#ManipulationofColumnsetc">Manipulation of Columns etc</a>: Act on data columns
+<LI><a href="RPNexamples.html#rpnExamples">rpn Examples</a>: A few examples
+</UL>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

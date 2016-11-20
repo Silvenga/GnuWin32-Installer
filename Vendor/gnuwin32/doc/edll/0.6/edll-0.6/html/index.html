@@ -1,0 +1,398 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Enhanced Dynamic Linking for MS-Windows</title>
+  <meta name="description"
+ content="The Enhanced Dynamic Linking Library to create plug-ins for your applications under Linux and MS-Windows with the exact same scheme">
+  <meta name="author" content="Alexis Wilke">
+  <meta name="keywords"
+ content="edll,enhanced,dynamic,link,linking,library,microsoft,windows,LGPL,free,undefined,symbol,linker,mingw,bfd">
+  <meta name="copyright" content="Copyright (c) 2005-2006  Alexis Wilke">
+</head>
+<body>
+<h1 style="text-align: center;">Enhanced Dynamic Linking Library<br>
+for MinGW under MS-Windows</h1>
+<div style="text-align: center;"><span style="font-weight: bold;">(Current
+version @version@)</span><br>
+</div>
+<br>
+<table style="width: 100%; text-align: left;" border="0" cellpadding="5"
+ cellspacing="5">
+  <tbody>
+    <tr>
+      <td style="border: 1px solid black; vertical-align: top;"
+ bgcolor="#cceecc" height="100%">
+      <table border="0" cellpadding="0" cellspacing="0" height="100%"
+ width="100%">
+        <tbody>
+          <tr>
+            <td>
+            <h3 style="text-align: center;">What's edll </h3>
+            <a href="#latest_news">Latest&nbsp;News</a><br>
+            <a href="#limitation">DLL&nbsp;limitation</a><br>
+            <a href="#usual">The&nbsp;usual&nbsp;solution</a><br>
+            <a href="#sub_dll">The&nbsp;sub-DLL&nbsp;solution</a><br>
+            <a href="#gimp">The&nbsp;Gimp&nbsp;solution</a><br>
+            <a href="#edll">The&nbsp;edll&nbsp;solution</a><br>
+            <br>
+            <hr style="width: 100%; height: 2px;">
+            <h3 style="text-align: center;">Links</h3>
+            <a href="edll.html">The&nbsp;edll&nbsp;Reference</a><br>
+            <a href="edll.html#requirements">Requirements<br>
+            </a><a href="edll.html#version">Versioning</a><br>
+            <a href="license.html">License</a><br>
+            <a href="edll.html#license">Document&nbsp;License</a><br>
+            <a href="edll.html#undefined_symbols">Undefined&nbsp;Symbols</a><br>
+            <a href="todo.html">TODO list</a><br>
+            <br>
+            <a href="https://sourceforge.net/projects/edll">SF&nbsp;Project</a><br>
+            <a
+ href="https://sourceforge.net/project/showfiles.php?group_id=137288">Download</a><br>
+            <a href="md5.html">tarball&nbsp;MD5</a><br>
+            <br>
+            <a href="http://edll.m2osw.com">EDLL&nbsp;at&nbsp;m2osw.com</a><br>
+            <a href="http://win32.m2osw.com/enhanced_dlls.html">Old&nbsp;Doc</a><br>
+            <br>
+            <hr style="width: 100%; height: 2px;">
+            <div style="text-align: center;">
+            <h3>Other projects<br>
+&amp; Docs</h3>
+            </div>
+            <a href="http://www.mingw.org">MinGW</a><br>
+            <a href="http://gnuwin32.sourceforge.net/">GnuWin32</a><br>
+            <br>
+            <a
+ href="http://sources.redhat.com/binutils/docs-2.15/bfd/index.html">BFD</a><br>
+            <a
+ href="http://sources.redhat.com/binutils/docs-2.15/ld/index.html">ld</a><br>
+            <a href="http://www.mingw.org/download.shtml#hdr2">binutils
+(MinGW)</a><br>
+            <br>
+            <a href="http://www.gnu.org/software/libtool/manual.html">ltdl
+manual</a><br>
+            <a
+ href="http://gnuwin32.sourceforge.net/packages/libtool.htm">ltdl
+(gnuwin32)</a><br>
+            <a href="http://www.gnu.org/software/libtool/libtool.html">ltdl
+(GNU)</a><br>
+            <br>
+            <a href="http://www.gimp.org/">Gimp</a><br>
+            <a href="http://libgpmi.sourceforge.net/">GPMI&nbsp;library</a><br>
+            <br>
+            <a
+ href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dllproc/base/loadlibrary.asp">LoadLibrary()</a><br>
+            <a
+ href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/memory/base/virtualalloc.asp">VirtualAlloc()</a><br>
+            <a
+ href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/memory/base/virtualprotect.asp">VirtualProtect()</a><br>
+            <br>
+            <hr style="width: 100%; height: 2px;"> <br>
+            <br>
+            </td>
+          </tr>
+          <tr>
+            <td align="center"> <img src="images/dot.png"
+ alt="A dot for separation" height="8" width="8"><br>
+            <br>
+            <img src="images/dot.png" alt="A dot for separation"
+ height="8" width="8"><br>
+            <br>
+            <img src="images/dot.png" alt="A dot for separation"
+ height="8" width="8"><br>
+            <iframe src="http://edll.m2osw.com/cgi-bin/counter.cgi"
+ bgcolor="#cceecc" frameborder="0" height="75" width="130"> </iframe> <br>
+            <img src="images/dot.png" alt="A dot for separation"
+ height="8" width="8"><br>
+            <br>
+            <img src="images/dot.png" alt="A dot for separation"
+ height="8" width="8"><br>
+            <br>
+            <img src="images/dot.png" alt="A dot for separation"
+ height="8" width="8"><br>
+            <br>
+            </td>
+          </tr>
+          <tr style="font-style: italic;">
+            <td style="text-align: center;" height="100%"
+ valign="bottom"> <img src="images/dot.png" alt="A dot for separation"
+ height="8" width="8"><br>
+            <br>
+            <img src="images/dot.png" alt="A dot for separation"
+ height="8" width="8"><br>
+            <br>
+            <img src="images/dot.png" alt="A dot for separation"
+ height="8" width="8"><br>
+            <br>
+This project is<br>
+hosted by:<br>
+            <a href="http://sourceforge.net"><img
+ src="http://sourceforge.net/sflogo.php?group_id=137288&amp;type=1"
+ alt="SourceForge.net Logo" border="0" height="31" width="88"></a><br>
+Thank you!</td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+      <td style="vertical-align: top;">
+      <hr style="width: 100%; height: 2px;"><br>
+Welcome to the <span style="font-weight: bold;">edll</span> home page.
+This page presents the library, the
+reasons behind creating it and how to use it. The library already
+works, but it is not yet finished. If you can help, I'll very much
+appreciate (see the <a href="todo.html">TODO</a> list). I'll be
+glad to give other developers access to the project too.<br>
+      <br>
+Version 0.5 now includes a binary and source distribution (.zip files)
+which works directly with <a href="http://www.mingw.org/">MinGW</a>.
+Soon, you should also be able to download <span
+ style="font-weight: bold;">edll</span> directly from the <a
+ href="http://www.mingw.org/">MinGW</a> project.<br>
+      <br>
+For those who downloaded the older version (0.2), there are some good
+news. The newer version (0.4) now properly handles COMMON sections.
+This is similar to a BSS section, just under a different name. This
+means many more programs will be supported by the <span
+ style="font-weight: bold;">edll</span>. Special thanks to Patric Stout
+(see the <a href="http://sourceforge.net/projects/libgpmi">GPMI</a>
+project)
+for his help in deciphering several problems with the newer version of
+BFD.<br>
+      <br>
+      <hr style="width: 100%; height: 2px;">
+      <h3><span style="font-weight: bold;"><a name="latest_news">Latest News</a></span></h3>
+      <pre>
+      @news@
+      </pre>
+      <hr style="width: 100%; height: 2px;">
+      <h3><span style="font-weight: bold;"><a name="limitation">DLL
+limitation</a></span></h3>
+      <img title="Fig 1." alt="Links as intended by Microsoft (Fig 1.)"
+ src="images/link-ms.jpg" style="width: 176px; height: 195px;"
+ align="right">As many people may know, DLLs have one limitation: they
+cannot have even
+one undefined symbol. This means at the time you create a DLL, you must
+link it against other DLLs in order to get all the undefined symbols
+from the object files
+resolved in some way.<br>
+      <br>
+In most cases this is fine. A good design expects that if a DLL <span
+ style="font-weight: bold;">a</span> depends on the DLL <span
+ style="font-weight: bold;">b</span>, then <span
+ style="font-weight: bold;">b</span> doesn't require <span
+ style="font-weight: bold;">a</span>. This is true when you create a
+library in which you offer some functionality for different projects to
+use.<br>
+      <br>
+Now, what we need more and more are plug-ins. Plug-ins are very similar
+to DLLs. In fact, under Unices (Linux and others) you create shared
+libraries and you call them plug-ins. Voila. With a DLL this doesn't
+work too well since it can't have undefined symbols and by default a
+DLL doesn't link back to your application (EXE). A plug-in is
+expected to link against the main application.<br>
+      <br>
+So? What's the solution? The following attempts to answer this question
+with the different solutions I've seen in use by other software.<br>
+      <br>
+      <small><span style="font-style: italic;">Legend: Fig 1. this
+figure presents an application (EXE) which needs two DLLs (DLL 1 and
+DLL 2) to start. DLL 1 needs DLL 3. DLL 2 needs DLL 3 and DLL 4. As you
+can see, this is a top-down design. It works great when the DLLs are
+used just as libraries of functions to be used by the executable.</span></small><br>
+      <br>
+      <hr style="width: 100%; height: 2px;">
+      <h3><a name="usual"></a>The usual solution</h3>
+There are several solutions to overcome the DLL limitations, but the
+most common is certainly to create a way for
+the plug-ins to receive a pointer to an object defined in the main
+application. This object can include function calls as well as data
+(very easy when you use a language such as C++).<br>
+      <br>
+This is a very good solution for projects such as Apache which have a
+very precise and small interface to interact with all the different
+plug-ins.<br>
+      <br>
+This looks more or less like this:<br>
+      <pre>	/* define one structure like this in your main app. */<br>	typedef void (*func1)(int arg1, int arg2);<br>	typedef void (*func2)(int arg1, int arg2);<br>	struct plugin_t {<br>		const char *name;<br>		func1	f1;<br>		func2	f2;<br>	};<br><br>	plugin_t pi_info = { "Info", my_func1, my_func2 };<br><br>	/* give a pointer to your plug-in */<br>	init = GetProcAddress("init");<br>	(*init)(&amp;pi_info);<br></pre>
+(note that in Apache, it goes the other way around: the plug-in has a
+structure which is given to Apache on initialization).<br>
+      <br>
+Again, this is a good solution if you don't have to offer the plug-ins
+the use of several thousand functions from the main application.
+Imagine writing such a structure for even just 100 functions... Good
+luck! Or maybe you want to read on...<br>
+      <br>
+      <small><span style="font-style: italic;">Note: this solution uses
+DLLs as presented in Fig 1. above.</span></small><br>
+      <br>
+      <hr style="width: 100%; height: 2px;">
+      <h3><a name="sub_dll"></a>The sub-DLL solution</h3>
+      <img title="Fig 2." alt="A usual solution (Fig 2.)"
+ src="images/link-dll.jpg" style="width: 176px; height: 195px;"
+ align="right">Another solution is to create a very small application
+which only
+purpose is to link against a large DLL which actually is the real
+application. This DLL can export all the symbols you need in your
+plug-ins. This is a good solution and you should go for it if you don't
+mind.<br>
+      <br>
+The figure shows that the plug-ins can themselves be linked with other
+DLLs. This is a good idea since the same DLLs could be used by multiple
+plug-ins.<br>
+      <br>
+One draw back when you use MinGW: you need to create a DLL which links
+against the GNU
+DLLs and that's not an option if you need to create a commercial
+application.<br>
+      <br>
+      <small style="font-style: italic;">Legend: Fig 2. this figure
+presents how one can use a DLL to trick the system to link against
+one's main application. Here we see a starter (the only .EXE file)
+which requires DLL 1 to work. DLL 1 is actually one's main application.
+At any time, it is possible to load a plug-in (DLL 3 or DLL 4) which
+back link to the main application. Note that a plug-in can itself link
+to a library (DLL 3 is linked to DLL 2).</small><br>
+      <br>
+      <hr style="width: 100%; height: 2px;">
+      <h3><a name="gimp">The Gimp solution</a></h3>
+      <img alt="The GIMP solution" title="Fig 3."
+ src="images/link-gimp.jpg" style="width: 176px; height: 195px;"
+ align="right">The Gimp authors (and others) have a way to actually
+trick the
+linker in creating a DLL
+plug-in which will back link to the main application.<br>
+      <br>
+This is fairly simple to do, however, it looks rather messy and
+cumbersome (it adds about 5 command lines). And it most certainly won't
+be supported any time soon by
+the MinGW or GNU people in a seamless fashion.<br>
+      <br>
+The solution is to create a <span style="font-style: italic;">.def</span>
+and <span style="font-style: italic;">.a</span> set of files from your
+main
+application (see the -Wl,--output-implib option). These files can later
+be used to link your DLLs. And yes,
+this makes the linker think that the symbols are defined in another
+DLL. And indeed,
+if you look at it closely, they are defined since MS-Windows will find
+these symbols in the Gimp application.<br>
+      <br>
+So in other words, this solution is to trick the linker and later the
+LoadLibrary() function to look in the main application for symbols.<br>
+      <br>
+Note that there is one draw back: your main application needs to export
+the symbols the plug-ins need to access. You most certainly can export
+all of them if you wish. Otherwise, use the <code>__dllexport</code>
+extension
+to mark functions to be exported.<br>
+      <br>
+This is a great trick which I find much better than the two previous
+solutions.<br>
+      <br>
+      <small style="font-style: italic;">Legend: Fig 3. this figure
+presents the Gimp application (EXE) as it stands. It is built in such a
+way that it looks like a library (i.e. it has a list of Exports and the
+compiler can generate a .def file) so the plug-ins can be linked
+against it at compile time. Then the plug-ins (DLL 1 and DLL 2) can be
+loaded as plug-ins and they will automatically link against the
+application (EXE) when LoadLibrary() is called.</small><br>
+      <br>
+      <hr style="width: 100%; height: 2px;">
+      <h3><a name="edll"></a>The edll solution</h3>
+      <img alt="The EDLL back links too" title="Fig 4."
+ src="images/link-edll.jpg" style="width: 176px; height: 195px;"
+ align="right">What I propose (and that's most certainly not the
+ultimate) is: the
+Enhanced Dynamic Link Library solution (edll in short).<br>
+      <br>
+The edll is a library which your application can use to load plug-ins
+and DLLs. Whenever you need to load a Windows DLL,
+it uses the LoadLibrary() function from MS-Windows; and for your
+plug-ins, it uses the BFD
+library (Binary File Descriptor Library) and it will do the linking
+(also called relocation) on the
+fly (Yes! This means, the link is done dynamically at runtime).<br>
+      <br>
+Some advantages is that you do not have to load any of your plug-ins
+until you
+actually need them. For instance, a 3D tool working on large NURBs
+could load only the modules it needs for the computations required by
+these NURBs. This can save a lot of memory. Note that all the plug-ins
+can have as many undefined symbols as you want at compile time. The
+runtime dynamic linking will figure out the necessary relocating at
+the time the plug-ins are loaded.<br>
+      <br>
+For those who have used Unices which support undefined symbols all over
+the place, this library gives you the exact same functionality under
+the
+MinGW environment (Cygwin is not supported).<br>
+      <br>
+Of course, your main application can't have any undefined symbols. This
+is because the MS-Windows loader can't deal with that situation. Note
+that Unices nearly work that way too. At the time the main application
+is loaded, it needs to have all of its symbols defined internally or
+using shared libraries. However, many Unices shared libraries can back
+link into the application. This is still not possible under MS-Windows.<br>
+      <br>
+There are a few quick the steps to create plug-ins with the edll (this
+will need
+enhancements to make it under the hood). Please, have a look at the
+tests for more working examples of this.<br>
+      <pre>	gcc -o file1.o file1.c<br>	gcc -o file2.o file2.c<br>	ld -r -o plugin.so file1.o file2.o<br></pre>
+Okay. How hard was that? Not too much I hope. What is missing here is
+a different specification in ld to understand -l to 'like libraries' to
+object files. It would automatically create the plugin (i.e. assume the
+-r option) and the necessary entries in the .load section (this
+section name is not official, if you know better, let me know!) Because
+the -l
+option doesn't work yet, we need to have some special data in the
+.c/.cpp
+files to specify the libraries required by each plug-ins. These will
+automatically be loaded when EDLL is used to load the resulting plug-in.<br>
+      <pre>	EDLL_LIBADD("kernel32.dll");</pre>
+This tells the <span style="font-weight: bold;">edll</span> to load <span
+ style="font-style: italic;">kernel32.dll</span> file before
+to try
+resolving all the symbols in this example plug-in. Note that if your
+main
+application already links with <span style="font-style: italic;">kernel32.dll</span>,
+the loading will be
+very fast, but at least one of your plug-ins (or even the main app.)
+will need to have this entry in the .load section because all the DLLs
+loaded automatically by MS-Windows
+at startup are not automatically accessible to the <span
+ style="font-weight: bold;">edll</span> environment.<br>
+      <br>
+Now, in your application, you need to use the open function to read a
+plug-in:<br>
+      <pre>	module = edll_open("plugin.so");</pre>
+The extension of your plug-in can be anything other than .dll (and I
+suggest you don't use .exe, .com, .sys and other well defined
+extensions). If you need a symbol from your plug-in, call the
+edll_sym()
+function. Once you are done with a plug-in, close it with edll_close().<br>
+      <br>
+      <small><span style="font-style: italic;">Legend: Fig 4. this
+figure presents the EDLL solution which is to keep all the symbols in
+all the modules (the debug info is, however, not required). Note that
+the plug-ins are not DLLs. Instead they are gcc object files with their
+symbol and relocation information. Plug-ins can specify which other
+DLL and plug-ins they need (OBJ 1 needs DLL 3) and
+they can back link to each others (OBJ 2 and OBJ 4 need each others).
+Note that a DLL still can't back link, but you should use them whenever
+possible.</span></small><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<div style="text-align: right;">________________________________________________________<br>
+<br>
+This page was created by <a
+ href="mailto:alexis_wilke@users.sourceforge.net">Alexis Wilke</a> (c)
+2005-2006<br>
+Last updated on @date@<br>
+</div>
+<br>
+<br>
+</body>
+</html>

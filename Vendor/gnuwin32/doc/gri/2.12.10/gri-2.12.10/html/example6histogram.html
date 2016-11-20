@@ -1,0 +1,64 @@
+<html>
+<head>
+<title>../../../gri-2.12.10-src/doc/examples/example6histogram.gri</title>
+</head>
+<body bgcolor="#FFFFFF">
+<i># This html document was prepared by gri2html based on the Gri script named</i>
+<br><i>#    <a href="../../../gri-2.12.10-src/doc/examples/example6histogram.gri">../../../gri-2.12.10-src/doc/examples/example6histogram.gri</a></i>
+<br># <i>Gri is available for free at <a href="http://gri.sourceforge.net">http://gri.sourceforge.net</a></i>
+<pre>
+<font color=#B22222># Example 6 -- Plot IR image of Gulf of Maine</font>
+
+<font color=#B22222># define characteristics of norda images</font>
+<font color=#0000EE>\0val =</font> <font color=#2F4F4F>"5"</font>			<font color=#B22222># 0 in image</font>
+<font color=#0000EE>\255val =</font> <font color=#2F4F4F>"30.5"</font>		<font color=#B22222># 255 in image</font>
+<font color=#0000EE>.rows. =</font> 128
+<font color=#0000EE>.cols. =</font> 128
+<font color=#0000EE>.pixel_width. =</font> 2
+<font color=#0000EE>.km. =</font> {<font color=#9400D3>rpn</font><font color=#CDAD00> .cols.</font><font color=#CDAD00> .pixel_width.</font> *}
+
+<font color=#B22222># get filenames</font>
+query<font color=#0000EE> \filename</font> <font color=#2F4F4F>"Name image file" ("example6image.dat"</font>)
+query<font color=#0000EE> \maskname</font> <font color=#2F4F4F>"Name mask  file" ("example6mask.dat"</font>)
+
+<font color=#B22222># get data</font>
+open<font color=#0000EE> \filename</font> binary uchar
+set image range<font color=#0000EE> \0val</font><font color=#0000EE> \255val
+</font>read image<font color=#CDAD00> .rows.</font><font color=#CDAD00> .cols.</font> box 0 0<font color=#CDAD00> .km.</font><font color=#CDAD00> .km.</font>
+close
+open<font color=#0000EE> \maskname</font> binary uchar
+read image mask<font color=#CDAD00> .rows.</font><font color=#CDAD00> .cols.</font>
+close
+
+<font color=#B22222># find out what grayscale method to use</font>
+query<font color=#0000EE> \histo</font> <font color=#2F4F4F>"Do histogram enhancement? (yes|no)" ("yes"</font>)
+query<font color=#0000EE> \minT</font>  <font color=#2F4F4F>"T/deg for white on page?          " ("10"</font>)
+query<font color=#0000EE> \maxT</font>  <font color=#2F4F4F>"T/deg for black on page?          " ("15"</font>)
+<font color=#0000EE>\incT =</font> <font color=#2F4F4F>"1"</font>
+
+<font color=#B22222># set up scales. </font>
+set x size 12.8
+set y size 12.8
+set x name <font color=#2F4F4F>"km"</font>
+set y name <font color=#2F4F4F>"km"</font>
+set x axis 0<font color=#CDAD00> .km.</font> 32
+set y axis 0<font color=#CDAD00> .km.</font> 32
+
+<font color=#B22222># plot image, grayscale, and histogram</font>
+<font color=#9400D3>if</font> {<font color=#2F4F4F>"<font color=#0000EE>\histo" =</font>= "yes"</font>}
+    set image grayscale using histogram black<font color=#0000EE> \maxT</font> white<font color=#0000EE> \minT
+</font><font color=#9400D3>else</font>
+    set image grayscale black<font color=#0000EE> \maxT</font> white<font color=#0000EE> \minT
+</font><font color=#9400D3>end if</font>
+draw image
+draw image palette left<font color=#0000EE> \minT</font> right<font color=#0000EE> \maxT</font> increment<font color=#0000EE> \incT
+</font>draw image histogram
+<font color=#9400D3>if</font> {<font color=#2F4F4F>"<font color=#0000EE>\histo" =</font>= "yes"</font>}
+    draw title <font color=#2F4F4F>"Example 6: grayscale histogram enhanced"</font>
+<font color=#9400D3>else</font>
+    draw title <font color=#2F4F4F>"Example 6: grayscale linear<font color=#0000EE> \minT</font> to<font color=#0000EE> \maxT"</font>
+</font><font color=#9400D3>end if</font>
+
+</pre>
+</body>
+</html>

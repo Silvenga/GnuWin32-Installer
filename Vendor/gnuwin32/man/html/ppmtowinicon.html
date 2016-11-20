@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Ppmtowinicon User Manual</TITLE></HEAD>
+<BODY>
+<H1>ppmtowinicon</H1>
+Updated: 01 May 2004
+<BR>
+<A HREF="ppmtowinicon.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+ppmtowinicon - convert PPM image into a Windows .ico file
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>ppmtowinicon</B>
+
+[<b>-andpgms</b>]
+
+[<b>-output=</b><i>output.ico</I>]
+
+[<I>ppmfile</I> [<i>andfile</i>] ...]
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>ppmtowinicon</b> reads one or more PPM images as input and
+produces a Microsoft Windows .ico file as output.
+
+<P>A Windows icon contains 1 or more images, at different resolutions
+and color depths.  When Windows wants to display the icon, it searches
+through the images to find the one the best matches the number of colors
+and resolution of the display.
+
+<P>Microsoft recommends including at least the following formats in each
+icon.
+
+<ul>
+<li>16 x 16 - 4 bpp
+<li>32 x 32 - 4 bpp
+<li>48 x 48 - 8 bpp
+</ul>
+
+<p>If you don't specify any input files, input is from Standard Input.
+
+<p>Output is to Standard Output unless you specify <b>-output</b>.
+
+<h3 id="transparency">Transparency</h3>
+
+<p>If you specify the <b>-andmask</b> option, you get (partly)
+transparent icons.  In that case, your arguments are pairs of file
+names, with the first file name being that of the image and the second
+file name being that of a standard Netpbm PGM transparency mask (see
+the <a href="pgm.html">pgm format specification</a>).
+
+<p>In a .ico file, there is no such thing as partial transparency
+(translucency).  Where the PGM mask says completely opaque, the icon will
+be opaque.  Everywhere else, the icon will be transparent.  Note that
+as with any Netpbm program, you can use a PBM image for the transparency
+mask and <b>ppmtowinicon</b> will treat it like a PGM.
+
+<P>The and mask is like an alpha mask, except for what it signifies in
+the "not opaque" areas.  In the usual case, the foreground image is
+black in those areas, and in that case the areas are fully transparent
+-- the background shows through the icon.  But in general, a not
+opaque pixel signifies that the background and foreground should be
+merged as follows: The intensities of the color components in the
+forgeground and background are represented as binary numbers, then
+corresponding bits of the background and foreground intensities are
+exlusive-or'ed together.  So there is a sort of reverse video effect.
+
+<p>If you don't want this special effect and instead want
+straightforward transparency, use the <b>-truetransparent</b> option.
+This causes <b>ppmtowinicon</b> to make the base image black
+everywhere your transparency mask says transparent, regardless of what
+color you input image is at that location.
+
+<p>If you don't specify <b>-andmask</b>, <b>ppmtowinicon</b> puts
+all-opaque and masks into the .ico file.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-andpgms</B>
+
+<DD>Include transparency information in the icons.
+See the <a href="ppmtowinicon.html#transparency">transparency section</a>.
+     
+<DT><B>-output=</b><i>output.ico</i>
+
+<DD>Name of output file.  By default, <b>ppmtowinicon</b> writes the
+icon to Standard Output.
+
+<DT><B>-truetransparent</b>
+
+<dd>Make transparency in the icon normal instead of the special reverse
+video effect.  See the <a href="ppmtowinicon.html#transparency">transparency section</a>.
+     
+</DL>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="winicontoppm.html">winicontoppm</A></B>,
+<B><A HREF="ppm.html">ppm</A></B>
+<B><A HREF="pgm.html">pgm</A></B>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 2000 by Lee Benfield.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="ppmtowinicon.html#lbAB">NAME</A>
+<LI><A HREF="ppmtowinicon.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="ppmtowinicon.html#lbAD">DESCRIPTION</A>
+<UL>
+  <LI><A HREF="ppmtowinicon.html#transparency">TRANSPARENCY</A>
+  </UL>
+<LI><A HREF="ppmtowinicon.html#lbAE">OPTIONS</A>
+<LI><A HREF="ppmtowinicon.html#lbAF">SEE ALSO</A>
+<LI><A HREF="ppmtowinicon.html#lbAG">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

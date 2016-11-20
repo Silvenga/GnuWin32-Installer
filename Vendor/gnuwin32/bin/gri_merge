@@ -1,0 +1,187 @@
+#!/usr/bin/perl
+$usage = "
+PURPOSE: Strings Gri PostScript files together.
+
+BUGS:    With old versions, of gri, make sure to match each `set clip
+ postscript on' with a `set clip postscript off'.
+
+USAGE (style 1):
+    gri_merge [OPTIONS] CxR a.ps b.ps ... > merged_file.ps
+ Merges the files onto one page, in 'C' columns and 'R' rows.  The C*R
+ files are given in the order of words on a page.  The page is
+ presumed to be 8.5x11 in size, as are all the input files, and the
+ input files are sized to fit, and kept in natural scale.
+
+USAGE (style 2):
+    gri_merge [OPTIONS] xcm ycm enlarge a.ps [b.ps ...] > merged_file.ps
+ Where `enlarge' is a scale factor applied after offsetting `xcm' to
+ the right and `ycm' upward.
+
+EXAMPLE (style 2):
+ The following
+   gri_merge  2 12 .5 a.ps \\
+            12 12 .5 b.ps \\
+             2  2 .5 c.ps \\
+            12  2 .5 d.ps > all.ps
+ produces 4 panels from gri plots done using margins and sizes
+ as specified in the following lines in a gri commandfile
+   set x margin 2
+   set x size 15
+   set y margin 2
+   set y size 15
+ The OPTIONS, available if your 'perl' has 'getopts' library, are:
+   -u graylevel -- set graylevel for underlay beneath panels, by default 0.75.
+                   Values range from 0 (black) to 1 (white), although a value
+                   of precisely 1 means do NOT draw underlay.
+   -b graylevel -- Set value for background under individual panels, again 0 
+                   for black to 1 for white, with 1 meaning no drawing.
+   -h           -- Print this help message and quit.
+";
+
+eval { require 'getopts.pl' ; };
+my $use_getopts = $@ ? 0 : 1;
+
+$underlay_gray = 0.9;
+$opt_u = -1;			# illegal value
+$background_gray = 1;
+$opt_b = -1;			# illegal value
+if ($use_getopts) {
+    &Getopts('hu:b:');
+    if ($opt_h) {
+        print "$usage";
+        exit 0;
+    }
+}
+
+$underlay_gray = $opt_u if $opt_u != -1;
+$underlay_gray = 0 if ($underlay_gray < 0);
+$underlay_gray = 1 if ($underlay_gray > 1);
+
+$background_gray = $opt_b if $opt_b != -1;
+$background_gray = 0 if ($background_gray < 0);
+$background_gray = 1 if ($background_gray > 1);
+
+$width_in  = 8.5;
+$height_in = 11.0;
+$width     =  $width_in * 2.54;		# Page width
+$height    = $height_in * 2.54;		# Page height
+
+# See if RowXColumn format
+($columns, $rows) = split("[xX]", $ARGV[0]);
+if ($rows) {
+    #
+    # Style 1
+    $xfac = 1 / $columns;
+    $yfac = 1 / $rows;
+    $mag = ($xfac < $yfac) ? $xfac : $yfac;
+    $i = 1;
+    $xmarg = 72 / 2.54 * ($width  -  $width * $columns * $mag) / 2;
+    $ymarg = 72 / 2.54 * ($height - $height *    $rows * $mag) / 2;
+    for ($r = $rows - 1; $r > -1; $r--) {
+	for ($c = 0; $c < $columns && $i <= $#ARGV; $c ++) {
+	    last if ($i > $#ARGV);
+	    $done_prolog = 0;
+	    $xcm =  $width * $mag * $c;
+	    $ycm = $height * $mag * $r;
+	    $xoff = $xcm * 72 / 2.54 + $xmarg;
+	    $yoff = $ycm * 72 / 2.54 + $ymarg;
+	    print STDERR "Panel '$file' origin = ($xcm, $ycm) cm, magnified $mag\n";
+	    open (FILE, "$ARGV[$i]") || die "Can't open $i-th file $ARGV[$i]\n";
+	    while(<FILE>) {
+		next if /^\/origstate save def/; # This data-explorer line messes up
+		next if /^origstate restore/;    # This data-explorer line messes up
+		next if /^%%Page:/; # These mess things up
+		if (/showpage/) {
+		    print "grestore                         % gri_merge\n";
+		    last if ($i != $#ARGV);
+		}
+		if ($i == 1 || $done_prolog) {
+		    if (/%%BoundingBox: (atend)/) {
+			print "%%BoundingBox: 0 0 612 792\n";
+		    } elsif (/%%BoundingBox:/) {
+			;
+		    } else {
+			print;
+		    }
+		}
+		if (/%%EndProlog/) {
+		    $done_prolog = 1;
+                    &grey_page if ($i == 1);
+		    &white_panel;
+		}
+	    }
+            $i++;
+	}
+    }
+} else {
+    #
+    # Style 2
+    $nargs = $#ARGV + 1;
+    die "$usage. ERROR: need 4, 8, 12, ..., arguments, not $nargs as given.\n"
+	if ($nargs < 4 || $nargs%4);
+    for($i = 0; $i < $nargs; $i += 4) {
+	$done_prolog = 0;
+	$xcm = $ARGV[$i + 0];
+	$ycm = $ARGV[$i + 1];
+	$xoff = 28.45 * $xcm;
+	$yoff = 28.45 * $ycm;
+	$mag = $ARGV[$i + 2];
+	$file = $ARGV[$i + 3];
+	print STDERR "Panel $i: '$file' origin = ($xcm, $ycm) cm, magnified $mag\n";
+	open (FILE, "$file") || die "Cannot open PostScript file $file\n";
+	while(<FILE>) {
+	    next if /^\/origstate save def/; # See above
+	    next if /^origstate restore/;    # See above
+	    next if /^%%Page:/;
+	    if (/showpage/) {
+		print "grestore               % gri_merge\n";
+		last if ($i != ($nargs - 4));
+	    }
+	    if ($i == 0 || $done_prolog) {
+		if (/^%%BoundingBox: (atend)/) {
+		    print "%%BoundingBox: 0 0 612 792\n";
+		} elsif (/^%%BoundingBox:/) {
+		    ;
+		} else {
+		    print;
+		}
+	    }
+	    if (/%%EndProlog/) {
+		$done_prolog = 1;
+                &grey_page if ($i == 0);
+		&white_panel;
+	    }
+	}
+    }
+}
+
+sub grey_page {
+    return if $underlay_gray == 1;
+    print "% gri_merge: `$ARGV[$i]' offset by ($xcm, $ycm) and scaled by $mag\n";
+    print "newpath                          % gri_merge\n";
+    if ($background_gray != 1) {
+	print "$underlay_gray setgray                     % gri_merge\n";
+	print "0 0 moveto                       % gri_merge\n";
+	print "$width_in 72 mul 0 lineto              % gri_merge\n";
+	print "$width_in 72 mul $height_in 72 mul lineto      % gri_merge\n";
+	print "0 $height_in 72 mul lineto               % gri_merge\n";
+	print "closepath                        % gri_merge\n";
+	print "fill                             % gri_merge\n";
+    }
+}
+sub white_panel {
+    print "% gri_merge: `$ARGV[$i]' offset by ($xcm, $ycm) and scaled by $mag\n";
+    print "gsave                            % gri_merge\n";
+    print "$xoff $yoff translate                  % gri_merge\n";
+    print "$mag $mag scale                    % gri_merge\n";
+    if ($background_gray != 1) {
+	print "newpath                          % gri_merge\n";
+	print "$background_gray setgray         % gri_merge\n";
+	print "0 0 moveto % gri_merge\n";
+	print "$width_in 72 mul 0 lineto % gri_merge\n";
+	print "$width_in 72 mul $height_in 72 mul lineto % gri_merge\n";
+	print "0 $height_in 72 mul lineto % gri_merge\n";
+	print "closepath                        % gri_merge\n";
+	print "fill                             % gri_merge\n";
+    }
+}

@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pamtojpeg2k User Manual</TITLE></HEAD>
+<BODY>
+<H1>PAMTOJPEG2K</H1>
+Updated: 27 October 2002
+<BR>
+<A HREF="pamtojpeg2k.html#index">Table Of Contents</A>
+
+<H2>NAME</H2>
+pamtojpeg2k - convert PAM/PNM image to a JPEG-2000 code stream
+
+<A NAME="synopsis">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pamtojpeg2k</B>
+[<B>-imgareatlx=</B><I>column</I>]
+[<B>-imgareatly=</B><I>row</I>]
+[<B>-tilegrdtlx=</B><I>column</I>]
+[<B>-tilegrdtly=</B><I>row</I>]
+[<B>-tilewidth=</B><I>columns</I>]
+[<B>-tileheight=</B><I>rows</I>]
+[<B>-prcwidth=</B><I>columns</I>]
+[<B>-prcheight=</B><I>rows</I>]
+[<B>-cblkwidth=</B><I>columns</I>]
+[<B>-cblkheight=</B><I>rows</I>]
+[<B>-mode=</B>{<B>integer</B>|<B>int</B>|<B>real</B>}]
+[<B>-compression=</B><I>ratio</I>]
+[<B>-ilyrrates=</B><I>ratestring</I>]
+[<B>-numrlvls=</B><I>number</I>]
+[<B>-progression=</B>{<B>lrcp</B>|<B>rlcp</B>|<B>rpcl</B>|<B>pcrl</B>|<B>cprl</B>}]
+[<B>-numgbits=</B><I>number</I>]
+[<B>-nomct</B>]
+[<B>-sop</B>]
+[<B>-eph</B>]
+[<B>-lazy</B>]
+[<B>-termall</B>]
+[<B>-segsym</B>]
+[<B>-vcausal</B>]
+[<B>-pterm</B>]
+[<B>-resetprob</B>]
+[<B>-verbose</B>]
+[<B>-debuglevel=</B><I>number</I>]
+<I>filename</I>
+
+<p>Minimum unique abbreviation of option is acceptable.  You may use double
+hyphens instead of single hyphen to denote options.  You may use white
+space in place of the equals sign to separate an option name from its value.
+
+
+<A NAME="description">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<P><B>pamtojpeg2k</b> converts the named PBM, PGM, PPM, or PAM file,
+or Standard Input if no file is named, to a JPEG-2000 code stream
+(JPC) file on Standard Output.
+
+<P>The JPEG-2000 specification specifies two different formats: JP2
+and JPEG-2000 code stream (JPC).  JP2 represents a visual image quite
+specifically, whereas JPC is a more or less arbitrary array of codes.
+<B>pamtojpeg2k</B> can't produce a JP2, but the JPC image that
+<b>pamtojpeg2k</b> produces is very similar to a JP2 if the input is a
+PBM, PGM, or PPM image or equivalent PAM image.  One difference is
+that that RGB intensity values in a JP2 are SRGB values, while
+<b>pamtojpeg2k</b> produces ITU Rec 709 values.  Those are very
+similar, but not identical.  Another difference is that a JP2 can
+contain extra information about an image that JPC cannot.
+
+<p>When the input is a PAM image other than a PBM, PGM, or PPM equivalent,
+the JPC raster produced contains whatever the PAM raster does.  It can have
+any number of planes with any meanings; the planes are in the same order in
+the JPC output as in the PAM input.
+
+<p>A JPC image has a "precision," which is the number of bits used for
+each code (in Netpbm lingo, "sample").  Actually, it has a separate
+precision for each component.  <b>pamtojpeg2k</b> uses for the
+precision of every component the least number of bits that can
+represent the maxval of the input image.  A JPC image does not have an
+independent concept of maxval; the maxval of a JPC sample is the
+maximum value that the number of bits specified by the precision can
+represent in pure binary code.  E.g. if the precision is 4, the maxval
+is 15.  <b>pamtojpeg2k</b> does of course scale the sample values from
+the input maxval to the output maxval.  Example: The input maxval is
+99.  This means JPC precision is 7 bits and the JPC maxval is 127.  A
+sample value of 33 in the input becomes a sample value of 43 in the
+output.
+
+<P><b>pamtojpeg2k</b> generates the JPC output with the <a
+href="http://www.ece.uvic.ca/~mdadams/jasper/">Jasper JPEG-2000
+library</a>.  See documentation of the library for details on what
+<b>pamtojpeg2k</b> produces.  Note that the Jasper library contains
+facilities for reading PNM images, but <b>pamtojpeg2k</b> does not use
+those.  It uses the Netpbm library instead.  Note that the makers of
+the Jasper library write it "JasPer," but Netpbm documentation follows
+standard American English typography rules, which don't allow that
+kind of capitalization.
+
+<P>Use <b>jpeg2ktopam</b> to convert in the other direction.
+
+<p>The program <b>jasper</b>, which is packaged with the Jasper 
+JPEG-2000 library, also converts between JPEG-2000 and PNM formats.
+Because it's packaged with the library, it may exploit it better, 
+especially recently added features.  However, since it does not use the
+Netpbm library to read and write the Netpbm formats, it doesn't do as
+good a job on that side.
+
+<A NAME="options">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+Most of the options are identical in name and function to options that the
+Jasper library JPC encoder subroutine takes.  See
+<a href="http://www.ece.uvic.ca/~mdadams/jasper/">Jasper documentation</a>
+for details.  Here, we document only options that are not direct analogs
+of Jasper options.
+
+<DL COMPACT>
+
+<DT><B>-compression=</b><i>ratio</i>
+
+<DD><i>ratio</i> is a floating point number that specifies the compression
+ratio.  <b>pamtojpeg2k</b> will adjust quality as necessary to ensure that
+you get this compression ratio.  E.g. 4 means the output will be about
+one fourth the size in bytes of the input file.
+
+<p>The compression ratio must be at least 1.  The default is 1, which means
+the output has all the quality of the input -- the conversion is lossless.
+
+<p>Note that though Jasper library takes a compression factor, this
+option specifies a compression ratio.  The compression factor is the
+multiplicative inverse of (1 divided by) the compression ratio.
+
+<DT><B>-verbose</b>
+
+<DD>This option causes <b>pamtojpeg2k</b> to issue informational messages about
+the conversion process.
+
+<DT><B>-debuglevel</b>=<i>number</i>
+
+<DD>This option controls debug messages from the Jasper library.  
+<b>pamtojpeg2k</b> passes <i>number</i> as the debug level to the Jasper
+JPC encoder.
+
+</DL>
+     
+<A NAME="examples">&nbsp;</A>
+<H2>EXAMPLES</H2>
+
+<P>This example compresses losslessly.
+
+<pre>
+  pamtojpeg2k myimg.ppm &gt;myimg.jpc
+</pre>
+
+<b>jpeg2ktopam</b> will recreate myimg.ppm exactly.
+
+<p>This example compresses the file to one tenth its original size, throwing
+away information as necessary.
+
+<pre>
+  pamtojpeg2k -compression=10 myimg.pgm &gt;myimg.jpc
+</pre>
+
+
+<A NAME="jpeg2000"></a>
+<H2>ABOUT JPEG-2000</H2>
+
+<p>JPEG-2000 is a format that compresses a visual image (or a similar set of
+data) into a minimal number of bytes for storage or transmission.  In that,
+its goal is similar to JPEG.  It has two main differences from JPEG.  
+
+<p>One difference is that it does a much better job on most images of
+throwing out information in order to achieve a smaller output.  That
+means when you reconstruct the image from the resulting compressed
+file, it looks a lot closer to the image you started with with
+JPEG-2000 than with JPEG, for the same compressed file size.  Or, looked
+at another way, with JPEG-2000 you get a much smaller file than with 
+JPEG for the same image quality.
+
+<p>The second difference is that with JPEG-2000, you decide how much
+compression you want and the compressor adjusts the quality to meet your
+requirement, whereas with JPEG, you decide how much quality you want
+and the compressor adjusts the size of the output to meet your requirement.
+I.e. with JPEG-2000, the quality of the result depends on the compressibility
+of the input, but with JPEG, the <em>size</em> of the result depends on
+the compressibility of the input.
+
+<p>With JPEG-2000, you can specify lossless compression, thus making it 
+compete with GIF and PNG.  With standard JPEG, you always lose something.
+(There are rumored to be variations of JPEG around that are lossless,
+though).
+
+<p>JPEG is much older than JPEG-2000 and far more popular.  JPEG is one of
+the half dozen most popular graphics formats and virtually all graphics
+facilities understand it.  JPEG-2000 is virtually unknown.
+
+<p>There is no compatibility between JPEG and JPEG-2000.  Programs that 
+read JPEG do not automatically read JPEG-2000 and vice versa.
+
+
+<A NAME="seealso">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="jpeg2ktopam.html">jpeg2ktopam</A></B>,
+<B><A HREF="pnmtojpeg.html">pnmtopeg</A></B>,
+<B><A HREF="ppm.html">ppm</A></B>,
+<B><A HREF="pgm.html">pgm</A></B>,
+<B><A HREF="pbm.html">pbm</A></B>,
+<B><A HREF="pam.html">pam</A></B>,
+
+<H2>History</H2>
+
+<p><b>pamtojpeg2k</b> was added to Netpbm in Release 10.12 (November 2002).
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pamtojpeg2k.html#synopsis">SYNOPSIS</A>
+<LI><A HREF="pamtojpeg2k.html#description">DESCRIPTION</A>
+<LI><A HREF="pamtojpeg2k.html#options">OPTIONS</A>
+<LI><A HREF="pamtojpeg2k.html#examples">EXAMPLES</A>
+<LI><A HREF="pamtojpeg2k.html#jpeg2000">ABOUT JPEG-2000</A>
+<LI><A HREF="pamtojpeg2k.html#seealso">SEE ALSO</A>
+</UL>
+</BODY>
+</HTML>

@@ -1,0 +1,3384 @@
+<html lang="en">
+<head>
+<title>Flex - a scanner generator</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Flex - a scanner generator">
+<meta name="generator" content="makeinfo 4.6">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+--></style>
+</head>
+<body>
+<h1 class="settitle">Flex - a scanner generator</h1>
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Name">Name</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Synopsis">Synopsis</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.1 Name</h3>
+
+<p>flex - fast lexical analyzer generator
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Synopsis">Synopsis</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Overview">Overview</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Name">Name</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.2 Synopsis</h3>
+
+<pre class="example">     flex [-bcdfhilnpstvwBFILTV78+? -C[aefFmr] -ooutput -Pprefix -Sskeleton]
+     [--help --version] [<var>filename</var> ...]
+     </pre>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Overview">Overview</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Description">Description</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Synopsis">Synopsis</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.3 Overview</h3>
+
+<p>This manual describes <code>flex</code>, a tool for generating programs
+that perform pattern-matching on text.  The manual
+includes both tutorial and reference sections:
+
+     <dl>
+<dt>Description
+     <dd>a brief overview of the tool
+
+     <br><dt>Some Simple Examples
+     <dd>
+<br><dt>Format Of The Input File
+     <dd>
+<br><dt>Patterns
+     <dd>the extended regular expressions used by flex
+
+     <br><dt>How The Input Is Matched
+     <dd>the rules for determining what has been matched
+
+     <br><dt>Actions
+     <dd>how to specify what to do when a pattern is matched
+
+     <br><dt>The Generated Scanner
+     <dd>details regarding the scanner that flex produces;
+how to control the input source
+
+     <br><dt>Start Conditions
+     <dd>introducing context into your scanners, and
+managing "mini-scanners"
+
+     <br><dt>Multiple Input Buffers
+     <dd>how to manipulate multiple input sources; how to
+scan from strings instead of files
+
+     <br><dt>End-of-file Rules
+     <dd>special rules for matching the end of the input
+
+     <br><dt>Miscellaneous Macros
+     <dd>a summary of macros available to the actions
+
+     <br><dt>Values Available To The User
+     <dd>a summary of values available to the actions
+
+     <br><dt>Interfacing With Yacc
+     <dd>connecting flex scanners together with yacc parsers
+
+     <br><dt>Options
+     <dd>flex command-line options, and the "%option"
+directive
+
+     <br><dt>Performance Considerations
+     <dd>how to make your scanner go as fast as possible
+
+     <br><dt>Generating C++ Scanners
+     <dd>the (experimental) facility for generating C++
+scanner classes
+
+     <br><dt>Incompatibilities With Lex And POSIX
+     <dd>how flex differs from AT&amp;T lex and the POSIX lex
+standard
+
+     <br><dt>Diagnostics
+     <dd>those error messages produced by flex (or scanners
+it generates) whose meanings might not be apparent
+
+     <br><dt>Files
+     <dd>files used by flex
+
+     <br><dt>Deficiencies / Bugs
+     <dd>known problems with flex
+
+     <br><dt>See Also
+     <dd>other documentation, related tools
+
+     <br><dt>Author
+     <dd>includes contact information
+</dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Description">Description</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Examples">Examples</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.4 Description</h3>
+
+<p><code>flex</code> is a tool for generating <dfn>scanners</dfn>: programs which
+recognized lexical patterns in text.  <code>flex</code> reads the given
+input files, or its standard input if no file names are
+given, for a description of a scanner to generate.  The
+description is in the form of pairs of regular expressions
+and C code, called <dfn>rules</dfn>. <code>flex</code> generates as output a C
+source file, <code>lex.yy.c</code>, which defines a routine <code>yylex()</code>. 
+This file is compiled and linked with the <code>-lfl</code> library to
+produce an executable.  When the executable is run, it
+analyzes its input for occurrences of the regular
+expressions.  Whenever it finds one, it executes the
+corresponding C code.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Examples">Examples</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Format">Format</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Description">Description</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.5 Some simple examples</h3>
+
+<p>First some simple examples to get the flavor of how one
+uses <code>flex</code>.  The following <code>flex</code> input specifies a scanner
+which whenever it encounters the string "username" will
+replace it with the user's login name:
+
+<pre class="example">     %%
+     username    printf( "%s", getlogin() );
+     </pre>
+
+   <p>By default, any text not matched by a <code>flex</code> scanner is
+copied to the output, so the net effect of this scanner is
+to copy its input file to its output with each occurrence
+of "username" expanded.  In this input, there is just one
+rule.  "username" is the <var>pattern</var> and the "printf" is the
+<var>action</var>.  The "%%" marks the beginning of the rules.
+
+   <p>Here's another simple example:
+
+<pre class="example">             int num_lines = 0, num_chars = 0;
+     
+     %%
+     \n      ++num_lines; ++num_chars;
+     .       ++num_chars;
+     
+     %%
+     main()
+             {
+             yylex();
+             printf( "# of lines = %d, # of chars = %d\n",
+                     num_lines, num_chars );
+             }
+     </pre>
+
+   <p>This scanner counts the number of characters and the
+number of lines in its input (it produces no output other
+than the final report on the counts).  The first line
+declares two globals, "num_lines" and "num_chars", which
+are accessible both inside <code>yylex()</code> and in the <code>main()</code>
+routine declared after the second "%%".  There are two rules,
+one which matches a newline ("\n") and increments both the
+line count and the character count, and one which matches
+any character other than a newline (indicated by the "." 
+regular expression).
+
+   <p>A somewhat more complicated example:
+
+<pre class="example">     /* scanner for a toy Pascal-like language */
+     
+     %{
+     /* need this for the call to atof() below */
+     #include &lt;math.h&gt;
+     %}
+     
+     DIGIT    [0-9]
+     ID       [a-z][a-z0-9]*
+     
+     %%
+     
+     {DIGIT}+    {
+                 printf( "An integer: %s (%d)\n", yytext,
+                         atoi( yytext ) );
+                 }
+     
+     {DIGIT}+"."{DIGIT}*        {
+                 printf( "A float: %s (%g)\n", yytext,
+                         atof( yytext ) );
+                 }
+     
+     if|then|begin|end|procedure|function        {
+                 printf( "A keyword: %s\n", yytext );
+                 }
+     
+     {ID}        printf( "An identifier: %s\n", yytext );
+     
+     "+"|"-"|"*"|"/"   printf( "An operator: %s\n", yytext );
+     
+     "{"[^}\n]*"}"     /* eat up one-line comments */
+     
+     [ \t\n]+          /* eat up whitespace */
+     
+     .           printf( "Unrecognized character: %s\n", yytext );
+     
+     %%
+     
+     main( argc, argv )
+     int argc;
+     char **argv;
+         {
+         ++argv, --argc;  /* skip over program name */
+         if ( argc &gt; 0 )
+                 yyin = fopen( argv[0], "r" );
+         else
+                 yyin = stdin;
+     
+         yylex();
+         }
+     </pre>
+
+   <p>This is the beginnings of a simple scanner for a language
+like Pascal.  It identifies different types of <var>tokens</var> and
+reports on what it has seen.
+
+   <p>The details of this example will be explained in the
+following sections.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Format">Format</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Patterns">Patterns</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Examples">Examples</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.6 Format of the input file</h3>
+
+<p>The <code>flex</code> input file consists of three sections, separated
+by a line with just <code>%%</code> in it:
+
+<pre class="example">     definitions
+     %%
+     rules
+     %%
+     user code
+     </pre>
+
+   <p>The <dfn>definitions</dfn> section contains declarations of simple
+<dfn>name</dfn> definitions to simplify the scanner specification,
+and declarations of <dfn>start conditions</dfn>, which are explained
+in a later section. 
+Name definitions have the form:
+
+<pre class="example">     name definition
+     </pre>
+
+   <p>The "name" is a word beginning with a letter or an
+underscore ('_') followed by zero or more letters, digits, '_',
+or '-' (dash).  The definition is taken to begin at the
+first non-white-space character following the name and
+continuing to the end of the line.  The definition can
+subsequently be referred to using "{name}", which will
+expand to "(definition)".  For example,
+
+<pre class="example">     DIGIT    [0-9]
+     ID       [a-z][a-z0-9]*
+     </pre>
+
+<p>defines "DIGIT" to be a regular expression which matches a
+single digit, and "ID" to be a regular expression which
+matches a letter followed by zero-or-more
+letters-or-digits.  A subsequent reference to
+
+<pre class="example">     {DIGIT}+"."{DIGIT}*
+     </pre>
+
+<p>is identical to
+
+<pre class="example">     ([0-9])+"."([0-9])*
+     </pre>
+
+<p>and matches one-or-more digits followed by a '.' followed
+by zero-or-more digits.
+
+   <p>The <var>rules</var> section of the <code>flex</code> input contains a series of
+rules of the form:
+
+<pre class="example">     pattern   action
+     </pre>
+
+<p>where the pattern must be unindented and the action must
+begin on the same line.
+
+   <p>See below for a further description of patterns and
+actions.
+
+   <p>Finally, the user code section is simply copied to
+<code>lex.yy.c</code> verbatim.  It is used for companion routines
+which call or are called by the scanner.  The presence of
+this section is optional; if it is missing, the second <code>%%</code>
+in the input file may be skipped, too.
+
+   <p>In the definitions and rules sections, any <em>indented</em> text or
+text enclosed in <code>%{</code> and <code>%}</code> is copied verbatim to the
+output (with the <code>%{}</code>'s removed).  The <code>%{}</code>'s must
+appear unindented on lines by themselves.
+
+   <p>In the rules section, any indented or %{} text appearing
+before the first rule may be used to declare variables
+which are local to the scanning routine and (after the
+declarations) code which is to be executed whenever the
+scanning routine is entered.  Other indented or %{} text
+in the rule section is still copied to the output, but its
+meaning is not well-defined and it may well cause
+compile-time errors (this feature is present for <code>POSIX</code> compliance;
+see below for other such features).
+
+   <p>In the definitions section (but not in the rules section),
+an unindented comment (i.e., a line beginning with "/*")
+is also copied verbatim to the output up to the next "*/".
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Patterns">Patterns</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Matching">Matching</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Format">Format</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.7 Patterns</h3>
+
+<p>The patterns in the input are written using an extended
+set of regular expressions.  These are:
+
+     <dl>
+<dt><code>x</code>
+     <dd>match the character <code>x</code>
+<br><dt><code>.</code>
+     <dd>any character (byte) except newline
+<br><dt><code>[xyz]</code>
+     <dd>a "character class"; in this case, the pattern
+matches either an <code>x</code>, a <code>y</code>, or a <code>z</code>
+<br><dt><code>[abj-oZ]</code>
+     <dd>a "character class" with a range in it; matches
+an <code>a</code>, a <code>b</code>, any letter from <code>j</code> through <code>o</code>,
+or a <code>Z</code>
+<br><dt><code>[^A-Z]</code>
+     <dd>a "negated character class", i.e., any character
+but those in the class.  In this case, any
+character EXCEPT an uppercase letter. 
+<br><dt><code>[^A-Z\n]</code>
+     <dd>any character EXCEPT an uppercase letter or
+a newline
+<br><dt><code></code><var>r</var><code>*</code>
+     <dd>zero or more <var>r</var>'s, where <var>r</var> is any regular expression
+<br><dt><code></code><var>r</var><code>+</code>
+     <dd>one or more <var>r</var>'s
+<br><dt><code></code><var>r</var><code>?</code>
+     <dd>zero or one <var>r</var>'s (that is, "an optional <var>r</var>")
+<br><dt><code></code><var>r</var><code>{2,5}</code>
+     <dd>anywhere from two to five <var>r</var>'s
+<br><dt><code></code><var>r</var><code>{2,}</code>
+     <dd>two or more <var>r</var>'s
+<br><dt><code></code><var>r</var><code>{4}</code>
+     <dd>exactly 4 <var>r</var>'s
+<br><dt><code>{</code><var>name</var><code>}</code>
+     <dd>the expansion of the "<var>name</var>" definition
+(see above)
+<br><dt><code>"[xyz]\"foo"</code>
+     <dd>the literal string: <code>[xyz]"foo</code>
+<br><dt><code>\</code><var>x</var><code></code>
+     <dd>if <var>x</var> is an <code>a</code>, <code>b</code>, <code>f</code>, <code>n</code>, <code>r</code>, <code>t</code>, or <code>v</code>,
+then the ANSI-C interpretation of \<var>x</var>. 
+Otherwise, a literal <code></code><var>x</var><code></code> (used to escape
+operators such as <code>*</code>)
+<br><dt><code>\0</code>
+     <dd>a NUL character (ASCII code 0)
+<br><dt><code>\123</code>
+     <dd>the character with octal value 123
+<br><dt><code>\x2a</code>
+     <dd>the character with hexadecimal value <code>2a</code>
+<br><dt><code>(</code><var>r</var><code>)</code>
+     <dd>match an <var>r</var>; parentheses are used to override
+precedence (see below)
+<br><dt><code></code><var>r</var><code></code><var>s</var><code></code>
+     <dd>the regular expression <var>r</var> followed by the
+regular expression <var>s</var>; called "concatenation"
+<br><dt><code></code><var>r</var><code>|</code><var>s</var><code></code>
+     <dd>either an <var>r</var> or an <var>s</var>
+<br><dt><code></code><var>r</var><code>/</code><var>s</var><code></code>
+     <dd>an <var>r</var> but only if it is followed by an <var>s</var>.  The text
+matched by <var>s</var> is included when determining whether this rule is
+the <dfn>longest match</dfn>, but is then returned to the input before
+the action is executed.  So the action only sees the text matched
+by <var>r</var>.  This type of pattern is called <dfn>trailing context</dfn>. 
+(There are some combinations of <code></code><var>r</var><code>/</code><var>s</var><code></code> that <code>flex</code>
+cannot match correctly; see notes in the Deficiencies / Bugs section
+below regarding "dangerous trailing context".) 
+<br><dt><code>^</code><var>r</var><code></code>
+     <dd>an <var>r</var>, but only at the beginning of a line (i.e.,
+which just starting to scan, or right after a
+newline has been scanned). 
+<br><dt><code></code><var>r</var><code>$</code>
+     <dd>an <var>r</var>, but only at the end of a line (i.e., just
+before a newline).  Equivalent to "<var>r</var>/\n".
+
+     <p>Note that flex's notion of "newline" is exactly
+whatever the C compiler used to compile flex
+interprets '\n' as; in particular, on some DOS
+systems you must either filter out \r's in the
+input yourself, or explicitly use <var>r</var>/\r\n for "r$". 
+<br><dt><code>&lt;</code><var>s</var><code>&gt;</code><var>r</var><code></code>
+     <dd>an <var>r</var>, but only in start condition <var>s</var> (see
+below for discussion of start conditions)
+&lt;<var>s1</var>,<var>s2</var>,<var>s3</var>&gt;<var>r</var>
+same, but in any of start conditions <var>s1</var>,
+<var>s2</var>, or <var>s3</var>
+<br><dt><code>&lt;*&gt;</code><var>r</var><code></code>
+     <dd>an <var>r</var> in any start condition, even an exclusive one. 
+<br><dt><code>&lt;&lt;EOF&gt;&gt;</code>
+     <dd>an end-of-file
+&lt;<var>s1</var>,<var>s2</var>&gt;&lt;&lt;EOF&gt;&gt;
+an end-of-file when in start condition <var>s1</var> or <var>s2</var>
+</dl>
+
+   <p>Note that inside of a character class, all regular
+expression operators lose their special meaning except escape
+('\') and the character class operators, '-', ']', and, at
+the beginning of the class, '^'.
+
+   <p>The regular expressions listed above are grouped according
+to precedence, from highest precedence at the top to
+lowest at the bottom.  Those grouped together have equal
+precedence.  For example,
+
+<pre class="example">     foo|bar*
+     </pre>
+
+<p>is the same as
+
+<pre class="example">     (foo)|(ba(r*))
+     </pre>
+
+<p>since the '*' operator has higher precedence than
+concatenation, and concatenation higher than alternation ('|'). 
+This pattern therefore matches <em>either</em> the string "foo" <em>or</em>
+the string "ba" followed by zero-or-more r's.  To match
+"foo" or zero-or-more "bar"'s, use:
+
+<pre class="example">     foo|(bar)*
+     </pre>
+
+<p>and to match zero-or-more "foo"'s-or-"bar"'s:
+
+<pre class="example">     (foo|bar)*
+     </pre>
+
+   <p>In addition to characters and ranges of characters,
+character classes can also contain character class
+<dfn>expressions</dfn>.  These are expressions enclosed inside <code>[</code>: and <code>:</code>]
+delimiters (which themselves must appear between the '['
+and ']' of the character class; other elements may occur
+inside the character class, too).  The valid expressions
+are:
+
+<pre class="example">     [:alnum:] [:alpha:] [:blank:]
+     [:cntrl:] [:digit:] [:graph:]
+     [:lower:] [:print:] [:punct:]
+     [:space:] [:upper:] [:xdigit:]
+     </pre>
+
+   <p>These expressions all designate a set of characters
+equivalent to the corresponding standard C <code>isXXX</code> function.  For
+example, <code>[:alnum:]</code> designates those characters for which
+<code>isalnum()</code> returns true - i.e., any alphabetic or numeric. 
+Some systems don't provide <code>isblank()</code>, so flex defines
+<code>[:blank:]</code> as a blank or a tab.
+
+   <p>For example, the following character classes are all
+equivalent:
+
+<pre class="example">     [[:alnum:]]
+     [[:alpha:][:digit:]
+     [[:alpha:]0-9]
+     [a-zA-Z0-9]
+     </pre>
+
+   <p>If your scanner is case-insensitive (the <code>-i</code> flag), then
+<code>[:upper:]</code> and <code>[:lower:]</code> are equivalent to <code>[:alpha:]</code>.
+
+   <p>Some notes on patterns:
+
+     <ul>
+<li>A negated character class such as the example
+"[^A-Z]" above <em>will match a newline</em> unless "\n" (or an
+equivalent escape sequence) is one of the
+characters explicitly present in the negated character
+class (e.g., "[^A-Z\n]").  This is unlike how many
+other regular expression tools treat negated
+character classes, but unfortunately the inconsistency
+is historically entrenched.  Matching newlines
+means that a pattern like [^"]* can match the
+entire input unless there's another quote in the
+input.
+
+     <li>A rule can have at most one instance of trailing
+context (the '/' operator or the '$' operator). 
+The start condition, '^', and "&lt;&lt;EOF&gt;&gt;" patterns
+can only occur at the beginning of a pattern, and,
+as well as with '/' and '$', cannot be grouped
+inside parentheses.  A '^' which does not occur at
+the beginning of a rule or a '$' which does not
+occur at the end of a rule loses its special
+properties and is treated as a normal character.
+
+     <p>The following are illegal:
+
+     <pre class="example">          foo/bar$
+          &lt;sc1&gt;foo&lt;sc2&gt;bar
+          </pre>
+
+     <p>Note that the first of these, can be written
+"foo/bar\n".
+
+     <p>The following will result in '$' or '^' being
+treated as a normal character:
+
+     <pre class="example">          foo|(bar$)
+          foo|^bar
+          </pre>
+
+     <p>If what's wanted is a "foo" or a
+bar-followed-by-a-newline, the following could be used (the special
+'|' action is explained below):
+
+     <pre class="example">          foo      |
+          bar$     /* action goes here */
+          </pre>
+
+     <p>A similar trick will work for matching a foo or a
+bar-at-the-beginning-of-a-line. 
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Matching">Matching</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Actions">Actions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Patterns">Patterns</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.8 How the input is matched</h3>
+
+<p>When the generated scanner is run, it analyzes its input
+looking for strings which match any of its patterns.  If
+it finds more than one match, it takes the one matching
+the most text (for trailing context rules, this includes
+the length of the trailing part, even though it will then
+be returned to the input).  If it finds two or more
+matches of the same length, the rule listed first in the
+<code>flex</code> input file is chosen.
+
+   <p>Once the match is determined, the text corresponding to
+the match (called the <var>token</var>) is made available in the
+global character pointer <code>yytext</code>, and its length in the
+global integer <code>yyleng</code>.  The <var>action</var> corresponding to the
+matched pattern is then executed (a more detailed
+description of actions follows), and then the remaining input is
+scanned for another match.
+
+   <p>If no match is found, then the <dfn>default rule</dfn> is executed:
+the next character in the input is considered matched and
+copied to the standard output.  Thus, the simplest legal
+<code>flex</code> input is:
+
+<pre class="example">     %%
+     </pre>
+
+   <p>which generates a scanner that simply copies its input
+(one character at a time) to its output.
+
+   <p>Note that <code>yytext</code> can be defined in two different ways:
+either as a character <em>pointer</em> or as a character <em>array</em>. 
+You can control which definition <code>flex</code> uses by including
+one of the special directives <code>%pointer</code> or <code>%array</code> in the
+first (definitions) section of your flex input.  The
+default is <code>%pointer</code>, unless you use the <code>-l</code> lex
+compatibility option, in which case <code>yytext</code> will be an array.  The
+advantage of using <code>%pointer</code> is substantially faster
+scanning and no buffer overflow when matching very large
+tokens (unless you run out of dynamic memory).  The
+disadvantage is that you are restricted in how your actions can
+modify <code>yytext</code> (see the next section), and calls to the
+<code>unput()</code> function destroys the present contents of <code>yytext</code>,
+which can be a considerable porting headache when moving
+between different <code>lex</code> versions.
+
+   <p>The advantage of <code>%array</code> is that you can then modify <code>yytext</code>
+to your heart's content, and calls to <code>unput()</code> do not
+destroy <code>yytext</code> (see below).  Furthermore, existing <code>lex</code>
+programs sometimes access <code>yytext</code> externally using
+declarations of the form:
+<pre class="example">     extern char yytext[];
+     </pre>
+   This definition is erroneous when used with <code>%pointer</code>, but
+correct for <code>%array</code>.
+
+   <p><code>%array</code> defines <code>yytext</code> to be an array of <code>YYLMAX</code> characters,
+which defaults to a fairly large value.  You can change
+the size by simply #define'ing <code>YYLMAX</code> to a different value
+in the first section of your <code>flex</code> input.  As mentioned
+above, with <code>%pointer</code> yytext grows dynamically to
+accommodate large tokens.  While this means your <code>%pointer</code> scanner
+can accommodate very large tokens (such as matching entire
+blocks of comments), bear in mind that each time the
+scanner must resize <code>yytext</code> it also must rescan the entire
+token from the beginning, so matching such tokens can
+prove slow.  <code>yytext</code> presently does <em>not</em> dynamically grow if
+a call to <code>unput()</code> results in too much text being pushed
+back; instead, a run-time error results.
+
+   <p>Also note that you cannot use <code>%array</code> with C++ scanner
+classes (the <code>c++</code> option; see below).
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Actions">Actions</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Generated%20scanner">Generated scanner</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Matching">Matching</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.9 Actions</h3>
+
+<p>Each pattern in a rule has a corresponding action, which
+can be any arbitrary C statement.  The pattern ends at the
+first non-escaped whitespace character; the remainder of
+the line is its action.  If the action is empty, then when
+the pattern is matched the input token is simply
+discarded.  For example, here is the specification for a
+program which deletes all occurrences of "zap me" from its
+input:
+
+<pre class="example">     %%
+     "zap me"
+     </pre>
+
+   <p>(It will copy all other characters in the input to the
+output since they will be matched by the default rule.)
+
+   <p>Here is a program which compresses multiple blanks and
+tabs down to a single blank, and throws away whitespace
+found at the end of a line:
+
+<pre class="example">     %%
+     [ \t]+        putchar( ' ' );
+     [ \t]+$       /* ignore this token */
+     </pre>
+
+   <p>If the action contains a '{', then the action spans till
+the balancing '}' is found, and the action may cross
+multiple lines.  <code>flex</code> knows about C strings and comments and
+won't be fooled by braces found within them, but also
+allows actions to begin with <code>%{</code> and will consider the
+action to be all the text up to the next <code>%}</code> (regardless of
+ordinary braces inside the action).
+
+   <p>An action consisting solely of a vertical bar ('|') means
+"same as the action for the next rule." See below for an
+illustration.
+
+   <p>Actions can include arbitrary C code, including <code>return</code>
+statements to return a value to whatever routine called
+<code>yylex()</code>.  Each time <code>yylex()</code> is called it continues
+processing tokens from where it last left off until it either
+reaches the end of the file or executes a return.
+
+   <p>Actions are free to modify <code>yytext</code> except for lengthening
+it (adding characters to its end-these will overwrite
+later characters in the input stream).  This however does
+not apply when using <code>%array</code> (see above); in that case,
+<code>yytext</code> may be freely modified in any way.
+
+   <p>Actions are free to modify <code>yyleng</code> except they should not
+do so if the action also includes use of <code>yymore()</code> (see
+below).
+
+   <p>There are a number of special directives which can be
+included within an action:
+
+     <ul>
+<li><code>ECHO</code> copies yytext to the scanner's output.
+
+     <li><code>BEGIN</code> followed by the name of a start condition
+places the scanner in the corresponding start
+condition (see below).
+
+     <li><code>REJECT</code> directs the scanner to proceed on to the
+"second best" rule which matched the input (or a
+prefix of the input).  The rule is chosen as
+described above in "How the Input is Matched", and
+<code>yytext</code> and <code>yyleng</code> set up appropriately.  It may
+either be one which matched as much text as the
+originally chosen rule but came later in the <code>flex</code>
+input file, or one which matched less text.  For
+example, the following will both count the words in
+the input and call the routine special() whenever
+"frob" is seen:
+
+     <pre class="example">                  int word_count = 0;
+          %%
+          
+          frob        special(); REJECT;
+          [^ \t\n]+   ++word_count;
+          </pre>
+
+     <p>Without the <code>REJECT</code>, any "frob"'s in the input would
+not be counted as words, since the scanner normally
+executes only one action per token.  Multiple
+<code>REJECT's</code> are allowed, each one finding the next
+best choice to the currently active rule.  For
+example, when the following scanner scans the token
+"abcd", it will write "abcdabcaba" to the output:
+
+     <pre class="example">          %%
+          a        |
+          ab       |
+          abc      |
+          abcd     ECHO; REJECT;
+          .|\n     /* eat up any unmatched character */
+          </pre>
+
+     <p>(The first three rules share the fourth's action
+since they use the special '|' action.)  <code>REJECT</code> is
+a particularly expensive feature in terms of
+scanner performance; if it is used in <em>any</em> of the
+scanner's actions it will slow down <em>all</em> of the
+scanner's matching.  Furthermore, <code>REJECT</code> cannot be used
+with the <code>-Cf</code> or <code>-CF</code> options (see below).
+
+     <p>Note also that unlike the other special actions,
+<code>REJECT</code> is a <em>branch</em>; code immediately following it
+in the action will <em>not</em> be executed.
+
+     </p><li><code>yymore()</code> tells the scanner that the next time it
+matches a rule, the corresponding token should be
+<em>appended</em> onto the current value of <code>yytext</code> rather
+than replacing it.  For example, given the input
+"mega-kludge" the following will write
+"mega-mega-kludge" to the output:
+
+     <pre class="example">          %%
+          mega-    ECHO; yymore();
+          kludge   ECHO;
+          </pre>
+
+     <p>First "mega-" is matched and echoed to the output. 
+Then "kludge" is matched, but the previous "mega-"
+is still hanging around at the beginning of <code>yytext</code>
+so the <code>ECHO</code> for the "kludge" rule will actually
+write "mega-kludge". 
+</ul>
+
+   <p>Two notes regarding use of <code>yymore()</code>.  First, <code>yymore()</code>
+depends on the value of <code>yyleng</code> correctly reflecting the
+size of the current token, so you must not modify <code>yyleng</code>
+if you are using <code>yymore()</code>.  Second, the presence of
+<code>yymore()</code> in the scanner's action entails a minor
+performance penalty in the scanner's matching speed.
+
+     <ul>
+<li><code>yyless(n)</code> returns all but the first <var>n</var> characters of
+the current token back to the input stream, where
+they will be rescanned when the scanner looks for
+the next match.  <code>yytext</code> and <code>yyleng</code> are adjusted
+appropriately (e.g., <code>yyleng</code> will now be equal to <var>n</var>
+).  For example, on the input "foobar" the
+following will write out "foobarbar":
+
+     <pre class="example">          %%
+          foobar    ECHO; yyless(3);
+          [a-z]+    ECHO;
+          </pre>
+
+     <p>An argument of 0 to <code>yyless</code> will cause the entire
+current input string to be scanned again.  Unless
+you've changed how the scanner will subsequently
+process its input (using <code>BEGIN</code>, for example), this
+will result in an endless loop.
+
+     <p>Note that <code>yyless</code> is a macro and can only be used in the
+flex input file, not from other source files.
+
+     </p><li><code>unput(c)</code> puts the character <code>c</code> back onto the input
+stream.  It will be the next character scanned. 
+The following action will take the current token
+and cause it to be rescanned enclosed in
+parentheses.
+
+     <pre class="example">          {
+          int i;
+          /* Copy yytext because unput() trashes yytext */
+          char *yycopy = strdup( yytext );
+          unput( ')' );
+          for ( i = yyleng - 1; i &gt;= 0; --i )
+              unput( yycopy[i] );
+          unput( '(' );
+          free( yycopy );
+          }
+          </pre>
+
+     <p>Note that since each <code>unput()</code> puts the given
+character back at the <em>beginning</em> of the input stream,
+pushing back strings must be done back-to-front. 
+An important potential problem when using <code>unput()</code> is that
+if you are using <code>%pointer</code> (the default), a call to <code>unput()</code>
+<em>destroys</em> the contents of <code>yytext</code>, starting with its
+rightmost character and devouring one character to the left
+with each call.  If you need the value of yytext preserved
+after a call to <code>unput()</code> (as in the above example), you
+must either first copy it elsewhere, or build your scanner
+using <code>%array</code> instead (see How The Input Is Matched).
+
+     <p>Finally, note that you cannot put back <code>EOF</code> to attempt to
+mark the input stream with an end-of-file.
+
+     </p><li><code>input()</code> reads the next character from the input
+stream.  For example, the following is one way to
+eat up C comments:
+
+     <pre class="example">          %%
+          "/*"        {
+                      register int c;
+          
+                      for ( ; ; )
+                          {
+                          while ( (c = input()) != '*' &amp;&amp;
+                                  c != EOF )
+                              ;    /* eat up text of comment */
+          
+                          if ( c == '*' )
+                              {
+                              while ( (c = input()) == '*' )
+                                  ;
+                              if ( c == '/' )
+                                  break;    /* found the end */
+                              }
+          
+                          if ( c == EOF )
+                              {
+                              error( "EOF in comment" );
+                              break;
+                              }
+                          }
+                      }
+          </pre>
+
+     <p>(Note that if the scanner is compiled using <code>C++</code>,
+then <code>input()</code> is instead referred to as <code>yyinput()</code>,
+in order to avoid a name clash with the <code>C++</code> stream
+by the name of <code>input</code>.)
+
+     </p><li>YY_FLUSH_BUFFER
+flushes the scanner's internal buffer so that the next time the scanner
+attempts to match a token, it will first refill the buffer using
+<code>YY_INPUT</code> (see The Generated Scanner, below).  This action is
+a special case of the more general <code>yy_flush_buffer()</code> function,
+described below in the section Multiple Input Buffers.
+
+     <li><code>yyterminate()</code> can be used in lieu of a return
+statement in an action.  It terminates the scanner
+and returns a 0 to the scanner's caller, indicating
+"all done".  By default, <code>yyterminate()</code> is also
+called when an end-of-file is encountered.  It is a
+macro and may be redefined. 
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Generated%20scanner">Generated scanner</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Start%20conditions">Start conditions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Actions">Actions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.10 The generated scanner</h3>
+
+<p>The output of <code>flex</code> is the file <code>lex.yy.c</code>, which contains
+the scanning routine <code>yylex()</code>, a number of tables used by
+it for matching tokens, and a number of auxiliary routines
+and macros.  By default, <code>yylex()</code> is declared as follows:
+
+<pre class="example">     int yylex()
+         {
+         ... various definitions and the actions in here ...
+         }
+     </pre>
+
+   <p>(If your environment supports function prototypes, then it
+will be "int yylex( void  )".)   This  definition  may  be
+changed by defining the "YY_DECL" macro.  For example, you
+could use:
+
+<pre class="example">     #define YY_DECL float lexscan( a, b ) float a, b;
+     </pre>
+
+   <p>to give the scanning routine the name <code>lexscan</code>, returning a
+float, and taking two floats as arguments.  Note that if
+you give arguments to the scanning routine using a
+K&amp;R-style/non-prototyped function declaration, you must
+terminate the definition with a semi-colon (<code>;</code>).
+
+   <p>Whenever <code>yylex()</code> is called, it scans tokens from the
+global input file <code>yyin</code> (which defaults to stdin).  It
+continues until it either reaches an end-of-file (at which
+point it returns the value 0) or one of its actions
+executes a <code>return</code> statement.
+
+   <p>If the scanner reaches an end-of-file, subsequent calls are undefined
+unless either <code>yyin</code> is pointed at a new input file (in which case
+scanning continues from that file), or <code>yyrestart()</code> is called. 
+<code>yyrestart()</code> takes one argument, a <code>FILE *</code> pointer (which
+can be nil, if you've set up <code>YY_INPUT</code> to scan from a source
+other than <code>yyin</code>), and initializes <code>yyin</code> for scanning from
+that file.  Essentially there is no difference between just assigning
+<code>yyin</code> to a new input file or using <code>yyrestart()</code> to do so;
+the latter is available for compatibility with previous versions of
+<code>flex</code>, and because it can be used to switch input files in the
+middle of scanning.  It can also be used to throw away the current
+input buffer, by calling it with an argument of <code>yyin</code>; but
+better is to use <code>YY_FLUSH_BUFFER</code> (see above).  Note that
+<code>yyrestart()</code> does <em>not</em> reset the start condition to
+<code>INITIAL</code> (see Start Conditions, below).
+
+   <p>If <code>yylex()</code> stops scanning due to executing a <code>return</code>
+statement in one of the actions, the scanner may then be called
+again and it will resume scanning where it left off.
+
+   <p>By default (and for purposes of efficiency), the scanner
+uses block-reads rather than simple <code>getc()</code> calls to read
+characters from <code>yyin</code>.  The nature of how it gets its input
+can be controlled by defining the <code>YY_INPUT</code> macro. 
+YY_INPUT's calling sequence is
+"YY_INPUT(buf,result,max_size)".  Its action is to place
+up to <var>max_size</var> characters in the character array <var>buf</var> and
+return in the integer variable <var>result</var> either the number of
+characters read or the constant YY_NULL (0 on Unix
+systems) to indicate EOF.  The default YY_INPUT reads from
+the global file-pointer "yyin".
+
+   <p>A sample definition of YY_INPUT (in the definitions
+section of the input file):
+
+<pre class="example">     %{
+     #define YY_INPUT(buf,result,max_size) \
+         { \
+         int c = getchar(); \
+         result = (c == EOF) ? YY_NULL : (buf[0] = c, 1); \
+         }
+     %}
+     </pre>
+
+   <p>This definition will change the input processing to occur
+one character at a time.
+
+   <p>When the scanner receives an end-of-file indication from
+YY_INPUT, it then checks the <code>yywrap()</code> function.  If
+<code>yywrap()</code> returns false (zero), then it is assumed that the
+function has gone ahead and set up <code>yyin</code> to point to
+another input file, and scanning continues.  If it returns
+true (non-zero), then the scanner terminates, returning 0
+to its caller.  Note that in either case, the start
+condition remains unchanged; it does <em>not</em> revert to <code>INITIAL</code>.
+
+   <p>If you do not supply your own version of <code>yywrap()</code>, then you
+must either use <code>%option noyywrap</code> (in which case the scanner
+behaves as though <code>yywrap()</code> returned 1), or you must link with
+<code>-lfl</code> to obtain the default version of the routine, which always
+returns 1.
+
+   <p>Three routines are available for scanning from in-memory
+buffers rather than files: <code>yy_scan_string()</code>,
+<code>yy_scan_bytes()</code>, and <code>yy_scan_buffer()</code>.  See the discussion
+of them below in the section Multiple Input Buffers.
+
+   <p>The scanner writes its <code>ECHO</code> output to the <code>yyout</code> global
+(default, stdout), which may be redefined by the user
+simply by assigning it to some other <code>FILE</code> pointer.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Start%20conditions">Start conditions</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Multiple%20buffers">Multiple buffers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Generated%20scanner">Generated scanner</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.11 Start conditions</h3>
+
+<p><code>flex</code> provides a mechanism for conditionally activating
+rules.  Any rule whose pattern is prefixed with "&lt;sc&gt;"
+will only be active when the scanner is in the start
+condition named "sc".  For example,
+
+<pre class="example">     &lt;STRING&gt;[^"]*        { /* eat up the string body ... */
+                 ...
+                 }
+     </pre>
+
+<p>will be active only when the scanner is in the "STRING"
+start condition, and
+
+<pre class="example">     &lt;INITIAL,STRING,QUOTE&gt;\.        { /* handle an escape ... */
+                 ...
+                 }
+     </pre>
+
+<p>will be active only when the current start condition is
+either "INITIAL", "STRING", or "QUOTE".
+
+   <p>Start conditions are declared in the definitions (first)
+section of the input using unindented lines beginning with
+either <code>%s</code> or <code>%x</code> followed by a list of names.  The former
+declares <em>inclusive</em> start conditions, the latter <em>exclusive</em>
+start conditions.  A start condition is activated using
+the <code>BEGIN</code> action.  Until the next <code>BEGIN</code> action is
+executed, rules with the given start condition will be active
+and rules with other start conditions will be inactive. 
+If the start condition is <em>inclusive</em>, then rules with no
+start conditions at all will also be active.  If it is
+<em>exclusive</em>, then <em>only</em> rules qualified with the start
+condition will be active.  A set of rules contingent on the
+same exclusive start condition describe a scanner which is
+independent of any of the other rules in the <code>flex</code> input. 
+Because of this, exclusive start conditions make it easy
+to specify "mini-scanners" which scan portions of the
+input that are syntactically different from the rest
+(e.g., comments).
+
+   <p>If the distinction between inclusive and exclusive start
+conditions is still a little vague, here's a simple
+example illustrating the connection between the two.  The set
+of rules:
+
+<pre class="example">     %s example
+     %%
+     
+     &lt;example&gt;foo   do_something();
+     
+     bar            something_else();
+     </pre>
+
+<p>is equivalent to
+
+<pre class="example">     %x example
+     %%
+     
+     &lt;example&gt;foo   do_something();
+     
+     &lt;INITIAL,example&gt;bar    something_else();
+     </pre>
+
+   <p>Without the <code>&lt;INITIAL,example&gt;</code> qualifier, the <code>bar</code> pattern
+in the second example wouldn't be active (i.e., couldn't match) when
+in start condition <code>example</code>.  If we just used <code>&lt;example&gt;</code>
+to qualify <code>bar</code>, though, then it would only be active in
+<code>example</code> and not in <code>INITIAL</code>, while in the first example
+it's active in both, because in the first example the <code>example</code>
+starting condition is an <em>inclusive</em> (<code>%s</code>) start condition.
+
+   <p>Also note that the special start-condition specifier <code>&lt;*&gt;</code>
+matches every start condition.  Thus, the above example
+could also have been written;
+
+<pre class="example">     %x example
+     %%
+     
+     &lt;example&gt;foo   do_something();
+     
+     &lt;*&gt;bar    something_else();
+     </pre>
+
+   <p>The default rule (to <code>ECHO</code> any unmatched character) remains
+active in start conditions.  It is equivalent to:
+
+<pre class="example">     &lt;*&gt;.|\\n     ECHO;
+     </pre>
+
+   <p><code>BEGIN(0)</code> returns to the original state where only the
+rules with no start conditions are active.  This state can
+also be referred to as the start-condition "INITIAL", so
+<code>BEGIN(INITIAL)</code> is equivalent to <code>BEGIN(0)</code>.  (The
+parentheses around the start condition name are not required but
+are considered good style.)
+
+   <p><code>BEGIN</code> actions can also be given as indented code at the
+beginning of the rules section.  For example, the
+following will cause the scanner to enter the "SPECIAL" start
+condition whenever <code>yylex()</code> is called and the global
+variable <code>enter_special</code> is true:
+
+<pre class="example">             int enter_special;
+     
+     %x SPECIAL
+     %%
+             if ( enter_special )
+                 BEGIN(SPECIAL);
+     
+     &lt;SPECIAL&gt;blahblahblah
+     ...more rules follow...
+     </pre>
+
+   <p>To illustrate the uses of start conditions, here is a
+scanner which provides two different interpretations of a
+string like "123.456".  By default it will treat it as as
+three tokens, the integer "123", a dot ('.'), and the
+integer "456".  But if the string is preceded earlier in
+the line by the string "expect-floats" it will treat it as
+a single token, the floating-point number 123.456:
+
+<pre class="example">     %{
+     #include &lt;math.h&gt;
+     %}
+     %s expect
+     
+     %%
+     expect-floats        BEGIN(expect);
+     
+     &lt;expect&gt;[0-9]+"."[0-9]+      {
+                 printf( "found a float, = %f\n",
+                         atof( yytext ) );
+                 }
+     &lt;expect&gt;\n           {
+                 /* that's the end of the line, so
+                  * we need another "expect-number"
+                  * before we'll recognize any more
+                  * numbers
+                  */
+                 BEGIN(INITIAL);
+                 }
+     
+     [0-9]+      {
+     
+     Version 2.5               December 1994                        18
+     
+                 printf( "found an integer, = %d\n",
+                         atoi( yytext ) );
+                 }
+     
+     "."         printf( "found a dot\n" );
+     </pre>
+
+   <p>Here is a scanner which recognizes (and discards) C
+comments while maintaining a count of the current input line.
+
+<pre class="example">     %x comment
+     %%
+             int line_num = 1;
+     
+     "/*"         BEGIN(comment);
+     
+     &lt;comment&gt;[^*\n]*        /* eat anything that's not a '*' */
+     &lt;comment&gt;"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
+     &lt;comment&gt;\n             ++line_num;
+     &lt;comment&gt;"*"+"/"        BEGIN(INITIAL);
+     </pre>
+
+   <p>This scanner goes to a bit of trouble to match as much
+text as possible with each rule.  In general, when
+attempting to write a high-speed scanner try to match as
+much possible in each rule, as it's a big win.
+
+   <p>Note that start-conditions names are really integer values
+and can be stored as such.  Thus, the above could be
+extended in the following fashion:
+
+<pre class="example">     %x comment foo
+     %%
+             int line_num = 1;
+             int comment_caller;
+     
+     "/*"         {
+                  comment_caller = INITIAL;
+                  BEGIN(comment);
+                  }
+     
+     ...
+     
+     &lt;foo&gt;"/*"    {
+                  comment_caller = foo;
+                  BEGIN(comment);
+                  }
+     
+     &lt;comment&gt;[^*\n]*        /* eat anything that's not a '*' */
+     &lt;comment&gt;"*"+[^*/\n]*   /* eat up '*'s not followed by '/'s */
+     &lt;comment&gt;\n             ++line_num;
+     &lt;comment&gt;"*"+"/"        BEGIN(comment_caller);
+     </pre>
+
+   <p>Furthermore, you can access the current start condition
+using the integer-valued <code>YY_START</code> macro.  For example, the
+above assignments to <code>comment_caller</code> could instead be
+written
+
+<pre class="example">     comment_caller = YY_START;
+     </pre>
+
+   <p>Flex provides <code>YYSTATE</code> as an alias for <code>YY_START</code> (since that
+is what's used by AT&amp;T <code>lex</code>).
+
+   <p>Note that start conditions do not have their own
+name-space; %s's and %x's declare names in the same fashion as
+#define's.
+
+   <p>Finally, here's an example of how to match C-style quoted
+strings using exclusive start conditions, including
+expanded escape sequences (but not including checking for
+a string that's too long):
+
+<pre class="example">     %x str
+     
+     %%
+             char string_buf[MAX_STR_CONST];
+             char *string_buf_ptr;
+     
+     \"      string_buf_ptr = string_buf; BEGIN(str);
+     
+     &lt;str&gt;\"        { /* saw closing quote - all done */
+             BEGIN(INITIAL);
+             *string_buf_ptr = '\0';
+             /* return string constant token type and
+              * value to parser
+              */
+             }
+     
+     &lt;str&gt;\n        {
+             /* error - unterminated string constant */
+             /* generate error message */
+             }
+     
+     &lt;str&gt;\\[0-7]{1,3} {
+             /* octal escape sequence */
+             int result;
+     
+             (void) sscanf( yytext + 1, "%o", &amp;result );
+     
+             if ( result &gt; 0xff )
+                     /* error, constant is out-of-bounds */
+     
+             *string_buf_ptr++ = result;
+             }
+     
+     &lt;str&gt;\\[0-9]+ {
+             /* generate error - bad escape sequence; something
+              * like '\48' or '\0777777'
+              */
+             }
+     
+     &lt;str&gt;\\n  *string_buf_ptr++ = '\n';
+     &lt;str&gt;\\t  *string_buf_ptr++ = '\t';
+     &lt;str&gt;\\r  *string_buf_ptr++ = '\r';
+     &lt;str&gt;\\b  *string_buf_ptr++ = '\b';
+     &lt;str&gt;\\f  *string_buf_ptr++ = '\f';
+     
+     &lt;str&gt;\\(.|\n)  *string_buf_ptr++ = yytext[1];
+     
+     &lt;str&gt;[^\\\n\"]+        {
+             char *yptr = yytext;
+     
+             while ( *yptr )
+                     *string_buf_ptr++ = *yptr++;
+             }
+     </pre>
+
+   <p>Often, such as in some of the examples above, you wind up
+writing a whole bunch of rules all preceded by the same
+start condition(s).  Flex makes this a little easier and
+cleaner by introducing a notion of start condition <dfn>scope</dfn>. 
+A start condition scope is begun with:
+
+<pre class="example">     &lt;SCs&gt;{
+     </pre>
+
+<p>where SCs is a list of one or more start conditions. 
+Inside the start condition scope, every rule automatically
+has the prefix <code>&lt;SCs&gt;</code> applied to it, until a <code>}</code> which
+matches the initial <code>{</code>.  So, for example,
+
+<pre class="example">     &lt;ESC&gt;{
+         "\\n"   return '\n';
+         "\\r"   return '\r';
+         "\\f"   return '\f';
+         "\\0"   return '\0';
+     }
+     </pre>
+
+<p>is equivalent to:
+
+<pre class="example">     &lt;ESC&gt;"\\n"  return '\n';
+     &lt;ESC&gt;"\\r"  return '\r';
+     &lt;ESC&gt;"\\f"  return '\f';
+     &lt;ESC&gt;"\\0"  return '\0';
+     </pre>
+
+   <p>Start condition scopes may be nested.
+
+   <p>Three routines are available for manipulating stacks of
+start conditions:
+
+     <dl>
+<dt><code>void yy_push_state(int new_state)</code>
+     <dd>pushes the current start condition onto the top of
+the start condition stack and switches to <var>new_state</var>
+as though you had used <code>BEGIN new_state</code> (recall that
+start condition names are also integers).
+
+     <br><dt><code>void yy_pop_state()</code>
+     <dd>pops the top of the stack and switches to it via
+<code>BEGIN</code>.
+
+     <br><dt><code>int yy_top_state()</code>
+     <dd>returns the top of the stack without altering the
+stack's contents. 
+</dl>
+
+   <p>The start condition stack grows dynamically and so has no
+built-in size limitation.  If memory is exhausted, program
+execution aborts.
+
+   <p>To use start condition stacks, your scanner must include a
+<code>%option stack</code> directive (see Options below).
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Multiple%20buffers">Multiple buffers</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#End-of-file%20rules">End-of-file rules</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Start%20conditions">Start conditions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.12 Multiple input buffers</h3>
+
+<p>Some scanners (such as those which support "include"
+files) require reading from several input streams.  As
+<code>flex</code> scanners do a large amount of buffering, one cannot
+control where the next input will be read from by simply
+writing a <code>YY_INPUT</code> which is sensitive to the scanning
+context.  <code>YY_INPUT</code> is only called when the scanner reaches
+the end of its buffer, which may be a long time after
+scanning a statement such as an "include" which requires
+switching the input source.
+
+   <p>To negotiate these sorts of problems, <code>flex</code> provides a
+mechanism for creating and switching between multiple
+input buffers.  An input buffer is created by using:
+
+<pre class="example">     YY_BUFFER_STATE yy_create_buffer( FILE *file, int size )
+     </pre>
+
+<p>which takes a <code>FILE</code> pointer and a size and creates a buffer
+associated with the given file and large enough to hold
+<var>size</var> characters (when in doubt, use <code>YY_BUF_SIZE</code> for the
+size).  It returns a <code>YY_BUFFER_STATE</code> handle, which may
+then be passed to other routines (see below).  The
+<code>YY_BUFFER_STATE</code> type is a pointer to an opaque <code>struct</code>
+<code>yy_buffer_state</code> structure, so you may safely initialize
+YY_BUFFER_STATE variables to <code>((YY_BUFFER_STATE) 0)</code> if you
+wish, and also refer to the opaque structure in order to
+correctly declare input buffers in source files other than
+that of your scanner.  Note that the <code>FILE</code> pointer in the
+call to <code>yy_create_buffer</code> is only used as the value of <code>yyin</code>
+seen by <code>YY_INPUT</code>; if you redefine <code>YY_INPUT</code> so it no longer
+uses <code>yyin</code>, then you can safely pass a nil <code>FILE</code> pointer to
+<code>yy_create_buffer</code>.  You select a particular buffer to scan
+from using:
+
+<pre class="example">     void yy_switch_to_buffer( YY_BUFFER_STATE new_buffer )
+     </pre>
+
+   <p>switches the scanner's input buffer so subsequent tokens
+will come from <var>new_buffer</var>.  Note that
+<code>yy_switch_to_buffer()</code> may be used by <code>yywrap()</code> to set
+things up for continued scanning, instead of opening a new
+file and pointing <code>yyin</code> at it.  Note also that switching
+input sources via either <code>yy_switch_to_buffer()</code> or <code>yywrap()</code>
+does <em>not</em> change the start condition.
+
+<pre class="example">     void yy_delete_buffer( YY_BUFFER_STATE buffer )
+     </pre>
+
+<p>is used to reclaim the storage associated with a buffer. 
+You can also clear the current contents of a buffer using:
+
+<pre class="example">     void yy_flush_buffer( YY_BUFFER_STATE buffer )
+     </pre>
+
+   <p>This function discards the buffer's contents, so the next time the
+scanner attempts to match a token from the buffer, it will first fill
+the buffer anew using <code>YY_INPUT</code>.
+
+   <p><code>yy_new_buffer()</code> is an alias for <code>yy_create_buffer()</code>,
+provided for compatibility with the C++ use of <code>new</code> and <code>delete</code>
+for creating and destroying dynamic objects.
+
+   <p>Finally, the <code>YY_CURRENT_BUFFER</code> macro returns a
+<code>YY_BUFFER_STATE</code> handle to the current buffer.
+
+   <p>Here is an example of using these features for writing a
+scanner which expands include files (the <code>&lt;&lt;EOF&gt;&gt;</code> feature
+is discussed below):
+
+<pre class="example">     /* the "incl" state is used for picking up the name
+      * of an include file
+      */
+     %x incl
+     
+     %{
+     #define MAX_INCLUDE_DEPTH 10
+     YY_BUFFER_STATE include_stack[MAX_INCLUDE_DEPTH];
+     int include_stack_ptr = 0;
+     %}
+     
+     %%
+     include             BEGIN(incl);
+     
+     [a-z]+              ECHO;
+     [^a-z\n]*\n?        ECHO;
+     
+     &lt;incl&gt;[ \t]*      /* eat the whitespace */
+     &lt;incl&gt;[^ \t\n]+   { /* got the include file name */
+             if ( include_stack_ptr &gt;= MAX_INCLUDE_DEPTH )
+                 {
+                 fprintf( stderr, "Includes nested too deeply" );
+                 exit( 1 );
+                 }
+     
+             include_stack[include_stack_ptr++] =
+                 YY_CURRENT_BUFFER;
+     
+             yyin = fopen( yytext, "r" );
+     
+             if ( ! yyin )
+                 error( ... );
+     
+             yy_switch_to_buffer(
+                 yy_create_buffer( yyin, YY_BUF_SIZE ) );
+     
+             BEGIN(INITIAL);
+             }
+     
+     &lt;&lt;EOF&gt;&gt; {
+             if ( --include_stack_ptr &lt; 0 )
+                 {
+                 yyterminate();
+                 }
+     
+             else
+                 {
+                 yy_delete_buffer( YY_CURRENT_BUFFER );
+                 yy_switch_to_buffer(
+                      include_stack[include_stack_ptr] );
+                 }
+             }
+     </pre>
+
+   <p>Three routines are available for setting up input buffers
+for scanning in-memory strings instead of files.  All of
+them create a new input buffer for scanning the string,
+and return a corresponding <code>YY_BUFFER_STATE</code> handle (which
+you should delete with <code>yy_delete_buffer()</code> when done with
+it).  They also switch to the new buffer using
+<code>yy_switch_to_buffer()</code>, so the next call to <code>yylex()</code> will
+start scanning the string.
+
+     <dl>
+<dt><code>yy_scan_string(const char *str)</code>
+     <dd>scans a NUL-terminated string.
+
+     <br><dt><code>yy_scan_bytes(const char *bytes, int len)</code>
+     <dd>scans <code>len</code> bytes (including possibly NUL's) starting
+at location <var>bytes</var>. 
+</dl>
+
+   <p>Note that both of these functions create and scan a <em>copy</em>
+of the string or bytes.  (This may be desirable, since
+<code>yylex()</code> modifies the contents of the buffer it is
+scanning.) You can avoid the copy by using:
+
+     <dl>
+<dt><code>yy_scan_buffer(char *base, yy_size_t size)</code>
+     <dd>which scans in place the buffer starting at <var>base</var>,
+consisting of <var>size</var> bytes, the last two bytes of
+which <em>must</em> be <code>YY_END_OF_BUFFER_CHAR</code> (ASCII NUL). 
+These last two bytes are not scanned; thus,
+scanning consists of <code>base[0]</code> through <code>base[size-2]</code>,
+inclusive.
+
+     <p>If you fail to set up <var>base</var> in this manner (i.e.,
+forget the final two <code>YY_END_OF_BUFFER_CHAR</code> bytes),
+then <code>yy_scan_buffer()</code> returns a nil pointer instead
+of creating a new input buffer.
+
+     <p>The type <code>yy_size_t</code> is an integral type to which you
+can cast an integer expression reflecting the size
+of the buffer. 
+</dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="End-of-file%20rules">End-of-file rules</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Miscellaneous">Miscellaneous</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Multiple%20buffers">Multiple buffers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.13 End-of-file rules</h3>
+
+<p>The special rule "&lt;&lt;EOF&gt;&gt;" indicates actions which are to
+be taken when an end-of-file is encountered and yywrap()
+returns non-zero (i.e., indicates no further files to
+process).  The action must finish by doing one of four
+things:
+
+     <ul>
+<li>assigning <code>yyin</code> to a new input file (in previous
+versions of flex, after doing the assignment you
+had to call the special action <code>YY_NEW_FILE</code>; this is
+no longer necessary);
+
+     <li>executing a <code>return</code> statement;
+
+     <li>executing the special <code>yyterminate()</code> action;
+
+     <li>or, switching to a new buffer using
+<code>yy_switch_to_buffer()</code> as shown in the example
+above. 
+</ul>
+
+   <p>&lt;&lt;EOF&gt;&gt; rules may not be used with other patterns; they
+may only be qualified with a list of start conditions.  If
+an unqualified &lt;&lt;EOF&gt;&gt; rule is given, it applies to <em>all</em>
+start conditions which do not already have &lt;&lt;EOF&gt;&gt;
+actions.  To specify an &lt;&lt;EOF&gt;&gt; rule for only the initial
+start condition, use
+
+<pre class="example">     &lt;INITIAL&gt;&lt;&lt;EOF&gt;&gt;
+     </pre>
+
+   <p>These rules are useful for catching things like unclosed
+comments.  An example:
+
+<pre class="example">     %x quote
+     %%
+     
+     ...other rules for dealing with quotes...
+     
+     &lt;quote&gt;&lt;&lt;EOF&gt;&gt;   {
+              error( "unterminated quote" );
+              yyterminate();
+              }
+     &lt;&lt;EOF&gt;&gt;  {
+              if ( *++filelist )
+                  yyin = fopen( *filelist, "r" );
+              else
+                 yyterminate();
+              }
+     </pre>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Miscellaneous">Miscellaneous</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#User%20variables">User variables</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#End-of-file%20rules">End-of-file rules</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.14 Miscellaneous macros</h3>
+
+<p>The macro <code>YY_USER_ACTION</code> can be defined to provide an
+action which is always executed prior to the matched
+rule's action.  For example, it could be #define'd to call
+a routine to convert yytext to lower-case.  When
+<code>YY_USER_ACTION</code> is invoked, the variable <code>yy_act</code> gives the
+number of the matched rule (rules are numbered starting
+with 1).  Suppose you want to profile how often each of
+your rules is matched.  The following would do the trick:
+
+<pre class="example">     #define YY_USER_ACTION ++ctr[yy_act]
+     </pre>
+
+   <p>where <code>ctr</code> is an array to hold the counts for the different
+rules.  Note that the macro <code>YY_NUM_RULES</code> gives the total number
+of rules (including the default rule, even if you use <code>-s</code>, so
+a correct declaration for <code>ctr</code> is:
+
+<pre class="example">     int ctr[YY_NUM_RULES];
+     </pre>
+
+   <p>The macro <code>YY_USER_INIT</code> may be defined to provide an action
+which is always executed before the first scan (and before
+the scanner's internal initializations are done).  For
+example, it could be used to call a routine to read in a
+data table or open a logging file.
+
+   <p>The macro <code>yy_set_interactive(is_interactive)</code> can be used
+to control whether the current buffer is considered
+<em>interactive</em>.  An interactive buffer is processed more slowly,
+but must be used when the scanner's input source is indeed
+interactive to avoid problems due to waiting to fill
+buffers (see the discussion of the <code>-I</code> flag below).  A
+non-zero value in the macro invocation marks the buffer as
+interactive, a zero value as non-interactive.  Note that
+use of this macro overrides <code>%option always-interactive</code> or
+<code>%option never-interactive</code> (see Options below). 
+<code>yy_set_interactive()</code> must be invoked prior to beginning to
+scan the buffer that is (or is not) to be considered
+interactive.
+
+   <p>The macro <code>yy_set_bol(at_bol)</code> can be used to control
+whether the current buffer's scanning context for the next
+token match is done as though at the beginning of a line. 
+A non-zero macro argument makes rules anchored with
+
+   <p>The macro <code>YY_AT_BOL()</code> returns true if the next token
+scanned from the current buffer will have '^' rules
+active, false otherwise.
+
+   <p>In the generated scanner, the actions are all gathered in
+one large switch statement and separated using <code>YY_BREAK</code>,
+which may be redefined.  By default, it is simply a
+"break", to separate each rule's action from the following
+rule's.  Redefining <code>YY_BREAK</code> allows, for example, C++
+users to #define YY_BREAK to do nothing (while being very
+careful that every rule ends with a "break" or a
+"return"!) to avoid suffering from unreachable statement
+warnings where because a rule's action ends with "return",
+the <code>YY_BREAK</code> is inaccessible.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="User%20variables">User variables</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#YACC%20interface">YACC interface</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Miscellaneous">Miscellaneous</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.15 Values available to the user</h3>
+
+<p>This section summarizes the various values available to
+the user in the rule actions.
+
+     <ul>
+<li><code>char *yytext</code> holds the text of the current token. 
+It may be modified but not lengthened (you cannot
+append characters to the end).
+
+     <p>If the special directive <code>%array</code> appears in the
+first section of the scanner description, then
+<code>yytext</code> is instead declared <code>char yytext[YYLMAX]</code>,
+where <code>YYLMAX</code> is a macro definition that you can
+redefine in the first section if you don't like the
+default value (generally 8KB).  Using <code>%array</code>
+results in somewhat slower scanners, but the value
+of <code>yytext</code> becomes immune to calls to <code>input()</code> and
+<code>unput()</code>, which potentially destroy its value when
+<code>yytext</code> is a character pointer.  The opposite of
+<code>%array</code> is <code>%pointer</code>, which is the default.
+
+     <p>You cannot use <code>%array</code> when generating C++ scanner
+classes (the <code>-+</code> flag).
+
+     </p><li><code>int yyleng</code> holds the length of the current token.
+
+     <li><code>FILE *yyin</code> is the file which by default <code>flex</code> reads
+from.  It may be redefined but doing so only makes
+sense before scanning begins or after an EOF has
+been encountered.  Changing it in the midst of
+scanning will have unexpected results since <code>flex</code>
+buffers its input; use <code>yyrestart()</code> instead.  Once
+scanning terminates because an end-of-file has been
+seen, you can assign <code>yyin</code> at the new input file and
+then call the scanner again to continue scanning.
+
+     <li><code>void yyrestart( FILE *new_file )</code> may be called to
+point <code>yyin</code> at the new input file.  The switch-over
+to the new file is immediate (any previously
+buffered-up input is lost).  Note that calling
+<code>yyrestart()</code> with <code>yyin</code> as an argument thus throws
+away the current input buffer and continues
+scanning the same input file.
+
+     <li><code>FILE *yyout</code> is the file to which <code>ECHO</code> actions are
+done.  It can be reassigned by the user.
+
+     <li><code>YY_CURRENT_BUFFER</code> returns a <code>YY_BUFFER_STATE</code> handle
+to the current buffer.
+
+     <li><code>YY_START</code> returns an integer value corresponding to
+the current start condition.  You can subsequently
+use this value with <code>BEGIN</code> to return to that start
+condition. 
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="YACC%20interface">YACC interface</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Options">Options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#User%20variables">User variables</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.16 Interfacing with <code>yacc</code></h3>
+
+<p>One of the main uses of <code>flex</code> is as a companion to the <code>yacc</code>
+parser-generator.  <code>yacc</code> parsers expect to call a routine
+named <code>yylex()</code> to find the next input token.  The routine
+is supposed to return the type of the next token as well
+as putting any associated value in the global <code>yylval</code>.  To
+use <code>flex</code> with <code>yacc</code>, one specifies the <code>-d</code> option to <code>yacc</code> to
+instruct it to generate the file <code>y.tab.h</code> containing
+definitions of all the <code>%tokens</code> appearing in the <code>yacc</code> input. 
+This file is then included in the <code>flex</code> scanner.  For
+example, if one of the tokens is "TOK_NUMBER", part of the
+scanner might look like:
+
+<pre class="example">     %{
+     #include "y.tab.h"
+     %}
+     
+     %%
+     
+     [0-9]+        yylval = atoi( yytext ); return TOK_NUMBER;
+     </pre>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Options">Options</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Performance">Performance</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#YACC%20interface">YACC interface</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.17 Options</h3>
+
+<p><code>flex</code> has the following options:
+
+     <dl>
+<dt><code>-b</code>
+     <dd>Generate backing-up information to <code>lex.backup</code>. 
+This is a list of scanner states which require
+backing up and the input characters on which they
+do so.  By adding rules one can remove backing-up
+states.  If <em>all</em> backing-up states are eliminated
+and <code>-Cf</code> or <code>-CF</code> is used, the generated scanner will
+run faster (see the <code>-p</code> flag).  Only users who wish
+to squeeze every last cycle out of their scanners
+need worry about this option.  (See the section on
+Performance Considerations below.)
+
+     <br><dt><code>-c</code>
+     <dd>is a do-nothing, deprecated option included for
+POSIX compliance.
+
+     <br><dt><code>-d</code>
+     <dd>makes the generated scanner run in <dfn>debug</dfn> mode. 
+Whenever a pattern is recognized and the global
+<code>yy_flex_debug</code> is non-zero (which is the default),
+the scanner will write to <code>stderr</code> a line of the
+form:
+
+     <pre class="example">          --accepting rule at line 53 ("the matched text")
+          </pre>
+
+     <p>The line number refers to the location of the rule
+in the file defining the scanner (i.e., the file
+that was fed to flex).  Messages are also generated
+when the scanner backs up, accepts the default
+rule, reaches the end of its input buffer (or
+encounters a NUL; at this point, the two look the
+same as far as the scanner's concerned), or reaches
+an end-of-file.
+
+     <br><dt><code>-f</code>
+     <dd>specifies <dfn>fast scanner</dfn>.  No table compression is
+done and stdio is bypassed.  The result is large
+but fast.  This option is equivalent to <code>-Cfr</code> (see
+below).
+
+     <br><dt><code>-h</code>
+     <dd>generates a "help" summary of <code>flex's</code> options to
+<code>stdout</code> and then exits.  <code>-?</code> and <code>--help</code> are synonyms
+for <code>-h</code>.
+
+     <br><dt><code>-i</code>
+     <dd>instructs <code>flex</code> to generate a <em>case-insensitive</em>
+scanner.  The case of letters given in the <code>flex</code> input
+patterns will be ignored, and tokens in the input
+will be matched regardless of case.  The matched
+text given in <code>yytext</code> will have the preserved case
+(i.e., it will not be folded).
+
+     <br><dt><code>-l</code>
+     <dd>turns on maximum compatibility with the original
+AT&amp;T <code>lex</code> implementation.  Note that this does not
+mean <em>full</em> compatibility.  Use of this option costs
+a considerable amount of performance, and it cannot
+be used with the <code>-+, -f, -F, -Cf</code>, or <code>-CF</code> options. 
+For details on the compatibilities it provides, see
+the section "Incompatibilities With Lex And POSIX"
+below.  This option also results in the name
+<code>YY_FLEX_LEX_COMPAT</code> being #define'd in the generated
+scanner.
+
+     <br><dt><code>-n</code>
+     <dd>is another do-nothing, deprecated option included
+only for POSIX compliance.
+
+     <br><dt><code>-p</code>
+     <dd>generates a performance report to stderr.  The
+report consists of comments regarding features of
+the <code>flex</code> input file which will cause a serious loss
+of performance in the resulting scanner.  If you
+give the flag twice, you will also get comments
+regarding features that lead to minor performance
+losses.
+
+     <p>Note that the use of <code>REJECT</code>, <code>%option yylineno</code> and
+variable trailing context (see the Deficiencies / Bugs section below)
+entails a substantial performance penalty; use of <code>yymore()</code>,
+the <code>^</code> operator, and the <code>-I</code> flag entail minor performance
+penalties.
+
+     <br><dt><code>-s</code>
+     <dd>causes the <dfn>default rule</dfn> (that unmatched scanner
+input is echoed to <code>stdout</code>) to be suppressed.  If
+the scanner encounters input that does not match
+any of its rules, it aborts with an error.  This
+option is useful for finding holes in a scanner's
+rule set.
+
+     <br><dt><code>-t</code>
+     <dd>instructs <code>flex</code> to write the scanner it generates to
+standard output instead of <code>lex.yy.c</code>.
+
+     <br><dt><code>-v</code>
+     <dd>specifies that <code>flex</code> should write to <code>stderr</code> a
+summary of statistics regarding the scanner it
+generates.  Most of the statistics are meaningless to
+the casual <code>flex</code> user, but the first line identifies
+the version of <code>flex</code> (same as reported by <code>-V</code>), and
+the next line the flags used when generating the
+scanner, including those that are on by default.
+
+     <br><dt><code>-w</code>
+     <dd>suppresses warning messages.
+
+     <br><dt><code>-B</code>
+     <dd>instructs <code>flex</code> to generate a <em>batch</em> scanner, the
+opposite of <em>interactive</em> scanners generated by <code>-I</code>
+(see below).  In general, you use <code>-B</code> when you are
+<em>certain</em> that your scanner will never be used
+interactively, and you want to squeeze a <em>little</em> more
+performance out of it.  If your goal is instead to
+squeeze out a <em>lot</em> more performance, you should be
+using the <code>-Cf</code> or <code>-CF</code> options (discussed below),
+which turn on <code>-B</code> automatically anyway.
+
+     <br><dt><code>-F</code>
+     <dd>specifies that the <dfn>fast</dfn> scanner table
+representation should be used (and stdio bypassed).  This
+representation is about as fast as the full table
+representation <code>(-f)</code>, and for some sets of patterns
+will be considerably smaller (and for others,
+larger).  In general, if the pattern set contains
+both "keywords" and a catch-all, "identifier" rule,
+such as in the set:
+
+     <pre class="example">          "case"    return TOK_CASE;
+          "switch"  return TOK_SWITCH;
+          ...
+          "default" return TOK_DEFAULT;
+          [a-z]+    return TOK_ID;
+          </pre>
+
+     <p>then you're better off using the full table
+representation.  If only the "identifier" rule is
+present and you then use a hash table or some such to
+detect the keywords, you're better off using <code>-F</code>.
+
+     <p>This option is equivalent to <code>-CFr</code> (see below).  It
+cannot be used with <code>-+</code>.
+
+     <br><dt><code>-I</code>
+     <dd>instructs <code>flex</code> to generate an <em>interactive</em> scanner. 
+An interactive scanner is one that only looks ahead
+to decide what token has been matched if it
+absolutely must.  It turns out that always looking one
+extra character ahead, even if the scanner has
+already seen enough text to disambiguate the
+current token, is a bit faster than only looking ahead
+when necessary.  But scanners that always look
+ahead give dreadful interactive performance; for
+example, when a user types a newline, it is not
+recognized as a newline token until they enter
+<em>another</em> token, which often means typing in another
+whole line.
+
+     <p><code>Flex</code> scanners default to <em>interactive</em> unless you use
+the <code>-Cf</code> or <code>-CF</code> table-compression options (see
+below).  That's because if you're looking for
+high-performance you should be using one of these
+options, so if you didn't, <code>flex</code> assumes you'd
+rather trade off a bit of run-time performance for
+intuitive interactive behavior.  Note also that you
+<em>cannot</em> use <code>-I</code> in conjunction with <code>-Cf</code> or <code>-CF</code>. 
+Thus, this option is not really needed; it is on by
+default for all those cases in which it is allowed.
+
+     <p>You can force a scanner to <em>not</em> be interactive by
+using <code>-B</code> (see above).
+
+     <br><dt><code>-L</code>
+     <dd>instructs <code>flex</code> not to generate <code>#line</code> directives. 
+Without this option, <code>flex</code> peppers the generated
+scanner with #line directives so error messages in
+the actions will be correctly located with respect
+to either the original <code>flex</code> input file (if the
+errors are due to code in the input file), or
+<code>lex.yy.c</code> (if the errors are <code>flex's</code> fault - you
+should report these sorts of errors to the email
+address given below).
+
+     <br><dt><code>-T</code>
+     <dd>makes <code>flex</code> run in <code>trace</code> mode.  It will generate a
+lot of messages to <code>stderr</code> concerning the form of
+the input and the resultant non-deterministic and
+deterministic finite automata.  This option is
+mostly for use in maintaining <code>flex</code>.
+
+     <br><dt><code>-V</code>
+     <dd>prints the version number to <code>stdout</code> and exits. 
+<code>--version</code> is a synonym for <code>-V</code>.
+
+     <br><dt><code>-7</code>
+     <dd>instructs <code>flex</code> to generate a 7-bit scanner, i.e.,
+one which can only recognized 7-bit characters in
+its input.  The advantage of using <code>-7</code> is that the
+scanner's tables can be up to half the size of
+those generated using the <code>-8</code> option (see below). 
+The disadvantage is that such scanners often hang
+or crash if their input contains an 8-bit
+character.
+
+     <p>Note, however, that unless you generate your
+scanner using the <code>-Cf</code> or <code>-CF</code> table compression options,
+use of <code>-7</code> will save only a small amount of table
+space, and make your scanner considerably less
+portable.  <code>Flex's</code> default behavior is to generate
+an 8-bit scanner unless you use the <code>-Cf</code> or <code>-CF</code>, in
+which case <code>flex</code> defaults to generating 7-bit
+scanners unless your site was always configured to
+generate 8-bit scanners (as will often be the case
+with non-USA sites).  You can tell whether flex
+generated a 7-bit or an 8-bit scanner by inspecting
+the flag summary in the <code>-v</code> output as described
+above.
+
+     <p>Note that if you use <code>-Cfe</code> or <code>-CFe</code> (those table
+compression options, but also using equivalence
+classes as discussed see below), flex still
+defaults to generating an 8-bit scanner, since
+usually with these compression options full 8-bit
+tables are not much more expensive than 7-bit
+tables.
+
+     <br><dt><code>-8</code>
+     <dd>instructs <code>flex</code> to generate an 8-bit scanner, i.e.,
+one which can recognize 8-bit characters.  This
+flag is only needed for scanners generated using
+<code>-Cf</code> or <code>-CF</code>, as otherwise flex defaults to
+generating an 8-bit scanner anyway.
+
+     <p>See the discussion of <code>-7</code> above for flex's default
+behavior and the tradeoffs between 7-bit and 8-bit
+scanners.
+
+     <br><dt><code>-+</code>
+     <dd>specifies that you want flex to generate a C++
+scanner class.  See the section on Generating C++
+Scanners below for details.
+
+     <br><dt><code>-C[aefFmr]</code>
+     <dd>controls the degree of table compression and, more
+generally, trade-offs between small scanners and
+fast scanners.
+
+     <p><code>-Ca</code> ("align") instructs flex to trade off larger
+tables in the generated scanner for faster
+performance because the elements of the tables are better
+aligned for memory access and computation.  On some
+RISC architectures, fetching and manipulating
+long-words is more efficient than with smaller-sized
+units such as shortwords.  This option can double
+the size of the tables used by your scanner.
+
+     <p><code>-Ce</code> directs <code>flex</code> to construct <dfn>equivalence classes</dfn>,
+i.e., sets of characters which have identical
+lexical properties (for example, if the only appearance
+of digits in the <code>flex</code> input is in the character
+class "[0-9]" then the digits '0', '1', <small class="dots">...</small>, '9'
+will all be put in the same equivalence class). 
+Equivalence classes usually give dramatic
+reductions in the final table/object file sizes
+(typically a factor of 2-5) and are pretty cheap
+performance-wise (one array look-up per character
+scanned).
+
+     <p><code>-Cf</code> specifies that the <em>full</em> scanner tables should
+be generated - <code>flex</code> should not compress the tables
+by taking advantages of similar transition
+functions for different states.
+
+     <p><code>-CF</code> specifies that the alternate fast scanner
+representation (described above under the <code>-F</code> flag)
+should be used.  This option cannot be used with
+<code>-+</code>.
+
+     <p><code>-Cm</code> directs <code>flex</code> to construct <dfn>meta-equivalence
+classes</dfn>, which are sets of equivalence classes (or
+characters, if equivalence classes are not being
+used) that are commonly used together. 
+Meta-equivalence classes are often a big win when using
+compressed tables, but they have a moderate
+performance impact (one or two "if" tests and one array
+look-up per character scanned).
+
+     <p><code>-Cr</code> causes the generated scanner to <em>bypass</em> use of
+the standard I/O library (stdio) for input. 
+Instead of calling <code>fread()</code> or <code>getc()</code>, the scanner
+will use the <code>read()</code> system call, resulting in a
+performance gain which varies from system to
+system, but in general is probably negligible unless
+you are also using <code>-Cf</code> or <code>-CF</code>.  Using <code>-Cr</code> can cause
+strange behavior if, for example, you read from
+<code>yyin</code> using stdio prior to calling the scanner
+(because the scanner will miss whatever text your
+previous reads left in the stdio input buffer).
+
+     <p><code>-Cr</code> has no effect if you define <code>YY_INPUT</code> (see The
+Generated Scanner above).
+
+     <p>A lone <code>-C</code> specifies that the scanner tables should
+be compressed but neither equivalence classes nor
+meta-equivalence classes should be used.
+
+     <p>The options <code>-Cf</code> or <code>-CF</code> and <code>-Cm</code> do not make sense
+together - there is no opportunity for
+meta-equivalence classes if the table is not being
+compressed.  Otherwise the options may be freely
+mixed, and are cumulative.
+
+     <p>The default setting is <code>-Cem</code>, which specifies that
+<code>flex</code> should generate equivalence classes and
+meta-equivalence classes.  This setting provides the
+highest degree of table compression.  You can trade
+off faster-executing scanners at the cost of larger
+tables with the following generally being true:
+
+     <pre class="example">          slowest &amp; smallest
+                -Cem
+                -Cm
+                -Ce
+                -C
+                -C{f,F}e
+                -C{f,F}
+                -C{f,F}a
+          fastest &amp; largest
+          </pre>
+
+     <p>Note that scanners with the smallest tables are
+usually generated and compiled the quickest, so
+during development you will usually want to use the
+default, maximal compression.
+
+     <p><code>-Cfe</code> is often a good compromise between speed and
+size for production scanners.
+
+     <br><dt><code>-ooutput</code>
+     <dd>directs flex to write the scanner to the file <code>out-</code>
+<code>put</code> instead of <code>lex.yy.c</code>.  If you combine <code>-o</code> with
+the <code>-t</code> option, then the scanner is written to
+<code>stdout</code> but its <code>#line</code> directives (see the <code>-L</code> option
+above) refer to the file <code>output</code>.
+
+     <br><dt><code>-Pprefix</code>
+     <dd>changes the default <code>yy</code> prefix used by <code>flex</code> for all
+globally-visible variable and function names to
+instead be <var>prefix</var>.  For example, <code>-Pfoo</code> changes the
+name of <code>yytext</code> to <code>footext</code>.  It also changes the
+name of the default output file from <code>lex.yy.c</code> to
+<code>lex.foo.c</code>.  Here are all of the names affected:
+
+     <pre class="example">          yy_create_buffer
+          yy_delete_buffer
+          yy_flex_debug
+          yy_init_buffer
+          yy_flush_buffer
+          yy_load_buffer_state
+          yy_switch_to_buffer
+          yyin
+          yyleng
+          yylex
+          yylineno
+          yyout
+          yyrestart
+          yytext
+          yywrap
+          </pre>
+
+     <p>(If you are using a C++ scanner, then only <code>yywrap</code>
+and <code>yyFlexLexer</code> are affected.) Within your scanner
+itself, you can still refer to the global variables
+and functions using either version of their name;
+but externally, they have the modified name.
+
+     <p>This option lets you easily link together multiple
+<code>flex</code> programs into the same executable.  Note,
+though, that using this option also renames
+<code>yywrap()</code>, so you now <em>must</em> either provide your own
+(appropriately-named) version of the routine for
+your scanner, or use <code>%option noyywrap</code>, as linking
+with <code>-lfl</code> no longer provides one for you by
+default.
+
+     <br><dt><code>-Sskeleton_file</code>
+     <dd>overrides the default skeleton file from which <code>flex</code>
+constructs its scanners.  You'll never need this
+option unless you are doing <code>flex</code> maintenance or
+development. 
+</dl>
+
+   <p><code>flex</code> also provides a mechanism for controlling options
+within the scanner specification itself, rather than from
+the flex command-line.  This is done by including <code>%option</code>
+directives in the first section of the scanner
+specification.  You can specify multiple options with a single
+<code>%option</code> directive, and multiple directives in the first
+section of your flex input file.  Most options are given
+simply as names, optionally preceded by the word "no"
+(with no intervening whitespace) to negate their meaning. 
+A number are equivalent to flex flags or their negation:
+
+<pre class="example">     7bit            -7 option
+     8bit            -8 option
+     align           -Ca option
+     backup          -b option
+     batch           -B option
+     c++             -+ option
+     
+     caseful or
+     case-sensitive  opposite of -i (default)
+     
+     case-insensitive or
+     caseless        -i option
+     
+     debug           -d option
+     default         opposite of -s option
+     ecs             -Ce option
+     fast            -F option
+     full            -f option
+     interactive     -I option
+     lex-compat      -l option
+     meta-ecs        -Cm option
+     perf-report     -p option
+     read            -Cr option
+     stdout          -t option
+     verbose         -v option
+     warn            opposite of -w option
+                     (use "%option nowarn" for -w)
+     
+     array           equivalent to "%array"
+     pointer         equivalent to "%pointer" (default)
+     </pre>
+
+   <p>Some <code>%option's</code> provide features otherwise not available:
+
+     <dl>
+<dt><code>always-interactive</code>
+     <dd>instructs flex to generate a scanner which always
+considers its input "interactive".  Normally, on
+each new input file the scanner calls <code>isatty()</code> in
+an attempt to determine whether the scanner's input
+source is interactive and thus should be read a
+character at a time.  When this option is used,
+however, then no such call is made.
+
+     <br><dt><code>main</code>
+     <dd>directs flex to provide a default <code>main()</code> program
+for the scanner, which simply calls <code>yylex()</code>.  This
+option implies <code>noyywrap</code> (see below).
+
+     <br><dt><code>never-interactive</code>
+     <dd>instructs flex to generate a scanner which never
+considers its input "interactive" (again, no call
+made to <code>isatty())</code>.  This is the opposite of <code>always-</code>
+<em>interactive</em>.
+
+     <br><dt><code>stack</code>
+     <dd>enables the use of start condition stacks (see
+Start Conditions above).
+
+     <br><dt><code>stdinit</code>
+     <dd>if unset (i.e., <code>%option nostdinit</code>) initializes <code>yyin</code>
+and <code>yyout</code> to nil <code>FILE</code> pointers, instead of <code>stdin</code>
+and <code>stdout</code>.
+
+     <br><dt><code>yylineno</code>
+     <dd>directs <code>flex</code> to generate a scanner that maintains the number
+of the current line read from its input in the global variable
+<code>yylineno</code>.  This option is implied by <code>%option lex-compat</code>.
+
+     <br><dt><code>yywrap</code>
+     <dd>if unset (i.e., <code>%option noyywrap</code>), makes the
+scanner not call <code>yywrap()</code> upon an end-of-file, but
+simply assume that there are no more files to scan
+(until the user points <code>yyin</code> at a new file and calls
+<code>yylex()</code> again). 
+</dl>
+
+   <p><code>flex</code> scans your rule actions to determine whether you use
+the <code>REJECT</code> or <code>yymore()</code> features.  The <code>reject</code> and <code>yymore</code>
+options are available to override its decision as to
+whether you use the options, either by setting them (e.g.,
+<code>%option reject</code>) to indicate the feature is indeed used, or
+unsetting them to indicate it actually is not used (e.g.,
+<code>%option noyymore</code>).
+
+   <p>Three options take string-delimited values, offset with '=':
+
+<pre class="example">     %option outfile="ABC"
+     </pre>
+
+<p>is equivalent to <code>-oABC</code>, and
+
+<pre class="example">     %option prefix="XYZ"
+     </pre>
+
+<p>is equivalent to <code>-PXYZ</code>.
+
+   <p>Finally,
+
+<pre class="example">     %option yyclass="foo"
+     </pre>
+
+<p>only applies when generating a C++ scanner (<code>-+</code> option).  It
+informs <code>flex</code> that you have derived <code>foo</code> as a subclass of
+<code>yyFlexLexer</code> so <code>flex</code> will place your actions in the member
+function <code>foo::yylex()</code> instead of <code>yyFlexLexer::yylex()</code>. 
+It also generates a <code>yyFlexLexer::yylex()</code> member function that
+emits a run-time error (by invoking <code>yyFlexLexer::LexerError()</code>)
+if called.  See Generating C++ Scanners, below, for additional
+information.
+
+   <p>A number of options are available for lint purists who
+want to suppress the appearance of unneeded routines in
+the generated scanner.  Each of the following, if unset,
+results in the corresponding routine not appearing in the
+generated scanner:
+
+<pre class="example">     input, unput
+     yy_push_state, yy_pop_state, yy_top_state
+     yy_scan_buffer, yy_scan_bytes, yy_scan_string
+     </pre>
+
+<p>(though <code>yy_push_state()</code> and friends won't appear anyway
+unless you use <code>%option stack</code>).
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Performance">Performance</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#C++">C++</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Options">Options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.18 Performance considerations</h3>
+
+<p>The main design goal of <code>flex</code> is that it generate
+high-performance scanners.  It has been optimized for dealing
+well with large sets of rules.  Aside from the effects on
+scanner speed of the table compression <code>-C</code> options outlined
+above, there are a number of options/actions which degrade
+performance.  These are, from most expensive to least:
+
+<pre class="example">     REJECT
+     %option yylineno
+     arbitrary trailing context
+     
+     pattern sets that require backing up
+     %array
+     %option interactive
+     %option always-interactive
+     
+     '^' beginning-of-line operator
+     yymore()
+     </pre>
+
+   <p>with the first three all being quite expensive and the
+last two being quite cheap.  Note also that <code>unput()</code> is
+implemented as a routine call that potentially does quite
+a bit of work, while <code>yyless()</code> is a quite-cheap macro; so
+if just putting back some excess text you scanned, use
+<code>yyless()</code>.
+
+   <p><code>REJECT</code> should be avoided at all costs when performance is
+important.  It is a particularly expensive option.
+
+   <p>Getting rid of backing up is messy and often may be an
+enormous amount of work for a complicated scanner.  In
+principal, one begins by using the <code>-b</code> flag to generate a
+<code>lex.backup</code> file.  For example, on the input
+
+<pre class="example">     %%
+     foo        return TOK_KEYWORD;
+     foobar     return TOK_KEYWORD;
+     </pre>
+
+<p>the file looks like:
+
+<pre class="example">     State #6 is non-accepting -
+      associated rule line numbers:
+            2       3
+      out-transitions: [ o ]
+      jam-transitions: EOF [ \001-n  p-\177 ]
+     
+     State #8 is non-accepting -
+      associated rule line numbers:
+            3
+      out-transitions: [ a ]
+      jam-transitions: EOF [ \001-`  b-\177 ]
+     
+     State #9 is non-accepting -
+      associated rule line numbers:
+            3
+      out-transitions: [ r ]
+      jam-transitions: EOF [ \001-q  s-\177 ]
+     
+     Compressed tables always back up.
+     </pre>
+
+   <p>The first few lines tell us that there's a scanner state
+in which it can make a transition on an 'o' but not on any
+other character, and that in that state the currently
+scanned text does not match any rule.  The state occurs
+when trying to match the rules found at lines 2 and 3 in
+the input file.  If the scanner is in that state and then
+reads something other than an 'o', it will have to back up
+to find a rule which is matched.  With a bit of
+head-scratching one can see that this must be the state it's in
+when it has seen "fo".  When this has happened, if
+anything other than another 'o' is seen, the scanner will
+have to back up to simply match the 'f' (by the default
+rule).
+
+   <p>The comment regarding State #8 indicates there's a problem
+when "foob" has been scanned.  Indeed, on any character
+other than an 'a', the scanner will have to back up to
+accept "foo".  Similarly, the comment for State #9
+concerns when "fooba" has been scanned and an 'r' does not
+follow.
+
+   <p>The final comment reminds us that there's no point going
+to all the trouble of removing backing up from the rules
+unless we're using <code>-Cf</code> or <code>-CF</code>, since there's no
+performance gain doing so with compressed scanners.
+
+   <p>The way to remove the backing up is to add "error" rules:
+
+<pre class="example">     %%
+     foo         return TOK_KEYWORD;
+     foobar      return TOK_KEYWORD;
+     
+     fooba       |
+     foob        |
+     fo          {
+                 /* false alarm, not really a keyword */
+                 return TOK_ID;
+                 }
+     </pre>
+
+   <p>Eliminating backing up among a list of keywords can also
+be done using a "catch-all" rule:
+
+<pre class="example">     %%
+     foo         return TOK_KEYWORD;
+     foobar      return TOK_KEYWORD;
+     
+     [a-z]+      return TOK_ID;
+     </pre>
+
+   <p>This is usually the best solution when appropriate.
+
+   <p>Backing up messages tend to cascade.  With a complicated
+set of rules it's not uncommon to get hundreds of
+messages.  If one can decipher them, though, it often only
+takes a dozen or so rules to eliminate the backing up
+(though it's easy to make a mistake and have an error rule
+accidentally match a valid token.  A possible future <code>flex</code>
+feature will be to automatically add rules to eliminate
+backing up).
+
+   <p>It's important to keep in mind that you gain the benefits
+of eliminating backing up only if you eliminate <em>every</em>
+instance of backing up.  Leaving just one means you gain
+nothing.
+
+   <p><var>Variable</var> trailing context (where both the leading and
+trailing parts do not have a fixed length) entails almost
+the same performance loss as <code>REJECT</code> (i.e., substantial). 
+So when possible a rule like:
+
+<pre class="example">     %%
+     mouse|rat/(cat|dog)   run();
+     </pre>
+
+<p>is better written:
+
+<pre class="example">     %%
+     mouse/cat|dog         run();
+     rat/cat|dog           run();
+     </pre>
+
+<p>or as
+
+<pre class="example">     %%
+     mouse|rat/cat         run();
+     mouse|rat/dog         run();
+     </pre>
+
+   <p>Note that here the special '|' action does <em>not</em> provide any
+savings, and can even make things worse (see Deficiencies
+/ Bugs below).
+
+   <p>Another area where the user can increase a scanner's
+performance (and one that's easier to implement) arises from
+the fact that the longer the tokens matched, the faster
+the scanner will run.  This is because with long tokens
+the processing of most input characters takes place in the
+(short) inner scanning loop, and does not often have to go
+through the additional work of setting up the scanning
+environment (e.g., <code>yytext</code>) for the action.  Recall the
+scanner for C comments:
+
+<pre class="example">     %x comment
+     %%
+             int line_num = 1;
+     
+     "/*"         BEGIN(comment);
+     
+     &lt;comment&gt;[^*\n]*
+     &lt;comment&gt;"*"+[^*/\n]*
+     &lt;comment&gt;\n             ++line_num;
+     &lt;comment&gt;"*"+"/"        BEGIN(INITIAL);
+     </pre>
+
+   <p>This could be sped up by writing it as:
+
+<pre class="example">     %x comment
+     %%
+             int line_num = 1;
+     
+     "/*"         BEGIN(comment);
+     
+     &lt;comment&gt;[^*\n]*
+     &lt;comment&gt;[^*\n]*\n      ++line_num;
+     &lt;comment&gt;"*"+[^*/\n]*
+     &lt;comment&gt;"*"+[^*/\n]*\n ++line_num;
+     &lt;comment&gt;"*"+"/"        BEGIN(INITIAL);
+     </pre>
+
+   <p>Now instead of each newline requiring the processing of
+another action, recognizing the newlines is "distributed"
+over the other rules to keep the matched text as long as
+possible.  Note that <em>adding</em> rules does <em>not</em> slow down the
+scanner!  The speed of the scanner is independent of the
+number of rules or (modulo the considerations given at the
+beginning of this section) how complicated the rules are
+with regard to operators such as '*' and '|'.
+
+   <p>A final example in speeding up a scanner: suppose you want
+to scan through a file containing identifiers and
+keywords, one per line and with no other extraneous
+characters, and recognize all the keywords.  A natural first
+approach is:
+
+<pre class="example">     %%
+     asm      |
+     auto     |
+     break    |
+     ... etc ...
+     volatile |
+     while    /* it's a keyword */
+     
+     .|\n     /* it's not a keyword */
+     </pre>
+
+   <p>To eliminate the back-tracking, introduce a catch-all
+rule:
+
+<pre class="example">     %%
+     asm      |
+     auto     |
+     break    |
+     ... etc ...
+     volatile |
+     while    /* it's a keyword */
+     
+     [a-z]+   |
+     .|\n     /* it's not a keyword */
+     </pre>
+
+   <p>Now, if it's guaranteed that there's exactly one word per
+line, then we can reduce the total number of matches by a
+half by merging in the recognition of newlines with that
+of the other tokens:
+
+<pre class="example">     %%
+     asm\n    |
+     auto\n   |
+     break\n  |
+     ... etc ...
+     volatile\n |
+     while\n  /* it's a keyword */
+     
+     [a-z]+\n |
+     .|\n     /* it's not a keyword */
+     </pre>
+
+   <p>One has to be careful here, as we have now reintroduced
+backing up into the scanner.  In particular, while <em>we</em> know
+that there will never be any characters in the input
+stream other than letters or newlines, <code>flex</code> can't figure
+this out, and it will plan for possibly needing to back up
+when it has scanned a token like "auto" and then the next
+character is something other than a newline or a letter. 
+Previously it would then just match the "auto" rule and be
+done, but now it has no "auto" rule, only a "auto\n" rule. 
+To eliminate the possibility of backing up, we could
+either duplicate all rules but without final newlines, or,
+since we never expect to encounter such an input and
+therefore don't how it's classified, we can introduce one
+more catch-all rule, this one which doesn't include a
+newline:
+
+<pre class="example">     %%
+     asm\n    |
+     auto\n   |
+     break\n  |
+     ... etc ...
+     volatile\n |
+     while\n  /* it's a keyword */
+     
+     [a-z]+\n |
+     [a-z]+   |
+     .|\n     /* it's not a keyword */
+     </pre>
+
+   <p>Compiled with <code>-Cf</code>, this is about as fast as one can get a
+<code>flex</code> scanner to go for this particular problem.
+
+   <p>A final note: <code>flex</code> is slow when matching NUL's,
+particularly when a token contains multiple NUL's.  It's best to
+write rules which match <em>short</em> amounts of text if it's
+anticipated that the text will often include NUL's.
+
+   <p>Another final note regarding performance: as mentioned
+above in the section How the Input is Matched, dynamically
+resizing <code>yytext</code> to accommodate huge tokens is a slow
+process because it presently requires that the (huge) token
+be rescanned from the beginning.  Thus if performance is
+vital, you should attempt to match "large" quantities of
+text but not "huge" quantities, where the cutoff between
+the two is at about 8K characters/token.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="C++">C++</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Incompatibilities">Incompatibilities</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Performance">Performance</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.19 Generating C++ scanners</h3>
+
+<p><code>flex</code> provides two different ways to generate scanners for
+use with C++.  The first way is to simply compile a
+scanner generated by <code>flex</code> using a C++ compiler instead of a C
+compiler.  You should not encounter any compilations
+errors (please report any you find to the email address
+given in the Author section below).  You can then use C++
+code in your rule actions instead of C code.  Note that
+the default input source for your scanner remains <code>yyin</code>,
+and default echoing is still done to <code>yyout</code>.  Both of these
+remain <code>FILE *</code> variables and not C++ <code>streams</code>.
+
+   <p>You can also use <code>flex</code> to generate a C++ scanner class, using
+the <code>-+</code> option, (or, equivalently, <code>%option c++</code>), which
+is automatically specified if the name of the flex executable ends
+in a <code>+</code>, such as <code>flex++</code>.  When using this option, flex
+defaults to generating the scanner to the file <code>lex.yy.cc</code> instead
+of <code>lex.yy.c</code>.  The generated scanner includes the header file
+<code>FlexLexer.h</code>, which defines the interface to two C++ classes.
+
+   <p>The first class, <code>FlexLexer</code>, provides an abstract base
+class defining the general scanner class interface.  It
+provides the following member functions:
+
+     <dl>
+<dt><code>const char* YYText()</code>
+     <dd>returns the text of the most recently matched
+token, the equivalent of <code>yytext</code>.
+
+     <br><dt><code>int YYLeng()</code>
+     <dd>returns the length of the most recently matched
+token, the equivalent of <code>yyleng</code>.
+
+     <br><dt><code>int lineno() const</code>
+     <dd>returns the current input line number (see <code>%option yylineno</code>),
+or 1 if <code>%option yylineno</code> was not used.
+
+     <br><dt><code>void set_debug( int flag )</code>
+     <dd>sets the debugging flag for the scanner, equivalent to assigning to
+<code>yy_flex_debug</code> (see the Options section above).  Note that you
+must build the scanner using <code>%option debug</code> to include debugging
+information in it.
+
+     <br><dt><code>int debug() const</code>
+     <dd>returns the current setting of the debugging flag. 
+</dl>
+
+   <p>Also provided are member functions equivalent to
+<code>yy_switch_to_buffer(), yy_create_buffer()</code> (though the
+first argument is an <code>istream*</code> object pointer and not a
+<code>FILE*</code>, <code>yy_flush_buffer()</code>, <code>yy_delete_buffer()</code>,
+and <code>yyrestart()</code> (again, the first argument is a <code>istream*</code>
+object pointer).
+
+   <p>The second class defined in <code>FlexLexer.h</code> is <code>yyFlexLexer</code>,
+which is derived from <code>FlexLexer</code>.  It defines the following
+additional member functions:
+
+     <dl>
+<dt><code>yyFlexLexer( istream* arg_yyin = 0, ostream* arg_yyout = 0 )</code>
+     <dd>constructs a <code>yyFlexLexer</code> object using the given
+streams for input and output.  If not specified,
+the streams default to <code>cin</code> and <code>cout</code>, respectively.
+
+     <br><dt><code>virtual int yylex()</code>
+     <dd>performs the same role is <code>yylex()</code> does for ordinary
+flex scanners: it scans the input stream, consuming
+tokens, until a rule's action returns a value.  If you derive a subclass
+<var>S</var>
+from <code>yyFlexLexer</code>
+and want to access the member functions and variables of
+<var>S</var>
+inside <code>yylex()</code>,
+then you need to use <code>%option yyclass="</code><var>S</var><code>"</code>
+to inform <code>flex</code>
+that you will be using that subclass instead of <code>yyFlexLexer</code>. 
+In this case, rather than generating <code>yyFlexLexer::yylex()</code>,
+<code>flex</code> generates <code></code><var>S</var><code>::yylex()</code>
+(and also generates a dummy <code>yyFlexLexer::yylex()</code>
+that calls <code>yyFlexLexer::LexerError()</code>
+if called).
+
+     <br><dt><code>virtual void switch_streams(istream* new_in = 0, ostream* new_out = 0)</code>
+     <dd>reassigns <code>yyin</code> to <code>new_in</code>
+(if non-nil)
+and <code>yyout</code> to <code>new_out</code>
+(ditto), deleting the previous input buffer if <code>yyin</code>
+is reassigned.
+
+     <br><dt><code>int yylex( istream* new_in = 0, ostream* new_out = 0 )</code>
+     <dd>first switches the input streams via <code>switch_streams( new_in, new_out )</code>
+and then returns the value of <code>yylex()</code>. 
+</dl>
+
+   <p>In addition, <code>yyFlexLexer</code> defines the following protected
+virtual functions which you can redefine in derived
+classes to tailor the scanner:
+
+     <dl>
+<dt><code>virtual int LexerInput( char* buf, int max_size )</code>
+     <dd>reads up to <code>max_size</code> characters into <var>buf</var> and
+returns the number of characters read.  To indicate
+end-of-input, return 0 characters.  Note that
+"interactive" scanners (see the <code>-B</code> and <code>-I</code> flags)
+define the macro <code>YY_INTERACTIVE</code>.  If you redefine
+<code>LexerInput()</code> and need to take different actions
+depending on whether or not the scanner might be
+scanning an interactive input source, you can test
+for the presence of this name via <code>#ifdef</code>.
+
+     <br><dt><code>virtual void LexerOutput( const char* buf, int size )</code>
+     <dd>writes out <var>size</var> characters from the buffer <var>buf</var>,
+which, while NUL-terminated, may also contain
+"internal" NUL's if the scanner's rules can match
+text with NUL's in them.
+
+     <br><dt><code>virtual void LexerError( const char* msg )</code>
+     <dd>reports a fatal error message.  The default version
+of this function writes the message to the stream
+<code>cerr</code> and exits. 
+</dl>
+
+   <p>Note that a <code>yyFlexLexer</code> object contains its <em>entire</em>
+scanning state.  Thus you can use such objects to create
+reentrant scanners.  You can instantiate multiple instances of
+the same <code>yyFlexLexer</code> class, and you can also combine
+multiple C++ scanner classes together in the same program
+using the <code>-P</code> option discussed above. 
+Finally, note that the <code>%array</code> feature is not available to
+C++ scanner classes; you must use <code>%pointer</code> (the default).
+
+   <p>Here is an example of a simple C++ scanner:
+
+<pre class="example">         // An example of using the flex C++ scanner class.
+     
+     %{
+     int mylineno = 0;
+     %}
+     
+     string  \"[^\n"]+\"
+     
+     ws      [ \t]+
+     
+     alpha   [A-Za-z]
+     dig     [0-9]
+     name    ({alpha}|{dig}|\$)({alpha}|{dig}|[_.\-/$])*
+     num1    [-+]?{dig}+\.?([eE][-+]?{dig}+)?
+     num2    [-+]?{dig}*\.{dig}+([eE][-+]?{dig}+)?
+     number  {num1}|{num2}
+     
+     %%
+     
+     {ws}    /* skip blanks and tabs */
+     
+     "/*"    {
+             int c;
+     
+             while((c = yyinput()) != 0)
+                 {
+                 if(c == '\n')
+                     ++mylineno;
+     
+                 else if(c == '*')
+                     {
+                     if((c = yyinput()) == '/')
+                         break;
+                     else
+                         unput(c);
+                     }
+                 }
+             }
+     
+     {number}  cout &lt;&lt; "number " &lt;&lt; YYText() &lt;&lt; '\n';
+     
+     \n        mylineno++;
+     
+     {name}    cout &lt;&lt; "name " &lt;&lt; YYText() &lt;&lt; '\n';
+     
+     {string}  cout &lt;&lt; "string " &lt;&lt; YYText() &lt;&lt; '\n';
+     
+     %%
+     
+     Version 2.5               December 1994                        44
+     
+     int main( int /* argc */, char** /* argv */ )
+         {
+         FlexLexer* lexer = new yyFlexLexer;
+         while(lexer-&gt;yylex() != 0)
+             ;
+         return 0;
+         }
+     </pre>
+
+   <p>If you want to create multiple (different) lexer classes,
+you use the <code>-P</code> flag (or the <code>prefix=</code> option) to rename each
+<code>yyFlexLexer</code> to some other <code>xxFlexLexer</code>.  You then can
+include <code>&lt;FlexLexer.h&gt;</code> in your other sources once per lexer
+class, first renaming <code>yyFlexLexer</code> as follows:
+
+<pre class="example">     #undef yyFlexLexer
+     #define yyFlexLexer xxFlexLexer
+     #include &lt;FlexLexer.h&gt;
+     
+     #undef yyFlexLexer
+     #define yyFlexLexer zzFlexLexer
+     #include &lt;FlexLexer.h&gt;
+     </pre>
+
+   <p>if, for example, you used <code>%option prefix="xx"</code> for one of
+your scanners and <code>%option prefix="zz"</code> for the other.
+
+   <p>IMPORTANT: the present form of the scanning class is
+<em>experimental</em> and may change considerably between major
+releases.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Incompatibilities">Incompatibilities</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Diagnostics">Diagnostics</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#C++">C++</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.20 Incompatibilities with <code>lex</code> and POSIX</h3>
+
+<p><code>flex</code> is a rewrite of the AT&amp;T Unix <code>lex</code> tool (the two
+implementations do not share any code, though), with some
+extensions and incompatibilities, both of which are of
+concern to those who wish to write scanners acceptable to
+either implementation.  Flex is fully compliant with the
+POSIX <code>lex</code> specification, except that when using <code>%pointer</code>
+(the default), a call to <code>unput()</code> destroys the contents of
+<code>yytext</code>, which is counter to the POSIX specification.
+
+   <p>In this section we discuss all of the known areas of
+incompatibility between flex, AT&amp;T lex, and the POSIX
+specification.
+
+   <p><code>flex's</code> <code>-l</code> option turns on maximum compatibility with the
+original AT&amp;T <code>lex</code> implementation, at the cost of a major
+loss in the generated scanner's performance.  We note
+below which incompatibilities can be overcome using the <code>-l</code>
+option.
+
+   <p><code>flex</code> is fully compatible with <code>lex</code> with the following
+exceptions:
+
+     <ul>
+<li>The undocumented <code>lex</code> scanner internal variable <code>yylineno</code>
+is not supported unless <code>-l</code> or <code>%option yylineno</code> is used. 
+<code>yylineno</code> should be maintained on a per-buffer basis, rather
+than a per-scanner (single global variable) basis.  <code>yylineno</code> is
+not part of the POSIX specification.
+
+     <li>The <code>input()</code> routine is not redefinable, though it
+may be called to read characters following whatever
+has been matched by a rule.  If <code>input()</code> encounters
+an end-of-file the normal <code>yywrap()</code> processing is
+done.  A "real" end-of-file is returned by
+<code>input()</code> as <code>EOF</code>.
+
+     <p>Input is instead controlled by defining the
+<code>YY_INPUT</code> macro.
+
+     <p>The <code>flex</code> restriction that <code>input()</code> cannot be
+redefined is in accordance with the POSIX
+specification, which simply does not specify any way of
+controlling the scanner's input other than by making
+an initial assignment to <code>yyin</code>.
+
+     </p><li>The <code>unput()</code> routine is not redefinable.  This
+restriction is in accordance with POSIX.
+
+     <li><code>flex</code> scanners are not as reentrant as <code>lex</code> scanners. 
+In particular, if you have an interactive scanner
+and an interrupt handler which long-jumps out of
+the scanner, and the scanner is subsequently called
+again, you may get the following message:
+
+     <pre class="example">          fatal flex scanner internal error--end of buffer missed
+          </pre>
+
+     <p>To reenter the scanner, first use
+
+     <pre class="example">          yyrestart( yyin );
+          </pre>
+
+     <p>Note that this call will throw away any buffered
+input; usually this isn't a problem with an
+interactive scanner.
+
+     <p>Also note that flex C++ scanner classes <em>are</em>
+reentrant, so if using C++ is an option for you, you
+should use them instead.  See "Generating C++
+Scanners" above for details.
+
+     </p><li><code>output()</code> is not supported.  Output from the <code>ECHO</code>
+macro is done to the file-pointer <code>yyout</code> (default
+<code>stdout</code>).
+
+     <p><code>output()</code> is not part of the POSIX specification.
+
+     <li><code>lex</code> does not support exclusive start conditions
+(%x), though they are in the POSIX specification.
+
+     <li>When definitions are expanded, <code>flex</code> encloses them
+in parentheses.  With lex, the following:
+
+     <pre class="example">          NAME    [A-Z][A-Z0-9]*
+          %%
+          foo{NAME}?      printf( "Found it\n" );
+          %%
+          </pre>
+
+     <p>will not match the string "foo" because when the
+macro is expanded the rule is equivalent to
+"foo[A-Z][A-Z0-9]*?" and the precedence is such that the
+'?' is associated with "[A-Z0-9]*".  With <code>flex</code>, the
+rule will be expanded to "foo([A-Z][A-Z0-9]*)?" and
+so the string "foo" will match.
+
+     <p>Note that if the definition begins with <code>^</code> or ends
+with <code>$</code> then it is <em>not</em> expanded with parentheses, to
+allow these operators to appear in definitions
+without losing their special meanings.  But the
+<code>&lt;s&gt;, /</code>, and <code>&lt;&lt;EOF&gt;&gt;</code> operators cannot be used in a
+<code>flex</code> definition.
+
+     <p>Using <code>-l</code> results in the <code>lex</code> behavior of no
+parentheses around the definition.
+
+     <p>The POSIX specification is that the definition be enclosed in
+parentheses.
+
+     </p><li>Some implementations of <code>lex</code> allow a rule's action to begin on
+a separate line, if the rule's pattern has trailing whitespace:
+
+     <pre class="example">          %%
+          foo|bar&lt;space here&gt;
+            { foobar_action(); }
+          </pre>
+
+     <p><code>flex</code> does not support this feature.
+
+     <li>The <code>lex</code> <code>%r</code> (generate a Ratfor scanner) option is
+not supported.  It is not part of the POSIX
+specification.
+
+     <li>After a call to <code>unput()</code>, <code>yytext</code> is undefined until
+the next token is matched, unless the scanner was
+built using <code>%array</code>.  This is not the case with <code>lex</code>
+or the POSIX specification.  The <code>-l</code> option does
+away with this incompatibility.
+
+     <li>The precedence of the <code>{}</code> (numeric range) operator
+is different.  <code>lex</code> interprets "abc{1,3}" as "match
+one, two, or three occurrences of 'abc'", whereas
+<code>flex</code> interprets it as "match 'ab' followed by one,
+two, or three occurrences of 'c'".  The latter is
+in agreement with the POSIX specification.
+
+     <li>The precedence of the <code>^</code> operator is different.  <code>lex</code>
+interprets "^foo|bar" as "match either 'foo' at the
+beginning of a line, or 'bar' anywhere", whereas
+<code>flex</code> interprets it as "match either 'foo' or 'bar'
+if they come at the beginning of a line".  The
+latter is in agreement with the POSIX specification.
+
+     <li>The special table-size declarations such as <code>%a</code>
+supported by <code>lex</code> are not required by <code>flex</code> scanners;
+<code>flex</code> ignores them.
+
+     <li>The name FLEX_SCANNER is #define'd so scanners may
+be written for use with either <code>flex</code> or <code>lex</code>. 
+Scanners also include <code>YY_FLEX_MAJOR_VERSION</code> and
+<code>YY_FLEX_MINOR_VERSION</code> indicating which version of
+<code>flex</code> generated the scanner (for example, for the
+2.5 release, these defines would be 2 and 5
+respectively). 
+</ul>
+
+   <p>The following <code>flex</code> features are not included in <code>lex</code> or the
+POSIX specification:
+
+<pre class="example">     C++ scanners
+     %option
+     start condition scopes
+     start condition stacks
+     interactive/non-interactive scanners
+     yy_scan_string() and friends
+     yyterminate()
+     yy_set_interactive()
+     yy_set_bol()
+     YY_AT_BOL()
+     &lt;&lt;EOF&gt;&gt;
+     &lt;*&gt;
+     YY_DECL
+     YY_START
+     YY_USER_ACTION
+     YY_USER_INIT
+     #line directives
+     %{}'s around actions
+     multiple actions on a line
+     </pre>
+
+<p>plus almost all of the flex flags.  The last feature in
+the list refers to the fact that with <code>flex</code> you can put
+multiple actions on the same line, separated with
+semicolons, while with <code>lex</code>, the following
+
+<pre class="example">     foo    handle_foo(); ++num_foos_seen;
+     </pre>
+
+<p>is (rather surprisingly) truncated to
+
+<pre class="example">     foo    handle_foo();
+     </pre>
+
+   <p><code>flex</code> does not truncate the action.  Actions that are not
+enclosed in braces are simply terminated at the end of the
+line.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Diagnostics">Diagnostics</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Files">Files</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Incompatibilities">Incompatibilities</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.21 Diagnostics</h3>
+
+     <dl>
+<dt><code>warning, rule cannot be matched</code>
+     <dd>indicates that the given
+rule cannot be matched because it follows other rules that
+will always match the same text as it.  For example, in
+the following "foo" cannot be matched because it comes
+after an identifier "catch-all" rule:
+
+     <pre class="example">          [a-z]+    got_identifier();
+          foo       got_foo();
+          </pre>
+
+     <p>Using <code>REJECT</code> in a scanner suppresses this warning.
+
+     <br><dt><code>warning, -s option given but default rule can be matched</code>
+     <dd>means that it is possible (perhaps only in a particular
+start condition) that the default rule (match any single
+character) is the only one that will match a particular
+input.  Since <code>-s</code> was given, presumably this is not
+intended.
+
+     <br><dt><code>reject_used_but_not_detected undefined</code>
+     <dd><dt><code>yymore_used_but_not_detected undefined</code>
+     <dd>These errors can
+occur at compile time.  They indicate that the scanner
+uses <code>REJECT</code> or <code>yymore()</code> but that <code>flex</code> failed to notice the
+fact, meaning that <code>flex</code> scanned the first two sections
+looking for occurrences of these actions and failed to
+find any, but somehow you snuck some in (via a #include
+file, for example).  Use <code>%option reject</code> or <code>%option yymore</code>
+to indicate to flex that you really do use these features.
+
+     <br><dt><code>flex scanner jammed</code>
+     <dd>a scanner compiled with <code>-s</code> has
+encountered an input string which wasn't matched by any of
+its rules.  This error can also occur due to internal
+problems.
+
+     <br><dt><code>token too large, exceeds YYLMAX</code>
+     <dd>your scanner uses <code>%array</code>
+and one of its rules matched a string longer than the <code>YYL-</code>
+<code>MAX</code> constant (8K bytes by default).  You can increase the
+value by #define'ing <code>YYLMAX</code> in the definitions section of
+your <code>flex</code> input.
+
+     <br><dt><code>scanner requires -8 flag to use the character '</code><var>x</var><code>'</code>
+     <dd>Your
+scanner specification includes recognizing the 8-bit
+character <var>x</var> and you did not specify the -8 flag, and your
+scanner defaulted to 7-bit because you used the <code>-Cf</code> or <code>-CF</code>
+table compression options.  See the discussion of the <code>-7</code>
+flag for details.
+
+     <br><dt><code>flex scanner push-back overflow</code>
+     <dd>you used <code>unput()</code> to push
+back so much text that the scanner's buffer could not hold
+both the pushed-back text and the current token in <code>yytext</code>. 
+Ideally the scanner should dynamically resize the buffer
+in this case, but at present it does not.
+
+     <br><dt><code>input buffer overflow, can't enlarge buffer because scanner uses REJECT</code>
+     <dd>the scanner was working on matching an
+extremely large token and needed to expand the input
+buffer.  This doesn't work with scanners that use <code>REJECT</code>.
+
+     <br><dt><code>fatal flex scanner internal error--end of buffer missed</code>
+     <dd>This can occur in an scanner which is reentered after a
+long-jump has jumped out (or over) the scanner's
+activation frame.  Before reentering the scanner, use:
+
+     <pre class="example">          yyrestart( yyin );
+          </pre>
+
+     <p>or, as noted above, switch to using the C++ scanner class.
+
+     <br><dt><code>too many start conditions in &lt;&gt; construct!</code>
+     <dd>you listed
+more start conditions in a &lt;&gt; construct than exist (so you
+must have listed at least one of them twice). 
+</dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Files">Files</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Deficiencies">Deficiencies</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Diagnostics">Diagnostics</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.22 Files</h3>
+
+     <dl>
+<dt><code>-lfl</code>
+     <dd>library with which scanners must be linked.
+
+     <br><dt><code>lex.yy.c</code>
+     <dd>generated scanner (called <code>lexyy.c</code> on some systems).
+
+     <br><dt><code>lex.yy.cc</code>
+     <dd>generated C++ scanner class, when using <code>-+</code>.
+
+     <br><dt><code>&lt;FlexLexer.h&gt;</code>
+     <dd>header file defining the C++ scanner base class,
+<code>FlexLexer</code>, and its derived class, <code>yyFlexLexer</code>.
+
+     <br><dt><code>flex.skl</code>
+     <dd>skeleton scanner.  This file is only used when
+building flex, not when flex executes.
+
+     <br><dt><code>lex.backup</code>
+     <dd>backing-up information for <code>-b</code> flag (called <code>lex.bck</code>
+on some systems). 
+</dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Deficiencies">Deficiencies</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#See%20also">See also</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Files">Files</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.23 Deficiencies / Bugs</h3>
+
+<p>Some trailing context patterns cannot be properly matched
+and generate warning messages ("dangerous trailing
+context").  These are patterns where the ending of the first
+part of the rule matches the beginning of the second part,
+such as "zx*/xy*", where the 'x*' matches the 'x' at the
+beginning of the trailing context.  (Note that the POSIX
+draft states that the text matched by such patterns is
+undefined.)
+
+   <p>For some trailing context rules, parts which are actually
+fixed-length are not recognized as such, leading to the
+abovementioned performance loss.  In particular, parts
+using '|' or {n} (such as "foo{3}") are always considered
+variable-length.
+
+   <p>Combining trailing context with the special '|' action can
+result in <em>fixed</em> trailing context being turned into the
+more expensive <var>variable</var> trailing context.  For example, in
+the following:
+
+<pre class="example">     %%
+     abc      |
+     xyz/def
+     </pre>
+
+   <p>Use of <code>unput()</code> invalidates yytext and yyleng, unless the
+<code>%array</code> directive or the <code>-l</code> option has been used.
+
+   <p>Pattern-matching of NUL's is substantially slower than
+matching other characters.
+
+   <p>Dynamic resizing of the input buffer is slow, as it
+entails rescanning all the text matched so far by the
+current (generally huge) token.
+
+   <p>Due to both buffering of input and read-ahead, you cannot
+intermix calls to &lt;stdio.h&gt; routines, such as, for
+example, <code>getchar()</code>, with <code>flex</code> rules and expect it to work. 
+Call <code>input()</code> instead.
+
+   <p>The total table entries listed by the <code>-v</code> flag excludes the
+number of table entries needed to determine what rule has
+been matched.  The number of entries is equal to the
+number of DFA states if the scanner does not use <code>REJECT</code>, and
+somewhat greater than the number of states if it does.
+
+   <p><code>REJECT</code> cannot be used with the <code>-f</code> or <code>-F</code> options.
+
+   <p>The <code>flex</code> internal algorithms need documentation.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="See%20also">See also</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Author">Author</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Deficiencies">Deficiencies</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.24 See also</h3>
+
+<p><code>lex</code>(1), <code>yacc</code>(1), <code>sed</code>(1), <code>awk</code>(1).
+
+   <p>John Levine, Tony Mason, and Doug Brown: Lex &amp; Yacc;
+O'Reilly and Associates.  Be sure to get the 2nd edition.
+
+   <p>M. E. Lesk and E. Schmidt, LEX - Lexical Analyzer Generator.
+
+   <p>Alfred Aho, Ravi Sethi and Jeffrey Ullman: Compilers:
+Principles, Techniques and Tools; Addison-Wesley (1986). 
+Describes the pattern-matching techniques used by <code>flex</code>
+(deterministic finite automata).
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Author">Author</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#See%20also">See also</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">0.25 Author</h3>
+
+<p>Vern Paxson, with the help of many ideas and much inspiration from
+Van Jacobson.  Original version by Jef Poskanzer.  The fast table
+representation is a partial implementation of a design done by Van
+Jacobson.  The implementation was done by Kevin Gong and Vern Paxson.
+
+   <p>Thanks to the many <code>flex</code> beta-testers, feedbackers, and
+contributors, especially Francois Pinard, Casey Leedom, Stan
+Adermann, Terry Allen, David Barker-Plummer, John Basrai, Nelson
+H.F. Beebe, <code>benson@odi.com</code>, Karl Berry, Peter A. Bigot,
+Simon Blanchard, Keith Bostic, Frederic Brehm, Ian Brockbank, Kin
+Cho, Nick Christopher, Brian Clapper, J.T. Conklin, Jason Coughlin,
+Bill Cox, Nick Cropper, Dave Curtis, Scott David Daniels, Chris
+G. Demetriou, Theo Deraadt, Mike Donahue, Chuck Doucette, Tom Epperly,
+Leo Eskin, Chris Faylor, Chris Flatters, Jon Forrest, Joe Gayda, Kaveh
+R. Ghazi, Eric Goldman, Christopher M.  Gould, Ulrich Grepel, Peer
+Griebel, Jan Hajic, Charles Hemphill, NORO Hideo, Jarkko Hietaniemi,
+Scott Hofmann, Jeff Honig, Dana Hudes, Eric Hughes, John Interrante,
+Ceriel Jacobs, Michal Jaegermann, Sakari Jalovaara, Jeffrey R. Jones,
+Henry Juengst, Klaus Kaempf, Jonathan I. Kamens, Terrence O Kane,
+Amir Katz, <code>ken@ken.hilco.com</code>, Kevin B. Kenny, Steve Kirsch,
+Winfried Koenig, Marq Kole, Ronald Lamprecht, Greg Lee, Rohan Lenard,
+Craig Leres, John Levine, Steve Liddle, Mike Long, Mohamed el Lozy,
+Brian Madsen, Malte, Joe Marshall, Bengt Martensson, Chris Metcalf,
+Luke Mewburn, Jim Meyering, R.  Alexander Milowski, Erik Naggum,
+G.T. Nicol, Landon Noll, James Nordby, Marc Nozell, Richard Ohnemus,
+Karsten Pahnke, Sven Panne, Roland Pesch, Walter Pelissero, Gaumond
+Pierre, Esmond Pitt, Jef Poskanzer, Joe Rahmeh, Jarmo Raiha, Frederic
+Raimbault, Pat Rankin, Rick Richardson, Kevin Rodgers, Kai Uwe Rommel,
+Jim Roskind, Alberto Santini, Andreas Scherer, Darrell Schiebel, Raf
+Schietekat, Doug Schmidt, Philippe Schnoebelen, Andreas Schwab, Alex
+Siegel, Eckehard Stolz, Jan-Erik Strvmquist, Mike Stump, Paul Stuart,
+Dave Tallman, Ian Lance Taylor, Chris Thewalt, Richard M. Timoney,
+Jodi Tsai, Paul Tuinenga, Gary Weik, Frank Whaley, Gerhard Wilhelms,
+Kent Williams, Ken Yap, Ron Zellar, Nathan Zelle, David Zuhn, and
+those whose names have slipped my marginal mail-archiving skills but
+whose contributions are appreciated all the same.
+
+   <p>Thanks to Keith Bostic, Jon Forrest, Noah Friedman, John Gilmore,
+Craig Leres, John Levine, Bob Mulcahy, G.T.  Nicol, Francois Pinard,
+Rich Salz, and Richard Stallman for help with various distribution
+headaches.
+
+   <p>Thanks to Esmond Pitt and Earle Horton for 8-bit character support;
+to Benson Margulies and Fred Burke for C++ support; to Kent Williams
+and Tom Epperly for C++ class support; to Ove Ewerlid for support of
+NUL's; and to Eric Hughes for support of multiple buffers.
+
+   <p>This work was primarily done when I was with the Real Time Systems
+Group at the Lawrence Berkeley Laboratory in Berkeley, CA.  Many thanks
+to all there for the support I received.
+
+   <p>Send comments to <code>vern@ee.lbl.gov</code>.
+
+
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a href="#Name">0.1 Name</a>
+<li><a href="#Synopsis">0.2 Synopsis</a>
+<li><a href="#Overview">0.3 Overview</a>
+<li><a href="#Description">0.4 Description</a>
+<li><a href="#Examples">0.5 Some simple examples</a>
+<li><a href="#Format">0.6 Format of the input file</a>
+<li><a href="#Patterns">0.7 Patterns</a>
+<li><a href="#Matching">0.8 How the input is matched</a>
+<li><a href="#Actions">0.9 Actions</a>
+<li><a href="#Generated%20scanner">0.10 The generated scanner</a>
+<li><a href="#Start%20conditions">0.11 Start conditions</a>
+<li><a href="#Multiple%20buffers">0.12 Multiple input buffers</a>
+<li><a href="#End-of-file%20rules">0.13 End-of-file rules</a>
+<li><a href="#Miscellaneous">0.14 Miscellaneous macros</a>
+<li><a href="#User%20variables">0.15 Values available to the user</a>
+<li><a href="#YACC%20interface">0.16 Interfacing with <code>yacc</code></a>
+<li><a href="#Options">0.17 Options</a>
+<li><a href="#Performance">0.18 Performance considerations</a>
+<li><a href="#C++">0.19 Generating C++ scanners</a>
+<li><a href="#Incompatibilities">0.20 Incompatibilities with <code>lex</code> and POSIX</a>
+<li><a href="#Diagnostics">0.21 Diagnostics</a>
+<li><a href="#Files">0.22 Files</a>
+<li><a href="#Deficiencies">0.23 Deficiencies / Bugs</a>
+<li><a href="#See%20also">0.24 See also</a>
+<li><a href="#Author">0.25 Author</a>
+</li></ul>
+</div>
+
+   </body></html>
+

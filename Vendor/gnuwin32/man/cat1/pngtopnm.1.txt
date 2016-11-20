@@ -1,0 +1,149 @@
+Pngtopnm User Manual(0)                 Pngtopnm User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       pngtopnm - convert a PNG image into a PNM image
+
+
+SYNOPSIS
+       pngtopnm  [-verbose] [-alpha | -mix] [-background=color]
+       [-gamma=value] [-text=filename] [-time] [pngfile]
+
+       Minimum unique abbreviation  of  option  is  acceptable.
+       You  may  use double hyphens instead of single hyphen to
+       denote options.  You may use white space in place of the
+       equals sign to separate an option name from its value.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       pngtopnm  reads  a PNG image (Portable Network Graphics)
+       as input and produces a PPM image as output.   The  type
+       of  the  output file depends on the input file - if it's
+       black & white, pngtopnm creates a  PBM  file.   If  it's
+       grayscale,  pngtopnm  creates a PGM file.  Otherwise, it
+       creates a PPM file.
+
+
+OPTIONS
+       -verbose
+              Display various information about the  input  PNG
+              image and the conversion process.
+
+              If  you  want even more information about the PNG
+              image, use pngcheck (not part of Netpbm).
+
+
+       -alpha Output the alpha channel or transparency mask  of
+              the  image.  The result is either a PBM file or a
+              PGM file, depending on whether  different  levels
+              of transparency appear.
+
+
+       -mix   Compose  the image with the transparency or alpha
+              mask against a background.  The background  color
+              is  determined  by  the  bKGD  chunk  in the PNG,
+              except that you can override it with -background.
+              If  the PNG has no bKGD chunk and you don't spec-
+              ify -background, the background color is white.
+
+
+       -background=color
+              This option specifies the background  color  with
+              which to mix the image when you specify -mix.
+
+              color  is  as  described  for the argument of the
+              ppm_parsecolor() library routine .
+
+              Examples:
+
+
+
+       o      -background=rgb:01/ff/80
+
+       o      -background=rgbi:1/255/128
+
+
+              If you don't specify -background, the  background
+              color  is what is specified in the PNG image, and
+              if the PNG doesn't specify anything, white.
+
+              You cannot specify -background  unless  you  also
+              specify  -mix.  Before Netpbm 10.27 (March 2005),
+              you could specify -background with  -mix  and  it
+              was just ignored.  (This caused a usability prob-
+              lem).
+
+
+
+       -gamma= value
+              Converts the image to a new display-gamma  value.
+              If  a gAMA chunk is present in the png-file, png-
+              topnm uses the specified image-gamma  value.   If
+              not,  pngtopnm  considers  the  image-gamma to be
+              1.0.  Based on the image-gamma and  the  display-
+              gamma  given  with  this option, pngtopnm adjusts
+              the colors written to the pnm-file.
+
+              Because the gammas of uncompensated monitors  are
+              around  2.6,  which  results in an image-gamma of
+              0.45,  some  typical  situations  are:  when  the
+              image-gamma  is  0.45 (use -verbose to check) and
+              the picture is too light, your system  is  gamma-
+              corrected, so convert with '-gamma 1.0'.  When no
+              gAMA chunk is present or the image-gamma is  1.0,
+              use  2.2  to make the picture lighter and 0.45 to
+              make the picture darker.
+
+
+       -text=file
+              Writes the tEXt and zTXt chunks to a file,  in  a
+              format  as described in the pnmtopng user manual.
+              These chunks contain  text  comments  or  annota-
+              tions.
+
+
+       -time  Prints the tIME chunk to stderr.
+
+
+
+
+SEE ALSO
+       pnmtopng(1), ptot, pnmgamma(1), pnm(1)
+
+       For    information    on    the    PNG    format,    see
+       http://schaik.com/png .
+
+
+NOTE
+       A PNG image contains a lot of information that can't  be
+       represented  in  Netpbm  formats.   Therefore,  you lose
+       information when you  convert  to  another  format  with
+       "pngtopnm  |  pnmtoxxx".  If there is a specialized con-
+       verter that converts directly to the other format,  e.g.
+       ptot  to  convert  from  PNG  to TIFF, you'll get better
+       results using that.
+
+
+LIMITATIONS
+       There could be an option to read the comment  text  from
+       pnm comments instead of a separate file.
+
+       The  program  could  be  much faster, with a bit of code
+       optimizing.  As with any Netpbm  program,  speed  always
+       takes  a  back seat to quick present and future develop-
+       ment.
+
+
+AUTHORS
+       Copyright (C) 1995-1997 by Alexander Lehmann and  Willem
+       van Schaik.
+
+
+
+netpbm documentation     24 March 2005  Pngtopnm User Manual(0)

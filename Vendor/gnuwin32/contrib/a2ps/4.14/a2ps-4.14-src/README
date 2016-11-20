@@ -1,0 +1,218 @@
+
+		    a2ps README
+
+           (or PRINTME if a2ps runs fine :)
+
+
+Please send problem reports to bug-a2ps@gnu.org.  Ask questions on
+a2ps@gnu.org.  Submit changes on a2ps-patches@gnu.org.
+
+Please send happiness messages to both Akim, Miguel & Masayuki
+(akim@freefriends.org, Miguel.Santana@st.com, mhatta@gnu.org), and
+*only* this kind of messages. 
+
+See the file ANNOUNCE for a presentation of a2ps, if you're still
+unsure it is indeed a filter from Anything To Probably Something.
+
+
+Contents:
+=========
+
+1. Installation
+2. Upgrading from versions prior to 4.10
+3. Upgrading from versions prior to 4.12
+4. Upgrading from versions prior to 4.13
+5. Distribution content
+6. More?
+
+
+1. Installation
+===============
+
+Some notes on the distribution:
+
+Most of the work for the installation is done by ./configure.  If you
+never ever read the file `INSTALL', then you really should do it
+*now*.
+
+Some choices are to make, and to give to ./configure
+
+    --disable-nls
+    	if you do not want to use Native Language Support
+    	(i.e. the ability to speak another tongue than English)
+    --with-gnu-gettext
+    	if you want to use the GNU gettext library for
+    	NLS, instead of available NLS services.  I recommend it.
+    --without-extensions
+    	Fewer files will get installed.  a2ps is still usable
+    	for Western Europe and American.  You should avoid unless
+    	you are really short on disk.  This does not imply
+    	--disable-nls, you have to add it yourself.
+
+The following choices *are not irreversible*.  They just correspond to
+settings in the file etc/a2ps-site.cfg:
+
+    --with-medium=MEDIUM
+    	define the default medium used by a2ps (A4, Letter etc.)
+    	There is a special medium name: `libpaper', which means
+    	that you have libpaper installed, and that a2ps should
+    	use the medium specified by it.  If you don't know,
+    	just let configure decide for you.  You can change it later.
+    --with-encoding=ENCODING
+    	define the default encoding (ascii, latin1..., latin6,
+    	hp, mac, ibmpc, pcg, cp1250).
+
+Note (for novices). If you are not root, you should give
+./configure the option --prefix=$HOME to be able to install.
+
+There are several things a2ps needs to know about your system in
+order to work properly.  Running configure should be enough to have
+apropriate values, nevertheless, it sure is better if you good check
+the following items:
+
+1. At the end of etc/a2ps_cfg, the lines
+  a. FileCommand:
+  b. Variable: lp.default
+  c. Variable: lp
+
+2. At the top of etc/a2ps-site.cfg, the lines
+  a. Options: --encoding=
+  b. Options: --medium=
+
+There are some architectures, typically Solaris, that will fail saying
+that symbols `bindtextdomain' etc. are missing.  Then re-configure but
+specifying --with-included-gettext.
+
+Remember that \`make install' is mandatory for a2ps to work correctly.
+Once the \`make install' done, you may remove the build directory (the
+one which has been extracted from the .gz, which you can also removed,
+BTW).
+
+If you encounter problems while configuring or running, it is likely
+that somebody already fell on the same problems.  Hence please read
+
+     http://www.gnu.org/software/a2ps/
+
+which lists the known problems, and the fixes.  Check out also for the
+FAQ, and for a newer version of a2ps: don't send me reports for
+prehistoric versions!
+
+If the trouble persists, then, indeed, you may wish to send a bug
+report (i.e. something *precise* about the problem and your
+configuration :-) to
+
+	mailto:bug-a2ps@gnu.org
+
+Do not, *ever*, send bug reports to a2ps@gnu.org.  Well, pleeeeeease,
+I mean.
+
+
+
+2. Upgrading from versions prior to 4.10
+========================================
+
+Because the organization of the library files is different, it is
+strongly suggested to get rid of your old library files (usually rm
+-rf .../share/a2ps is enough).
+
+There _will_be_ problems if you don't remove them, because the new
+a2ps may use files meant for the old versions.  If you don't want to
+remove these files, at least make sure they won't be installed in the
+same place.
+
+There can be strange things happening with `make check'.  This is due
+to a painful behavior of some shared library handlers: they use an old
+a2ps library with the new a2ps executable.
+
+Doing `make install' _before_ make check solves the problem.
+
+
+
+
+3. Upgrading from versions prior to 4.12
+========================================
+
+The most sensitive changes in the interface are that -D no longer
+means --setpagedevice, but --define, and -S no longer means
+--statusdict, but --setpagedevice.
+
+
+
+4. Upgrading from versions prior to 4.13
+========================================
+
+There's a big change in the syntax of the style sheets.  I must
+confess I took a very bad decision when I first implemented this: I
+wanted to be compatible with the regexp of Emacs, for obscure and not
+really interesting reasons.
+
+*All* the style sheets shipped with a2ps are updated (of course,
+otherwise my life would be in danger).  While I did try, I probably
+didn't managed to fix your own .ssh file hidden on your disk.  So you
+may have to handle this by yourself.  Here's the piece of NEWS stating
+the problem:
+
+ * Regexp are now \`egrep'  and \`Perl' like, and no longer \`Emacs' like.
+   Before some characters had to be backslashed to denote the
+   operators.  Now, it is just the contrary.  For instance before
+   `\\(' and `\\)' used to be the grouping operator and `(' and `)'
+   were standing for the characters parentheses; while now it is the
+   converse.
+   Affected characters are `(', `)', `|', `{', and `}'.
+   Make sure to update your own style sheets.
+
+
+
+5. Distribution content
+=======================
+
+Some interesting files/directories you might want to look at are:
+
+README		This message
+INSTALL		Information on the installation process
+ABOUT_NLS	A presentation of GNU's Native Language Support
+		project
+TODO		Some things to be done
+afm/		Files that describe the width of the chars of a font
+arch/		Files to help to port a2ps to non Unix OSes
+doc/		The whole documentation
+encoding/	Description of the encodings.
+etc/a2ps_cfg	The default configuration (after configure/make)
+po/		Files for the translation
+sheets/		Style sheets for pretty printing support
+tests/          Sanity checks of a2ps
+contrib/emacs/	Useful emacs files for a2ps
+contrib/sample/	A sample on using liba2ps
+ogonkify/	The full distribution of the fantastic
+		ogonkify package, that fixes a font designed for
+		Latin1 so that other Latin encodings are supported.
+
+
+
+6. More ?
+=========
+
+a2ps has a home page where the latest version may be found.
+
+	http://www.gnu.org/software/a2ps/
+
+There, you will also find the documentation in various formats.
+
+There is also a mailing list, to subscribe please see 
+
+	http://lists.gnu.org/mailman/listinfo/a2ps
+
+*NOTE* The mailing list is not a place to drop your bug reports or the
+problems you have.  It is a place to discuss about a2ps, to make the
+announcements, wishes etc.  Before sending a mail there, remember many
+people will read your mail.
+
+Bug reports should be sent to bug-a2ps@gnu.org
+
+PS(um): if you're happy with this program, or just if you installed
+it, please _let_us_know_!   That's about the only contact we have from
+the world of outside, since there are never bug reports 8*)
+
+Local Variables:
+mode: indented-text
+End:

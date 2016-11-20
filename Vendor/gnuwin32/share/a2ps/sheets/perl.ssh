@@ -1,0 +1,196 @@
+# perl.ssh --- Sheet definitions for Perl files
+# Copyright (c) 1988-1993 Miguel Santana
+# Copyright (c) 1995-2000 Akim Demaille, Miguel Santana, Denis Girou
+#
+
+#
+# This file is part of a2ps.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+
+## TODO
+# Finer grained sub, require etc. handling (regexps?)
+# Make the difference between a proto and a def
+# Generic s/// handling?
+
+style Perl is
+
+written by "Denis Girou <Denis.Girou@idris.fr>"
+version is 2.11
+requires a2ps version 4.13
+
+documentation is
+   "As most interpreted languages, Perl is very free on its syntax, what"
+   "leads to significant problems for a pretty printer.  Please, be kind"
+   "with our try.  Any improvement is most welcome."
+end documentation
+
+first alphabet is
+   "$@ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_"
+second alphabet is
+   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_"
+case sensitive
+
+keywords in Keyword_strong are
+    if, BEGIN, CORE, END, __FILE__, __LINE__, abs, accept, alarm, and,
+    atan, atan2, bind, binmode, bless, caller, chdir, chmod, chop,
+    chown, chr, chroot, close, closedir, cmp, connect, continue, cos,
+    crypt, dbmclose, dbmopen, defined, delete, die, do, dump, each,
+    else, elsif, endgrent, endhostent, endnetent, endprotoent,
+    endpwent, endservent, eof, eq, eval, exec, exit, exp, fcntl,
+    fileno, flock, for, foreach, fork, formline, ge, getc, getgrent,
+    getgrgid, getgrnam, gethostbyaddr, gethostbyname, gethostent,
+    getlogin, getnetbyaddr, getnetbyname, getnetent, getpeername,
+    getpgrp, getppid, getpriority, getprotobyname, getprotobynumber,
+    getprotoent, getpwent, getpwnam, getpwuid, getservbyname,
+    getservbyport, getservent, getsockname, getsockopt, glob, gmtime,
+    goto, grep, gt, hex, index, int, ioctl, join, keys, kill, last,
+    lc, lcfirst, le, length, link, listen, local, localtime, log,
+    lstat, lt, mkdir, msgctl, msgget, msgrcv, msgsnd, my, ne, next,
+    not, oct, open, opendir, or, ord, pack, package, pipe, pop, print,
+    printf, push, q, qq, quotemeta, qw, rand, read, readdir, readline,
+    readlink, readpipe, recv, redo, ref, rename, require, reset,
+    return, reverse, rewinddir, rindex, rmdir, seek, seekdir, select,
+    semctl, semget, semop, send, setgrent, sethostent, setnetent,
+    setpgrp, setpriority, setprotoent, setpwent, setservent,
+    setsockopt, shift, shmctl, shmget, shmread, shmwrite, shutdown,
+    sin, sleep, socket, socketpair, sort, split, sprintf, sqrt, srand,
+    stat, study, sub, substr, symlink, syscall, sysread, system,
+    syswrite, tell, telldir, time, times, truncate, uc, ucfirst,
+    umask, undef, unless, unlink, unpack, unshift, until, use, utime,
+    values, vec, wait, waitpid, wantarray, warn, while, write, x, xor
+end keywords
+
+# Since regex cannot be spread upon several lines, they are
+# handled thanks to operators, not sequences.
+operators are
+    # I'd be damned.  $' is not starting a string :(
+    "$'" Plain,
+    # and $# does not start a comment.
+    "$#" Plain,
+    # There can be quoted characters in the test.
+    /\\\\./ Plain,
+
+    # Functions calls
+    /(&[[:alnum:]_]+)/ Label,
+
+    # Regular expressions: chars not (`/' and '\') or `\.' between `/'.
+    /\/([^\\\/]|\\\\.)*\// Plain,
+
+    # Matching:
+    # One regexp with a single char as delimiter
+    (/(m)/			# 1. The command: `m'
+     /([[:punct:]])/		# 2. The delimiter
+     /(/             		# 3. The regexp
+     /(.|\\\\.)*/
+     /)/
+     /\\2/			# Closer
+     \1 Keyword_strong, \2 Plain, \3 Plain, \2 Plain),
+
+
+    # Substitution and transliteration:
+    # two regexps with a single char as delimiter
+    (/(s|tr)/			# 1. The command: `tr' or `s'
+     /(([[:punct:]])/		# 2. The delimiter
+     /(/			# 3. The *two* regexps
+     /(.|\\\\.)*/		#   First regexp
+     /\\3/			#   Separator
+     /(.|\\\\.)*/		#   Second Regexp
+     /)/			#
+     /\\3)/			# Closer
+     \1 Keyword_strong, \2 Plain),
+
+    # Substitution and transliteration:
+    # two regexps with ()() as delimiter
+    (/(s|tr)/			# The command: `tr' or `s'
+     /(\\(/			# The delimiter
+     /([^)]|\\\\.)*/		# First part
+     /\\)[^(]*\\(/		# The separation
+     /([^)]|\\\\.)*/		# Second part
+     /\\))/			# Closer
+     \1 Keyword_strong, \2 Plain),
+
+    # Substitution and transliteration:
+    # two regexps with {}{} as delimiter
+    (/(s|tr)/			# The command: `tr' or `s'
+     /(\\{/			# The delimiter
+     /([^}]|\\\\.)*/		# First part
+     /\\}[^{]*\\{/		# The separation
+     /([^}]|\\\\.)*/		# Second part
+     /\\})/			# Closer
+     \1 Keyword_strong, \2 Plain),
+
+    # Substitution and transliteration:
+    # two regexps with [][] as delimiter
+    (/(s|tr)/			# The command: `tr' or `s'
+     /(\\[/			# The delimiter
+     /([^]]|\\\\.)*/		# First part
+     /\\][^[]*\\[/		# The separation
+     /([^]]|\\\\.)*/		# Second part
+     /\\])/			# Closer
+     \1 Keyword_strong, \2 Plain)
+end operators
+
+sequences are
+    # Strings
+    C-string,
+    "'" Plain String "'" Plain
+       exceptions are
+	/\\\\./
+       end exceptions,
+    "`" Plain String "`" Plain
+       exceptions are
+	/\\\\./
+       end exceptions,
+
+    # A few << Constructs seen in html2ps and help2man
+    "<<EOC" Plain /^EOC/,
+    "<<EOD" Plain /^EOD/,
+    "<<EOT" Plain /^EOT/,
+    "<<'EOR'" Plain /^EOR/,
+
+    # Comments
+    "#"            Comment,
+    /^=/           Comment_strong        /^=cut/,
+
+    # Some declarations
+    (/(sub|require|use)/	# \1. the keyword
+     /([[:blank:]]+)/		# \2. blanks
+     \1 Keyword_strong, \2 Plain) (Label_strong  + Index1)
+	closers are
+	  /$/ Plain,
+	  /[ ;{]/ Plain
+	end closers
+end sequences
+
+# Trying to support Some regexp from here
+sequences are
+  # Regular expressions: m{}, m(), and m[]
+  ("m(" "m" Keyword_strong, "(") Plain ")"
+     exceptions are
+       /\\\\./
+     end exceptions,
+  ("m{" "m" Keyword_strong, "{") Plain "}"
+     exceptions are
+       /\\\\./
+     end exceptions,
+  ("m[" "m" Keyword_strong, "[") Plain "]"
+     exceptions are
+       /\\\\./
+     end exceptions
+end sequences
+
+end style

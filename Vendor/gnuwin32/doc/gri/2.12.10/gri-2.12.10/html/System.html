@@ -1,0 +1,285 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: `system' command</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile System.html "Gri: `system' command" "Gri Commands" --> 
+
+<!-- @node   System, Unlink, Superuser, List Of Gri Commands -->
+<a name="System" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="ListOfGriCommands.html#ListOfGriCommands" shape="rect" coords="516,2,532,24" href="ListOfGriCommands.html#ListOfGriCommands">
+<area alt="Gri: `superuser' command" shape="rect" coords="557,2,573,24" href="Superuser.html">
+<area alt="Gri: `unlink' command" shape="rect" coords="581,2,599,24" href="Unlink.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: `unlink' command" shape="rect" coords="581,2,599,24" href="Unlink.html">
+</map>
+<h3>9.3.50: `<font color="#82140F"><code>system</code></font>'</h3>
+
+<!-- latex: \index{system} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`system \system-command'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Tell the operating system to perform the indicated action.  Whatever
+string follows the word `<font color="#82140F"><code>system</code></font>' is passed directly to the
+operating system, <b>after</b> substitution of synonyms if any exist.
+<p>
+If your system command contains double-slashes, you must protect them
+from Gri (which will interpret them as comments) by enclosing in
+double-quotes, e.g. `<font color="#82140F"><code>system cat A | sed -e "s/foo//g" | cat &gt; B</code></font>'.
+(In the particular case of the `<font color="#82140F"><code>sed</code></font>' command you could also do
+`<font color="#82140F"><code>system cat A | sed -e "s:foo::g" | cat &gt; B</code></font>'.
+<p>
+Note that `<font color="#82140F"><code>rpn</code></font>' expressions are not evaluated, and variable values
+are not substituted before passing the string to the operating system.
+The exit status is stored in the builtin variable
+`<font color="#82140F"><code>..exit_status..</code></font>'. 
+<p>
+There are two ways to use the system:
+<ul>
+<li>
+<b>Assign output to synonym</b>: The form `<font color="#82140F"><code>\synonym = system ...</code></font>'
+does the system command and then inserts the output from that command
+into the indicated synonym.)
+<p>
+<li> <b>Just run a command</b>: The command `<font color="#82140F"><code>system ls</code></font>' will list
+the files in the current directory.
+</ul>
+<p>
+For long commands, there are two approaches, the second preferred:
+<ul>
+<li>
+<b>Use continuation lines</b>: String a lot of information onto one
+effective system line, using the `<font color="#82140F"><code>\</code></font>' line-continuation character
+at the ends of lines.  The problem is that it is very easy to lose one of
+these backslashes.  The next method is better.
+<li>
+<b>Here-is syntax</b> The here-is syntax of many unix shells is also
+provided.  If the system command contains the characters `<font color="#82140F"><code>&lt;&lt;</code></font>'
+followed by a word (with no space between!) then Gri will issue a system
+command which includes not only this line but also all succeeding lines,
+until a line is found which matches the indicated word precisely (with
+no leading space allowed).  The `<font color="#82140F"><code>&lt;&lt; "WORD"</code></font>' syntax is also
+supported, meaning that the operating system is being told not to mess
+with the dollar-signs -- needed in perl.
+<p>
+Be careful using this inside a new-command.  Gri
+Recognizes the end of the body of a new-command by a line with `<font color="#82140F"><code>}</code></font>'
+in the <b>first column</b>, and no non-white characters thereafter.  
+If you system command happens to use a line with a curly brace (as in a
+loop in perl, for example), you must put whitespace before the brace.
+This won't affect the system command, but it will let Gri correctly
+realize that this is <b>not</b> the end of the new-command.  For more
+information on new-commands (see <a href="ParsingSynonyms.html#Parsing">Parsing</a>).
+<p>
+<b>Caution:</b> Before sending the string to the system, Gri first
+translates any synonyms present.  Be careful with this, since system
+commands calling awk, etc, very often use backslashes for the newline
+character `<font color="#82140F"><code>\n</code></font>' within strings.  If you have a synonym whose name
+starts with `<font color="#82140F"><code>\n</code></font>', you can get a conflict.  For example, the awk
+command `<font color="#82140F"><code>print "foo\nbar";</code></font>' should print a line with `<font color="#82140F"><code>foo</code></font>' on
+it, followed by a line with `<font color="#82140F"><code>bar</code></font>' on it, but it will instead print
+a single line with `<font color="#82140F"><code>fooMISTAKE</code></font>', if you had previously defined a
+synonym as `<font color="#82140F"><code>\nbar = "MISTAKE"</code></font>'.  One way to avoid this mistake is
+to make sure any `<font color="#82140F"><code>\n</code></font>' characters appear at the end of strings, and
+then simply avoid having a synonym named `<font color="#82140F"><code>\n</code></font>'.
+<p>
+Here is a Perl example.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\m = "Foo bar"
+system perl &lt;&lt;"EOF"
+$a = 100;
+print "foo bar is \m, and a is $a\n";
+print "BETTER: foo bar is \m, and a is $a\n";
+print "Q: was a 100?\n";
+EOF
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+</ul>
+<p>
+
+<b>Some more examples</b>:
+<ul>
+<li>
+To get the first 15 lines of a file called `<font color="#82140F"><samp>foo.dat</samp></font>' inserted into
+another file called `<font color="#82140F"><samp>bar.dat</samp></font>', you might do the following.  Only
+the first method works; the second will fail because `<font color="#82140F"><code>.n.</code></font>' will not
+be translated before passing to the operating system.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\num = "-15"
+system head \num foo.dat &gt; bar.dat
+# Following will not work correctly because .num. 
+# will not be translated
+.num. = -15
+system head .num. foo.dat &gt; bar.dat
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+Issue a unix command to get a listing of files in the current
+working directory, and pipe them into the `<font color="#82140F"><code>more</code></font>' system command.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+system ls -l *c | more
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+Store the date and time into a synonym, and use it in a
+title:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\time = system date
+...
+draw title "Plotted at time \time"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+Use `<font color="#82140F"><code>awk</code></font>' to prepare a two-column table of x, ranging
+from 0 to 1 in steps of 0.1, and sin(x).  The table is stored in a file
+whose suffix is the process ID of the Gri job.  This file is then
+opened, and the data plotted.  Finally, a system command is issued to
+remove the temporary file.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+system awk 'BEGIN { \
+    for (x=0; x&lt;1; x+=0.1) { \
+      printf("%f %f\n", x, sin(x)) \
+    } \
+  }'  &gt; tmp.\.pid.
+open tmp.\.pid.
+read columns x y
+close
+system rm tmp.\.pid.
+draw curve
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<b>Note</b>: in unix, this command calls the Bourne shell, not the C-shell
+that is often used interactively.  For many simple uses, the only
+difference from normal interactive use will be that `<font color="#82140F"><code>~</code></font>' is not
+expanded to the home directory.  For example, you should write
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+system awk -f $HOME/foo/bar/cmd.gawk
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+instead of the 
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+system awk -f ~/foo/bar/cmd.gawk
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+that you might expect from interactive C-shell use.
+<p>
+RETURN VALUE:
+Sets `<font color="#82140F"><code>\.return_value</code></font>' to system status
+`<font color="#82140F"><code>N status</code></font>'
+</ul>
+<p>
+
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

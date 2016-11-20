@@ -1,0 +1,121 @@
+Ppmtowinicon User Manual(0)         Ppmtowinicon User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       ppmtowinicon  -  convert  PPM  image into a Windows .ico
+       file
+
+
+SYNOPSIS
+       ppmtowinicon
+
+       [-andpgms]
+
+       [-output=output.ico]
+
+       [ppmfile [andfile] ...]
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       ppmtowinicon reads one or more PPM images as  input  and
+       produces a Microsoft Windows .ico file as output.
+
+       A  Windows  icon contains 1 or more images, at different
+       resolutions and color depths.   When  Windows  wants  to
+       display the icon, it searches through the images to find
+       the one the best matches the number of colors and  reso-
+       lution of the display.
+
+       Microsoft  recommends  including  at least the following
+       formats in each icon.
+
+
+
+       o      16 x 16 - 4 bpp
+
+       o      32 x 32 - 4 bpp
+
+       o      48 x 48 - 8 bpp
+
+
+       If you don't specify any  input  files,  input  is  from
+       Standard Input.
+
+       Output is to Standard Output unless you specify -output.
+
+
+   Transparency
+       If you specify the -andmask  option,  you  get  (partly)
+       transparent  icons.   In  that  case, your arguments are
+       pairs of file names, with the first file name being that
+       of  the  image  and the second file name being that of a
+       standard Netpbm PGM transparency mask (see  the  pgmfor-
+       matspecification(1)).
+
+       In a .ico file, there is no such thing as partial trans-
+       parency (translucency).  Where the PGM  mask  says  com-
+       pletely  opaque,  the  icon  will be opaque.  Everywhere
+       else, the icon will be transparent.  Note that  as  with
+       any  Netpbm  program,  you  can  use a PBM image for the
+       transparency mask and ppmtowinicon will treat it like  a
+       PGM.
+
+       The  and  mask is like an alpha mask, except for what it
+       signifies in the "not opaque" areas.  In the usual case,
+       the  foreground  image  is  black in those areas, and in
+       that case the areas are fully transparent --  the  back-
+       ground  shows  through  the icon.  But in general, a not
+       opaque pixel signifies that  the  background  and  fore-
+       ground  should  be merged as follows: The intensities of
+       the color components in the forgeground  and  background
+       are  represented  as  binary numbers, then corresponding
+       bits of the background and  foreground  intensities  are
+       exlusive-or'ed  together.  So there is a sort of reverse
+       video effect.
+
+       If you don't want this special effect and  instead  want
+       straightforward  transparency,  use the -truetransparent
+       option.  This causes ppmtowinicon to make the base image
+       black  everywhere  your transparency mask says transpar-
+       ent, regardless of what color you input image is at that
+       location.
+
+       If  you  don't  specify -andmask, ppmtowinicon puts all-
+       opaque and masks into the .ico file.
+
+
+OPTIONS
+       -andpgms
+              Include transparency information  in  the  icons.
+              See the transparency section .
+
+
+       -output=output.ico
+              Name  of  output  file.  By default, ppmtowinicon
+              writes the icon to Standard Output.
+
+
+       -truetransparent
+              Make transparency in the icon normal  instead  of
+              the special reverse video effect.  See the trans-
+              parency section .
+
+
+
+
+SEE ALSO
+       winicontoppm(1), ppm(1) pgm(1)
+
+
+AUTHOR
+       Copyright (C) 2000 by Lee Benfield.
+
+
+
+netpbm documentation      01 May 200Ppmtowinicon User Manual(0)

@@ -1,0 +1,357 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>User manual for old pnm functions</TITLE>
+<META NAME="manual_section" CONTENT="3">
+</HEAD>
+<BODY>
+<H1>pnm Functions</H1>
+Updated: 22 July 2004
+<BR>
+<A HREF="libpnm.html#index">Table Of Contents</A>
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+libpnm - libnetpbm functions to read and write PNM image files
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>#include &lt;pnm.h&gt;</B>
+
+<P>
+<B>void pnm_init(</B>
+<B>int *</B><I>argcP</I><B>,</B>
+<B>char *</B><I>argv</I><B>[]</B>
+<B>);</B>
+
+<P>
+<B>xel ** pnm_allocarray(</B>
+<B>int </B><I>cols</I><B>,</B>
+<B>int </B><I>rows</I><B>);</B>
+
+<P>
+<B>xel * pnm_allocrow(</B>
+<B>int </B><I>cols</I><B>);</B>
+
+<P>
+<B>void pnm_freearray(</B>
+<B>xel **</B><I>xels</I><B>,</B>
+<B>int </B><I>rows</I><B>);</B>
+
+<P>
+<B>void pnm_freerow(</B>
+<B>xel *</B><I>xelrow</I><B>);</B>
+
+<P>
+<B>void pnm_readpnminit( </B>
+<B>FILE *</B><I>fp</I><B>,</B>
+<B>int *</B><I>colsP</I><B>,</B>
+<B>int *</B><I>rowsP</I><B>,</B>
+<B>xelval *</B><I>maxvalP</I><B>,</B>
+<B>int *</B><I>formatP</I><B> );</B>
+
+<P>
+<B>void pnm_readpnmrow( </B>
+<B>FILE *</B><I>fp</I><B>,</B>
+<B>xel *</B><I>xelrow</I><B>,</B>
+<B>int </B><I>cols</I><B>,</B>
+
+<BR>
+
+<B>xelval </B><I>maxval</I><B>,</B>
+<B>int </B><I>format</I><B> );</B>
+
+<P>
+<B>xel ** pnm_readpnm( </B>
+<B>FILE *</B><I>fp</I><B>,</B>
+<B>int *</B><I>colsP</I><B>,</B>
+<B>int *</B><I>rowsP</I><B>,</B>
+
+<BR>
+
+<B>xelval *</B><I>maxvalP</I><B>, int</B><I>*</I><B> formatP </B><I>);</I>
+
+<P>
+<B>void pnm_writepnminit( </B>
+<B>FILE *  fp , </B>
+<B>int </B><I>cols</I><B>,</B>
+<B>int </B><I>rows</I><B>,</B>
+<B>xelval </B><I>maxval</I><B>,</B>
+<B>int </B><I>format</I><B>,</B>
+<B>int </B><I>forceplain</I><B>);</B>
+
+<P>
+<B>void pnm_writepnmrow( </B>
+<B>FILE *</B><I>fp</I><B>,</B>
+<B>xel *</B><I>xelrow</I><B>,</B>
+<B>int cols</B><I>,</I>
+<B>xelval </B><I>maxval</I><B>,</B>
+<B>int </B><I>format</I><B>,</B>
+<B>int </B><I>forceplain</I><B> );</B>
+
+<P>
+<B>void pnm_writepnm( </B>
+<B>FILE *</B><I>fp</I><B>,</B>
+<B>xel ** </B><I>xels</I><B>,</B>
+<B>int </B><I>cols</I><B>,</B>
+<B>int </B><I>rows</I><B>,</B>
+<B>xelval </B><I>maxval</I><B>,</B>
+<B>int </B><I>format</I><B>,</B>
+<B>int </B><I>forceplain</I><B> );</B>
+
+<P>
+<B>void pnm_check(</B>
+<B>FILE * </B><I>file</I><B>,</B>
+<B>const enum pm_check_type </B><I>check_type</I><B>,</B>
+<B>const int </B><I>format</I><B>,</B>
+<B>const int </B><I>cols</I><B>,</B>
+<B>const int </B><I>rows</I><B>,</B>
+<B>const xelval </B><I>maxval</I><B>,</B>
+<B>enum pm_check_code *</B><I>retvalP</I><B>);</B>
+
+<P>
+<B>void pnm_promoteformatrow( </B>
+<B>xel *</B><I>xelrow</I><B>,</B>
+<B>int </B><I>cols</I><B>,</B>
+<B>xelval </B><I>maxval</I><B>,</B>
+<B>int </B><I>format</I><B>,</B>
+<B>xelval </B><I>newmaxval</I><B>,</B>
+<B>int </B><I>newformat</I><B>);</B>
+
+<P>
+<B>void pnm_promoteformat( </B>
+<B>xel **</B><I>xels</I><B>,</B>
+<B>int </B><I>cols</I><B>,</B>
+<B>xelval </B><I>maxval</I><B>,</B>
+<B>int </B><I>format</I><B>,</B>
+<B>xelval </B><I>newmaxval</I><B>,</B>
+<B>int </B><I>newformat</I><B>);</B>
+
+<P>
+<B>xel pnm_whitexel( </B>
+<B>xelval </B><I>maxval</I><B>,</B>
+<B>int </B><I>format</I><B>);</B>
+
+<P>
+<B>xel pnm_blackxel( </B>
+<B>xelval </B><I>maxval</I><B>,</B>
+<B>int </B><I>format</I><B>);</B>
+
+<P>
+<B>void pnm_invertxel( </B>
+<B>xel *</B><I>x</I><B>,</B>
+<B>xelval </B><I>maxval</I><B>,</B>
+<B>int </B><I>format</I><B>);</B>
+
+<P>
+<B>xel pnm_backgroundxelrow( </B>
+<B>xel *</B><I>xelrow</I><B>,</B>
+<B>int </B><I>cols</I><B>,</B>
+<B>xelval </B><I>maxval</I><B>,</B>
+<B>int </B><I>format</I><B>);</B>
+
+<P>
+<B>xel pnm_backgroundxel( </B>
+<B>xel **</B><I>xels</I><B>,</B>
+<B>int </B><I>cols</I><B>,</B>
+<B>int </B><I>rows</I><B>,</B>
+<B>xelval </B><I>maxval</I><B>,</B>
+<B>int </B><I>format</I><B>);</B>
+<P><B>typedef ... xelval;</B>
+<P><B>typedef ... xel;</B>
+<P><B>extern xelval pnm_pbmmaxval;</B>
+
+<P>
+<B>#define </B>
+<B>PNM_ASSIGN1(</B><I>x</I><B>,</B><I>v</I><B>)</B>
+<B>...</B>
+
+<P>
+<B>#define </B>
+<B>PNM_GET1(</B><I>x</I><B>)</B>
+<B>...</B>
+
+<P>
+<B>#define </B>
+<B>PNM_EQUAL(</B><I>x</I><B>,</B><I>y</I><B>)</B>
+<B>...</B>
+
+<P>
+<B>#define </B>
+<B>PNM_FORMAT_TYPE(</B><I>format</I><B>)</B>
+<B>...</B>
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>These library functions are part of <a href="index.html">Netpbm</a>.
+
+
+<A NAME="lbAI">&nbsp;</A>
+<H3>PNM TYPES AND CONSTANTS</H3>
+
+<P>Each <B>xel</B> contains three <B>xelval</B>s, each of which should
+contain only the values between <B>0</B> and <B>PNM_MAXMAXVAL</B>,
+inclusive.  <B>pnm_pbmmaxval</B> is the maxval used when a PNM program
+reads a PBM file.  Normally it is 1; however, for some programs, a
+larger value gives better results.
+
+<A NAME="lbAJ">&nbsp;</A>
+<H3>PNM XEL MANIPULATIONS</H3>
+
+<A NAME="lbAK">&nbsp;</A>
+
+<p>The <B>PNM_GET1</B> macro extracts a single value from an xel, when
+you know it's from a PBM or PGM file.  When it's from a PPM file, use
+<B>PPM_GETR()</B>, <B>PPM_GETG()</B>, and <B>PPM_GETB()</B>.
+
+<P>The <B>PNM_ASSIGN1</B> macro assigns a single value to an xel, when
+you know it's from a PBM or PGM file.  When it's from a PPM file, use
+<B>PPM_ASSIGN</B>.
+
+The <B>PNM_EQUAL</B> macro checks two xels for equality.  The
+<B>PNM_FORMAT_TYPE</B> macro computes a
+format type code from a format code.  The format types are PBM, PGM,
+PPM, and PAM.  But note that PBM, PGM, and PPM each are two different
+formats: a plain one and a raw one.  So there are four format types,
+but seven formats.  <B>PNM_FORMAT_TYPE</B> does not work on the PAM
+format code.
+
+<A NAME="lbAL">&nbsp;</A>
+<H3>INITIALIZATION</H3>
+
+<p><b>pnm_init</b> is identical to <b>pm_init()</b>.
+
+<A NAME="lbAM">&nbsp;</A>
+<H3>MEMORY MANAGEMENT</H3>
+
+<P><B>pnm_allocarray()</B> allocates space for an array of xels.
+<B>pnm_freearray()</B> frees an array space allocated by
+<B>pnm_allocarray()</B> or <B>pnm_readpnm()</B>.
+
+<P><B>pnm_allocrow()</B> allocates space for a row of a PNM image.
+<B>pnm_freerow()</B> frees it.
+
+
+<A NAME="lbAN">&nbsp;</A>
+<H3>READING PNM FILES</H3>
+
+<P><B>pnm_readpnminit()</B> is similar to <B>pnm_readpaminit()</B>,
+but reads only PNM images and has a different parameter list.
+
+<P><B>pnm_readpnmrow()</B> is similar to <B>pnm_readpamrow()</B>
+but only works on PNM images and has a different parameter list and returns
+the row as an array of xels instead of tuples.
+
+<P><B>pnm_readpnm()</B> is similar to <B>pnm_readpam()</B> except that
+it reads only PNM images and uses a different parameter list and
+returns an array of rows such that <B>pnm_readpnmrow()</B> would
+return rather than such that <B>pnm_readpamrow()</B> would return.
+
+
+<A NAME="lbAO">&nbsp;</A>
+<H3>WRITING FILES</H3>
+
+<P><B>pnm_writepnminit()</B> is similar to <B>pnm_writepaminit()</B>
+except that it can write only a PNM header and has a different
+parameter list.
+
+<P><i>forceplain</i> is a binary value.  True (nonzero) means to write
+the image in the plain (ASCII) version of the selected format.  False
+(zero) means to write it in the raw (binary) version of the selected
+format.  See <a href="pnm.html">PNM format specification</a>.
+
+<P><B>pnm_writepnmrow()</B> is similar to <B>pnm_writepamrow()</B>
+except that it works only on PNM images and has a different parameter
+list and takes an array of xels instead of an array of tuples.  See
+the description of <I>forceplain </I> above.
+
+<P><B>pnm_writepnm()</B> is similar to <B>pnm_writepam()</B> except
+that it works only on PNM image, has a different parameter list, and
+takes an array of rows of xels instead of an array of rows of tuples.
+See the description of <I>forceplain</I> above.
+
+
+<A NAME="lbAP">&nbsp;</A>
+<H3>MISCELLANEOUS</H3>
+
+<P> <B>pnm_check()</B> is similar to <B>pnm_checkpam()</B> except it
+works only on PNM images.
+
+<P><B>pnm_check()</B> is identical to <B>ppm_check()</B>.
+
+<A NAME="lbAQ">&nbsp;</A>
+<H3>PNM FORMAT PROMOTION</H3>
+
+<B>pnm_promoteformatrow()</B> promotes a row of xels from one maxval
+and format to a new set.  Use this when you are combining multiple
+anymaps of different types - just take the maximum of the maxvals and
+the maximum of the formats, and promote them all to that.
+
+<P><B>pnm_promoteformat()</B> promotes an entire anymap.
+
+
+<A NAME="lbAR">&nbsp;</A>
+<H3>PNM XEL MANIPULATION</H3>
+
+<B>pnm_whitexel()</B> and <B>pnm_blackxel()</B> return a white or
+black xel, respectively, for the given <I>maxval</I> and
+<I>format</I>.
+
+<P><B>pnm_invertxel()</B> inverts an xel.
+
+<P><B>pnm_backgroundxelrow()</B> figures out an appropriate background
+xel based on the row of xels <I>xelrow</I>, which is <I>cols</I> xels
+wide, has maxval <I>maxval</I>, and represents an image with format
+<I>format</I>.
+
+<P>This estimate works best when the row is the top or bottom row of
+the image.
+
+<P><B>pnm_backgroundxel()</B> does the same thing as
+<B>pnm_backgroundxelrow()</B>, except based on an entire image instead
+of just one row.  This tends to do a slightly better job than
+<B>pnmbackgroundxelrow()</B>.
+
+<A NAME="lbAS">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="libnetpbm.html">Libnetpbm</A></B>,
+<B><A HREF="libnetpbm_ug.html">Libnetpbm User's Guide</A></B>,
+<B><A HREF="libnetpbm_dir.html">Libnetpbm Directory</A></B>,
+<B><A HREF="pbm.html">pbm</A></B>,
+<B><A HREF="pgm.html">pgm</A></B>,
+<B><A HREF="ppm.html">ppm</A></B>,
+<B><A HREF="pam.html">pam</A></B>,
+<B><A HREF="libpbm.html">libpbm</A></B>,
+<B><A HREF="libpgm.html">libpgm</A></B>,
+<B><A HREF="libppm.html">libppm</A></B>
+
+<A NAME="lbAT">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1989, 1991 by Tony Hansen and Jef Poskanzer.
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Table Of Contents</H2>
+<UL>
+  <LI><A HREF="libpnm.html#lbAB">NAME</A>
+  <LI><A HREF="libpnm.html#lbAD">SYNOPSIS</A>
+  <LI><A HREF="libpnm.html#lbAE">DESCRIPTION</A>
+  <UL>
+    <LI><A HREF="libpnm.html#lbAI">PNM TYPES AND CONSTANTS</A>
+    <LI><A HREF="libpnm.html#lbAJ">PNM XEL MANIPULATIONS</A>
+    <LI><A HREF="libpnm.html#lbAK">The </A>
+    <LI><A HREF="libpnm.html#lbAL">INITIALIZATION</A>
+    <LI><A HREF="libpnm.html#lbAM">MEMORY MANAGEMENT</A>
+    <LI><A HREF="libpnm.html#lbAN">READING PNM FILES</A>
+    <LI><A HREF="libpnm.html#lbAO">WRITING FILES</A>
+    <LI><A HREF="libpnm.html#lbAP">MISCELLANEOUS</A>
+    <LI><A HREF="libpnm.html#lbAQ">PNM FORMAT PROMOTION</A>
+    <LI><A HREF="libpnm.html#lbAR">PNM XEL MANIPULATION</A>
+    </UL>
+  <LI><A HREF="libpnm.html#lbAS">SEE ALSO</A>
+  <LI><A HREF="libpnm.html#lbAT">AUTHOR</A>
+  </UL>
+</BODY>
+</HTML>

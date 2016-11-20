@@ -1,0 +1,2787 @@
+Jef Poskanzer (jef@acme.com) invented the PBM format in the 1980s to
+provide the computer graphics world with a common, trouble-free
+format, a lingua-franca, for bitmaps.  The format was designed to be
+simple enough that it could transmitted within an email message
+without any special encapsulating and survive any translations and
+recoding that an email message might go through and be easily
+extractable on the other end.
+
+In 1988, Jef distributed the forerunner of Netpbm, Pbmplus, which
+gathered together the various tools he had developed to work with PBM
+files.  These were mainly tools to convert between PBM and other
+existing graphics formats, making it possible to deal with the Tower
+Of Babel situation that had arisen with the proliferation of graphics
+formats.
+
+By the end of 1988, Jef had added the PGM and PPM formats and lots more
+tools to Pbmplus.
+
+In 1991, Jef added a variety of programs and code contributed by the
+user community, and then stopped maintaining Pbmplus.  Jef never
+formally renounced support for it, but simply didn't get around to
+distributing any updates for over a year following his final December
+10, 1991 release.
+
+In 1993, Netpbm was developed to replace Pbmplus.  Netpbm was nothing
+more than a new release of Pbmplus, and named for the fact that people
+all over the world would maintain the package by submitting fixes and
+enhancements over the Net.  This was a time when such worldwide
+collaboration was still novel.
+
+Then Netpbm apparently fell into neglect with the last release by its
+regular maintainer in March 1994.  In September of 1995 Anthony
+Thyssen released an unofficial update of it called Netpbm-1mar1994.p1,
+while disclaiming any responsibity for ongoing upkeep.
+
+The documentation in that 1995 release mentioned two different official
+mailing lists concerning the package, but by April 1999, neither
+existed anymore.
+
+In September 1999, Bryan Henderson needed some minor bugs fixed, and
+wanted to clean up the mess of unsupported versions and outdated
+documentation of these tools.  After checking around to see if anyone
+had any claims of ownership of the package, and finding none, Bryan
+assumed control and responsibility for Netpbm.  
+
+In November 1999, Thorbjoern Ravn Anderson <ravn@mip.sdu.dk> did the
+same thing, for the same reason (apparently unaware of Bryan's work)
+and made available an updated version (based on the 1994 release) as
+described by http://sunsite.auc.dk/netpbm.  Shortly thereafter, he
+discontinued his effort in deference to the new Pbmplus effort
+mentioned below.  Bryan did not know about Anderson's work until March
+2000.
+
+In August 2000, the PAM format appeared.  But it took a long time
+after that for there to be enough programs and library routines to
+make it useful.  It still is barely known and used; PAM is more of a
+direction or philosophy than a practical tool.  Along with PAM came a
+whole new suite of library routines for processing both classic PNM
+and PAM format images.  The new "pam" routines are easier to use.
+
+In parallel, and unknown to Bryan, Jef was working on a new release
+under the original name Pbmplus and claiming again (or maybe still) to
+be maintaining Pbmplus.  He did a limited release of a beta version of
+it in November 1999.  A mailing list pbmplus@acme.com was active.
+Bryan learned of this effort's existence in March 2000.  No widespread
+distribution ever resulted from this.
+
+Pbmplus and Netpbm were once part of the body of X/Windows contributed
+software, distributed on ftp.x.org (directory contrib/utilities).
+Bryan didn't receive a response to an inquiry to the ftp.x.org owner
+as to the prospect of cleaning up the Netpbm related files there.  So
+Bryan instead made Metalab the new home of the source code.  But
+Metalab had pretty low quality too, and in April 2000 Bryan moved the
+package's home to Sourceforge.
+
+In June 2002, Bryan reorganized the package.  Before, it was organized to
+reflect the evolution of the package:  first PBM only, then PGM was added,
+then PPM, and then the multi-format PNM programs.  There were four separate
+subroutine libraries and each of the PBM, PGM, PPM, and PNM components was
+independent of the components invented later.  Documentation was in the form
+of traditional man pages.  In Release 10, the package was integrated into a
+single monolithic package.  There was one subroutine library and the source
+tree was divided according to program function rather than what generation
+of Netpbm it related to.  All documentation was converted to HTML.
+
+In January 2004, Netpbm started to get the linear/gamma-adjusted
+sample value thing right.  Many programs had always used the gamma
+adjusted values from Netpbm images as if they were linear, which
+produced incorrect and rather terrible results.  Netpbm 10.20 brought
+the pm_[un]gamma709() library routines and pnm_readpamrown() etc.  for
+manipulating Netpbm images in floating point 0..1 sample values, both
+linear and gamma-adjusted.
+
+
+CHANGE HISTORY 
+--------------
+
+05.03.28 BJH  Release 10.27
+
+              tifftopnm: do multi-image streams.
+
+              pnmtotiff: add -append option.
+
+              pnmtotiff: do multi-image streams.
+
+              pnmtopclxl: fix bug with invalid palette in
+              SetColorSpace command.
+
+              pnmtopng: don't accept -background without -mix.
+
+              Eliminate pnmtopnm program -- install 'pnmtopnm' as an
+              alternate name for 'pamtopnm' instead.
+
+              pamscale: refilter as part of resampling for better
+              quality downsampling.
+
+              ppmcolormask: fix segfault with stdin input.
+
+              Add pm_setjmpbuf().
+
+              pnmindex, ppmquantall: use pnmquant instead of ppmquant.
+
+              pnmquant: add -quiet, -plain options
+
+              ppmfade, pnmshadow, pnmindex, pamlookup: Use pamscale
+              instead of pnmscale.
+
+              ppmtoxpm: Don't include superfluous entries for colors
+              of transparent pixels, or for transparency when there are
+              all colors are opaque, in the XPM color map.
+              
+              pnmquant: remove dependency on File::Temp, not available
+              before Perl 5.6.1.
+
+              pamfunc: use multiplication instead of division for -divisor,
+              for speed.
+
+              pamfunc: fix bug in -adder and -subtractor with signed
+              arithmetic.  Thanks David Jones <drj@pobox.com>.
+
+              pamscale: fix bug in converting negative floats to integers.
+              Thanks David Jones <drj@pobox.com>.
+
+              pamscale: fix bug with -filter: scanbuf too small, thus
+              some output rows/columns can never be created and output raster
+              is invalid.
+
+              build: fix build errors in ppmtompeg with OMIT_NETWORK.
+
+              jpeg2ktopam: fix uninitialized memory problem in allocating
+              jasperCmptNo.
+
+              pbmclean: fix -minneighbors so it isn't really -minneighbor.
+
+              pnmremap: allow RGB map and BLACKANDWHITE/GRAYSCALE input.
+
+              pamstereogram: fix bug with -eyesep (float/double).
+
+              pamtojpeg2k: fix bug with -compression (float/double).
+
+              pamtojpeg2k/jpeg2ktopam: work on 64 bit machine; fix
+              definition of int32fast_t, etc. in libjasper.
+
+              libnetpbm: Respect plainness of specified format when writing.
+
+              pnmremap: fix handling of arithmetic overflow in color
+              distance calculation.
+
+              pnmremap: fix bug with palette of different depth from image.
+              
+              libnetpbm: fix 2 byte per pixel pnm_pamwriterow(),
+              pnm_formatpamrow().
+
+              pbmmake: default to -white, as manual has always said.
+
+              -plain works with PAM write functions.
+
+              common -plain option causes failure instead of wrong output
+              when used with PAM output.
+
+              pnmremap: fix rounding error where map maxval is small and
+              unequal to image maxval.
+
+              Add pnm_normalizeRow(), pnm_unnormalizeRow(),
+              pnm_creategammatransform(), pnm_createungammatransform(),
+              pnm_freegammatransform(), pnm_freeungammatransform().
+              Idea and prototype from "Scott T. Smith" <scott@gelatinous.com>.
+
+              pamscale: Use pnm_noramlizeRow() to speed up gamma adjustments.
+
+              palmtopnm: Don't assume Palm Bitmap is valid.
+              Thanks Paul Bolle <pebolle@tiscali.nl>.
+
+              giftopnm: fix crash with input that has bogus color indices
+              in the raster.
+
+              giftopnm: fix crash with input that has a bogus minimum code
+              length field.  Thanks deekoo@tentacle.net (Deekoo L.).
+
+              pnm_readpamrown(): use pnm_readpamrow() instead of
+              pm_getraw() for speed.  Similar for pnm_writepamrown().
+
+              pnm_readpamrown(): use multiplication instead of division
+              for speed.  Thanks "Scott T. Smith" <scott@gelatinous.com>.
+         
+              pm_readbiglong(), etc.: pm_error() in case of failure.
+
+              Add pm_readchar(), pm_writechar(), pm_readcharu(),
+              pm_writecharu().
+
+              pnmtopalm: Add packbits compression.
+
+              pnmtopalm: Add version 3 capability (-density, -withdummy).
+
+              pnmtopalm: fix bug: incorrect between-image pad amount.
+
+              pnmtopalm: fix compressed images.  use 0 compressed size
+              field - not totally correct, but passable.
+
+              palmtopnm: fix incorrect handling of some combinations of
+              PALM_IS_COMPRESSED flag and compression type field.
+              Thanks Paul Bolle <pebolle@tiscali.nl>.
+
+              palmtopnm: fix totally broken RLE and scanline compression.
+              Thanks Paul Bolle <pebolle@tiscali.nl>.
+
+              palmtopnm: handle PackBits compression.  Thanks Paul
+              Bolle <pebolle@tiscali.nl>.
+
+              palmtopnm: handle Version 3 encoding.  Thanks Paul Bolle
+              <pebolle@tiscali.nl>.
+
+              Make makeman put in missing newline.  Thanks Eric S. Raymond
+              <esr@thyrsus.com>.
+
+              Include libz in build of programs that use TIFF library.
+
+              palmtopnm: fix wrong check for disallowed combination of
+              -transparent and -rendition.
+
+              pnmtops: Add -psfilter, -flate, -ascii85, -level options.
+
+              pnmtops: Add -dict, -vmreclaim options.
+
+              pnmtops: improve %%Title
+
+              pamcomp: fix bug that duplicates last row of overlay image.
+              Thanks achurch@achurch.org (Andrew Church).
+
+              pamcut: fix bug that fills the rightmost column with black.
+              Thanks achurch@achurch.org (Andrew Church).
+
+              pnmtops: Add -noshowpage option.
+
+              pnmtops: Add %%%%Page.
+
+              pnmtopalm: fix bug with -offset option.
+
+              xwdtopnm: recognize TrueColor visual class in header dump.
+
+              ppmforge: fix bug: crash due to wild pointer with -night.
+              Thanks John Walker <kelvin@fourmilab.ch>.
+
+05.01.01 BJH  Release 10.26
+
+              pnmhistmap: Add -dots, -nmax, -red, -green, -blue, -lval,
+              -rval, -height, and -width options.
+              Thanks "John H. DuBois III" <spcecdt@armory.com>.
+
+              pnmnorm: accept -wpercent and -wvalue (or -bpercent and -bvalue)
+              together.  Thanks Gregg Townsend <gmt@CS.Arizona.EDU>.
+         
+              xwdtopnm: Add -headerdump option.
+
+              pnmtoxwd: Include 256 color color maps in direct color instead
+              of zero.  Zero has a weird effect.
+
+              pamtotga: recognize RGB_ALPHA instead of RGBA.
+
+              palmtopnm: fix bug in determination of compression type.
+
+              palmtopnm: fix bug in handling of multi-image streams.
+              Thanks Paul Bolle <pebolle@tiscali.nl>.
+
+              pnmtopalm: fix bugs in computation of nextDepthOffset.
+              Thanks Paul Bolle <pebolle@tiscali.nl>.
+
+              pamtotga: fix TGA pixel size for TGA with alpha.  Don't do
+              colormap if input has transparency.
+
+              pamtotga: fix crash due to uninitialized "id" field in TGA 
+              header.
+
+              pbm_writepbmrow(): Fix bug in MMX/SSE code that causes
+              segmentation fault.
+
+              pnmhistmap: Fix bug: doesn't work with maxval != 255.
+              Thanks "John H. DuBois III" <spcecdt@armory.com>.
+
+              pbmtext: fix crash with code point > 127.
+
+              ppmtompeg: major cleanup.
+
+              pnmtopng: fix "internal error" and crash bug with -transparent.
+
+              pnmtoxwd: fix endianness on littleendian machines.
+
+              pnmtoxwd: fix bug: doesn't work if you specify an option.
+              
+              jpegtopnm: fix bug: -dumpexif all wrong.
+
+              jpegtopnm: fix bug: newline written to stdout instead of stderr
+              with -dumpexif.
+
+              Add missing 'col' declaration so -msse compile works.
+
+              pcdovtoppm: fix syntax error
+
+              pnmtojbig/jbigtopnm: add newline to "usage" message.
+
+              pamperspective: fix bugs with -frame_include, etc.
+
+              build: Jeg2k programs build properly with newer Jasper library.
+
+              build: Fix bug: "no rule to build xxx.so" with external
+              Jasper or Jbig library.
+
+              Add NAME and DESCRIPTION section to pointer man pages.
+
+04.10.16 BJH  Release 10.25
+
+              Add pcxstd.ppm.
+
+              Add pbmtoibm23xx.  Thanks Jo Fahlke <jorrit@jorrit.de>.
+
+              Add pamedge, replacement for pnmedge.
+         
+              pamperspective: add -frame_include, -*margin, -include.
+
+              pamcomp: Handle RGB_ALPHA and GRAYSCALE_ALPHA images,
+              using the opacity plane.
+              
+              pamscale: do transparency pixel mixing properly.
+
+              ppmtompeg: cleanups and additional verbosity.
+
+              anytopnm: Use 'nawk' instead of 'awk' where available.
+
+              anytopnm: Don't use -e.  (not available everywhere).
+
+              tifftopnm: Add warning when Whole Image method reduces
+              resolution to 8 bit.
+
+              pamtopnm: accept extra planes (ignore them).
+
+              pamcut: major speedup.  Thanks Prophet of the Way
+              <afu@wta.att.ne.jp> (Akira Urushibata ("Douso")).
+
+              Add pnm_getopacity().
+
+              libnetpbm: "pam" read and write routines much more
+              efficient.  Thanks Prophet of the Way
+              <afu@wta.att.ne.jp> (Akira Urushibata ("Douso")).
+
+              Add pnm_formatpamrow(), pnm_allocrowimage(),
+              pnm_freerowimage().  Thanks Thanks Prophet of the Way
+              <afu@wta.att.ne.jp> (Akira Urushibata ("Douso")).
+
+              pnm_readpamrow(): Add option to have "tuplerow" argument
+              NULL and not get the row's contents.  Thanks Thanks
+              Prophet of the Way <afu@wta.att.ne.jp> (Akira Urushibata
+              ("Douso")).
+
+              Add pnm_writepamrowmult().  Thanks Thanks Prophet of the
+              Way <afu@wta.att.ne.jp> (Akira Urushibata ("Douso")).
+
+              libnetpbm: format plain format images more nicely.
+              Thanks Thanks Prophet of the Way <afu@wta.att.ne.jp>
+              (Akira Urushibata ("Douso")).  
+
+              pamcut: fix bug: Blows up instead of failing cleanly
+              when you try to cut beyond the bounds of the image.
+              Thanks Thanks Prophet of the Way <afu@wta.att.ne.jp>
+              (Akira Urushibata ("Douso")).
+
+              fix bug: MMX/SSE fast PBM writing (with gcc -msse) all wrong.
+
+              pamscale; fix bug: -linear option sense reversed.
+
+              pamscale: fix bug: everything too dark when using resampling
+              to enlarge.
+
+              Speed up pbm_writepbmrow() (and all PBM output programs)
+              by going a byte at a time.  Thanks Prophet of the Way
+              <afu@wta.att.ne.jp>.
+
+              pamperspective: fix bug that can cause memory corruption
+              and crashes.  Thanks Mark Weyer
+              <Mark.Weyer@math.uni-freiburg.de>.
+
+              ppmtompeg: put in proper marshalling/unmarshalling so as not
+              to depend on a 32 bit integer type.
+
+              ppmtopcx: add -palette option.
+
+              pnmconvol: fix bug: green and blue convolution matrices
+              exchanged, gray exchanged with random.
+
+              ppmtowinicon: fix bug: crashes on 32 bit images.
+         
+              Use <inttypes.h> or <types.h> where possible, dynamically
+              built "inttypes.h" where not.  Eliminate uint32n.
+
+              Handle BITS_PER_WORD=64 in wordaccess.h so it builds on 
+              64 bit platforms.
+
+04.08.11 BJH  Release 10.24
+
+              g3topbm: Add -stop_error.
+
+              Add makeman to build tools.  Thanks Eric S. Raymond
+              <esr@thyrsus.com>.
+
+              pamflip: Large speed, memory improvements for
+              non-diagonal flips.  Thanks Prophet of the Way
+              <afu@wta.att.ne.jp>.
+
+              jbigtopnm, pnmtojbig: Use packed PBM functions to speed up
+              greatly.  Thanks Prophet of the Way <afu@wta.att.ne.jp>.
+
+              g3topbm: Don't fail on premature EOF; produce partial
+              output instead.
+
+              add pnm_maketuplergb(), pnm_makerowrgb(), pnm_makearrayrgb().
+
+              Fix a bunch of programs that, starting with 10.23, have too
+              large a "len" field in the pam structure, causing storage
+              overwrites.
+
+              pbmtext: fix free of unallocated storage bug with stdin
+              input text.
+
+              pnm_writepaminit(): deal correctly with pam structure that
+              doesn't contain tuple_type member.
+
+              Fix pamP->allocation_depth == 0.
+
+              pamstretch-gen: use pamscale instead of pnmscale.
+
+              Generate pm_config.h at make time.  Determine endianness
+              and word size stuff dynamically.  Use uint32n instead of
+              uint32_t in infotopam.c.
+         
+              fitstopnm: fix MIN/MAX transposition in maxval bounding.
+         
+              Fix bug: "wordn" in place of "wordint" in wordaccess.h.
+
+              Fix bug: -plain option on "pam" programs generated plain
+              header, but raw raster.
+
+04.07.17 BJH  Release 10.23
+
+              Add pamgauss.
+
+              Add pammasksharpen.
+
+              Replace pnmtoplainpnm with pnmtopnm.
+
+              pnmconvol: Add -nooffset.
+
+              pamdice: add -hoverlap, -voverlap.  Thanks Geoff
+              Kuenning <geoff@cs.hmc.edu>.
+         
+              pbmtoepson: Add -dpi, -adjacent, -noadjacent, and -protocol
+              options.
+
+              pstopnm: recognize Encapsulated Postscript by presence of 
+              "EPSF-" in the header instead of a whole specific header line.
+              Thanks Philip Hallstrom <philip.hallstrom@gilbarco.com>.
+
+              pnmpad: Allow -left/-right along with -width,
+              -bottom/-top along with -height.  Thanks David Jones 
+              <drj@pobox.com>.
+
+              pnmpad: round to nearest instead of lowest in interpretation
+              of -halign, -valign.
+
+              pnmsplit: Add -padname option.
+
+              pnmenlarge: work on multi-image streams.
+              
+              libnetpbm: add allocation_depth to PAM structure.  Add
+              maketuplergb(), makerowrgb(), makearrayrgb().
+
+              pnminvert: much faster for PBMs.  Thanks 
+              Prophet of the Way <afu@wta.att.ne.jp>.
+
+              pbmmake: use packed bits to speed up.  Thanks Prophet of
+              the Way <afu@wta.att.ne.jp> (Akira Urushibata ("Douso")).
+
+              pbmtog3: speedups.  Thanks Prophet of the Way
+              <afu@wta.att.ne.jp> (Akira Urushibata ("Douso")).
+
+              Fix gamma value (from .45 to 2.2) in pm_gamma709(), 
+              pm_ungamma709().
+
+              pgmramp: Fix signedness bug with -rectangle, -ellipse.
+
+              pnmtojpeg: fix bug with large exif files. (negative malloc)
+
+              pnmtopng: Fix estimation of whether it's better to use a
+              colormap or not.
+         
+              Add pamditherbw, replacement for pgmtopbm.
+
+              pamperspective: Fix bug.  Incorrect output.  Thanks
+              <Mark.Weyer@math.uni-freiburg.de>.
+
+              ppmtompeg: fix crash with input that is not a multiple of
+              16 pixels high and wide.
+
+              pamtotga: fix crash due to freeing nonexistent color table.
+
+              pamtotga: fix bug: invalid TGA when you use -rgb with a
+              non-color input.
+
+              pgmtopbm: fix calculations that divide by maxval+1; should
+              divide by maxval.  Thanks David Jones <drj@pobox.com>.
+
+04.05.01 BJH  Release 10.22
+
+              Add pamperspective.  Thanks Mark Weyer
+              <Mark.Weyer@math.uni-freiburg.de>.
+
+              Add pamstereogram.  Thanks Scott Pakin <scott@pakin.org>.
+
+              Add pc1toppm.  Thanks Roine Gustafsson
+              <roine@users.sourceforge.net>.
+
+              Add pbmtodjvurle.  Thanks Scott Pakin <scott@pakin.org>.
+
+              Add infotopam.  Thanks Rich Griswold <griswold@acm.org>.
+
+              Add pamtopfm, pfmtopam.
+
+              ppmtowinicon: Add -truetransparent.
+
+              ppmtowinicon: remove old, wrong, undocumented -andppm synonym
+              of -andpgm.
+
+              ppmtopcx: Add -stdpalette option.
+
+              pamsumm: Add -brief, -normalize.
+
+              All programs that interpret color specifiers (ppmchange, etc.):
+              warn if the specified color can't be represented, to the 
+              precision specified, in the operative maxval.
+
+              ppmchange: fail if the specified color can't be represented in
+              the maxval of the input image.
+
+              pcxtoppm: Imply standard palette when palette in PCX header is
+              all black.  This function apparently got lost some time since
+              it was added in 1994.
+              
+              pcxtoppm: Add the color palette to -verbose output.
+
+              ppmtopcx: Fix bug: wrong 256 color PCX output.  From
+              10.21.  Thanks Timothy Borgeaud
+              <timothy@borgeaud.freeserve.co.uk>.
+
+              Convert ppmtodjvurle into pamtodjvurle.
+
+              pngtopnm: Dump additional info about PNG with -verbose.
+
+              pngtopnm: Use Netpbm command line parser.
+
+              pbm_readpbmrowpacked(): Fix bug: ORs bits into return value
+              instead of setting them.  Affects pbmtoescp2.
+
+              ppmtopcx: Fix bug: don't add black to a palette if it's not
+              already there.
+
+              pnm_tuplehashtotable(): fix allocsize (maxsize) = 0 case.
+
+              pamflip: fix bug with random memory accesses due to
+              signed/unsigned comparison.
+
+04.03.28 BJH  Release 10.21
+
+              Add pamsumm.
+
+              Add pamsummcol.
+
+              Add pamsharpness, pamsharpmap.
+
+              Add ppmtodjvurle.  Thanks Scott Pakin <scott@pakin.org>.
+
+              pstopnm: add -dpi option.
+
+              ppmtopcx: add -planes option.
+         
+              pbmtext: add -width option.
+
+              replace pnmcomp with pamcomp, do transparency right wrt gamma.
+
+              tifftopnm: Use better CMYK->RGB algorithm: y=1-(b+k) instead
+              of y=(1-k)*(1-b) in Row By Row mode.
+
+              pbmtext/libnetpbm: Allow pbmfont fonts to have 96 characters
+              (32-128) instead of 95.
+
+              pnmtopng: fix bug with -transparent.
+
+              pcxtoppm: remove debugging footsteps.
+
+              pnmflip: pass through -plain, etc. to pamflip.
+
+              Include pm_system.h, pm_gamma.h in package.
+
+              ppmtomap: Change #/bin/sh to #!/bin/sh.
+
+              ppmtogif: Don't violate array bounds when GIF color map is
+              is larger than internal color map.
+
+              yuvsplittoppm: Fix -ccir601 option; clean up.
+
+              ppmtobmp: Fix bug: Generates invalid bits per pixel
+              (e.g. 3) when input image has small number of colors.
+              Thanks David Jones <drj@pobox.com>.
+
+              pbmtog3: fix buffer overrun when image > 1728 columns.
+              Thanks Prophet of the Way <afu@wta.att.ne.jp>.
+
+              pnmsvgalib: Correct error message - too wide -> too tall.
+
+              pnmtotiffcmyk:  Correct abs to fabs so -theta works.
+
+              sldtoppm: Correct abs to fabs.
+
+              pgmramp: Correct abs to fabs so -rectangle and -ellipse work.
+
+              pgmramp: Don't crash with -rectangle and height or width = 1.
+
+              ppmforge: Correct abs to fabs so the planet is more than
+              2 pixels wide.  Also recode much of program in high level C.
+
+              pnmtojpeg: interpret "length" field in exif data as unsigned
+              16 bit instead of signed.
+
+              pnmrotate: fix bug: always crashes in memory free
+
+              pnmrotate: remove debugging messages.
+
+              Declare _XOPEN_SOURCE=500 in programs that use strdup() so
+              C libraries that don't have _BSD_SOURCE will declare it.
+
+              Use FTELLO macro so things compile on a system that
+              doesn't have ftello.  Don't assume _LARGE_FILE_API means
+              ftello is available -- _LARGE_FILE_API is input to libc, not
+              output from it.
+
+04.01.30 BJH  Release 10.20
+
+              pamscale: derive from pnmscale.
+
+              pamscale: Add resampling/convolution code.  Thanks
+              Michael Reinelt <m.reinelt@steinhilberschwehr.at>.
+
+              pamscale: Do math in linear intensities instead of
+              gamma-adjusted.
+
+              pamscale: Add -xyfill.
+
+              pnmtopng: Remove global variables.  Solves a problem with 
+              conflicting name with libc: "gamma".
+                       
+              pbmtomda: make program identifier 'MicroDesignPCW'.  Thanks
+              John Elliott <jce@seasip.demon.co.uk>.
+
+              fitstopnm: Produce maxval 1 instead of 0 when input is all one
+              value.  Use maxval 255 when samples are floating point.
+
+              pamstretch-gen: be robust to invalid PNM input.
+
+              anytopnm: do safe temporary files.
+
+              ppmquantall: do safe temporary files.
+
+              pnmindex: do safe temporary files.
+
+              pnmmargin: do safe temporary files.
+
+              pamstretch-gen: do safe temporary files.  Thanks 
+              Stefan Nordhausen <nordhaus@informatik.hu-berlin.de>.
+              
+              tifftopnm: Do better validation of number of channels.
+              
+              libnetpbm: Add "normalized" (floating point) read/write
+              routines:  pnm_readpamrown(), pnm_writepamrown(), 
+              pnm_allocpamrown(), pnm_freepamrown().
+
+              libnetpbm: Add pm_gamma709, pm_ungamma709().
+
+              libnetpbm: rename createBlackTuple() to pnm_createBlackTuple().
+
+              pm_openr_seekable(): use TMPFILE environment variable.
+              Thanks Kai Strieder <ska@pixelboxx.de>.
+
+              libnetpbm: Fail when input maxval is 0.  This wreaks havoc
+              with such things as rescaling to a new maxval.
+
+              pnmquant: Fix bug wherein all options are rejected.
+
+              ppmshadow: Fix crash in all invocations.
+
+              pnmtopng: fix bug with array bounds violation with -alpha.
+              Usual symptom: "internal inconsistency" message.
+
+              anytopnm: Remove "function" so it works on FreeBSD.
+
+              configure: Do a better job of choosing between -R and -rpath.
+
+              configure: Add test compile for PNG, Z libraries.
+
+03.11.15 BJH  Release 10.19
+
+              ppmhist: Add -float option.
+
+              ppmhist: speed up -colorname by reading color dictionary only
+              once.
+
+              bmptopnm: fix bug with BMPs that end prematurely.
+
+              giftopnm: Properly generate alpha mask when the same
+              color is both transparent and opaque in the GIF.  Thanks
+              Karl Zilles <zilles@1969.ws>.
+
+              rgb.txt: move D65 to the end, so "white" is preferred.
+
+              xwdtopnm: change interpretation of bitmap_pad and bitmap_unit
+              to accomodate Xfree86 direct color 24 bit xwd.
+
+              pbmtextps: fix bug where intermediate file gets truncated.
+
+              pstopnm: fix bug in which Standard Input never works.
+
+              ppmtobmp: change 'char' to 'unsigned char' to work around a
+              Solaris C library bug.
+
+              ppmtobmp: handle maxval properly for maxval != 256 truecolor BMP.
+              Thanks Michael Buchholz <michael.buchholz@deu.mci.com>.
+
+              ppmquant: replace with wrapper for pnmquant, because ppmquant
+              had some really hard bug in computing the new color set.
+
+              Fix stack corruption in pXm_check() on systems that have
+              both 32 and 64 bit file offsets.
+
+              Add 'makecat' build tool and description to USERDOC of
+              using lynx -dump to get man-able documentation.
+
+              Make AIX shared library build work, with -qmkshrobj.
+
+              configure: Add intelligence to default location for zlib,
+              libpng headers.
+
+              configure: Make shared libraries work on AIX.
+
+              Add netpbm-config.
+
+              installnetpbm: don't crash on mkdir on old Perl.
+
+03.09.19 BJH  Release 10.18
+
+              Add escp2topbm, pbmtoescp2.  Thanks Ulrich Walcher
+              <u.walcher@gmx.de>
+
+              Add pbmtomatrixorbital.
+
+              Add ddbugtopbm by Russell Marks.
+
+              bmptopnm: Handle transparency, arbitrary pixel format (rgba
+              masks in BMP header).
+
+              bmptopnm: Handle top-down BMP.
+
+              bmptopnm: Handle 32 bit BMP.  Thanks Aaron Orenstein
+              <aorenste@grandvirtual.com>.
+
+              ppmtopcx: add -8bit option.  Thanks Holger Schemel
+              <holger.schemel@telefonica.de>.
+
+              ilbmtoppm: recognize (and ignore) DPPS and TINY chunks.
+
+              pbmpage: Add solid perimeter box to Pattern 1.
+
+              anytopnm: use 'file --mime' where available to determine file
+              type more robustly.
+
+              manweb: make 'webdir' a list of directories instead of just one.
+
+              pnmpsnr: fix bug: Cr and Cb interchanged.  Thanks
+              "Uwe Utecht" <uwe.utecht@bbc.co.uk>.
+
+              pnmstitch: fix crash.  Thanks "Paul" <pwilkins@lashwhip.com>.
+
+              manweb: add ability to read info files.
+
+              configure: missing lineends for Solaris.
+
+              anytopnm, ppmquantall: remove non-POSIX tail -N and egrep.
+
+              pgmtexture: Fix Measure of Correlation-2 so small values don't
+              turn into zero (replace abs() with fabs()).
+         
+              Add and use MALLOCVAR and MALLOCARRAY utility macros.
+
+              Allocate rows individually if can't get all rows in a single
+              memory block.
+
+              Remove hpcdtoppm from the main package because it isn't
+              licensed properly to be distributed on Sourceforge.
+              
+              Remove "magic" file -- the version that comes with Christos
+              Zoulas' 'file' package now contains everything that file had.
+
+              configure: put space after -o in test compiles.
+
+              Explicitly set SCRIPTS make variable to null so environment
+              variable of the same name doesn't screw things up.
+
+              Remove -DALL_SOURCE from AIX compile; define it in files that
+              require it.
+
+              Add -ffast-math option to recommended Gcc options.
+
+              stamp_date: don't use LOGNAME as a variable (on AIX, you can't).
+
+03.07.05 BJH  Release 10.17
+
+              Various code cleanups based on TRU64 compiler warnings.
+
+              Configure: print message when $OSNAME not recognized.
+
+              Fix Makefile.common so LIBS and LOADLIBES work.
+
+              Fix make file for Ppmglobe so it links the math library.
+
+              Fix bug in xxx_check(): function/prototype mismatch
+              causes bogus wrong-filesize error on systems where off_t
+              is sometimes not 64 bits.
+
+03.07.03 BJH  Release 10.16
+
+              Add ppmglobe.  Thanks Max Gensthaler <Max@Gensthaler.de>.
+
+              bmptopnm: Add ability to convert 16 bits per pixel Windows BMP.
+
+              giftopnm: add -image=all.
+
+              pnmtiff: Add -resolutionunit option.
+
+              pnmtopng: fix bugs, remove limitations with -text.
+
+              pgmabel: Declare internal subroutines 'static'.
+              
+              pstopnm: fix bug: encapsulated postscript confused with 
+              regular postscript, so all pages get overlaid as one page.
+
+              pnmrotate: Use smaller real memory working set.
+
+              winicontoppm: use standard option parser.
+
+              pnmflip: fix bug causing -r180 and -r270 to be ignored.
+              Thanks YANO Hirokuni <hyano@ya-no.com>.
+
+              configure: fix bug with missing space when using CFLAGS
+              environment variable.
+
+              Add CPPFLAGS and LOADLIBES to rules and 'configure' test
+              compiles.
+
+              Issue error message if you do 'make package' before 'make'.
+
+              Add VERSION file to package.
+
+              Use explicit library file name on a link instead of -L/-l
+              where possible.
+
+03.04.27 BJH  Release 10.15
+
+              Add pamtohtmltbl.  Thanks Alexander B. Ivanov <ssh@S-and-B.ru>.
+
+              Add pampop9.  Thanks Robert Tinsley, 
+              <http://www.thepoacher.net/contact>.
+
+              winicontoppm: Handle 24 bit direct color winicons.  Thanks
+              Lee Benfield <lee@benf.org>.
+
+              pnmrotate: add -background option.
+
+              pnmtojpeg: Add -density option.
+
+              pamtotga: Add alpha capability, via "RGBA" tuple type.
+
+              libnetpbm: Add ppm_readcolornamefile().
+
+              Make library and programs work with files > 2GB.  At least 
+              on GNU and AIX.
+
+              pbmtext: Add -momargin option.  Thanks "Slaven Rezic"
+              <eserte@web.de>.
+
+              pbmtoepsi: fix bug: non six-digit lines between 
+              %%BeginPreview: ... and %%EndImage .  Thanks
+              "K.Nakano" <ksk@seeds-man.com>.
+
+              pnmrotate: fix bug: background color computed wrong.
+              
+              pnmrotate: fix bug: PBMs without -noantialias not properly
+              promoted to PGM.
+
+              pnmtops: fix bug: 1 bit per sample output when maxval is 2
+              or 3.  Should be 4 bits per sample.
+
+              pnmtops: fix bug: everything too dark when input maxval less
+              than Postscript maxval.
+
+              pm_nextimage(): fix bug: doesn't read past white space at the
+              end of a plain-format raster.
+
+              pnmremap: fix performance bug: don't put same color into hash
+              twice.  Thanks Hannu Koivisto <Hannu.Koivisto@ionific.com>.
+
+              ppmtoxpm: Add -hexonly.  Default to system color dictionary.
+              Use standard library routines to access color dictionary.
+
+              pnmcolormap: Keep only one row at a time in memory.
+
+              bmptopnm: fix buffer overrun with wild ColorsUsed value.
+
+              Change ordering of include files in parallel.c so it compiles
+              on AIX 5.
+
+              configure: change -O2 to -O0 for broken gcc compiler.
+
+              One more chop at the -R/-rpath issue: new defaults for Solaris.
+
+03.02.13 BJH  Release 10.14
+
+              Add pamedge, adapted from pnmedge by Peter Kirchgessner, 1995.
+
+              Add ppmwheel, adapted from ppmcirc by Peter Kirchgessner, 1995.
+
+              Add ppmtoarbtxt, renamed from ppmtotxt by Peter Kirchgessner,
+              1995.
+              
+              pnmflip: add pnmflip directory to search path for pamflip.
+
+              picttoppm: Recognize DirectBitsRgn opcode.  Thanks
+              <kabe@sra-tohoku.co.jp>.
+
+              ppmbrighten: -normalize works with nonseekable input.
+
+              jpegtopnm: Update exif stuff to match Jhead 1.9.
+
+              bmptopnm: fix for the case of ColorsUsed != 0 in 
+              non-colormapped (24 bit) image.
+
+              pbmtopgm: limit the maxval to legal values.
+         
+              pamarith: minimum output maxval of 2 for -compare.
+
+              rgb.txt: remove redundant lines, clean up.
+
+              pnmgamma: fix bug in -ungamma -cieramp. 1/gamma vs gamma.
+
+              pnmtopng: fix bug: background color = transparent color in
+              colormapped image causes transparent color not to be
+              transparent.  Also make bilevel images with background color
+              use 1 bit per pixel instead of 2.
+
+              pngtopnm: Fix bug: wrong exit code.
+
+              Fix broken ISUPPER; affects sbigtopgm and color name functions
+
+              pamflip: Use bundled strsepN() instead of strsep().
+
+              giftopnm: fix bug with GIFs that (invalidly) contain translation
+              cycles.  Clean up LZW decompression so it is readable and more
+              robust.
+              
+              Add strsepN() to libnetpbm, because strsep() is not available
+              everywhere.
+
+              Change --rpath to -rpath.
+
+              Change LINKERISGCC to LINKERISCOMPILER and default to Y.
+
+              configure: Handle explicit "none" response to svgalib prompt.
+
+              Add merge.o (vs mergelist) method of doing merge build.
+         
+              Fix bug: jbig converters missing from merge build.
+
+03.01.09 BJH  Release 10.13
+
+              Add pamlookup.
+              
+              Add pamflip: replacement of pnmflip.  Does PAM images and has
+              -xform option.
+
+              Add pm_system().
+
+              Ppmrainbow:  Add -norepeat option.
+
+              tifftopnm: handle 32 bits per sample -- Use upper 16 bits.
+
+              tifftopnm: add -byrow.
+
+              pamarith:  Add -compare operator.
+
+              ppmtompeg: Check for missing YUV_SIZE option with 
+              -combine_frames and -combine_gops.
+
+              ppmtompeg: fix buffer overrun with invalid message received
+              by slave processor.
+
+              pamseq: Fix crash/memory corruption.
+
+              pamseq: Remove debugging statement.
+
+              Add some protection against Netpbm images that indicate
+              dimensions too big to process without arithmetic overflow.
+
+              Replace isdigit() with ISDIGIT(), etc.
+
+              pnmnorm: malloc histogram array instead of using stack
+              variable to avoid stack overflow.
+
+              thinkjettopbm: works with Solaris Lex.
+              
+              Add PKGDIR_DEFAULT Makefile.config variable.
+
+              Configure: Test for old JPEG library without jpeg_marker_struct.
+
+              Configure: Add -I/usr/local/include and -I/usr/local/lib to
+              OpenBSD and NetBSD compiles and links.
+
+              Change make variable from INCLUDE to INCLUDES to avoid collision
+              with Cygwin environment variable.
+
+02.11.09 BJH  Release 10.12
+              
+              Add pamtojp2k, jp2ktopam.
+
+              pnmtotiff: add test for seekable output.
+
+              pnmflip: use packed PBM format to save memory.  Thanks
+              Ivan Karski <karski@nym.alias.net>.
+
+              thinkjettopbm: replace getopt with shhopt to avoid header file
+              problem (getopt.h) on some systems.
+
+              fix multiple definition problem with pm_plain_output.
+
+              pgmminkowski, pgmmorphconv: fix bug: programs missing.  These
+              were formally added in 10.0, but the code never actually went in.
+
+              pbmtomda: fix crash with input image not multiple of 4 rows.
+
+              tgatoppm: fix segfault in option processing from recent
+              option processor change.
+
+              Slight correction to coefficients in pnm_YCbCrtuple.
+
+              Add pnm_YCbCr_to_rgbtuple() to libnetpbm.
+
+              ppmtompeg: fix build failure with NETWORKLD=NONE.
+
+              ppmtompeg: fix build error due to broken C library header files
+              on SunOS.
+
+              Fix missing alias symlinks in merge build.
+
+02.10.17 BJH  Release 10.11
+         
+              Fix nstring.h, ppmcmap.h dependency in analyzer/.
+
+              pnmtojpeg: Add -rgb option.
+
+              jpegtopnm: Handle a stream of consecutive JPEGs.
+
+              tifftopnm: use TIFFRGBAImageGet() so it works on compressed
+              images.
+
+              'make distclean' deletes all symbolic links, even if I forget
+              to put them in HEADERLINKS so that 'make clean' gets them.
+
+02.10.10 BJH  Release 10.10
+
+              Add -plain common option.  Thanks "John H. DuBois III"
+              <spcecdt@armory.com>.
+
+              ppmhist: Add -colorname option
+
+              pnmcomp: Add -align=beyondleft, -align=beyondright,
+              -valign=above, -valign=below and make -xoff and -yoff work
+              in conjunction with -align and -valign.  Idea from 
+              "John H. DuBois III" <spcecdt@armory.com>.
+
+              manweb: Add ability to search through PATH for documentation
+              so you can just say 'manweb bmptopnm'.
+
+              bmptopnm: fix bug from 10.9: 24 bit truecolor should be
+              BGR, not RGB.
+
+              ppmtobmp: fix bug from 10.9: 24 bit truecolor should be
+              BGR, not RGB.
+
+              pamarith: Fix bug with mixed depth inputs.
+         
+              pamarith: Fix bug with -subtract of larger # from smaller.
+
+              pnmstitch: fix bug causing segfault at end.
+
+              pgmtopgm, ppmtoppm: Issue error message if arguments given.
+
+              giftopnm: remove debugging messages.
+
+              Fix line number in color dictionary error messages.
+
+              Fix build errors on systems that don't do "echo -n" by using
+              cat /dev/null instead.
+
+              Fix build errors that cause the data files not to get installed.
+              
+              Merge build: fix install of other/ programs and add NETWORKLD
+              to the link.
+
+              Merge build: add missing backward compatibility 'pnmfile' link.
+
+              Add SCO OpenServer to configure dialog.  Thanks
+              John H. DuBois III <spcecdt@armory.com>
+
+              Add FreeBSD to the configure dialog.
+
+02.09.21 BJH  Release 10.9
+
+              Add pgmtopgm.
+
+              Add ppmtoppm.
+
+              Add ppmtoterm.  Thanks Ero Carrera <ecarrera@lightforge.com>.
+
+              Add ppmrough.  Thanks Eckard Specht
+              <specht@hydra.nat.uni-magdeburg.de>.
+
+              Add rgb.txt
+
+              pnmquant: make it work with pipe input; fix crash due to 
+              half-finished work accidentally released a few releases ago.
+
+              bmptopnm: Use way less memory by inverting image while still
+              in the BMP raster format (as little as 1 bit per pixel), 
+              instead of in the libnetpbm format (96 bits per pixel).
+
+              ppmhist: Reads image into memory one row at a time instead
+              of entire image in memory at once.
+
+              ppmshadow: make it work with non-PPM input.
+
+              ppmshadow: Don't run a shell for every Netpbm program.
+
+              xwdtopnm, pnmtoxwd: make them work on 64-bit-long machines.
+              
+              ppmdither: Fix subscript out of bounds bug which caused
+              random intensity values for the most intense pixels (and
+              very slightly too-intense values everywhere).
+
+              ppmtobmp: Fix bug in 24 bit truecolor: was writing B, G, R
+              but standard appears to be R, G, B (per bmptopnm and xli).
+
+              pamarith: restore pnmarith capability of having one of the
+              inputs be depth 1 while the other is not.
+
+              pnmtopclxl: fine tuning of PBM input case.
+
+              remove pnmfile; obsoleted by pamfile.
+
+              ppmfade, ppmshadow: Change #!/bin/perl to #!/usr/bin/perl.
+
+              Add a bunch of missing #include <string.h> and fix scanf type
+              mismatches, per gcc 3.2 compiler warnings.
+
+              Add some missing -R options to links.
+
+02.08.16 BJH  Release 10.8
+  
+              Build: Fix Configure bug with JPEG headers in default path.
+
+              Pnmtopclxl: fix bug with PBM input not multiple of 8 across.
+
+02.08.15 BJH  Release 10.7
+
+              Pnmtopclxl: remove padBytesMultiple attribute, which doesn't
+              exist on old printers.
+
+              Pnmtopclxl: fix MediaDestination parameter value.
+
+              Pnmtopclxl: make options parsed by standard Netpbm
+              option parser; remove unconventional (and broken)
+              --output option.  Fix crash with Standard Input input.
+              Check whole length given for option values.
+
+              pnmflip: Add -memsize and -pagesize.  Make other options
+              conventional - only one transformation allowed.
+
+              Make 'configure' a Bourne Shell program that calls configure.pl.
+
+              Add pnmstitch.  Thanks Mark Salyzyn <salyzyn@cfl.rr.com>.
+
+              Fix -R stuff to fix Solaris build.
+              
+              Add lots of consts, remove dead code, with the help of 
+              GNU compiler warnings.
+
+02.07.29 BJH  Release 10.6
+
+              Add pnmtopclxl.  Thanks Jochen Karrer
+              <cip307@cip.physik.uni-wuerzburg.de>.
+
+              Add pnmstitch code; not working yet.
+
+              pnmmontage: add -data option.  Thanks Ben
+              <bem@mad.scientist.com>.
+
+              pnmtotga: put "image ID" in TGA output.
+
+              ppmtotga: Correct name to pnmtotga.
+
+              pnmcomp:  Add -opacity option.
+
+              pbmtog3: Add -nofixedwidth option.  Vladimir Nadvornik
+              <nadvornik@suse.cz>
+
+              ppmtopgm: upgrade to handle multi-image PPM file.
+
+              icontopbm: fix bugs with invalid input formats.  Thanks
+              Vladimir Nadvornik <nadvornik@suse.cz>
+
+              ppmtompeg: fix crash with logarithmic psearch algorithm and
+              non-power-of-2 search range.
+
+              configure: fix use of compiler other than cc.  Thanks
+              Ben <bem@mad.scientist.com>.
+
+              Fix Cygwin library build for default DLLVER.
+
+              Fix file handle problem with Configure on old Perl.
+
+              Don't use .defs file/run dlltool (Windows).
+
+02.07.14 BJH  Release 10.5
+         
+              Make library link on Solaris with GNU Ld work.  Thanks
+              Russel Winder <russel@russel.org.uk>.
+
+              Make Configure not depend on File::Temp.
+
+02.07.09 BJH  Release 10.4
+
+              Fix space after -I bug in Makefile.common, lib/Makefile.
+
+              Change a bunch of macros to upper case; avoid name collision
+              of round() with math library.
+
+              Configure detects broken gcc, sets -O2.
+
+              Configure detects jpeg headers not in default search path.
+
+02.07.02 BJH  Release 10.3
+
+              Add pamfunc.
+
+              Add pgmabel.  Thanks Volker Schmidt <lefti@voyager.boerde.de>.
+
+              pamslice: add -xmgr option.
+                       
+              pgmslice: upgrade to pamslice.
+         
+              pamarith: add -mean option.
+
+              pnmarith: upgrade to pamarith.
+
+              pnmtopng: add -palette option.  Functional copy from
+              "Pnmtopng" package.
+
+              pbmtoepsi: Add -dpi option.  Thanks Bill Cheng
+              <bill.cheng@acm.org>
+
+              tifftopnm: make -respectfillorder work.
+
+              pnmtopng: fix bugs in handling of text comment files.
+              Taken from "Pnmtopng" package.
+
+              pnmtopng: fix -hist option.
+
+              Cygwin build accomodations.  Thanks Charles Wilson 
+              <cwilson@ece.gatech.edu>.
+
+              Fix ppmtompeg build failure when JPEGLIB = NONE
+
+              Fix missing -R link options.
+
+02.06.14 BJH  Release 10.2
+         
+              Works with separate build directory.
+
+              pnmnorm: fix precision error causes whites to become black
+
+              Fix bug: Pbmpage needs math library
+
+02.06.07 BJH  Release 10.1
+
+              ppmmake: add -maxval option
+
+              pgmramp: add -maxval option
+
+              Add pamseq.
+
+              ppmcolors: base on pamseq.
+
+              pnmtotiff: Fix bug in -indexbits.
+
+              Fix runtime library paths for Darwin, Netbsd
+
+              installnetpbm: Fix infinite loop when you refuse manweb.conf.
+
+              installnetpbm: Add mode to mkdir for older Perl.
+
+              installnetpbm: Use BSD option on Cp if not GNU.
+
+02.06.01 BJH  Release 10.0
+         
+              Man pages replaced by web pages -- either private copies
+              or straight from Netpbm Central.  Documentation distributed
+              via Worldwide Web, not in the Netpbm source code tarball.
+
+              Reorganize source tree.  Combine 4 Netpbm libraries into 1.
+              Make merge build merge ALL programs into one.
+
+              Add pamendian.
+
+              Add pamstack.
+
+              Add pamtohdiff, hdifftopam.
+         
+              Add pbmtextps.  Thanks James McCann <jmccann@eskimo.com>.
+
+              Add pgmminkowski, pgmmorphconv.  Thanks Luuk van Dijk
+              <lvd@mndmttr.nl>
+
+              pnmtotiff: Add -indexbits option to allow fewer than 8 bits
+              per sample in apletted image.  Thanks Thomas Henlich.
+              <http://sourceforge.net/users/thenlich/>.
+
+              pnmtotiff: put zeroes in unused colormap entries.  Thanks
+              Thomas Henlich <http://sourceforge.net/users/thenlich/>.
+         
+              pbmtext:  Add -lspace option.  Thanks Denis <denism@cyberus.ca>.
+
+              ppmqvga: remove; appears to be obsoleted by Pnmquant.
+
+              pnmtops: remove setpagedevice by default.  Add -setpage option.
+
+              ppmtouil: rename to pamtouil, add transparency.
+
+              pamchannel: Add -tupletype option.
+
+              pstopnm: Add a showpage in case the EPS source doesn't have it.
+              Thanks "J. Milgram" <milgram@cgpp.com>.
+
+              pstopnm: Run Ghostscript directly instead of via a shell.
+              Some Windows environments don't have a Bourne-compatible shell.
+
+              pnmtotiff: Don't put bogus colormap in grayscale TIFF.
+              Thanks Thomas Henlich  <http://sourceforge.net/users/thenlich/>.
+
+              picttoppm, ppmtompeg, rletoppm: fix bug with invalid parameter
+              ("b" modes) on popen().
+
+              pnmtopng: fix bug with 'mayscale'.
+
+              pnmnorm: Fix bug with bvalue == 0.  Thanks "Blake, Chris" 
+              <chris.blake@windriver.com>
+
+              pnmtopng: restructure palette generation to make it
+              easier to read.
+
+              configure: Add --help.
+
+              Add Windows DLL versioning.  Thanks Charles Wilson 
+              <cwilson@ece.gatech.edu>.
+         
+              Add Nstring library, so Netpbm programs can use asprintf(), etc.
+
+02.03.15 BJH  Release 9.25
+
+              Add pamdice.
+         
+              pnmgamma: add -srgbramp.
+
+              ppmnorm, pgmnorm: replace with pnmnorm
+
+              ppmnorm: Read only a row at a time into memory.
+         
+              ppmnorm: Add -keephues option.
+
+              pnmtotiff: Add -miniswhite option.
+
+              pnmtopsnr: Read only a row at a time into memory.
+
+              Convert bmptoppm to bmptopnm.
+
+              ppmtopcx: Add -xpos, -ypos options.
+
+              pcxtoppm: Don't require seekable input.
+
+              pcxtoppm: Improve messages; add some PCX header validation.
+
+              ppmtowinicon: Use standard alpha mask (PGM image) instead of
+              PPM image (black/not black) for and file.
+
+              pnmpad: Add -width, -height, -halign, -valign options.
+              Thanks M. van Beilen <mvb@iradis.org>.
+
+              ppmhist: remove 100,000 color limit.
+
+              pnmnlfilt: works with multi-image streams.  Thanks 
+              "Steven M. Schultz" <sms@2BSD.COM>.
+
+              pcxtoppm: Fix bug with negative image position.
+
+              pnmtopsnr: fix unsigned integer bug giving wrong results on PGMs.
+
+              libpnm: fix bug: PAM functions write 16 bit samples wrong.
+
+              Tifftopnm: fix bug: transparency mask all wrong.  Thanks
+              Heikki Suonsivu <hsu@bbnetworks.net>.
+
+              Makefile improvements for cross compiling.  Thanks
+              "Maciej W. Rozycki" <macro@ds2.pg.gda.pl>.
+ 
+              Allow build with existing JBIG library instead of the
+              bundled one.  Thanks "Maciej W. Rozycki"
+              <macro@ds2.pg.gda.pl>.
+
+              ppmtompeg Makefile: include -R option where needed.
+              Thanks Hans Werner Strube <strube@physik3.gwdg.de>.
+
+              Add BSD/OS to configure program.  
+              Thanks seebs@plethora.net (Peter Seebach)
+
+              install uses supplied install.sh instead of an 'install program
+              it finds on your system.
+
+              configure: Fix missing newline bug for IRIX.
+
+02.01.27 BJH  Release 9.24
+
+              Add ppmsvgalib.
+              
+              pnmremap: Use full color resolution of input instead of that
+              of color map to do Floyd-Steinberg dithering.
+         
+              pnmremap: fix bug where Floyd-Steinberg dithering of very 
+              dark areas creates spots of maximal brightness.
+
+              ppmquant: fix same bug as pnmremap.
+
+              pnmscale: add -nomix option
+
+              rawtopgm: fix bug.  Thanks Joe Krahn <krahn@niehs.nih.gov>.
+              
+              pnmquant: replace with a Perl program that calls
+              pnmcolormap and pnmremap.
+
+              Fix bug: PAM library routines fail to read 2-byte samples.
+         
+              fix bug: install-dev doesn't install mappam.h.
+
+              configure sets up install paths.
+
+              make install does Ldconfig where required.
+         
+              pnmtops: Add "XxY" form of -dpi option.  Thanks Vladimir 
+              Nadvornik <nadvornik@suse.cz>
+
+              ppmtomap: rewrite to call the new pnmcolormap.
+
+              pnmscale: clean up code a little; now it appears to produce
+              somewhat better results -- don't know why.
+
+              exif.h: remove C++ comments
+
+              various fixes to please Irix compiler.
+
+              Change some "long" to "uint32n" so it works on 64 bit 
+              machines.
+
+02.01.04 BJH  Release 9.23
+
+              tifftopnm: fix bug from 9.22: always crashes.
+
+              xpmtoppm: fix bug from 9.21: XPM 3 files not recognized because
+              /* XPM */ comment read twice.
+                         
+              xwdtopnm: Use bitmap_pad instead of bitmap_unit on X11 pixmap
+              files with depth > 1.  Thanks "Ben Kelley" <ben_kelley@ubsw.com>.
+
+              pnmtopalm: fix bug: crashes with -colormap and non-color input.
+
+              ppmforge: fix bug: array subscripts out of bounds.  Thanks
+              Rob Menke <robmenke@mac.com>.
+
+              giftopnm: fix bug with extraneous "bogus character 0x00" message
+
+              tifftopnm: add -respectfillorder option.  Ignore FILLORDER
+              by default.
+
+              make install-dev: install shared library stub files (symlinks).
+              
+              ppmtogif: Fix bug: color resolution in wrong bits in logical
+              screen descriptor.  Thanks Elmue <elmue@gmx.de>.
+
+              Add -lz to Tiff programs; libtiff requires it now.
+
+              Add ppmcolors.
+
+              Add pnmremap.
+
+              Add pnmcolormap.
+
+              pnmtops: Include setpagedevice directive in Postscript output.
+              Thanks A Braunsdorf <ab@eas.purdue.edu>.
+
+              pnmtops: turn-to-fit logic works properly where paper is 
+              wider than tall.  Thanks A Braunsdorf <ab@eas.purdue.edu>.
+
+              giftopnm: cleanup
+         
+01.12.10 BJH  Release 9.22
+
+              Fix bug: pnm_luminosity_factor must be "extern" in pam.h
+
+              pbmtonokia: can create picture messages.  -txt, -net options.
+
+              tifftopnm: Accept invalid FILLORDER value - assume msb-to-lsb.
+
+01.12.01 BJH  Release 9.21
+
+              Add pamdeinterlace.
+
+              Add pnmquant.
+
+              pnmtops: Accept maxval > 255 input.
+         
+              Rename pnminterp to the more informative pnmstretch.
+
+              pnmstretch: convert from pnm to pam - pamstretch.
+
+              pamstretch: add -xscale, -yscale options
+
+              pbmtolj: Add -copies option
+
+              ppmtogif: Add secret -h option to make Latex2html configure
+              program work.
+
+              ppmquant: output maxval controlled by colormap maxval,
+              not input maxval.
+
+              pbmclean: Add -black and -white options.  Thanks
+              Michael Sternberg <sternberg@phys.uni-paderborn.de>.
+
+              xpmtoppm: Don't require input to start with a comment.
+              Thanks MINAMI <minami@chem.s.u-tokyo.ac.jp>.
+
+              xpmtoppm: Fix bug introduced with 9.20 with XPM 1 files.
+
+              pnmcut, pamcut: fix bug with cut that begins past right edge
+              of image.
+         
+              pamcut: Same fix as in pnmcut in 9.9.  Also fix black fill.  
+
+              pnmtotiff:  Process one row at a time instead of reading
+              entire image into memory.  Add -color, -truecolor.
+
+01.10.05 BJH  Release 9.20
+
+              ppmtogif: Add -nolzw option.
+
+              ppmntsc: do multiple images
+
+              pnmtojpeg: fix bug from 9.19 causing crash on most images.
+
+              ilbmtoppm: Correct cmyk -> rgb transformation.
+
+              ppmtompeg: Fix bug due to missing "breaks".  Thanks
+              Wolfgang Mueller <muellerw@pc7143.unige.ch>    
+
+              eyuvtoppm: fix memory leak, speed up by allocating working
+              storage only once.
+
+              libopt.c: replace strtok_r() with strtok() so it compiles on
+              Mac OS X.
+         
+01.09.18 BJH  Release 9.19
+
+              pnmtotiff: fix bug from 9.17 causing compile to fail
+              with old Tiff library
+
+              pnmtojpeg: Add -exif option.
+
+              ppmtojpeg: Change to pnmtojpeg; PBM/PGM input causes grayscale
+              output.
+
+              pnmtotiff: Handle LSB2MSB FILLORDER.
+
+              pnmtotiff: Fix -msb2lsb, -lsb2msb.  Used to do nothing but 
+              set FILLORDER tag value.
+
+              Make maxval of a PBM image read as a PGM image 255 instead of 1.
+              
+              libpbm: eliminate external data symbol pm_show_version
+              so it works with Windows.
+
+              Use subplatform-specific prefixes on Windows shared libraries.
+              Thanks Charles Wilson <cwilson@ece.gatech.edu>.
+
+01.09.04 BJH  Release 9.18
+
+              Fix bug from 9.17: -lm now needed in jpegtopnm link.
+
+              jpegtopnm: Add -dumpexif and -exif options.
+
+              pnmtotiff: Fix bug: 16 bit samples byte-swapped on little-
+              endian machines.
+
+              Remove C++ comments from exif.c
+
+01.09.03 BJH  Release 9.17
+
+              Add ppmtoneo, neotoppm.  Thanks Teemu Hukkanen <tjhukkan@iki.fi>.
+
+              pnmtotiff:  Add -flate, -adobeflate.  Thanks Peter Creath.
+
+              pnmindex: Fix bug with -size option.  Thanks 
+              André Majorel <amajorel@teaser.fr>
+
+              pnmflip: Fix memory leak, plus make special case for PBM
+              images that uses 12 times less memory.  Thanks
+              Stefan Roellin <stefan.roellin@switzerland.org>.
+          
+              tifftopnm: Fix incorrect interpretation of FILLORDER tag
+              causing incorrect output with 16 bit samples and
+              FILLORDER not msb2lsb.  Thanks Don Reid
+              <donr@cvs.agilent.com>.
+
+              tifftopnm: Fix PHOTOMETRIC_MIN_IS_WHITE case.
+              Thanks Don Reid <donr@cvs.agilent.com>.
+
+              giftopnm: Fix bug with malformed GIFs that end prematurely.
+
+              pbmtonokia: Convert C++ style comments to C style so Sun C
+              compiler can handle them.  Thanks Jon Parise <jon@csh.rit.edu>.
+
+              Install development package (header files, static libraries)
+              by default.  Add ability to build both static and shared
+              libraries.
+
+              Add merge/nonmerge to Makefile.config/configure, in place
+              of special make targets.
+
+              Fix Mac OSX build for gcc 3.0.  Thanks m-sekino@mb.kcom.ne.jp 
+              (Masanori Sekino)
+
+              Fix make install.hdr.  Thanks m-sekino@mb.kcom.ne.jp 
+              (Masanori Sekino)
+
+01.07.24 BJH  Release 9.16
+
+              Builds on Darwin/Mac OS.  Thanks m-sekino@mb.kcom.ne.jp 
+              (Masanori Sekino)
+
+              Add pbmtopsg3.  (Postscript G3 fax) Thanks Kristof Koehler 
+              <kristof@fachschaft.physik.uni-karlsruhe.de>
+
+              Add pbmtonokia.  Thanks Tim.Ruehsen@OpenMediaSystem.de.
+
+              Add ppmrainbow.  Thanks Arjen Bax <arjen.bax@cmg.nl>.
+
+              Add pamoil, as replacement for pgmoil.  Based on ppmoil by
+              Chris <cesheppa@midnightsun.uwaterloo.ca>.
+
+              ppmtogif:  Add -alpha option.
+
+              ppmtojpeg: fix bug: option takes as input filename.
+
+              xpmtoppm: fix bug: Bogus EOF failure.  Thanks 
+              "Dr. Larry Pyeatt" <pyeatt@redwood.cs.ttu.edu>.
+              
+              pnmtopng/pngtopnm: update to Release 2.37.5 of the pnmtopng
+              package.  Make -transparent option work like ppmtogif --
+              you can add an "=" before the color to specify "exact".
+              fix bug with background color and maxval = 65535.  Fix a 
+              raft of bugs in pnmtopng from Netpbm 9.15.
+
+              Remove Tiff library from the package.
+
+              Proper naming of AIX and HP-UX shared libraries.
+
+              giftopnm: Add color index to transparency message.
+
+              Add some -R link options in make files.
+
+              ppm3d: fix bug: ignores offset argument.
+
+              tifftopnm: fix bug: shifted right one pixel.
+         
+              pnmshear: remove sscanf so it works better with Cygwin,
+              convert to shhopt, clean up.
+
+              pgmcrater: Remove black vertical line at right
+              edge. Make craters wrap around the image (enables tiling
+              of image).  Thanks Arjen Bax.
+              
+              pgmtopbm: remove sscanf so it works better with Cygwin.
+              Thanks Arjen Bax.
+
+              Treat all white space, including DOS carriage returns,    
+              in color name db file as white space;  Thanks Arjen Bax.
+
+01.06.24 BJH  Release 9.15
+
+              Change format specs to state that sample values are
+              nonlinear instead of linear.
+
+              pnmtopalm/palmtopnm: Handle PalmOS 4.0 16 bit direct
+              color format.  Thanks  Bill Janssen  <janssen@parc.xerox.com>.
+
+              pnmgamma: Add CIE Rec 709 gamma correction option.
+
+              pnmgamma: Add -ungamma option
+              
+              ppmcie: Add -rec709 color system option as default so
+              that it produces true PPM output (per the new spec) and
+              carefully document what the program generates.
+              
+              ppmcie (work done by Andrew Hamilton
+              <Andrew.Hamilton@colorado.edu> in May 1999 but not
+              distributed):
+
+                 1. Corrected the XYZ -> RGB transformation;
+                 2. Eliminated the -interpwp option, a fudge which had been
+                    necessitated by the incorrect XYZ -> RGB transformation;
+                 3. Added a Gamma correction, missing in the original;
+                 4. Added the option to plot u' v' chromaticity instead of x y;
+                 5. Added options to suppress labels and/or axes.
+
+              pnmscale, pnmscalefixed:  Fix bug with unwanted -verbose
+              behavior.
+
+              pnmscale, pnmscalefixed: Add -reduce option.  Thanks
+              Christopher W. Boyd <cboyd@pobox.com>
+
+              ppmtoeyuv: Speed up by not freeing/reallocating storage for
+              each image.  Thanks "Steven M. Schultz" <sms@moe.2bsd.com>
+
+              ppmtoeyuv: Fix memory leak.
+
+              Eliminate pgm_pbmmaxval, ppm_pbmmaxval, and pnm_pbmmaxval
+              from libpgm, libppm, and libpnm.  'maxval' argument to 
+              pgm_readpgmrow() and ppm_readppmrow() already accomplishes
+              this.  pnm_readpnmrow() changed to do same.  external data
+              symbols like this do not work with Mingw.
+         
+              various changes to accomodate Mingw (native Windows)
+              and DLLs with Cygwin (Windows).
+
+              eyuvtoppm: rewrite.  Uses Netpbm libraries now.
+
+              pstopnm: Remove gratuitous 5% margin.  Add -equalpixels,
+              -imageheight, and -imagewidth options.
+
+              pnmtopng: Read only one row at a time, not the whole image,
+              into memory.  Do multiple passes through the (hopefully
+              fully cached) file.  This saves memory because pnmtopng's
+              internal format may use 96 times as much space per pixel 
+              as the file.
+
+              libpbm: Add pm_openr_seekable(), pm_seek(), pm_tell().
+
+              libppm: Add ppm_computecolorhash2(), ppm_computecolorhist2().
+
+              configure: fix bug with Solaris/Sun compiler.
+
+              Split pbmplus.h into pm_config.h and pbm/pm.h to prepare
+              for automatic generation of pm_config.h.  Move pm_*()
+              subroutines from libpbm1.c to new libpm.c for clarity.
+
+              Remove malloc.h from 411toppm.  malloc is included by
+              pm_config.h, in platform-dependent way.
+
+01.05.13 BJH  Release 9.14
+
+              fix bug in shhopt causing wild branches.
+
+              winicontoppm: Make alpha mask ("and") output PBM instead
+              of PPM; correct sense so white is opaque, black transparent.
+
+              ppmtoxpm: Add --alphamask option.  Remove 256 color limit.
+         
+              xpmtoppm: Add --alphaout option
+         
+              ppmtogif: Add "=" to -transparent option to specify exact
+              color.
+
+              configure: change /bin/perl to /usr/bin/perl.  Red Hat Linux
+              doesn't have /bin/perl.
+
+              pnm/Makefile: correct bugs in link.  Thanks J Scott Berg 
+              <jsberg@bnl.gov>
+
+              Make it build on Unixware.
+
+              Make it build on OpenBSD.
+
+              document color indexing and histogram functions.
+
+01.04.22 BJH  Release 9.13
+
+              ppmtogif: fix divide by zero
+
+              move much of README file into a new master man page, netpbm.1.
+
+              pnmcomp: add -align and -valign options.
+              
+              Add thinkjettopbm.  Thanks Eric Norum <eric.norum@usask.ca>.
+
+              Builds with Sun compiler.
+
+01.03.25 BJH  Release 9.12
+
+              Add 411toppm.  Thanks Steve Allen <sla@alumni.caltech.edu>.
+
+              pnmcrop:  add -sides option (does what was default
+              behavior until July 2000)
+
+              ppmtoeyuv: Use netpbm libraries, deal with multi-image
+              input.
+
+              Add color row color map and Floyd-Steinberg functions from
+              ilbm package to libppm.
+
+              ilbmtoppm, ppmtoilbm: replace with Ingo Wilken's version from
+              April 13, 1995.
+
+              jpegtopnm: fix crash with B&W JPEG input.
+
+              pnmcomp: fix bug: invalid output image when overlay image
+              is "higher" format than underlying image.
+
+              ppmchange: fix bug: wouldn't work with maxval != 255.
+
+              pnmtojbig: fix bug: it always says invalid maxval. 
+              Thanks Bill Davidsen.
+
+              pbmtext: fix bug: output is sometimes "not implemented"
+              because of uninitialized variable.
+
+              pnmpsnr: rewritten so as not to use Fiasco library.
+              Correctly handles maxval != 255.  Works with PAM.
+
+              Add IRIX to the configure program.  Thanks Neil Franklin 
+              <franklin@arch.ethz.ch>.
+
+              make files: add ZLIB_DIR and ZHDR_DIR variables to
+              Makefile.config.  Thanks Bill Janssen.  
+              <janssen@parc.xerox.com>
+
+              pcdindex: convert from csh to sh.  Thanks Steve McIntyre.
+
+01.02.20 BJH  Release 9.11
+
+              pnmtopalm: Handle 16 bit direct color format.
+
+              pnmtotiff: Add -xresolution and -yresolution options.
+              Thanks Tim Ruehsen.
+
+              Add error message to GNUMakefile for when GNU Make is too old.
+
+              pnmpsnr: fix bug: PGM files always compared equal.
+
+              libpbm: improve --version to reflect that libraries are
+              usually dynamically linked now, so it's the version of
+              libpbm, not the program itself.
+
+              pbmtext: add -space option.
+
+              asciitopgm: fix crash due to memcpy that should be memset.
+              Thanks Philipp Knirsch <pknirsch@redhat.com>.
+
+              pktopbm: fix numerous bugs.  Copied from Red Hat.  By
+              jcn <janneke@gnu.org> 1998.09.22.
+
+              pstopnm.csh: fix bomb when xres=yres.  This program is
+              obsolete (use pstopnm.c instead), but the patch was free,
+              so why not?  Copied from Red Hat.  By Nalin Dahyabhai
+              <nalin@redhat.com> 2000.02.14.
+
+              pnmtotiff: Make photometric for G3/G4 fax MINISWHITE 
+              instead of MINISBLACK.  Add -minisblack option.  Thanks
+              Eric Smith <eric@brouhaha.com>.
+
+              libppm/ppm_parsecolor: fix rounding error for very small
+              maxvals (e.g. PBM files -- maxval = 1).
+         
+              pnmtopalm, palmtopnm: minor updates
+              
+              bmptoppm: handle BMPs that use ColorsUsed instead of
+              bits per pixel to determine color map size.
+
+              bmptoppm: add -verbose option.
+
+              ppmquant: fix bug with maxval > 255 causing arithmetic
+              overflow and arbitrary colors in output.
+
+01.01.10 BJH  Release 9.10
+
+              giftopnm: add -alphaout.
+
+              ppmchange: Add -remainder option.
+
+              Add pnmtopalm, palmtopnm.  Thanks Bill Janssen 
+              <bill@janssen.org>.
+
+              Add pnmmontage.  Thanks Ben Olmstead <bem@mad.scientist.com>.
+
+              ppmtogif: Add -comment option.
+
+              ppmtogif: fix bug: created GIF89 when it should have created
+              GIF87.
+
+              giftopnm: fix bug in displaying of comment extensions.
+
+              jpegtopnm: Add -comments option.
+
+              ppmtojpeg: Add -comment option.
+
+              ppmtompeg: fix crash.  Thanks  Roger Southwick 
+              <rogers@mediaforte.com>
+
+              More work on separating source and build directories.
+              GNU Make 3.77 or better now required.
+
+00.11.20 BJH  Release 9.9
+
+              add ppmtolj: color HP Laserjet graphics (PCL).  Thanks
+              Jonathan.Melvin@heywood.co.uk.
+
+              ppmfade: add -mix option.
+
+              ppmhist: add -noheader option.
+
+              rawtopgm: Add --bpp, --maxval, and --littleendian options.
+
+              pnmindex: Add -noquant, -title options.
+
+              pnmtotiff: create 16 bits-per-sample Tiff files when 
+              maxval > 255 instead of crash.
+
+              tifftopnm: handle 16 bits-per-sample Tiff files.
+
+              pnmscale: Use floating point arithmetic instead of 12 bit
+              fixed point to reduce distortion at right and bottom edge of
+              large images with weird scaling factors.  Add pnmscalefixed,
+              which is the old fixed point pnmscale, which goes faster.  But
+              also fix bug in the fixed point version so the distortion 
+              isn't as bad.  Add -verbose option.
+
+              pnmcut: fix bug: right edge wrong or subscript out of bounds.
+              Thanks MURAKAMI Masahiko <muramasa@np.catv.ne.jp>,
+              Sven Over <sven.over@web.de>, Frederic Vivien 
+              <vivien@lcs.mit.edu>, Pete Weisz <pete@pw34.resnet.cornell.edu>.
+
+              xpmtoppm: fix reading of 4-character color codes; handles
+              "NONE" color (transparent background); add -v.  Thanks
+              Martin Vermeer <martin.vermeer@hut.fi>.
+
+              ppm/Makefile: fix bug: ppmtompeg, hpcdtoppm not installed.
+              Thanks Mike Castle <dalgoda@ix.netcom.com>.
+
+              ppmpspread: fix bug: invalid memory reference crash.  Thanks
+              digger <jfk666@poczta.onet.pl>, john joseph iii casey 
+              <jjcasey@midway.uchicago.edu>.
+
+              ppmchange: fix bug: every other argument pair ignored.
+              Thanks Sven Over <sven.over@web.de>.
+
+              Fix error message in pXmmerge (no pm_error()).  Thanks
+              Pete Weisz <pete@pw34.resnet.cornell.edu>, 
+              <g031w503@soft.iwate-pu.ac.jp>
+
+              libppm: add /usr/X11R6/lib/X11/rgb.txt as default rgb.txt file.
+              Thanks ceder@lysator.liu.se (Per Cederqvist).
+
+              Replace hpcdtoppm version 0.3 (1992) with 0.6 (1994).  Add
+              pcdindex.
+
+              Build fixes for Tru64.  Thanks Phil Benchoff <benchoff@vt.edu>.
+
+              Makefile.config: option to not strip binaries on install.
+
+00.09.01 BJH  Release 9.8
+
+              jpegtopnm: Add -adobe, -notadobe options.
+
+              ppmchange:  Add -closeness.
+
+              giftopnm: report transparency information.
+
+              jpegtopnm: Accept single-hyphen options.
+
+              Make it build on DJGPP.
+
+00.08.12 BJH  Release 9.7
+
+              sgitopnm: add -channel option to access more than 3 channels.
+              Thanks Smarasderagd.
+         
+              pnmcut: Add -pad option
+
+              ppmtobmp: change default from -os2 to -windows.
+
+              pnmcut: fix bug: height argument misinterpreted.
+
+              ppmquantall: fix bug: don't crop white borders off images
+
+              yuvtoppm: fix bugs: don't depend on bigendian representation
+              of integers.  reject odd-width images.
+
+              ppmtoyuv: fix bug: reject odd-width images.
+
+              anytopnm: fix bug: required nonstandard shell feature.
+
+              giftopnm: fix bug: when image consists of two gray colors,
+              program converted them to black or white and created PBM
+              file.  Thanks Smarasderagd.  Also fix memory leak.
+
+              Make changes since 9.2 build on Cygwin.
+
+00.07.12 BJH  Release 9.6
+
+              Add pnmtofiasco, fiascotopnm, psnpsnr.  Thanks to Ullrich
+              Hafner.
+
+              Make Pnmcrop use a temporary file instead of huge amounts
+              of memory.
+
+              bmptoppm: fix crash when OS/2 BMP file has > 8 bits per pixel.
+
+              anytopnm: fix bug (from 9.0) wherein program almost
+              always crashed.  Add gzip, bzip, bzip2 capability.
+              Thanks Charles Howes.
+
+              parallel.c: Work around SunOS libc problem.
+
+              Define some newer libtiff macros so it compiles against
+              older libtiff.
+
+00.07.01 BJH  Release 9.5
+
+              Extend formats to allow multiple images per file.  Add
+              -allimages option to pnmfile.  Add pnmsplit.  Extend
+              pnmtops.
+
+              Add pbmtowbmp, wbmptopbm.  Thanks Terje Sannum.
+
+              ppmtobmp: Add 24 bit (truecolor) capability.  Remove Release 8.3
+              colormap size update.
+
+              pnmcut: easier, more expressive syntax for specifying what
+              to cut.
+
+              pnminterp: handle maxval != 255, convert to use Netpbm
+              libraries.
+
+              Translate pstopnm from Csh to C, eliminate dependency
+              on the 'bc' program.
+
+              Fix bug in tiff library build which caused null soname.
+
+              Add optParseopt2() to shhopt.a so you can use long options
+              with one hyphen instead of two.
+
+              giftopnm: fix bug with variable used before set.  Fix bug
+              (coding error -- 0=>i).  Unknown impact.
+
+              bmptoppm: fix bug with 24 bit (truecolor) Windows BMPs.
+
+              xwdtopnm: fix one more bug with bits_per_item <> bits_per_pixel.
+
+              Fix ppmtompeg build bug with static libraries.
+
+              Make build clean with gcc -ansi (albeit with some files
+              that need extensions declaring the _BSD_SOURCE etc.).
+
+00.06.04 BJH  Release 9.4
+
+              Rebase pnmtopng, pngtopnm on Pnmtopng 2.37.4.
+
+              pbmtolj: fix bug where blank lines get discarded.  Thanks
+              Charles Howes.
+
+              ppmtompeg: fix bug with "PNM" format files with maxval != 255.
+              Get rid of built-in PPM file parsing.
+
+              Fix 'make install' where mkinstalldirs is not found.
+
+              Fix bug where rle_global.c would not compile with GNU C 
+              Library 2.
+
+00.06.01 BJH  Release 9.3
+
+              pnmfile: check for file size error.
+
+              ppmhist: handle larger maxvals, image sizes
+
+              xwdtopnm: Use color map with DirectColor to fix wrong color
+              bug on some DirectColor xwds.
+
+              xwdtopnm: Correct bug with 24/32 DirectColor LSBfirst xwds.
+
+              Add pXmcheck() library function.
+
+              Add leaftoppm and ppmtoleaf.  Thanks Bill O'Donnell.
+
+              Add winicontoppm and ppmtowinicon.  Thanks Lee Benfield 
+              <lee@benf.org>.
+
+              Add pgmslice.  Thanks to Jos Dingjan.
+              
+              Include subset of RLE library in the package.
+
+              stamp-date doesn't rely on whoami.
+
+              Make file fixes to accomodate more install programs.
+         
+              Replace tmpnam() with mkstemp().
+
+              Add pXm_init() into all programs that didn't have it.
+
+00.05.15 BJH  Release 9.2
+
+              Shared libraries now build properly for Solaris, SunOS, NetBSD.
+
+              Add jbigtopnm, pnmtojbig.  Thanks to Markus Kuhn.
+
+              Add pnminterp, pnminterp-gen by Russell Marks.
+
+              Add pbm_writepbmrow_packed() and pbm_readpbmrow_packed() to
+              libpbm.
+
+              ppmdither: fix bug with input maxval != 255.  Make output
+              maxval the LCM of the requested numbers of primary levels.
+
+              xwdtopnm: works with files where there aren't an integeral
+              number of pixels per storage unit (e.g. 24 bits per pixel)
+              
+              Add some missing pXm_init()
+
+              Make pXmmerge source code automatically generated.
+
+00.05.06 BJH  Release 9.1
+
+              Add pbmtoppa (renamed from pbm2ppa, renamed from print-pbm).
+              Thanks Tim Norman.
+
+              Add pbmpage.  Thanks Tim Norman.
+
+              Add pbmtomda, mdatopbm.  Thanks John Elliott.
+
+              Replace gemtopbm with gemtopnm.  Thanks to John Elliott.
+
+              Add ppmntsc: change colors to those acceptable for ntsc or pal.
+
+              Rename old ppmntsc to ppmtv.
+
+              pbmtolj: Add compression (-delta, -packbits, -compress) by
+              Dave Platt
+
+              Look for both /usr/lib/X11/rgb.txt and /usr/openwin/lib/rgb.txt
+              by default.  Improved error messages if file not found.
+
+              pbmtext: renders character codes 0x80-0xff and 0x00-0x1f as
+              whatever the font says, rather than always blank.  Thanks
+              Helge Oldach.
+
+              Fix bug in parsing of rgb.txt file in ppm_colorname().
+
+              Add optional static library build to make files.
+
+              Fix a bunch of build bugs for Solaris, SunOS.  Still not all 
+              the way there.  Thanks Richard Curnow, Philippe Brieu, 
+              Benjamin Kuit.
+
+              Make it build on Cygwin.  Thanks Pierre Humblet.
+
+              Use rm -f;ls instead of ls -sf in make files; some systems don't
+              have ln -f.
+              
+00.04.15 BJH  Release 9.0
+
+              Add the 16-bit-per-sample format for maxval > 255.
+              Change size of samples in the library interface from 8
+              bits to 32 bits.  Library write routines now create the
+              new 16 bit format instead of plain format when you
+              request a maxval > 255 and not 'forceplain'.  Make all
+              programs read the new format, and all programs that
+              convert to PNM from a >8 bit input generate it instead
+              of failing or normalizing.  Make pnmdepth generate it.
+
+              pnm_readpnminit(), etc. fails if you request a maxval >
+              65535 and not 'forceplain'.  It used to generate plain
+              format in that case, but you couldn't actually specify    
+              a sample value > 255.
+
+              Add pnmtorle and rletopnm from the Army High Performance 
+              Computing Research Center.
+
+              add ppmcolormask - creates a mask of areas of a certain 
+              color in an image.
+
+              anytopnm: fix infinite loop
+              
+              pbmtext:  Ignore non-8-bit characters in bdf files instead
+              of crashing.
+
+              ppmdither: fix crash with large dithering matrix dimensions.
+
+              Rename ppmtompeg/headers/search.h to motion_search.h to avoid
+              possible confusion with the OSF system file search.h
+         
+              Fix erroneous shhopt.h dependency in build.
+              
+00.04.03 BJH  Release 8.4
+
+              Add ppmtompeg, adapted from Berkeley's mpeg_encode.
+         
+              Add eyuvtoppm and ppmtoeyuv, and vidtoppm, from Berkeley
+              mpeg tools.
+
+              Add ppmfade, adapted from Wesley C. Barris' pbmfade. 
+
+              Add ability to extract the alpha channel to tifftopnm,
+              tgatoppm, and ximtoppm.  (It's already in pngtoppm,
+              and still missing from ilbmtoppm).
+
+              pnmtotiff: Change default compression to none, due to
+              removal of LZW capability from Tiff library.
+
+              Make merge build use symbolic links instead of hard links.
+
+              Include dependent libraries in the link of the
+              libraries.  This is necessary on some systems, and a
+              good idea on others.
+
+              Use strerror() instead of sys_errlist[] everywhere.  If
+              some systems do not have the former, we need to do some
+              work, because strerror() was already used in some
+              places.  We do have a report of a BeOS system with no
+              sys_errlist[].
+
+00.03.24 BJH  Release 8.3
+
+              Add ppmshadow, by John Walker <http://www.fourmilab.ch/>,
+              dated 1997.08.15.
+
+              Add ppmlabel, by John Walker, dated June 1995.
+
+              Add ppmcie by John Walker, dated September 1994.
+
+              Add character drawing routines by John Walker to libppm.
+
+              Add sbigtopgm by John Walker, dated January 1998.
+
+              Handle BMP file color map size parameter in ppmtobmp, bmptoppm.
+              Thanks Marc Moorcroft.
+
+              Rewrite make files, fix lots of make install bugs.
+
+00.03.20 BJH  Release 8.2
+
+              Add ppmtojpeg and jpegtopnm.
+
+              Rename pnmnoraw to pnmtoplainpnm.
+
+              Add CMYK capability to tifftopnm.
+ 
+              Major make file rewrite, especially making install work.
+              Pnmmerge is no longer the default.  Shared libraries are.
+ 
+              Add pnmtotiffcmyk.  Written by Andrew Cooke  (Jara Software)
+              jara@andrewcooke.free-online.co.uk
+
+00.03.02 BJH  Release 8.1
+
+00.03.02 BJH  Add pnmtopng and pngtopnm.  I got these from 
+              ftp://ftp.au.netbsd.org/pub/NetBSD/packages/distfiles
+              today.  Release 2.37.3.  I added an "unsigned" and
+              changed the type of 'scaleval' to quiet compiler warnings.
+
+00.03.01 BJH  Fix xwdtopnm interpretation of 16 bit TrueColor files.
+              Thanks to Martin Kroeker, mk@daveg.com.
+
+99.09.23 BJH  Update xbmtopbm to recognize newer xbm format.
+
+
+
+
+CHANGES TO NETPBM THROUGH MARCH 1994
+------------------------------------
+
+Functional changes to Netpbm since 13 October 1993.
+Minor bug fixes and compatibility fixes are not documented in this file.
+
+PBM
+
+libpbm1.c	strstr() added to libpbm1.c.
+libpbm5.c	BDF font support added.
+pbmtext		BDF font support added.
+pbmto4425	New filter.
+pbmtoln03	Command line parsing changed to Pbmplus standard.
+
+
+PGM
+
+pgmnoise	New filter.
+
+
+PPM
+
+picttoppm	Updated
+ppm3d		New facility.
+ppmchange	New filter.
+ppmdim		New filter.
+ppmflash	New filter.
+ppmmix		New filter.
+ppmntsc		New filter.
+ppmqvga		Option parsing changed to Pbmplus standard.
+ppmshift	New filter.
+ppmspread	New filter.
+ppmtoxpm	Prototypes added.
+xpmtoppm	Prototypes added.
+ilbmtoppm	Updated.
+ppmtoilbm	Updated.
+
+
+PNM
+
+pnmtoddif	New filter.
+pnmhistmap	New facility.
+pnmtops		New option (-nocenter) added.
+
+
+Functional changes to Netpbm since 7 December 1993.
+Minor bug fixes and compatibility fixes are not documented in this file.
+
+PGM
+
+asciitopgm	New filter.
+fitstopgm	Replaced by fitstopnm.
+pgmtofits	Replaced by pnmtofits.
+pgmtopbm	Upgraded.
+pgmkernel	New filter.
+
+PPM
+
+ppmchange	Upgraded.
+xvminitoppm	New filter.
+
+PNM
+
+pnmalias	New filter.
+pnmtofits	Replacement for pgmtofits.
+fitstopnm	Replacement for fitstopgm.
+pnmtosgi	New filter.
+sgitopnm	New filter.
+pstopnm		New filter.
+
+
+
+CHANGES BETWEEN PBMPLUS AND THE ORIGINAL NETPBM
+-----------------------------------------------
+
+The following is new in Netpbm (compared to Pbmplus):
+
+PBM
+
+pbmtext		BDF font support added.
+
+pbmto4425	Display on an AT&T 4425 Ascii terminal.
+
+pbmtoascii	A new improved version.
+
+pbmtoln03	Convert to DEC LN03+.
+
+pbmtolps	Fast PostScript creator.
+
+pbmtopk		Conversion to/from a packed (PK) format font.
+pktopbm
+
+pbmclean	Flip isolated pixels.
+
+pbmpscale	Enlarge pbm image with edge smoothing.
+
+
+PGM
+
+asciitopgm	Convert an ascii image into pgm.
+
+pbmtopgm	Convert pbm to pgm by averaging areas.
+
+rawtopgm	Handles input files without specification of the file size,
+		assuming the input image is quadratic. It also supports a
+		-tb (top bottom flip) option.
+
+bioradtopgm	Conversion utility for files created by Biorad confocal
+		microscopes.
+
+spottopgm	Convert SPOT satellite images to pgm.
+
+pgmkernel	Generate a convolution kernel.
+
+pgmnoise	Create a pgm file with random pixels.
+
+
+PPM
+
+bmptoppm	Conversion to/from windows bitmap format.
+ppmtobmp
+
+ppmtogif	Updated version.
+giftoppm	Removed (see giftopnm).
+
+ppmtoilbm	Updated version.
+ilbmtoppm
+
+picttoppm	Updated version.
+ppmtopict
+
+ppmtoxpm	Updated version, which supports xpm version 3.
+xpmtoppm
+
+ppmtomap	Extract all colours from a ppm file.
+
+ppmtomitsu	Convert to Mitsubishi S340-10 printer format.
+
+xvminitoppm	Convert an XV thumbnail picture to ppm.
+
+ppmtoyuvsplit	Conversion to/from YUV triplets. (MPEG / JPEG).
+yuvsplittoppm
+
+ppm3d		Create a red/blue stereo image.
+
+ppmbrighten	Change image saturation and value on an HSV map.
+
+ppmchange	Change all pixels of one colour to another in a portable pixmap
+
+ppmdim		Dim a ppm file down to total blackness.
+
+ppmdist		Simplistic grayscale assignment for machine generated
+		colour images.
+
+ppmflash	Brighten a picture up to complete white-out
+
+ppmmix		Blend together two portable pixmaps.
+
+ppmnorm		Normalize the contrast in a portable pixmap.
+
+ppmntsc		Make a portable pixmap look like taken from an American TV.
+
+ppmqvga		Eight plane quantization.
+
+ppmshift	Shift lines of a portable pixmap left or right by a random amount.
+
+ppmspread	Displace a portable pixmap's pixels by a random amount.
+
+ppmtopjxl	Convert a ppm file into an HP PaintJet XL PCL file.
+
+
+PNM
+
+pnmtops		New option (-nocenter) added.
+
+pnmtofits	Replacement for pgmtofits/fitstopgm
+fitstopnm
+
+pnmtosgi	Conversion to/from sgi image format.
+sgitopnm
+
+pnmtosir	Conversion to/from Solitaire image recorder format.
+sirtopnm
+
+giftopnm	Replaces giftoppm. Examines the input image and produces
+		a pbm, pgm, or ppm output.
+
+pstopnm		Convert PostScript to pnm. Requires Ghostscript.
+
+zeisstopnm	Conversion utility for files created by Zeiss confocal
+		microscopes (the old standard).
+
+pnmalias	Anti aliasing filter.
+
+pnmcomp		Composite two portable anymaps together.
+
+pnmcrop		New options added.
+
+pnmpad		Add borders to anymap.
+
+
+LIBTIFF
+
+A new release of libtiff is included. Please read its supporting
+documentation.
+
+
+CHANGE LOG FROM PBMPLUS
+-----------------------
+
+Changes since the 30oct91 patch version:
+
+    Fixed uninitialized variable in ppmtotga.  (John Walker)
+    Added pgmcrater, ppmforge, ppmtoacad, sldtoppm.  (John Walker)
+    Slight change to the p?mmerge.c front-ends to allow for main programs
+      that return instead of exitting.
+    Minor clarifications to the pnmconvol man page.
+    Fixed xwdtopnm to read some 16-bit True/Direct files. (David Elliott)
+    Fixed uninitialized variables in pnmtotiff.  (Larry Rosenstein, Bayles Holt)
+    Added a couple of checks for \r while reading whitespace. (Larry Rosenstein)
+    Removed all the BROKENPUTC stuff.  Now we ignore all return values from
+      putc(), and check ferror() in pm_close().  Added pm_close() calls to
+      many of the filters.
+    Fixed pnmdepth to check for too-large newmaxvals.  Improved rounding
+      in pnmdepth and PPM_DEPTH macro.  (Tom Lane)
+    Minor fix to ppmtouil.  (Mohsen Banan)
+    Added new Imakefiles.  (Rainer Klute)
+
+Changes since the 05oct91 X11R5 contrib tape version:
+
+    Fixed minor SysV config error in pbmplus.h.  (Tom Lane)
+    Fixed tifftopnm so that BITSPERSAMPLE and SAMPLESPERPIXEL default
+      correctly.  Fixed possible bug in tgatoppm line-interleaving code.
+      (Arthur David Olson)
+    Fixed tifftopnm so that colormapped files are read correctly.
+      (PauL Drews, Mike Wade)
+    Corrected use of DefaultRGBDatabase / RGB_DB for imake sites.
+      (Randal L. Schwartz)
+    Bugfix to pnmtops color PostScript in -rle mode.  (Angus Duggan)
+    Added auto-turning to pnmtops.
+    Added run-length encoding to ppmtotga.
+    Space optimization to pgmoil.
+
+Changes since the 27sep91 comp.sources.misc distribution:
+
+    Fixed spelling error in giftoppm.  Fixed ppmrelief to not shrink the
+      image by 2 rows and columns.  Minor fix to pgmramp.  Fixed off-by-one
+      error in pnmtoxwd.  Man page fix for pnmgamma.  (Arthur David Olson)
+    Converted ANSI trigraphs in ppmtosixel into good old octal.  (Jeff Glover)
+    Fix to 24/32 bit case in rasttopnm.  (Behr de Ruiter)
+    Float/double portability fix to libppm4.  (Bruce Holmer, Ronald Khoo)
+    Fixed typo in compat.ksh.  (Larry Virden)
+    Fixed int/short incompatibility in tifftopnm.  (Salik Rafiq)
+
+Changes during the extended beta test period, starting on 15jan91:
+
+    Lots of fixes from: Anthony A. Datri, Arthur David Olson, David Brooks,
+      David Elliott, Doug Claar, Duncan Sinclair, Francois Pinard, Gerard
+      Leurs, Jim Hanko, Ken Laprade, Klaus U. Schallhorn, Markus Bolz, Mike
+      Hench, Philip Gladstone, R C Smith, Selden E. Ball, Jr., Stephen Uitti,
+      Steve Allen, Tom Lane, update.kpj-jaakkola@athena.dsv.su.se,
+      Charles Karney, Unmesh Agarwala, Ed Pendzik, Juha Sarlin, Tom Tulinsky,
+      Phillip Smith, Lai-King Mau, David Koblas, Mark Donovan.
+    Added a global -version flag.
+    Added bunches of statics and prototypes.  Now compiles with zero
+      warnings under gcc -ansi -pedantic.
+    Changed #ifdef __STDC__ to #if __STDC__, since some non-compliant
+      compilers define it as 0.
+    Changed pm_message and pm_error to be varargs routines.  Added a
+      portable version of vfprintf for those systems which don't have it.
+    Removed the option of not compiling the pgm and ppm parts.  Very few
+      people used it, and it added amazing complexity to the pnm programs,
+      turning them into maintenance nightmares.
+    Merged pbmpaste into pnmpaste.
+    Merged pgmtops and ppmtops into pnmtops.
+    Added auto-scaling and dpi / page size flags to pnmtops.
+    Changed the interpretation of bits in pbmlife to conform with other
+      tools.
+    Changed xwdtopnm to ignore the pixel number in the xwd color structure.
+    Added a -pseudodepth flag to pnmtoxwd.
+    Updated tifftopnm for libtiff 2.4.
+    Added many option flags to pnmtotiff.  (J.T. Conklin)
+    Added support for X11R5's new color specifiers rgb: and rgbi:.
+    Added pgmtexture.  (James Darrell McCauley)
+    Added ppmtopj, pjtoppm, and ppmdither.  (Christos Zoulas)
+    Added ppmtotga.  (Mark Shand)
+    Added ppmtosixel.  (Rick Vinci)
+    Added pbmtoatk and atktopbm.  (Bill Janssen)
+    Added ppmtoyuv and yuvtoppm.  (Marc Boucher)
+    Fixes to picttoppm.  (George Phillips)
+    Added 24-bit support to ilbmtoppm.  (Mark Thompson)
+
+Changes since the X.V11R4 / comp.sources.misc distribution of 22nov89:
+
+    Added pgmramp, pgmedge, pgmtoppm, rgb3toppm, ppmtoxpm, pnmgamma,
+      ximtoppm, pgmtofs, picttoppm, ppmtopict, ppmquantall, anytopnm,
+      pi1toppm, ppmtopi1, sputoppm, spctoppm, pbmto10x, ppmtoicr, ppmmake,
+      xpmtoppm, ppmtopuzz, ppmtouil, ybmtopbm, pbmtoybm, lispmtopgm,
+      pgmtolispm, pbmtogem, pi3topbm, pbmtopi3, pbmtoepson, pbmtoplot,
+      pbmtozinc, pbmtext, pnmnoraw, pnmmargin, pnmfile, pnmindex,
+      ppmtorgb3, gouldtoppm, pgmbentley, pgmoil, ppmrelief, pnmtotiff,
+      ppmtopcx.
+    Merged some filters:
+      rasttopbm and rasttoppm into rasttopnm;
+      pbmtorast and ppmtorast into pnmtorast;
+      xwdtopbm and xwdtoppm into xwdtopnm;
+      pbmtoxwd and ppmtoxwd into pnmtoxwd.
+    Promoted some filters:
+      pcxtopbm to pcxtoppm;
+      ppmarith to pnmarith;
+      ppmconvol to pnmconvol;
+      ppmcscale to pnmdepth;
+      ppmrotate to pnmrotate;
+      ppmscale to pnmscale;
+      ppmshear to pnmshear;
+      ppmsmooth to pnmsmooth;
+      tifftopgm to tifftopnm - new version based on Sam Leffler's libtiff.
+    Bugfixes to pbmtoicon, ppmtops.
+    The Makefiles now have a "merge" option.
+    All flags are now case-insensitive.
+    Added $(MAKE) stuff to Makefile.
+    Changed pnmsmooth from a csh script to a sh script.
+    Made macro use in pbmtox10bm and pbmtoxbm more portable.
+    Moved compataliases to compat.csh, and added compat.ksh.
+    Made ppmtoilbm less Amiga-specific.
+    Added -headerskip and -rowskip flags to rawtopgm.
+    Enhanced rasttopnm to interpret 8-bit rasters with no colormap as grayscale.
+    Changed sscanf %g to %f - some systems can't handle %g on input.
+    Added -expand flag to pbmmask.
+    Speedup to pnmflip - don't buffer if possible.
+    Added color-name-to-value routine to ppm - uses X11's rgb.txt if present.
+    Updated Imakefile support to reflect X.V11R4.
+    Removed picttopbm.
+    Improved pnmcut argument syntax so that negative coords work like pnmpaste.
+    Added "magic" file, for use with the "file" program.
+    40% speedup for pgmnorm from Robert Stockton (rgs@cs.cmu.edu).
+    Fixed long-standing bug involving colormaps on SPARCstations when
+      compiled with gcc -- had to do with passing structs by value.
+    Removed the -x flag from pnmtorast -- it's not really needed.
+    Fixed subtle bug in the pnm reading code that caused pnmcat to blow
+      it on images that differed greatly in width or height.
+    New version of giftoppm that handles the GIF89a standard, and doesn't
+      use fseek.
+    Fixed fitstopgm to handle three-axis images, such as the Hubble pix.
+    Xwdtopnm and pnmtoxwd finally handle byte-order properly.
+    Added -xysize flag to pnmscale.
+    Added conditional ANSI function prototypes to library routines.
+    Added -noantialias flag to pnmrotate and pnmshear.
+    Removed the TIPS file.  No one ever sent in any new tips, so I just
+      moved the few I had into the relevant man pages.  That's probably
+      where they belonged in the first place.
+    Added justification flags to pnmcat.
+    Added -map flag to ppmquant - user-specifiable colormap.  Also, the
+      Floyd-Steinberg error diffusion finally works right.
+    Added -map flag to pgmtoppm.
+    Added DirectColor support to xwdtopnm and pnmtoxwd.
+    Speedup to pgmtolj from Arthur David Olson: avoid sending whitespace.
+    Fix to pbmtogo from Bo Thide': 2D compression now works.
+
+Patch 1 to the X.V11R4 / comp.sources.misc distribution of 22nov89:
+
+    Fixed bug in pgmtops -rle.
+
+Changes since the alt.sources distribution of 13sep89:
+
+    Small corrections to ppmtorast, pgmtops.
+    Moved pbm/tifftopbm to pgm/tifftopgm - it now handles grayscale TIFF files.
+    Fixed tifftopgm to handle non-native byte order.
+    Changes to tifftopgm to handle bogus AppleScan TIFF files, to have
+      better command syntax, and to use stdio.
+    Optimizations to xbmtopbm, pbmtoxbm, and pbmtox10bm, courtesy of
+      Juha Sarlin, to make them go about three times as fast.
+    Optimization to pgmtops and ppmtops to make them go three times as fast.
+    Optimization to pnmcrop.
+    Added PBMPLUS_BROKENPUTC defines in pbmplus.h to handle systems (such as
+      ULTRIX) which have broken putc() macros.
+    Rewrote ppmscale, pnmcat, and pgmhist to operate line-by-line, instead
+      of reading in the whole image.
+    Rewrote pnmflip to keep only one copy of the image in memory.
+    Added pgmtofits, courtesy of Wilson H. Bent, plus bugfixes to fitstopgm
+      and a patch to giftoppm to handle black&white GIF files.
+    Added picttopbm and rawtopgm.
+    Fixes to xwdtoppm and ppmtoxwd so they compile with SunOS cc as well as gcc.
+    Another small change to ppmtoxwd having to do with colormap size.
+    Changed macptopbm's -headersize flag to be -extraskip.
+    Changed tgatoppm to read color values as BGRA instead of ARGB; the Targa
+      documentation is apparently wrong about the order.
+    Some changes to the Makefiles, partially to work around bugs in gnumake.
+    Got g3topbm working, and added pbmtog3, courtesy of Paul Haeberli.
+    Added some pixrect work-alike code so that rasttopbm, pbmtorast, rasttoppm,
+      and ppmtorast can be used on non-Sun systems.  This also provides a
+      final solution to the persistent byte- and bit-order problems on 386's.
+    Moved the SYSV-checking #ifdefs to *after* the include of pbm.h, which
+      defines SYSV.
+    Made all the #else's and #endif's ANSI-compliant.
+    Added manual pages for libpbm, libpgm, libppm, and libpnm, courtesy
+      of Tony Hansen.
+    Changed man page installation so that pages from different sections
+      can go in different directories.
+    Fixed Imakefiles.
+
+Changes since the expo.lcs.mit.edu FTP distribution of 06sep89:
+
+    Added #ifdefs to pnm/libpnm3.c to allow the PBM-PNM-only configuration.
+    Small corrections to TIPS, pnm/Makefile, pnm/Imakefile, ppm/ppmrotate.1,
+      ppm/ppmshear.1, ppm/ppmtoilbm.c, pbm/xwdtopbm.c, ppm/xwdtoppm.c,
+      ppm/ppmtoxwd.c, ppm/ppmtoxwd.1, pbm/x11wd.h.
+
+Changes since the comp.sources.misc distribution of 31oct88:
+
+    Added pbmreduce, pbmlife, pbmmask, and pbmupc.
+    Added gemtopbm, tifftopbm, pcxtopbm, pbmtogo, mgrtopbm, pbmtomgr,
+      cmuwmtopbm, pbmtocmuwm, g3topbm, and pbmtobg.
+    Minor bugfix to pbmtolj.
+    Slight restructuring of most of the programs to use vastly less memory.
+    Various other minor optimizations.
+    Fixed pbmtorast and rasttopbm to handle byte-swapped big-endian 386 boxes.
+    Slight changes to argument syntax of pbmcrop, pbmmake, pbmreduce.
+    Moved to the new PGM package: pbmtops (which now produces Conforming PS).
+    Moved to the new PPM package: giftopbm.
+    Moved to the new PNM package: pbmcrop pbmcut pbmenlarge pbminvert.
+    Consolidated into a single pnmflip tool: pbmfliplr pbmfliptb pbmtrnspos.
+    Consolidated into a single pnmcat tool: pbmcatlr pbmcattb.
+    Added compataliases script for upward compatability with changed tools.
+    Removed xxxtopbm.
+    Added a -headersize flag to macptopbm, to help get around annoying
+      problems in MacPaint file format.
+    Added the RAWBITS compilation-time option, to use a more compact and
+      much faster (but less portable) external format.
+    Removed the CBM format - use compress(1) and / or RAWBITS instead.
+    Pbmpaste (and the new pnmpaste) now accepts negative x and y coords,
+      which are interpreted relative to the right and bottom sides.
+    Changed all programs to accept a "-" file argument as meaning standard
+      input.
+    Removed pbmtox10wd, since it was never very useful (X10 doesn't have xwud).
+    Added Imakefiles, for X11 types to use.
+
+Changes since the X.V11R3 distribution of 31aug88:
+
+    The cbm format has been revised to support run-length encoding.
+    Pbmtops now does run-length encoding.
+
+Major changes since the X.V11R2 distribution of 28mar88:
+
+    The pbm format now has a "magic number".
+    New conversion filters: brushtopbm, giftopbm, pbmtolj, pbmtomacp,
+      pbmtoxwd, and pbmtox10wd.
+    Icontopbm converter has a better parser -- it knows to skip over
+      any extraneous comments at the beginning of the icon file.
+    Pbmtops generates a different PostScript wrapper program -- it should
+      handle huge bitmaps better.
+    Xwdtopbm now handles byte-swapping correctly.
+    Pbmmake takes a flag to specify the color of the new bitmap.
+    Pbmpaste now implements 'or', 'and', and 'xor' operations as well
+      as the default 'replace'.

@@ -1,0 +1,107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pbmmask User Manual</TITLE></HEAD>
+<BODY>
+<H1>pbmmask</H1>
+Updated: 08 August 1989
+<BR>
+<A HREF="pbmmask.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pbmmask - create a mask bitmap from a regular bitmap
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pbmmask</B>
+[<B>-expand</B>]
+[<I>pbmfile</I>]
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pbmmask</b> reads a PBM image as input and Generates a
+corresponding mask of the foreground areas as another PBM image.
+
+<P>The color to be interpreted as &quot;background&quot; is
+determined automatically.  Regardless of which color is background,
+the mask will be white where the background is and black where the
+figure is.
+
+<P>This lets you do a masked paste like this, for objects with a black
+background:
+
+<PRE>
+    pbmmask obj &gt; objmask
+    pnmpaste &lt; dest -and objmask &lt;x&gt; &lt;y&gt; | pnmpaste -or obj &lt;x&gt; &lt;y&gt;
+</PRE>
+
+For objects with a white background, you can either invert them or
+add a step:
+<PRE>
+    pbmmask obj &gt; objmask
+    pnminvert objmask | pnmpaste -and obj 0 0 &gt; blackback
+    pnmpaste &lt; dest -and objmask &lt;x&gt; &lt;y&gt; | pnmpaste -or blackback &lt;x&gt; &lt;y&gt;
+</PRE>
+
+Note that this three-step version works for objects with black backgrounds
+too, if you don't care about the wasted time.
+
+<P>You can also use masks with graymaps and pixmaps, using the
+<I>pnmarith</I> tool.  For instance:
+
+<PRE>
+    ppmtopgm obj.ppm | pamditherbw -threshold | pbmmask &gt; objmask.pbm
+    pnmarith -multiply dest.ppm objmask.pbm &gt; t1.ppm
+    pnminvert objmask.pbm | pnmarith -multiply obj.ppm - &gt; t2.ppm
+    pnmarith -add t1.ppm t2.ppm
+</PRE>
+
+An interesting variation on this is to pipe the mask through
+<I>pnmsmooth</I> before using it.  This makes the boundary between the
+two images less sharp.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-expand</B>
+
+<DD>Expands the mask by one pixel out from the image.  This is useful
+if you want a little white border around your image.  (A better
+solution might be to turn the <b>pbmlife</b> program into a general
+cellular automaton tool...)
+
+</DL>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="ppmcolormask.html">ppmcolormask</A></B>,
+<B><A HREF="pnmpaste.html">pnmpaste</A></B>,
+<B><A HREF="pnminvert.html">pnminvert</A></B>,
+<B><A HREF="pnmarith.html">pnmarith</A></B>,
+<B><A HREF="pnmsmooth.html">pnmsmooth</A></B>
+<B><A HREF="pbm.html">pbm</A></B>,
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1988 by Jef Poskanzer.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pbmmask.html#lbAB">NAME</A>
+<LI><A HREF="pbmmask.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pbmmask.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pbmmask.html#lbAE">OPTIONS</A>
+<LI><A HREF="pbmmask.html#lbAF">SEE ALSO</A>
+<LI><A HREF="pbmmask.html#lbAG">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

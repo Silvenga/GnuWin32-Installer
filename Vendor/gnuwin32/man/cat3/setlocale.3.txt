@@ -1,0 +1,146 @@
+SETLOCALE(3)       Linux Programmer's Manual       SETLOCALE(3)
+
+
+
+
+
+NAME
+       setlocale - set the current locale.
+
+SYNOPSIS
+       #include <locale.h>
+
+       char *setlocale(int category, const char * locale);
+
+DESCRIPTION
+       The  setlocale()  function  is  used to set or query the
+       program's current locale.
+
+       If locale is not NULL, the program's current  locale  is
+       modified according to the arguments.  The argument cate-
+       gory determines which parts  of  the  program's  current
+       locale should be modified.
+
+       LC_ALL for all of the locale.
+
+       LC_COLLATE
+              for  string  collation.  Affected functions: str-
+              coll(), strxfrm(), wstrcoll(), wstrxfrm().
+
+       LC_CTYPE
+              for character classification,  conversion,  case-
+              sensitive   comparison,  and  regular  expression
+              matching. Affected  functions:  isalnum(),  isal-
+              pha(),     isblank(),    iscntrl(),    isdigit(),
+              isgraph(), islower(), isprint(), ispunct(),  iss-
+              pace(),  isupper(),  isxdigit(), tolower(), toup-
+              per(), strcasecmp(),  strncasecmp(),  iswalnum(),
+              iswalpha(),  iswblank(),  iswcntrl(), iswdigit(),
+              iswgraph(), iswlower(),  iswprint(),  iswpunct(),
+              iswspace(),  iswupper(), iswxdigit(), iswctype(),
+              towlower(),       towupper(),        towctrans(),
+              wcscasecmp(),      wcsncasecmp(),      wcwidth(),
+              wcswidth(), regcomp, regexec().
+
+       LC_MESSAGES
+              for   localizable   natural-language    messages.
+              Affected functions: gettext(), dgettext().
+
+       LC_MONETARY
+              for  monetary  formatting. Affected: the function
+              localeconv().
+
+       LC_NUMERIC
+              for number formatting (such as the decimal  point
+              and  the  thousands  separator).   Affected:  the
+              function localeconv().
+
+       LC_TIME
+              for time and date formatting. Affected: the func-
+              tion strftime().
+
+       If  locale is "", each part of the locale that should be
+       modified is set according to the environment  variables.
+       The  following  environment  variables are inspected, in
+       order of precedence. If an environment variable  is  not
+       set or if its value is empty, it is ignored.
+
+       LC_COLLATE
+              "LC_ALL", "LC_COLLATE", "LANG".
+
+       LC_CTYPE
+              "LC_ALL", "LC_CTYPE", "LANG".
+
+       LC_MESSAGES
+              "LANGUAGE" (may contain several, colon-separated,
+              locale names), "LC_ALL", "LC_MESSAGES", "LANG".
+
+       LC_MONETARY
+              "LC_ALL", "LC_MONETARY", "LANG".
+
+       LC_NUMERIC
+              "LC_ALL", "LC_NUMERIC", "LANG".
+
+       LC_TIME
+              "LC_ALL", "LC_TIME", "LANG".
+
+       The locale "C" or "POSIX"  is  a  portable  locale;  its
+       LC_CTYPE  part  corresponds to the 7-bit ASCII character
+       set.
+
+       A locale name is typically of the form  language[_terri-
+       tory][.codeset][@modifier], where language is an ISO 639
+       language code, territory is an ISO  3166  country  code,
+       and  codeset  is  a character set or encoding identifier
+       like ISO-8859-1 or UTF-8.
+
+       If locale is NULL, the current locale is  only  queried,
+       not modified.
+
+       On  startup of the main program, the portable "C" locale
+       is selected as default.  A program may be made  portable
+       to  all  locales by calling setlocale(LC_ALL, "" ) after
+       program  initialization, by using  the  values  returned
+       from a localeconv() call for locale - dependent informa-
+       tion, by using the multi-byte and wide  character  func-
+       tions  for  text  processing  if  MB_CUR_MAX > 1, and by
+       using strcoll(), wstrcoll() or strxfrm(), wstrxfrm()  to
+       compare strings.
+
+RETURN VALUE
+       A  successful  call to setlocale() returns a string that
+       corresponds to the locale set.  This string may be allo-
+       cated  in  static  storage.  The string returned is such
+       that a subsequent call with that string and its  associ-
+       ated  category  will  restore that part of the process's
+       locale. The return value is NULL if the  request  cannot
+       be honored.
+
+CONFORMING TO
+       ANSI C, POSIX.1
+
+NOTES
+       Linux  (that is, GNU libc) supports the portable locales
+       "C" and "POSIX".  In the good old days there used to  be
+       support  for  the  European  Latin-1 "ISO-8859-1" locale
+       (e.g. in libc-4.5.21 and libc-4.6.27), and  the  Russian
+       "KOI-8"  (more  precisely,  "koi-8r")  locale  (e.g.  in
+       libc-4.6.27), so that  having  an  environment  variable
+       LC_CTYPE=ISO-8859-1  sufficed  to  make isprint() return
+       the right answer.  These days non-English speaking Euro-
+       peans have to work a bit harder, and must install actual
+       locale files.
+
+       The printf()  and  scanf()  families  of  functions  are
+       affected  by the current locale: The decimal dot depends
+       on the LC_NUMERIC part of the locale, and the  tokeniza-
+       tion  uses  isspace()  and  thus depends on the LC_CTYPE
+       part of the locale.
+
+SEE ALSO
+       locale(1), localedef(1), strcoll(3), isalpha(3), locale-
+       conv(3), strftime(3), charsets(4), locale(7)
+
+
+
+GNU                       July 4, 1999             SETLOCALE(3)

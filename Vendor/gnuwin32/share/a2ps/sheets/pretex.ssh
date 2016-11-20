@@ -1,0 +1,105 @@
+# Style sheet for PreTeX
+# Copyright (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+# Copyright (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+# $Id: pretex.ssh,v 1.1.1.1.2.1 2007/12/29 01:58:32 mhatta Exp $
+#
+
+#
+# This file is part of a2ps.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+style PreTeX is
+
+written by "Akim Demaille <akim@freefriends.org>"
+version is 1.0
+requires a2ps version 4.9.7
+
+ancestors are
+  symbols
+end ancestors
+
+documentation is
+  "This style sheets provides LaTeX-like commands to format text."
+  "It is an alternative to the PreScript style sheet, in which formating"
+  "commands are specified in a more a2ps related syntax."
+  ""
+  "It provides by the use of LaTeX like commands, a way to describe the "
+  "pages that this program should produce."
+end documentation
+
+# Some LaTeX commands we don't want to see
+keywords are
+   "\\begin{document}"  Invisible,
+   "\\end{document}"  Invisible,
+   "\\begin{itemize}"  Invisible,
+   "\\end{itemize}"  Invisible,
+   "\\begin{enumerate}"  Invisible,
+   "\\end{enumerate}"  Invisible,
+   "\\begin{description}"  Invisible,
+   "\\end{description}"  Invisible
+end keywords
+
+# Some LaTeX escapes
+operators are
+   "\\$" $,
+   "\\_" _,
+   "\\%" %,
+   "\\&" &,
+   "\\#" "#",
+   "\\(" "(",
+   "\\)" ")",
+   "\\[" [,
+   "\\]" ],
+   "\\{" {,
+   "\\|" |,
+   "\\}" },
+   $ Invisible
+end operators
+
+sequences are
+    "\\encoding{" Invisible (Invisible + Encoding) } Invisible,
+    # Here we hard code `$' as `\n', because the caracter
+    # `\n' will receive a special treatment (Invisible).
+    # Remember that `$' matches the null string anchored at the
+    # end-of-line: it does not match the end-of-line character.
+    % Invisible "\n",
+    "\\item[" Invisible Label ] Invisible,
+    "\\section{" Invisible Label_strong } Invisible,
+    "\\subsection{" Invisible Label } Invisible,
+    "\\subsubsection{" Invisible Label } Invisible,
+    # LaTeX likes
+    "\\textbf{" Invisible Keyword_strong } Invisible,
+    "\\textit{" Invisible Keyword } Invisible,
+    "\\textbi{" Invisible Keyword_strong } Invisible,
+    "\\textrm{" Invisible String } Invisible,
+    "\\textsy{" Invisible Symbol } Invisible,
+    "\\texttt{" Invisible Plain } Invisible,
+
+    # Special tags
+    "\\header{" Invisible (Invisible + Tag1) "}\n" Invisible,
+    "\\footer{" Invisible (Invisible + Tag2) "}\n" Invisible,
+
+    # Quotings
+    "\\verb+" Invisible Plain "+" Invisible,
+    "\\verb!" Invisible Plain ! Invisible,
+    "\\verb|" Invisible Plain | Invisible,
+    "\\verb#" Invisible Plain "#" Invisible,
+    "\\verb=" Invisible Plain = Invisible
+end sequences
+
+end style # PreTeX

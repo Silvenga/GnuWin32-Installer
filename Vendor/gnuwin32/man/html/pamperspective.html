@@ -1,0 +1,497 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head><title>Pamperspective User Manual</title></head>
+
+<body>
+
+<h1>pamperspective</h1>
+Updated: 2 September 2004
+<br>
+<a href="pamperspective.html#index">Table Of Contents</a>
+
+<a name="name"></a>
+<h2>NAME</h2>
+
+pamperspective - a reverse scanline renderer for Netpbm images
+
+<a name="synopsis"></a>
+<h2>SYNOPSIS</h2>
+
+<pre>
+<b>pamperspective</b> 
+    [<b>--bottom_margin=</b><i>num</i>]
+    [<b>--detail=</b><i>num</i>]
+    [<b>--frame_include=</b><i>bool</i>]
+    [<b>--height=</b><i>num</i>]
+    [<b>--include=[</b><i>x1</i>,<i>y1</i>;<i>x2</i>,<i>y2</i>; ...]]
+    [<b>--input_system=</b><i>spec</i>]
+    [<b>--input_unit=</b><i>spec</i>]
+    [<b>--interpolation=</b><i>spec</i>]
+    [<b>--left_margin=</b><i>num</i>]
+    [<b>--margin=</b><i>num</i>]
+    [<b>--output_system=</b><i>spec</i>]
+    [<b>--proportion=</b><i>spec</i>]
+    [<b>--ratio=</b><i>num</i>]
+    [<b>--right_margin=</b><i>num</i>]
+    [<b>--top_margin=</b><i>num</i>]
+    [<b>--width=</b><i>num</i>]
+    {
+      {
+        <i>upper_left_x</i> <i>upper_left_y</i> <i>upper_right_x</i> <i>upper_right_y</i>
+        <i>lower_left_x</i> <i>lower_left_y</i> <i>lower_right_x</i> <i>lower_right_y</i>
+      }
+      |
+      {
+        {<b>--upper_left_x</b>|<b>--ulx</b>}<b>=</b><i>upper_left_x</i>
+        {<b>--upper_left_y</b>|<b>--uly</b>}<b>=</b><i>upper_left_y</i>
+        {<b>--upper_right_x</b>|<b>--urx</b>}<b>=</b><i>upper_right_x</i>
+        {<b>--upper_right_y</b>|<b>--ury</b>}<b>=</b><i>upper_right_y</i>
+        {<b>--lower_left_x</b>|<b>--llx</b>}<b>=</b><i>lower_left_x</i>
+        {<b>--lower_left_y</b>|<b>--lly</b>}<b>=</b><i>lower_left_y</i>
+        {<b>--lower_right_x</b>|<b>--lrx</b>}<b>=</b><i>lower_right_x</i>
+        {<b>--lower_right_y</b>|<b>--lry</b>}<b>=</b><i>lower_right_y</i>
+      }
+   }
+   [<i>infile</i>]
+
+</pre>
+
+<?makeman .SH OPTION USAGE ?>
+<p>Minimum unique abbreviation of option is acceptable. (But note 
+that shortest unique prefixes might be longer in future versions of 
+the program.) You may use single hyphens instead of double hyphen to 
+denote options. You may use white space in place of the equals sign 
+to separate an option name from its value. All options starting with 
+hyphens may be given in any order. 
+
+
+<a name="description"></a>
+<h2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<b>pamperspective</b> reads a Netpbm image as input and produces a
+Netpbm image of the same format as output.
+
+<p>The values <i>upper_left_x</i> ... <i>lower_right_y</i>, that are
+required on the command line, specify a quadrilateral in the input
+image.  <b>pamperspective</b> interprets the input image as a
+perspective projection of a three dimensional scene, for example a
+photograph.  <b>pamperspective</b> assumes the specified quadrilateral
+represents a parallelogram in that scene.  The output image consists
+of this parallelogram, sheared to a rectangle.  In this way
+<b>pamperspective</b> undoes the effect of a raytracer or scanline
+renderer.
+
+<p>The input is from <i>infile</i>, or from Standard Input, if
+<i>infile</i> is not specified.  The output is to Standard Output.
+
+
+<a name="options"></a>
+<h2>OPTIONS</h2>
+
+<p>For options of the form <b>--name=</b><i>num</i>, You can specify
+the value <i>num</i> in any of the traditional ways.  Additionally,
+you can specify it as <i>num1</i>/<i>num2</i>, where <i>num1</i> and
+<i>num2</i> are specified traditionally.  This is useful for
+specifying a width/height ratio of 4/3, without having to write
+infinitely many digits.  Where <i>num</i> is supposed to be a natural
+number, <b>pamperspective</b> does not allow this format.
+
+<h3>Quadrilateral specification options</h3>
+
+<dl>
+  <dt><b>--upper_left_x=</b><i>num</i></dt>
+  <dt><b>--ulx=</b><i>num</i></dt>
+
+  <dd>This specifies the horizontal coordinate of the upper left
+  vertex of the quadrilateral.  The meaning of 'upper left' is
+  relative to the output image.  The interpretation of <i>num</i>
+  depends on the values for <b>--input_system</b> and
+  <b>--input_unit</b>.</dd>
+
+  <dt><b>--upper_left_y=</b><i>num</i></dt>
+  <dt><b>--uly=</b><i>num</i></dt>
+
+  <dd>This specifies the vertical coordinate of the upper left vertex
+  of the quadrilateral.  The meaning of 'upper left' is relative to
+  the output image.  The interpretation of <i>num</i> depends on the
+  values for <b>--input_system</b> and <b>--input_unit</b>.</dd>
+
+  <dt><b>--upper_right_x=</b><i>num</i></dt>
+  <dt><b>--urx=</b><i>num</i></dt>
+
+  <dd>This specifies the horizontal coordinate of the upper right
+  vertex of the quadrilateral.  The meaning of 'upper right' is
+  relative to the output image.  The interpretation of <i>num</i>
+  depends on the values for <b>--input_system</b> and
+  <b>--input_unit</b>.</dd>
+
+  <dt><b>--upper_right_y=</b><i>num</i></dt>
+  <dt><b>--ury=</b><i>num</i></dt>
+
+  <dd>This specifies the vertical coordinate of the upper right vertex
+  of the quadrilateral.  The meaning of 'upper right' is relative to
+  the output image.  The interpretation of <i>num</i> depends on the
+  values for <b>--input_system</b> and <b>--input_unit</b>.</dd>
+
+  <dt><b>--lower_left_x=</b><i>num</i></dt>
+  <dt><b>--llx=</b><i>num</i></dt>
+
+  <dd>This specifies the horizontal coordinate of the lower left
+  vertex of the quadrilateral.  The meaning of 'lower left' is
+  relative to the output image.  The interpretation of <i>num</i>
+  depends on the values for <b>--input_system</b> and
+  <b>--input_unit</b>.</dd>
+
+  <dt><b>--lower_left_y=</b><i>num</i></dt>
+  <dt><b>--lly=</b><i>num</i></dt>
+
+  <dd>This specifies the vertical coordinate of the lower left vertex
+  of the quadrilateral.  The meaning of 'lower left' is relative to
+  the output image.  The interpretation of <i>num</i> depends on the
+  values for <b>--input_system</b> and <b>--input_unit</b>.</dd>
+
+  <dt><b>--lower_right_x=</b><i>num</i></dt>
+  <dt><b>--lrx=</b><i>num</i></dt>
+
+  <dd>This specifies the horizontal coordinate of the lower right
+  vertex of the quadrilateral.  The meaning of 'lower right' is
+  relative to the output image.  The interpretation of <i>num</i>
+  depends on the values for <b>--input_system</b> and
+  <b>--input_unit</b>.</dd>
+
+  <dt><b>--lower_right_y=</b><i>num</i></dt>
+  <dt><b>--lry=</b><i>num</i></dt>
+
+  <dd>This specifies the vertical coordinate of the lower right vertex
+  of the quadrilateral.  The meaning of 'lower right' is relative to
+  the output image.  The interpretation of <i>num</i> depends on the
+  values for <b>--input_system</b> and <b>--input_unit</b>.</dd>
+
+  <dt><b>--input_system=</b><i>system</i></dt>
+  <dt><b>--input_unit=</b><i>unit</i></dt>
+
+  <dd>The input image consists of pixels, which are, from the point of
+  view of a scanline renderer, solid squares.  These options specify
+  how the coordinates are interpreted:
+
+  <dl>
+    <dt><i>system</i>=<b>lattice</b>, <i>unit</i>=<b>image</b></dt>
+
+    <dd>(0,0) refers to the upper left corner of the upper left pixel
+    and (1,1) refers to the lower right corner of the lower right
+    pixel.</dd>
+
+    <dt><i>system</i>=<b>lattice</b>, <i>unit</i>=<b>pixel</b></dt>
+
+    <dd>(0,0) refers to the upper left corner of the upper left pixel
+    and (<i>width</i>,<i>height</i>) refers to the lower right corner
+    of the lower right pixel.  Here <i>width</i> and <i>height</i> are
+    the width and height of the input image.</dd>
+
+    <dt><i>system</i>=<b>pixel</b>, <i>unit</i>=<b>image</b></dt>
+
+    <dd>(0,0) refers to the centre of the upper left pixel and (1,1)
+    refers to the centre of the lower right pixel.</dd>
+
+    <dt><i>system</i>=<b>pixel</b>, <i>unit</i>=<b>pixel</b></dt>
+
+    <dd>(0,0) refers to the centre of the upper left pixel and
+    (<i>width</i>-1,<i>height</i>-1) refers to the centre of the lower
+    right pixel.  Here <i>width</i> and <i>height</i> are the width
+    and height of the input image.</dd>
+
+    </dl>
+
+  The defaults are <b>--input_system</b>=<b>lattice</b> and
+  <b>--input_unit</b>=<b>pixel</b>.  Point-and-click front ends should
+  use <b>--input_system</b>=<b>pixel</b>.</dd>
+
+  </dl>
+
+<h3>Frame options</h3>
+
+By default <b>pamperspective</b> outputs exactly the above
+parallelogram, sheared to a rectangle.  With the following options, it
+is possible to make <b>pamperspective</b> output a larger or smaller
+portion, which we call the &quot;visible part.&quot; We refer to the
+default rectangle as the &quot;frame.&quot; The visible part is always
+a rectangle the axes of which are parallel to those of the frame.
+
+<p>The frame options are additive.  All the parts of the image
+specified by either margin options, <b>--include_frame</b>, or
+<b>--include</b> (or their defaults) are in the visible part.  The
+visible part is the smallest possible rectangle that contains the
+parts specified those three ways.
+
+<p>The visible part must have nonzero size.  That means if you specify
+<b>--frame-include=no</b> (overriding the default), you'll need to
+specify other frame options in order to have something in the visible
+part.
+
+<dl>
+  <dt>[<b>--margin=</b><i>num</i>]</dt>
+
+  <dd>This specifies an area surrounding the frame that is to be
+  included in the visible part.  The units of <i>num</i> are the width
+  of the frame for the horizontal extensions and the height of the
+  frame for vertical extensions.
+
+  <p>For example, <b>--margin=1</b> makes the visible part 9 times as large,
+  because it makes the visible part extend one frame's worth to the left
+  of the frame, one frame's worth to the right, one frame's worth above
+  the frame, and one frame's worth below the frame, for a total of
+  3 frames' worth in both dimensions.
+
+  <p>A negative value has an effect only if you specify
+  <b>--frame_include=no</b>.  The default is no margin.
+
+  <p>The individual margin options below override this common margin
+  setting.
+  </dd>
+
+  <dt>[<b>--top_margin=</b><i>num</i>]</dt>
+  <dt>[<b>--left_margin=</b><i>num</i>]</dt>
+  <dt>[<b>--right_margin=</b><i>num</i>]</dt>
+  <dt>[<b>--bottom_margin=</b><i>num</i>]</dt>
+
+  <dd>These are like <b>--margin</b>, but they specify only one of 
+  the 4 sides.  The default value for each is the value (or default) of
+  <b>--margin</b>.
+  </dd>
+
+  <dt>[<b>--frame_include=</b><i>bool</i>]</dt>
+
+  <dd>Valid values for <i>bool</i> are:
+
+  <dl>
+    <dt><b>yes</b></dt>
+    <dt><b>true</b></dt>
+    <dt><b>on</b></dt>
+
+    <dd>The frame itself is in the visible part.</dd>
+
+    <dt><b>no</b></dt>
+    <dt><b>false</b></dt>
+    <dt><b>off</b></dt>
+
+    <dd>The frame itself is not necessarily in the visible part
+    (but it could be if other options cause it to be).
+    </dd>
+
+    </dl>
+
+  The default value is <b>yes</b></dd>
+
+  <dt><b>--include=[</b><i>x1</i>,<i>y1</i>;<i>x2</i>,<i>y2</i>; ...]
+
+  <dd>The visible part is made large enough such that every point
+  (<i>x1</i>,<i>y1</i>), (<i>x2</i>,<i>y2</i>), of the <em>input</em> image is 
+  visible.  The meaning of <i>x</i> and <i>y</i> is determined by
+  <b>--input_system</b> and <b>--input_unit</b>.  You can specify any
+  number of semicolon-delimited points, including zero.
+
+  <p>If you're supplying these options via a Unix command shell, be
+  sure to use proper quoting, because semicolon (<b>;</b>) is usually
+  a shell control character.
+
+  </dl>
+
+  <p>The frame options were new in Netpbm 10.25 (October 2004).
+
+<h3>Output size options</h3>
+
+<dl>
+  <dt><b>--width=</b><i>width</i></dt>
+  <dt><b>--height=</b><i>height</i></dt>
+
+  <dd>These specify the size of the output image in horizontal and
+  vertical direction.  The values are numbers of pixels, so only
+  natural numbers are valid.  These values override the default
+  means to determine the output size.</dd>
+
+  <dt><b>--detail=</b><i>num</i></dt>
+
+  <dd>If you do not specify <b>--width</b>, <b>pamperspective</b>
+  determines the width of the output image such that moving <i>num</i>
+  output pixels horizontally does not change the corresponding pixel
+  coordinates of the input image by more than 1.
+  <b>pamperspective</b> determines the height of the output image
+  analogously.  The default value is 1.</dd>
+
+  <dt><b>--proportion=</b><i>prop</i></dt>
+  <dt><b>--ratio=</b><i>ratio</i></dt>
+
+  <dd>Valid values for <i>prop</i> are:
+
+  <dl>
+    <dt><b>free</b></dt>
+
+    <dd>In this case <b>--ratio</b> does not have any effect.</dd>
+
+    <dt><b>fixed</b></dt><dd>After the width and height are determined
+    according to <b>--detail</b>, one of both will be increased, in
+    order to obtain width/height=<i>ratio</i>.</dd>
+
+    </dl>
+
+  The defaults are <b>--proportion</b>=<b>free</b> and
+  <b>--ratio</b>=1.</dd>
+
+  </dl>
+
+<h3>Output options</h3>
+
+<dl>
+  <dt><b>--output_system=</b><i>spec</i></dt>
+
+  <dd>The output image consists of pixels, which are, from the point
+  of view of a scanline renderer, solid squares.  This option
+  specifies how the four vertices of the quadrilateral correspond to
+  the pixels of the output image.  Valid values for <i>spec</i> are:
+
+  <dl>
+    <dt><b>lattice</b></dt>
+
+    <dd>The upper left vertex corresponds to the upper left corner of
+    the upper left pixel and The lower right vertex corresponds to the
+    lower right corner of the lower right
+    pixel.</dd>
+
+    <dt><b>pixel</b></dt>
+
+    <dd>The upper left vertex corresponds to the centre of the upper
+    left pixel and The lower right vertex corresponds to the centre of
+    the lower right pixel.</dd>
+
+    </dl>
+
+  The default value is <b>lattice</b>.  Point-and-click front ends
+  should use <b>pixel</b>.</dd>
+
+  <dt><b>--interpolation=</b><i>spec</i></dt>
+
+  <dd>Usually (centres of) output pixels do not exactly correspond to
+  (centres of) input pixels.  This option determines how the program
+  will choose the new pixels.  Valid values for <i>spec</i> are:
+
+  <dl>
+    <dt><b>nearest</b></dt>
+
+    <dd>The output pixel will be identical to the nearest input
+    pixel.</dd>
+
+    <dt><b>linear</b></dt>
+
+    <dd>The output pixel will be a bilinear interpolation of the four
+    surrounding input pixels.</dd>
+
+    </dl>
+
+  The default value is <b>nearest</b>.</dd>
+
+  </dl>
+
+<a name="hints"></a>
+<h2>HINTS</h2>
+
+<p>It might be tempting always to use the options
+<b>--include 0,0;0,1;1,0;1,1</b> 
+(assuming <b>--input_system=lattice</b> and <b>--input_unit=image</b>), 
+so that no part of the input image is missing in the output. 
+There are problems with that:
+
+<ul>
+  <li>If the threedimensional plane defined by the quadrilateral has a
+  visible horizon in the input image, then the above asks <b>pamperspective</b>
+  to include points that cannot ever be part of the output.
+
+  <li>If the horizon is not visible, but close to the border of the input
+  image, this may result in <em>very</em> large output files. Consider a
+  picture of a road. If you ask a point close to the horizon to be included,
+  then this point is far away from the viewer. The output will cover many
+  kilometers of road, while <b>--detail</b> perhaps makes a pixel equal to a
+  square centimeter.
+
+  </ul>
+
+<p>When working with large files <b>pamperspective</b>'s memory usage
+might be an issue.  In order to keep it small, you should minimize each
+of the following:
+
+<ul>
+  <li>The vertical range that the top output line consumes in the
+  input image;
+
+  <li>The vertical range that the bottom output line consumes in the
+  input image;
+
+  <li>The vertical range from the topmost (with respect to the 
+  input image) quadrilateral point to the top (with respect to the output 
+  image) output line.
+
+  </ul>
+
+For this purpose you can use <b>pamflip</b> before and/or after
+<b>pamperspective</b>. Example: Instead of
+
+<pre>
+<b>pamperspective 10 0 100 50 0 20 95 100 infile &gt; outfile</b>
+</pre>
+
+you can use
+
+<pre>
+<b>
+pamflip -rotate90 infile | 
+   pamperspective 50 0 100 5 0 90 20 100 | 
+   pamflip -rotate270 &gt; outfile
+</b>
+</pre>
+  
+<a name="seealso"></a>
+<h2>SEE ALSO</h2>
+
+<a href="index.html"><b>netpbm</b></a>,
+<a href="pam.html"><b>pam</b></a>,
+<a href="pnm.html"><b>pnm</b></a>,
+<a href="pamcut.html"><b>pamcut</b></a>,
+<a href="pamflip.html"><b>pamflip</b></a>,
+<a href="pnmrotate.html"><b>pnmrotate</b></a>,
+<a href="pamscale.html"><b>pamscale</b></a>,
+<a href="pnmshear.html"><b>pnmshear</b></a>,
+<a href="pnmstitch.html"><b>pnmstitch</b></a>
+
+<a name="history"></a>
+<h2>HISTORY</h2>
+
+<p>Mark Weyer wrote <b>pamperspective</b> in March 2004.
+
+<p>It was new in Netpbm 10.22 (April 2004).
+
+
+<a name="author"></a>
+</p><h2>AUTHOR</h2>
+
+This documentation was written by Mark Weyer.  Permission is granted
+to copy, distribute and/or modify this document under the terms of the
+GNU General Public License, Version 2 or any later version published
+by the Free Software Foundation.
+
+<a name="index"></a>
+<h2>Table Of Contents</h2>
+<ul>
+  <li><a href="pamperspective.html#name">NAME</a>
+  </li><li><a href="pamperspective.html#synopsis">SYNOPSIS</a>
+  </li><li><a href="pamperspective.html#description">DESCRIPTION</a>
+  </li><li><a href="pamperspective.html#options">OPTIONS</a>
+  </li><li><a href="pamperspective.html#hints">HINTS</a>  
+  </li><li><a href="pamperspective.html#seealso">SEE ALSO</a>  
+  </li><li><a href="pamperspective.html#history">HISTORY</a>  
+  </li><li><a href="pamperspective.html#author">AUTHOR</a>  
+  </li></ul>
+
+</body></html>
+
+
+

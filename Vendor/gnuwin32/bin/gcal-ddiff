@@ -1,0 +1,414 @@
+#! /bin/sh
+#
+#  Generated automatically from ddiff.in by configure.
+#
+#  $Id: ddiff.in 0.06 2000/03/24 00:00:06 tom Exp $
+#
+#  ddiff.in:  Uses `ddiff1[.awk|.pl]' and `ddiff2[.awk|.pl]' for creating
+#               a Gcal location resource file which contains the day/night
+#               lengths and differences for all days of the year YYYY for
+#               a definite location.
+#               A Gcal location response file is a Gcal response file
+#               consisting of one line, which passes the location name
+#               LOC, its country code CC, and the ISO-6709-co-ordinate
+#               COORD via text variables to Gcal.  The line template of
+#               a Gcal location response file is: -r$l=CC-LOC:$c=COORD
+#
+#               Usage: ddiff --help | --version
+#               Usage: ddiff [--debug] [--precise]
+#                            [--year=YYYY] LOCATION-RESPONSE-FILE
+#               Usage: ddiff [--debug] [--precise]
+#                            [--year=YYYY] CC LOCATION-NAME ISO-COORDINATE
+#
+#               `--debug':      Turn on shell debugging.
+#               `--precise':    Use more precise time values.
+#               `--year=YYYY':  Create the Gcal location resource file for the
+#                                 year YYYY, otherwise for the actual year.
+#
+#  UN*X solution.
+#
+#  Needs `test', `echo', `expr', `eval', `set', `sed', `cat', `rm', `gcal'
+#  and `perl' or `awk' for processing!
+#
+#  Returns 0 if processing was successfully.
+#  Returns 1 in case an error occured while processing.
+#  Returns 2 if neither Perl nor AWK are present for further processing.
+#
+#  Copyright (c) 2000  Thomas Esken      <esken@uni-muenster.de>
+#                      Im Hagenfeld 84
+#                      D-48147 M"unster
+#                      GERMANY
+#
+#  This software doesn't claim completeness, correctness or usability.
+#  On principle I will not be liable for ANY damages or losses (implicit
+#  or explicit), which result from using or handling my software.
+#  If you use this software, you agree without any exception to this
+#  agreement, which binds you LEGALLY !!
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the `GNU General Public License' as published by
+#  the `Free Software Foundation'; either version 2, or (at your option)
+#  any later version.
+#
+#  You should have received a copy of the `GNU General Public License'
+#  along with this program; if not, write to the:
+#
+#    Free Software Foundation, Inc.
+#    59 Temple Place - Suite 330
+#    Boston, MA 02111-1307,  USA
+#
+#
+
+#
+# Basically used programs.
+#
+Rm=rm
+Cat=cat
+Sed=sed
+Set=set
+Test=test
+Echo=echo
+Expr=expr
+
+#
+# Basically used texts.
+#
+packagedatamiscdir=c:/progra~1/Gcal/share/gcal/misc/ddiff
+#
+PACKAGE=gcal
+VERSION=3.01
+transform=s,$$,,; s,^,,; s/i386-pc-mingw32//
+#
+mydefaultname=ddiff
+#
+myname=`$Echo "$0" | $Sed -e 's,.*/,,' -e "$transform"`
+myversion=0.06
+myinternalname="$myname ($PACKAGE $VERSION) $myversion"
+#
+gcal_resource_file_suffix=.rc
+#
+info1="$myname: Creates a Gcal location resource file which contains the"
+info2="$myname: day/night lengths and differences for all days of the year"
+info3="$myname: YYYY for a definite location."
+info4="$myname: By definition, a Gcal location response file is a text file of"
+info5="$myname: one line with a   \`-r\$l=CC-LOCATION:\$c=COORDINATE'   contents."
+info6="$myname:"
+usage1="usage: $myname  --help | --version"
+usage2="usage: $myname  [--debug] [--precise] [--year=YYYY] LOCATION-RESPONSE-FILE"
+usage3="usage: $myname  [--debug] [--precise] [--year=YYYY] CC LOCATION-NAME ISO-COORDINATE"
+
+#
+# Some constant values (EXIT_SUCCESS(==0) and EXIT_FATAL(==2)
+#   are also returned by the processed AWK/Perl script.
+#
+EXIT_SUCCESS=0
+EXIT_FAILURE=1
+EXIT_FATAL=2
+
+#
+# The used programs.
+#
+Eval=eval
+ThisGcal=`$Echo "$PACKAGE" | $Sed "$transform"`
+#
+Awk=gawk
+Awk_script1=$mydefaultname""1.awk
+Awk_script2=$mydefaultname""2.awk
+#
+Perl=perl
+Perl_script1=$mydefaultname""1.pl
+Perl_script2=$mydefaultname""2.pl
+
+#
+# Let's check for command line arguments.
+#
+debug=no
+precise=""
+opt_year=""
+commands=""
+previous=""
+for option in $*
+do
+  #
+  # If the previous option needs an argument, assign it.
+  #
+  if $Test -n "$previous";
+  then
+    $Eval "$previous=\$option"
+    previous=""
+    continue
+  fi
+
+  case "$option" in
+    -*=)  optarg="###error###" ;;
+    -*=*) optarg=`$Echo "$option" | $Sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *)    optarg="" ;;
+  esac
+
+  #
+  # Manage the options.
+  #
+  case "$option" in
+    -help=* | -hel=* | -he=* | -h=* | -help | -hel | -he | -h | \
+    --help=* | --hel=* | --he=* | --h=* | --help | --hel | --he | --h)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$info1"
+      $Echo "$info2"
+      $Echo "$info3"
+      $Echo "$info4"
+      $Echo "$info5"
+      $Echo "$info6"
+      $Echo "$usage1"
+      $Echo "$usage2"
+      $Echo "$usage3"
+      exit $EXIT_SUCCESS ;;
+
+    -version=* | -versio=* | -versi=* | -vers=* | -ver=* | -ve=* | -v=* | \
+    -version | -versio | -versi | -vers | -ver | -ve | -v | \
+    --version=* | --versio=* | --versi=* | --vers=* | --ver=* | --ve=* | --v=* | \
+    --version | --versio | --versi | --vers | --ver | --ve | --v)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$myinternalname"
+      exit $EXIT_SUCCESS ;;
+
+    -debug=* | -debu=* | -deb=* | -de=* | -d=* | \
+    -debug | -debu | -deb | -de | -d | \
+    --debug=* | --debu=* | --deb=* | --de=* | --d=* | \
+    --debug | --debu | --deb | --de | --d)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      debug=yes
+      shift ;;
+
+    -precise=* | -precis=* | -preci=* | -prec=* | -pre=* | -pr=* | -p=* | \
+    -precise | -precis | -preci | -prec | -pre | -pr | -p | \
+    --precise=* | --precis=* | --preci=* | --prec=* | --pre=* | --pr=* | --p=* | \
+    --precise | --precis | --preci | --prec | --pre | --pr | --p)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      precise="--precise"
+      shift ;;
+
+    -year | -yea | -ye | -y | --year | --yea | --ye | --y)
+      previous=year ;;
+    -year=* | -yea=* | -ye=* | -y=* | --year=* | --yea=* | --ye=* | --y=*)
+      if $Test -z "$optarg" || $Test "$optarg" = "###error###";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=//g'`' requires an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      opt_year="$optarg"
+      shift ;;
+
+    -* | /*)
+      $Echo "$myname: error: $option: invalid option, use --help to show usage" 1>&2
+      exit $EXIT_FAILURE ;;
+
+    *)
+      if $Test -z "$commands";
+      then
+        commands="$option"
+      else
+        commands="$commands $option"
+      fi
+  esac
+done
+
+if $Test -n "$previous";
+then
+  $Echo "$myname: error: missing argument to --$previous" 1>&2
+  exit $EXIT_FAILURE
+fi
+
+#
+# Get the number of commands given and assign them to the local variables.
+#
+cmd_number=0
+cmd_1=""
+cmd_2=""
+cmd_3=""
+for cmd in $commands
+do
+  if $Test -z "$cmd_1";
+  then
+    cmd_1="$cmd"
+  else
+    if $Test -z "$cmd_2";
+    then
+      cmd_2="$cmd"
+    else
+      if $Test -z "$cmd_3";
+      then
+        cmd_3="$cmd"
+      fi
+    fi
+  fi
+  cmd_number=`$Expr $cmd_number + 1`
+done
+
+#
+# Enable tracing.
+#
+if $Test "$debug" = yes;
+then
+  $Set -x
+fi
+
+#
+# Let's start processing now.
+#
+if $Test -n "$Awk" || $Test -n "$Perl";
+then
+  if $Test "$cmd_number" -eq 0 || $Test "$cmd_number" -eq 2 || $Test "$cmd_number" -gt 3;
+  then
+    $Echo "$info1"
+    $Echo "$info2"
+    $Echo "$info3"
+    $Echo "$info4"
+    $Echo "$info5"
+    $Echo "$info6"
+    $Echo "$usage1"
+    $Echo "$usage2"
+    $Echo "$usage3"
+    exit $EXIT_FAILURE
+  else
+    gcal_year=""
+    if $Test -n "$opt_year";
+    then
+      arg=`$Echo "$opt_year" | $Sed -e 's/[0-9]//g'`
+      if $Test -n "$arg";
+      then
+        $Echo "$myname: error: invalid option argument \`$opt_year' specified" 1>&2
+        $Echo "$myname: use --help to show usage" 1>&2
+        exit $EXIT_FAILURE
+      else
+        gcal_year="-u $opt_year""+""$opt_year"
+      fi
+    fi
+    if $Test "$cmd_number" -eq 1;
+    then
+      if $Test -s "$cmd_1";
+      then
+        outfile="$cmd_1""$gcal_resource_file_suffix"
+      else
+        $Echo "$myname: error: LOCATION-RESPONSE-FILE \`$cmd_1' is missing" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      gcal_option="@""$cmd_1"
+    else
+      gcal_option="-r\$l=$cmd_1"-"$cmd_2":\$c="$cmd_3"
+      outfile=`$Echo "$cmd_1"-"$cmd_2""$gcal_resource_file_suffix" | \
+               $Sed -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
+    fi
+    #
+    if $Test -n "$Perl";
+    then
+      if $Test ! -s "$packagedatamiscdir/$Perl_script1";
+      then
+        $Echo "$myname: error: file \`$packagedatamiscdir/$Perl_script1' is missing" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      if $Test ! -s "$packagedatamiscdir/$Perl_script2";
+      then
+        $Echo "$myname: error: file \`$packagedatamiscdir/$Perl_script2' is missing" 1>&2
+        exit $EXIT_FAILURE
+      fi
+    else
+      if $Test ! -s "$packagedatamiscdir/$Awk_script1";
+      then
+        $Echo "$myname: error: file \`$packagedatamiscdir/$Awk_script1' is missing" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      if $Test ! -s "$packagedatamiscdir/$Awk_script2";
+      then
+        $Echo "$myname: error: file \`$packagedatamiscdir/$Awk_script2' is missing" 1>&2
+        exit $EXIT_FAILURE
+      fi
+    fi
+    #
+    # Let's set some default directories first.
+    #
+    tmpdir=/tmp
+    #
+    # Respect a $TMPDIR or a $TMP environment variable.
+    #
+    if $Test -n "$TMPDIR";
+    then
+      tmpdir="$TMPDIR"
+    else
+      if $Test -n "$TMP";
+      then
+        tmpdir="$TMP"
+      fi
+    fi
+    #
+    tmpdir=`$Echo "$tmpdir" | $Sed -e 's,/\$,,'`
+    #
+    tmpfile1="$tmpdir"/1-"$$"
+    tmpfile2="$tmpdir"/2-"$$"
+    tmpfile3="$tmpdir"/3-"$$"
+    #
+    if $Test "$debug" = no;
+    then
+      trap "$Rm -f $outfile $tmpfile1 $tmpfile2 $tmpfile3;exit $EXIT_FAILURE" 1 2 15
+    fi
+    #
+    $Echo "$myname: creating the Gcal location resource file \`$outfile', please wait..."
+    $ThisGcal -f/dev/null -QUx '-#0 -r$y=%:04*Y' > $tmpfile1
+    $ThisGcal $gcal_option \
+      @$tmpfile1 \
+      '--date-format=%>04*Y%>02*M%>02*D%1%2' \
+      '-#0*d1#999 $l %u$c d %z$c n $c %>04*Y$y@t -%>02*M$y@t -%>02*D$y@t  %t %=' \
+      -f/dev/null -Qxy -Hno $precise $gcal_year > $tmpfile2
+    #
+    # We prefer the use of Perl.
+    #
+    if $Test -n "$Perl";
+    then
+      $Perl $packagedatamiscdir/$Perl_script1 $tmpfile2 > $tmpfile3
+      $Cat $packagedatamiscdir/$Perl_script2 >> $tmpfile3
+      $Perl -- $tmpfile3 -a$outfile $tmpfile2 > $outfile
+    else
+      $Awk -f $packagedatamiscdir/$Awk_script1 $tmpfile2 > $tmpfile3
+      $Cat $packagedatamiscdir/$Awk_script2 >> $tmpfile3
+      $Awk -f $tmpfile3 -- -a$outfile $tmpfile2 > $outfile
+    fi
+    status=$?
+    if $Test "$debug" = no;
+    then
+      $Rm -f $tmpfile1 $tmpfile2 $tmpfile3
+    fi
+    if $Test "$status" -eq "$EXIT_FATAL";
+    then
+      if $Test -n "$Perl";
+      then
+        $Echo "$myinternalname: error: invalid option to \`$Perl' given" 1>&2
+      else
+        $Echo "$myinternalname: error: invalid option to \`$Awk' given" 1>&2
+      fi
+      if $Test "$debug" = no;
+      then
+        $Rm -f $outfile
+      fi
+      exit $status
+    fi
+  fi
+  exit $EXIT_SUCCESS
+else
+  $Echo "$myinternalname: error: neither \`perl' nor \`awk' available" 1>&2
+  exit $EXIT_FATAL
+fi

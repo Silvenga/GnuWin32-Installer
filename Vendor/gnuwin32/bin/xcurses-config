@@ -1,0 +1,73 @@
+#! /bin/sh
+#
+# The idea to this kind of setup info script was stolen from numerous
+# other packages, such as neon, libxml and gnome.
+#
+# $Id: xcurses-config.in,v 1.2 2002/11/27 11:14:53 mark Exp $
+#
+prefix=c:/progra~1/PDCurses
+exec_prefix=${prefix}
+includedir=${prefix}/include
+
+usage()
+{
+    echo "Usage: xcurses-config [OPTION]"
+    echo ""
+    echo "Available values for OPTION include:"
+    echo ""
+    echo "  --help         display this help and exit"
+    echo "  --cflags       pre-processor and compiler flags"
+    echo "                 [-I$includedir]"
+    echo "  --libs         library linking information"
+    echo "                 [-L$prefix/lib -lXCurses  -Wl,-s -Wl,--force-exe-suffix -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc -Wl,--allow-multiple-definition     -L/usr/X11R6/lib -lXaw -lXmu -lXt -lX11   "
+    echo "  --prefix       PDCurses install prefix"
+    echo "                 [$prefix]"
+    echo "  --version      output version information"
+    echo "                 [2.6]"
+    exit $1
+}
+
+if test $# -eq 0; then
+    usage 1
+fi
+
+while test $# -gt 0; do
+    case "$1" in
+    # this deals with options in the style
+    # --option=value and extracts the value part
+    # [not currently used]
+    -*=*) value=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *) value= ;;
+    esac
+
+    case "$1" in
+    --prefix)
+       echo $prefix
+       ;;
+
+    --version)
+       echo 2.6
+       exit 0
+       ;;
+
+    --help)
+       usage 0
+       ;;
+
+    --cflags)
+       echo -I$includedir
+       ;;
+
+    --libs)
+       echo -L$prefix/lib -lXCurses  -Wl,-s -Wl,--force-exe-suffix -Wl,--enable-auto-import -Wl,--enable-runtime-pseudo-reloc -Wl,--allow-multiple-definition     -L/usr/X11R6/lib -lXaw -lXmu -lXt -lX11   
+       ;;
+
+    *)
+       usage
+       exit 1
+       ;;
+    esac
+    shift
+done
+
+exit 0

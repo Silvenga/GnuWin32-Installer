@@ -1,0 +1,1907 @@
+<HTML
+><HEAD
+><TITLE
+>Svp rendering</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.64
+"><LINK
+REL="HOME"
+TITLE="The libart library"
+HREF="libart.html"><LINK
+REL="UP"
+TITLE="Rendering APIs"
+HREF="basic-rendering.html"><LINK
+REL="PREVIOUS"
+TITLE="SVPs"
+HREF="libart-svps.html"><LINK
+REL="NEXT"
+TITLE="Known problems"
+HREF="problems.html"></HEAD
+><BODY
+CLASS="REFENTRY"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="4"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="5"
+>The libart library</FONT
+></TH
+></TR
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="libart-svps.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libart.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="basic-rendering.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="problems.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+></TABLE
+></DIV
+><H1
+><A
+NAME="LIBART-SVP-RENDERING"
+>Svp rendering</A
+></H1
+><DIV
+CLASS="REFNAMEDIV"
+><A
+NAME="AEN1448"
+></A
+><H2
+>Name</H2
+>Svp rendering&nbsp;--&nbsp;How to actually render SVPs into pixel buffers.</DIV
+><DIV
+CLASS="REFSYNOPSISDIV"
+><A
+NAME="AEN1451"
+></A
+><H2
+>Synopsis</H2
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="SYNOPSIS"
+>&#13;
+
+void        <A
+HREF="libart-svp-rendering.html#ART-RGB-FILL-RUN"
+>art_rgb_fill_run</A
+>                (art_u8 *buf,
+                                             art_u8 r,
+                                             art_u8 g,
+                                             art_u8 b,
+                                             int n);
+void        <A
+HREF="libart-svp-rendering.html#ART-RGB-RUN-ALPHA"
+>art_rgb_run_alpha</A
+>               (art_u8 *buf,
+                                             art_u8 r,
+                                             art_u8 g,
+                                             art_u8 b,
+                                             int alpha,
+                                             int n);
+void        <A
+HREF="libart-svp-rendering.html#ART-RGB-SVP-AA"
+>art_rgb_svp_aa</A
+>                  (const ArtSVP *svp,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             art_u32 fg_color,
+                                             art_u32 bg_color,
+                                             art_u8 *buf,
+                                             int rowstride,
+                                             <A
+HREF="libart-art-alpha-gamma-stuff.html#ARTALPHAGAMMA"
+>ArtAlphaGamma</A
+> *alphagamma);
+void        <A
+HREF="libart-svp-rendering.html#ART-RGB-SVP-ALPHA"
+>art_rgb_svp_alpha</A
+>               (const ArtSVP *svp,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             art_u32 rgba,
+                                             art_u8 *buf,
+                                             int rowstride,
+                                             <A
+HREF="libart-art-alpha-gamma-stuff.html#ARTALPHAGAMMA"
+>ArtAlphaGamma</A
+> *alphagamma);
+void        <A
+HREF="libart-svp-rendering.html#ART-GRAY-SVP-AA"
+>art_gray_svp_aa</A
+>                 (const ArtSVP *svp,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             art_u8 *buf,
+                                             int rowstride);
+struct      <A
+HREF="libart-svp-rendering.html#ARTSVPRENDERAASTEP"
+>ArtSVPRenderAAStep</A
+>;
+void        <A
+HREF="libart-svp-rendering.html#ART-SVP-RENDER-AA"
+>art_svp_render_aa</A
+>               (const ArtSVP *svp,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             void (*callback) (void *callback_data,int y,int start,ArtSVPRenderAAStep *steps, int n_steps),
+                                             void *callback_data);</PRE
+></TD
+></TR
+></TABLE
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN1481"
+></A
+><H2
+>Description</H2
+><P
+>Once SVPs have been generated from <TT
+CLASS="LITERAL"
+>ArtVPaths</TT
+> and <TT
+CLASS="LITERAL"
+>ArtBPaths</TT
+>, you need to do
+the actual rasterization into pixel buffers. This step can be done with three
+routines: <A
+HREF="libart-svp-rendering.html#ART-RGB-SVP-AA"
+>art_rgb_svp_aa</A
+>, 
+<A
+HREF="libart-svp-rendering.html#ART-RGB-SVP-ALPHA"
+>art_rgb_svp_alpha</A
+> or
+<A
+HREF="libart-svp-rendering.html#ART-GRAY-SVP-AA"
+>art_gray_svp_aa</A
+>. There also exist
+a low-level API for rasterizing, <A
+HREF="libart-svp-rendering.html#ART-SVP-RENDER-AA"
+>art_svp_render_aa</A
+>.
+For conveniance, libart also provides some simple functions to fill pixel buffers with 
+background colors such as <A
+HREF="libart-svp-rendering.html#ART-RGB-FILL-RUN"
+>art_rgb_fill_run</A
+> and
+<A
+HREF="libart-svp-rendering.html#ART-RGB-RUN-ALPHA"
+>art_rgb_run_alpha</A
+></P
+><P
+>Each of the three high-level function used for rendering represents pixel buffers by
+two parameters: a rowstride and pointer to an array of art_u8. The exact semantics of these
+parameters depend of course on the nature pixel buffer (namely, the semantics are slightly
+different for B&amp;W and color pixel buffers) but the spirit is the same. An image is represented
+by the list of the values of each of its pixels. Libart manipulates only images where each
+such pixel value is coded on 8 bits (that is, a byte/octet): this does not harm libart's usefulness
+since this is the most widely used format both in software and hardware. For example, a 256x256
+B&amp;W image will use 256 * 256 = 65536 bytes and a color image will use 256 * 256 * 3 = 196608 bytes
+(because in a color image, we code separatly the red, green and blue components of the image,
+each on 8 bits).</P
+><P
+>It is a natural idea to store these pixels one after the other, building a pixel buffer which 
+is represented by the art_u8 array (pixels are listed from left to right/top to bottom). Once you
+know the kind of pixel you are using (either B&amp;W or color), all you need to know to parse
+efficiently the buffer is to know the width of the original image (so that you can jump from line 
+to line). It happens that people are used to represent this information with rowstrides. The
+rowstride of our 256x256 B&amp;W image is 256: it is the number of bytes a row of the image needs to
+be stored.</P
+><P
+>Code to use the three rendering functions can be found in the previous examples. The only thing you 
+need to take care of when using them is to make sure the rendering area defined by (x0,y0,x1,y1) is 
+smaller than the pixel buffer where the vector paths are to be rendered (otherwise, bad segfaults 
+will happen).</P
+><P
+>Finally, users who want to do cool rendering (such as filling a vector path with a pattern or a gradient
+instead of using a solid color should look into librsvg. librsvg is a library used by nautilus to render 
+svg graphics which extends libart and provides a number of rendering functions using the low-level 
+<A
+HREF="libart-svp-rendering.html#ART-RGB-RUN-ALPHA"
+>art_rgb_run_alpha</A
+> function. It should be noted that librsvg
+contains code from the unstable branch of libart_lgpl which was backported to the stable libart
+but not included in it because of binary compatibility.). Users could also write their own rendering 
+callbacks with <A
+HREF="libart-svp-rendering.html#ART-RGB-RUN-ALPHA"
+>art_rgb_run_alpha</A
+> but doing so requires a lot of 
+knowledge of the internals of libart: if you really want to do this, read the section
+<A
+HREF="internals.html"
+>Libart Internals</A
+>.</P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN1499"
+></A
+><H2
+>Details</H2
+><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN1501"
+></A
+><H3
+><A
+NAME="ART-RGB-FILL-RUN"
+></A
+>art_rgb_fill_run ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_rgb_fill_run                (art_u8 *buf,
+                                             art_u8 r,
+                                             art_u8 g,
+                                             art_u8 b,
+                                             int n);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Fills a buffer with <TT
+CLASS="PARAMETER"
+><I
+>n</I
+></TT
+> copies of the (<TT
+CLASS="PARAMETER"
+><I
+>r</I
+></TT
+>, <TT
+CLASS="PARAMETER"
+><I
+>g</I
+></TT
+>, <TT
+CLASS="PARAMETER"
+><I
+>b</I
+></TT
+>) triple. Thus,
+locations <TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+> (inclusive) through <TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+> + 3 * <TT
+CLASS="PARAMETER"
+><I
+>n</I
+></TT
+> (exclusive) are
+written.</P
+><P
+>The implementation of this routine is very highly optimized.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1519"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Buffer to fill.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>r</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Red, range 0..255.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>g</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Green, range 0..255.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>b</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Blue, range 0..255.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>n</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Number of RGB triples to fill.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN1544"
+></A
+><H3
+><A
+NAME="ART-RGB-RUN-ALPHA"
+></A
+>art_rgb_run_alpha ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_rgb_run_alpha               (art_u8 *buf,
+                                             art_u8 r,
+                                             art_u8 g,
+                                             art_u8 b,
+                                             int alpha,
+                                             int n);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Renders a sequential run of solid (<TT
+CLASS="PARAMETER"
+><I
+>r</I
+></TT
+>, <TT
+CLASS="PARAMETER"
+><I
+>g</I
+></TT
+>, <TT
+CLASS="PARAMETER"
+><I
+>b</I
+></TT
+>) color over <TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+> with
+opacity <TT
+CLASS="PARAMETER"
+><I
+>alpha</I
+></TT
+>.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1559"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Buffer for rendering.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>r</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Red, range 0..255.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>g</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Green, range 0..255.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>b</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Blue, range 0..255.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>alpha</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Alpha, range 0..256.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>n</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Number of RGB triples to render.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN1588"
+></A
+><H3
+><A
+NAME="ART-RGB-SVP-AA"
+></A
+>art_rgb_svp_aa ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_rgb_svp_aa                  (const ArtSVP *svp,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             art_u32 fg_color,
+                                             art_u32 bg_color,
+                                             art_u8 *buf,
+                                             int rowstride,
+                                             <A
+HREF="libart-art-alpha-gamma-stuff.html#ARTALPHAGAMMA"
+>ArtAlphaGamma</A
+> *alphagamma);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Renders the shape specified with <TT
+CLASS="PARAMETER"
+><I
+>svp</I
+></TT
+> into the <TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+> RGB buffer.
+<TT
+CLASS="PARAMETER"
+><I
+>x1</I
+></TT
+> - <TT
+CLASS="PARAMETER"
+><I
+>x0</I
+></TT
+> specifies the width, and <TT
+CLASS="PARAMETER"
+><I
+>y1</I
+></TT
+> - <TT
+CLASS="PARAMETER"
+><I
+>y0</I
+></TT
+> specifies the height,
+of the rectangle rendered. The new pixels are stored starting at
+the first byte of <TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+>. Thus, the <TT
+CLASS="PARAMETER"
+><I
+>x0</I
+></TT
+> and <TT
+CLASS="PARAMETER"
+><I
+>y0</I
+></TT
+> parameters specify
+an offset within <TT
+CLASS="PARAMETER"
+><I
+>svp</I
+></TT
+>, and may be tweaked as a way of doing
+integer-pixel translations without fiddling with <TT
+CLASS="PARAMETER"
+><I
+>svp</I
+></TT
+> itself.</P
+><P
+>The <TT
+CLASS="PARAMETER"
+><I
+>fg_color</I
+></TT
+> and <TT
+CLASS="PARAMETER"
+><I
+>bg_color</I
+></TT
+> arguments specify the opaque colors to
+be used for rendering. For pixels of entirely 0 winding-number,
+<TT
+CLASS="PARAMETER"
+><I
+>bg_color</I
+></TT
+> is used. For pixels of entirely 1 winding number,
+<TT
+CLASS="PARAMETER"
+><I
+>fg_color</I
+></TT
+> is used. In between, the color is interpolated based on
+the fraction of the pixel with a winding number of 1. If
+<TT
+CLASS="PARAMETER"
+><I
+>alphagamma</I
+></TT
+> is NULL, then linear interpolation (in pixel counts) is
+the default. Otherwise, the interpolation is as specified by
+<TT
+CLASS="PARAMETER"
+><I
+>alphagamma</I
+></TT
+>.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1617"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>svp</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The source sorted vector path.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>x0</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Left coordinate of destination rectangle.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>y0</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Top coordinate of destination rectangle.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>x1</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Right coordinate of destination rectangle.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>y1</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Bottom coordinate of destination rectangle.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>fg_color</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Foreground color in 0xRRGGBB format.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>bg_color</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Background color in 0xRRGGBB format.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Destination RGB buffer.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>rowstride</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Rowstride of <TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+> buffer.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>alphagamma</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> <A
+HREF="libart-art-alpha-gamma-stuff.html#ARTALPHAGAMMA"
+>ArtAlphaGamma</A
+> for gamma-correcting the rendering.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN1664"
+></A
+><H3
+><A
+NAME="ART-RGB-SVP-ALPHA"
+></A
+>art_rgb_svp_alpha ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_rgb_svp_alpha               (const ArtSVP *svp,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             art_u32 rgba,
+                                             art_u8 *buf,
+                                             int rowstride,
+                                             <A
+HREF="libart-art-alpha-gamma-stuff.html#ARTALPHAGAMMA"
+>ArtAlphaGamma</A
+> *alphagamma);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Renders the shape specified with <TT
+CLASS="PARAMETER"
+><I
+>svp</I
+></TT
+> over the <TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+> RGB buffer.
+<TT
+CLASS="PARAMETER"
+><I
+>x1</I
+></TT
+> - <TT
+CLASS="PARAMETER"
+><I
+>x0</I
+></TT
+> specifies the width, and <TT
+CLASS="PARAMETER"
+><I
+>y1</I
+></TT
+> - <TT
+CLASS="PARAMETER"
+><I
+>y0</I
+></TT
+> specifies the height,
+of the rectangle rendered. The new pixels are stored starting at
+the first byte of <TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+>. Thus, the <TT
+CLASS="PARAMETER"
+><I
+>x0</I
+></TT
+> and <TT
+CLASS="PARAMETER"
+><I
+>y0</I
+></TT
+> parameters specify
+an offset within <TT
+CLASS="PARAMETER"
+><I
+>svp</I
+></TT
+>, and may be tweaked as a way of doing
+integer-pixel translations without fiddling with <TT
+CLASS="PARAMETER"
+><I
+>svp</I
+></TT
+> itself.</P
+><P
+>The <TT
+CLASS="PARAMETER"
+><I
+>rgba</I
+></TT
+> argument specifies the color for the rendering. Pixels of
+entirely 0 winding number are left untouched. Pixels of entirely
+1 winding number have the color <TT
+CLASS="PARAMETER"
+><I
+>rgba</I
+></TT
+> composited over them (ie,
+are replaced by the red, green, blue components of <TT
+CLASS="PARAMETER"
+><I
+>rgba</I
+></TT
+> if the alpha
+component is 0xff). Pixels of intermediate coverage are interpolated
+according to the rule in <TT
+CLASS="PARAMETER"
+><I
+>alphagamma</I
+></TT
+>, or default to linear if
+<TT
+CLASS="PARAMETER"
+><I
+>alphagamma</I
+></TT
+> is NULL.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1691"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>svp</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The source sorted vector path.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>x0</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Left coordinate of destination rectangle.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>y0</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Top coordinate of destination rectangle.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>x1</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Right coordinate of destination rectangle.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>y1</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Bottom coordinate of destination rectangle.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>rgba</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Color in 0xRRGGBBAA format.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Destination RGB buffer.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>rowstride</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Rowstride of <TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+> buffer.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>alphagamma</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> <A
+HREF="libart-art-alpha-gamma-stuff.html#ARTALPHAGAMMA"
+>ArtAlphaGamma</A
+> for gamma-correcting the compositing.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN1734"
+></A
+><H3
+><A
+NAME="ART-GRAY-SVP-AA"
+></A
+>art_gray_svp_aa ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_gray_svp_aa                 (const ArtSVP *svp,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             art_u8 *buf,
+                                             int rowstride);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Each pixel gets a value proportional to the area within the pixel
+overlapping the (filled) SVP. Pixel (x, y) is stored at:</P
+><P
+><TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+>[(y - * <TT
+CLASS="PARAMETER"
+><I
+>y0</I
+></TT
+>) * <TT
+CLASS="PARAMETER"
+><I
+>rowstride</I
+></TT
+> + (x - <TT
+CLASS="PARAMETER"
+><I
+>x0</I
+></TT
+>)]</P
+><P
+>All pixels <TT
+CLASS="PARAMETER"
+><I
+>x0</I
+></TT
+> &lt;= x &lt; <TT
+CLASS="PARAMETER"
+><I
+>x1</I
+></TT
+>, <TT
+CLASS="PARAMETER"
+><I
+>y0</I
+></TT
+> &lt;= y &lt; <TT
+CLASS="PARAMETER"
+><I
+>y1</I
+></TT
+> are generated. A
+stored value of zero is no coverage, and a value of 255 is full
+coverage. The area within the pixel (x, y) is the region covered
+by [x..x+1] and [y..y+1].</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1752"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>svp</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The SVP to render.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>x0</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The view window's left coord.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>y0</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The view window's top coord.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>x1</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The view window's right coord.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>y1</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The view window's bottom coord.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The buffer where the bytemap is stored.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>rowstride</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> the rowstride for <TT
+CLASS="PARAMETER"
+><I
+>buf</I
+></TT
+>.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN1786"
+></A
+><H3
+><A
+NAME="ARTSVPRENDERAASTEP"
+></A
+>struct ArtSVPRenderAAStep</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>struct ArtSVPRenderAAStep {
+  int x;
+  int delta; /* stored with 16 fractional bits */
+};</PRE
+></TD
+></TR
+></TABLE
+><P
+></P
+></DIV
+><HR><DIV
+CLASS="REFSECT2"
+><A
+NAME="AEN1791"
+></A
+><H3
+><A
+NAME="ART-SVP-RENDER-AA"
+></A
+>art_svp_render_aa ()</H3
+><TABLE
+BORDER="0"
+BGCOLOR="#D6E8FF"
+WIDTH="100%"
+CELLPADDING="6"
+><TR
+><TD
+><PRE
+CLASS="PROGRAMLISTING"
+>void        art_svp_render_aa               (const ArtSVP *svp,
+                                             int x0,
+                                             int y0,
+                                             int x1,
+                                             int y1,
+                                             void (*callback) (void *callback_data,int y,int start,ArtSVPRenderAAStep *steps, int n_steps),
+                                             void *callback_data);</PRE
+></TD
+></TR
+></TABLE
+><P
+>Renders the sorted vector path in the given rectangle, antialiased.</P
+><P
+>This interface uses a callback for the actual pixel rendering. The
+callback is called <TT
+CLASS="PARAMETER"
+><I
+>y1</I
+></TT
+> - <TT
+CLASS="PARAMETER"
+><I
+>y0</I
+></TT
+> times (once for each scan line). The y
+coordinate is given as an argument for convenience (it could be
+stored in the callback's private data and incremented on each
+call).</P
+><P
+>The rendered polygon is represented in a semi-runlength format: a
+start value and a sequence of "steps". Each step has an x
+coordinate and a value delta. The resulting value at position x is
+equal to the sum of the start value and all step delta values for
+which the step x coordinate is less than or equal to x. An
+efficient algorithm will traverse the steps left to right, keeping
+a running sum.</P
+><P
+>All x coordinates in the steps are guaranteed to be <TT
+CLASS="PARAMETER"
+><I
+>x0</I
+></TT
+> &lt;= x &lt; <TT
+CLASS="PARAMETER"
+><I
+>x1</I
+></TT
+>.
+(This guarantee is a change from the gfonted vpaar renderer from
+which this routine is derived, and is designed to simplify the
+callback).</P
+><P
+>The value 0x8000 represents 0% coverage by the polygon, while
+0xff8000 represents 100% coverage. This format is designed so that
+&gt;&gt; 16 results in a standard 0x00..0xff value range, with nice
+rounding.</P
+><P
+></P
+><DIV
+CLASS="INFORMALTABLE"
+><A
+NAME="AEN1806"
+></A
+><P
+></P
+><TABLE
+BORDER="0"
+WIDTH="100%"
+BGCOLOR="#FFD0D0"
+CELLSPACING="0"
+CELLPADDING="4"
+CLASS="CALSTABLE"
+><TBODY
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>svp</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The ArtSVP to render.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>x0</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Left coordinate of destination rectangle.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>y0</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Top coordinate of destination rectangle.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>x1</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Right coordinate of destination rectangle.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>y1</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Bottom coordinate of destination rectangle.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>callback</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> The callback which actually paints the pixels.</TD
+></TR
+><TR
+><TD
+WIDTH="20%"
+ALIGN="RIGHT"
+VALIGN="TOP"
+><TT
+CLASS="PARAMETER"
+><I
+>callback_data</I
+></TT
+>&nbsp;:</TD
+><TD
+WIDTH="80%"
+ALIGN="LEFT"
+VALIGN="TOP"
+> Private data for <TT
+CLASS="PARAMETER"
+><I
+>callback</I
+></TT
+>.</TD
+></TR
+></TBODY
+></TABLE
+><P
+></P
+></DIV
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><BR
+CLEAR="all"><BR><TABLE
+WIDTH="100%"
+BORDER="0"
+BGCOLOR="#000000"
+CELLPADDING="1"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="left"
+><A
+HREF="libart-svps.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>&#60;&#60;&#60; Previous Page</B
+></FONT
+></A
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#0000C0"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="libart.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Home</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#00C000"
+ALIGN="center"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+><A
+HREF="basic-rendering.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Up</B
+></FONT
+></A
+></B
+></FONT
+></TD
+><TD
+WIDTH="25%"
+BGCOLOR="#C00000"
+ALIGN="right"
+><A
+HREF="problems.html"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Next Page &#62;&#62;&#62;</B
+></FONT
+></A
+></TD
+></TR
+><TR
+><TD
+COLSPAN="2"
+ALIGN="left"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>SVPs</B
+></FONT
+></TD
+><TD
+COLSPAN="2"
+ALIGN="right"
+><FONT
+COLOR="#FFFFFF"
+SIZE="3"
+><B
+>Known problems</B
+></FONT
+></TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

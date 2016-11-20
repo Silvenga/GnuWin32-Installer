@@ -1,0 +1,603 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: `convert' command</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile Convert.html "Gri: `convert' command" "Gri Commands" --> 
+
+<!-- @node   Convert, Convert Columns To Grid, Close, List Of Gri Commands -->
+<a name="Convert" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="ListOfGriCommands.html#ListOfGriCommands" shape="rect" coords="516,2,532,24" href="ListOfGriCommands.html#ListOfGriCommands">
+<area alt="Gri: `close' command" shape="rect" coords="557,2,573,24" href="Close.html">
+<area alt="Gri: `create' command" shape="rect" coords="581,2,599,24" href="Create.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: `create' command" shape="rect" coords="581,2,599,24" href="Create.html">
+</map>
+<h3>9.3.4: The `<font color="#82140F"><code>convert</code></font>' commands</h3>
+
+
+<UL>
+<LI><a href="Convert.html#ConvertColumnsToGrid">Convert Columns To Grid</a>: Create grid from (x,y,f) data
+<LI><a href="Convert.html#ConvertColumnsToSpline">Convert Columns To Spline</a>: Create spline (x',y') from (x,y) data
+<LI><a href="Convert.html#ConvertGridToColumns">Convert Grid To Columns</a>: Create (x,y,f) data from grid
+<LI><a href="Convert.html#ConvertGridToImage">Convert Grid To Image</a>: Create an image from grid data
+<LI><a href="Convert.html#ConvertImageToGrid">Convert Image To Grid</a>: Create a grid from image data
+</UL>
+
+
+<!-- @node   Convert Columns To Grid, Convert Columns To Spline, Convert, Convert -->
+<a name="ConvertColumnsToGrid" ></a>
+<h4>9.3.4.1: `<font color="#82140F"><code>convert columns to grid</code></font>'</h4>
+
+<!-- latex: \index{convert columns to grid} -->
+Various forms exist:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`convert columns to grid OPTIONS'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+where the `<font color="#82140F"><code>OPTIONS</code></font>' may be omitted or
+selected from this list:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`neighbor'
+`boxcar    [.xr. .yr. [.n. .e.]]'
+`objective [.xr. .yr. [.n. .e.]]'
+`barnes    [.xr. .yr. .gamma. .iter.]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+For more discussion on the methods see see <a href="ContourPlots.html#UngriddedData">Ungridded Data</a>.
+<p>
+All these commands ``grid'' columnar (x,y,z) data.  That is, they fill
+up a grid based on some form of interpolation of the possibly randomly-spaced 
+columnar data.  There are many methods in existence for doing
+this, and Gri implements several of them as alternatives.
+<p>
+The grid will have been defined by commands such as `<font color="#82140F"><code>set x grid</code></font>',
+`<font color="#82140F"><code>set y grid</code></font>', `<font color="#82140F"><code>read grid x</code></font>' and `<font color="#82140F"><code>read grid y</code></font>'.  As of
+version 2.1.9, Gri does not require a grid to have been pre-defined; it
+will create a regular 20 by 20 grid, spanning the range of x and y data,
+as a default.  This is a good starting point in many cases.
+<p>
+<dl>
+<p>
+<dt> <i>`neighbor' method</i>
+<dd>Very fast but very limited.
+<p>
+<dt> <i>`boxcar' method</i>
+<dd>Slower but a lot better.  Still, this can produce noisy contours if the
+data are not densely and uniformly ditributed through domain.
+<p>
+<dt> <i>`objective' method</i>
+<dd>Somewhat slower than `boxcar', but produces better fields since the
+averaging function is smooth.
+<p>
+<dt> <i>`barnes' method</i>
+<dd>Somewhat slower than `objective', but only by a constant factor (that
+is, independent of number of data).  This produces by far the best
+results, since the smoothing function has variable spatial scale.  This
+is the default method if no method is supplied.
+</dl>
+
+All except the `<font color="#82140F"><code>neighbor</code></font>' method may take optional arguments to
+define the x and y scales of the smoothing function (called `<font color="#82140F"><code>.xr.</code></font>'
+and `<font color="#82140F"><code>.yr.</code></font>').  (The barnes method has two other optional arguments
+-- see below.)  If you do not supply these arguments, Gri will make a
+reasonable choice and inform you of its decision.  Many users find that
+it is best to `<font color="#82140F"><code>convert columns to grid</code></font>' with no additional
+parameters as a first step, to get advice on values to use for the
+optional parameters.
+<p>
+The default `<font color="#82140F"><code>.xr.</code></font>' and `<font color="#82140F"><code>.yr.</code></font>' are calculated by determining
+the span in x and in y directions, and dividing each by the square root
+of the number of data points.  These numbers are then multiplied by the
+square root of 2.  The method is as proposed by S. E. Koch and M.
+DesJardins and P. J. Kocin, 1983.  ``An interactive Barnes objective map
+anlaysis scheme for use with satellite and conventional data,'',
+J. Climate Appl.  Met., vol 22, p. 1487-1503.
+<p>
+If `<font color="#82140F"><code>.xr.</code></font>' and `<font color="#82140F"><code>.yr.</code></font>' were supplied but negative, then Gri
+interprets this as an instruction to modify the default values,
+described in last paragraph, by multiplying by the absolute values of
+the negative numbers given, instead of muliplying by square root of 2.
+<p>
+If the `<font color="#82140F"><code>chatty</code></font>' option is turned on 
+then Gri will print out the values of
+(dx,dy) that it has 
+calculated; this gives you some guidance for supplying your own values
+of `<font color="#82140F"><code>(.xr.,.yr.)</code></font>' if you choose to supply them yourself.  It is also
+a good idea to let these parameters be a guide for your grid spacing;
+for example, Koch et al., 1983, suggest using grid spacing of 0.3 to 0.5
+times (dx,dy).
+<p>
+And now, the details ...
+<p>
+<ul>
+<p>
+<li> <b>``Neighbor'' method</b>
+The `<font color="#82140F"><code>convert columns to grid neighbor</code></font>' method is useful for (x,y,z)
+data which are already gridded (i.e., for which x and y take only values
+which lie on the grid), or nearly gridded.  The (x,y,z) data are scanned
+from start to finish. For each data point, the nearest grid point is
+found.  Nearness is measured as Cartesian distance, with scale factor
+given by the distance between the first and second grid points.  In
+other words, distance is given by D=sqrt(dx*dx+dy*dy) where dx is ratio
+of distance from data point to nearest grid point, in x-units, divided
+by the difference between the first two elements of the x-grid, and dy
+is similarly defined.  Once the grid point nearest the data point is
+determined, Gri adds the z-value to a list of possible values to store
+in the grid.  Once the entire data set has been scanned, Gri then goes
+back to each grid point, and chooses the z-value of the data point that
+was nearest to the grid point -- that is, it stores the z value of the
+(x,y,z) data triplet which has minimal D value.  Note that this scheme
+is independent of the order of the data within the columns.
+<p>
+
+The `<font color="#82140F"><code>neighbor</code></font>' method is useful when the data are already
+pre-gridded, meaning that the (x,y,z) triplets have x and y values which
+are already aligned with the grid.  <b>Computational cost:</b> For
+`<font color="#82140F"><code>P</code></font>' data points, `<font color="#82140F"><code>X</code></font>' x-grid points, and `<font color="#82140F"><code>Y</code></font>' y-grid
+points, the method calculation cost is proportional to
+`<font color="#82140F"><code>P*[log2(X)+log2(Y)]</code></font>' where `<font color="#82140F"><code>log2</code></font>' is logarithm base 2.
+As discussed below, this is often several orders of magnitude lower than
+the other methods of gridding.
+<p>
+<li> <b>``Objective'' method</b>
+In the `<font color="#82140F"><code>objective</code></font>' method, a smoothing technique known as objective
+mapping is applied.  It is essentially a variable-size smoothing filter
+of approximately Gaussian shape (it is method ``two'' of Levy and Brown
+[1986 J. Geophysical Res. vol 91, p 5153-5158]) The parameters
+`<font color="#82140F"><code>.xr.</code></font>' and `<font color="#82140F"><code>.yr.</code></font>' give the width of the filter.
+<p>
+With the optional additional parameters `<font color="#82140F"><code>.n.</code></font>' and `<font color="#82140F"><code>.e.</code></font>' are
+specified, then grid values will be assigned the missing value if there
+are fewer than `<font color="#82140F"><code>.n.</code></font>' (x,y,f) data in the neighborhood of the
+gridpoint, even after enlarging the neighborhood by widening and
+heightening by root(2) up to `<font color="#82140F"><code>.e.</code></font>' times.  (The enlargement is only
+done if fewer than `<font color="#82140F"><code>.n.</code></font>' points are found.)  If these parameters
+are not specified in the command, then values `<font color="#82140F"><code>.n.</code></font>'=5 and
+`<font color="#82140F"><code>.e.</code></font>'=1 are assumed.  The special case where `<font color="#82140F"><code>.e.</code></font>' is negative
+tells Gri to <b>always</b> fill in each grid point, by extending the
+neighborhood to enclose the entire dataset if necessary.
+<p>
+<b>Computational cost:</b> For `<font color="#82140F"><code>P</code></font>' data points, `<font color="#82140F"><code>X</code></font>' x-grid
+points, and `<font color="#82140F"><code>Y</code></font>' y-grid points, the method calculation cost is
+proportional to `<font color="#82140F"><code>P*X*Y</code></font>'.  Given that `<font color="#82140F"><code>X</code></font>' and `<font color="#82140F"><code>Y</code></font>' are
+determined by the requirement for smoothness of contours and the size of
+the graph, they are more or less fixed for all applications.  They are
+often in the range of 20 or so -- on 10 cm wide graph, this yields a
+contour footprint of 1/2 cm, which is often small enough to yield smooth
+contours.  Therefore, the computational cost scales linearly with the
+number of data points.  Compared to the ``neighborhood'' method, this is
+more costly by a factor of `<font color="#82140F"><code>X*Y/log_2(X)/log_2(Y)</code></font>' which is
+normally in the range from 20 to 50.
+<p>
+<li> <b>``Boxcar'' method</b>
+In the `<font color="#82140F"><code>boxcar</code></font>' method, the grid points are derived from simple
+averages calculated in rectangles `<font color="#82140F"><code>.xr.</code></font>' wide and `<font color="#82140F"><code>.yr.</code></font>' tall,
+centred on the gridpoints.  The `<font color="#82140F"><code>.n.</code></font>' and `<font color="#82140F"><code>.e.</code></font>' parameters
+have similar meanings as in the ``objective'' method.
+<p>
+<b>Computational cost:</b> Roughly same as `<font color="#82140F"><code>objective</code></font>' method
+described above.
+<p>
+<li> <b>``Barnes'' method</b>
+This is the default scheme.
+<p>
+The Barnes algorithm is applied.  If no parameters are specified,
+`<font color="#82140F"><code>.xr.</code></font>' and `<font color="#82140F"><code>.yr.</code></font>' are determined as above, with `<font color="#82140F"><code>.gamma.</code></font>'
+set to 0.5, and `<font color="#82140F"><code>.iter.</code></font>' set to 2 so that two iterations are done.
+On successive iterations, the smoothing lengthscales `<font color="#82140F"><code>.xr</code></font>' and
+`<font color="#82140F"><code>.yr</code></font>' are each reduced by multiplying by the square root of
+`<font color="#82140F"><code>.gamma.</code></font>'.  Smaller `<font color="#82140F"><code>.gamma.</code></font>' values yield better resolution
+of small-scale features on successive iterations.  Koch et al., 1983,
+recommend using a `<font color="#82140F"><code>.gamma.</code></font>' value in the range 0.2 to 1, with two
+iterations.
+<p>
+Provided that all the grid points are close enough to at least some
+column data, the entire grid is filled.  But if `<font color="#82140F"><code>.xr.</code></font>' and
+`<font color="#82140F"><code>.yr.</code></font>' are too small, the weighting function can fall to zero,
+since it is exponential in the sum of the squares of the
+x-distance/`<font color="#82140F"><code>.xr.</code></font>' and the y-distance/`<font color="#82140F"><code>.yr.</code></font>'; in that case
+missing values result at those grid points.  On a 32 bit computer, the
+weighting function will fall to zero when x-distance/`<font color="#82140F"><code>.xr.</code></font>'  and
+y-distance/`<font color="#82140F"><code>.yr.</code></font>'  are less than about 15 to 20.
+<p>
+If weights have been read in (see <a href="Read.html#ReadColumns">Read Columns</a>), then these values are
+applied in addition to the distance-based weighting.  (The normalization
+means that weights for two data points of e.g. 1 and 2 will yield the
+same result as if the weights had been given as 10 and 20.)
+<p>
+The computational cost at each iteration scales as `<font color="#82140F"><code>P*X*Y)</code></font>'.  This
+is comparable to that of the ``objective'' and ``boxcar'' methods.
+Since normally two iterations are done, ``barnes'' is about double the
+cost of these methods.  (Note: versions prior to 2.1.8 were much slower
+for large datasets, being proportional to `<font color="#82140F"><code>P*P</code></font>'.)
+<p>
+References: (1) Section 3.6 in Roger Daley, 1991, ``Atmospheric data
+analysis,'' Cambridge Press, New York. (2) S. E. Koch and M. DesJardins
+and P. J. Kocin, 1983.  ``An interactive Barnes objective map anlaysis
+scheme for use with satellite and conventional data,'', J. Climate Appl.
+Met., vol 22, p. 1487-1503.
+</ul>
+<p>
+The Barnes algorithm is as follows:
+<p>
+
+
+The gridded field is estimated iteratively.  Successive iterations
+retain largescale features from previous iterations, while adding
+details at smaller scales.
+<p>
+The first estimate of the gridded field, here denoted
+`<font color="#82140F"><code>G_(ij)^0</code></font>' (the superscript indicating the order of the
+iteration) is given by a weighted sum of the input data, with
+`<font color="#82140F"><code>z_k</code></font>' denoting the k-th `<font color="#82140F"><code>z</code></font>' value.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+             sum_1^n W_(ijk)^0 z_k
+G_(ij)^(0) = ----------------------
+               sum_1^n W_(ijk)0
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+where the notation `<font color="#82140F"><code>sum_1^n</code></font>' means to sum the elements
+for the `<font color="#82140F"><code>k</code></font>' index ranging from 1 to `<font color="#82140F"><code>n</code></font>'.
+<p>
+The weights `<font color="#82140F"><code>W_(ijk)^0</code></font>' are defined in terms of a Guassian
+function decaying with distance from observation point to grid point:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+               (   (x_k - X_i)^2       (y_k - Y_j)^2  )
+W_(ijk)^0 = exp(-  --------------  -  --------------- )
+               (      L_x^2                L_y^2      )
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Here `<font color="#82140F"><code>L_x</code></font>' and `<font color="#82140F"><code>L_y</code></font>' are lengths which define the smallest
+`<font color="#82140F"><code>(x,y)</code></font>' scales over which the gridded field will have significant
+variations (for details of the spectral response see Koch et al. 1983).
+<p>
+Note: if the user has supplied weights then these
+are applied in addition to the distance-based weights.  That is,
+`<font color="#82140F"><code>w_i W_(ijk)</code></font>' is used instead of `<font color="#82140F"><code>W_(ijk)</code></font>'.
+<p>
+The second iteration derives a grid `<font color="#82140F"><code>G_(ij)^1</code></font>' in terms of the
+first grid `<font color="#82140F"><code>G_(ij)^0</code></font>' and ``analysis values'' `<font color="#82140F"><code>f_k^0</code></font>'
+calculated at the `<font color="#82140F"><code>(x_k,y_k)</code></font>' using a formula analogous to that
+above.  (Interpolation based on the first estimate of the grid
+`<font color="#82140F"><code>G_(ij)^0</code></font>' can also be used to calculate `<font color="#82140F"><code>f_k^0</code></font>', with
+equivalent results for a grid of sufficiently fine mesh.)  In this
+iteration, however, the weighted average is based on the difference
+between the data and the gridded field, so that no further adjustment
+of the gridded field is done in regions where it is already close to
+through the observed values.  The second estimate of the gridded field
+is given by
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+                       sum_1^n W_(ijk)^1 (f_k - f_k^0)
+G_(ij)^1 = G_(ij)^0 +  -------------------------------
+                              sum_1^n W_(ijk)^1
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+ where the weights `<font color="#82140F"><code>w_{ik,1}</code></font>' are defined by analogy
+with `<font color="#82140F"><code>W_{ik}^0</code></font>' except that `<font color="#82140F"><code>L_x</code></font>' and `<font color="#82140F"><code>L_y</code></font>' are
+replaced by `<font color="#82140F"><code>gamma^{1/2}L_x</code></font>' and `<font color="#82140F"><code>gamma^{1/2}L_y</code></font>'.  The
+nondimensional parameter `<font color="#82140F"><code>gamma</code></font>' (`<font color="#82140F"><code>0&lt;gamma&lt;1</code></font>') controls the
+degree to which the focus is improved on the second iteration.  Just
+as the weighting function forced the gridded field to be smooth over
+scales smaller than `<font color="#82140F"><code>L_x</code></font>' and `<font color="#82140F"><code>L_y</code></font>' on the first iteration,
+so it forces the second estimate of the gridded field to be smooth
+over the smaller scales `<font color="#82140F"><code>gamma^{1/2}L_x</code></font>' and
+`<font color="#82140F"><code>gamma^{1/2}L_y</code></font>'.
+<p>
+The first iteration yields a gridded field which represents the
+observations over scales larger than `<font color="#82140F"><code>(L_x,L_y)</code></font>', while successive
+iterations fill in details at smaller scales, without greatly
+modifying the larger scale field.
+<p>
+In principle, the iterative process may be continued an arbitrary number
+of times, each time reducing the scale of variation in the gridded field
+by the factor `<font color="#82140F"><code>gamma^{1/2}</code></font>'.  Koch et al. 1983 suggest that there
+is little utility in performing more than two iterations, providing an
+appropriate choice of the focussing parameter `<font color="#82140F"><code>gamma</code></font>' has been made.
+Thus the gridding procedure defines a gridded field based on three
+tunable parameters: `<font color="#82140F"><code>(L_x,L_y,gamma)</code></font>'.
+<p>
+
+
+
+
+<!-- @node   Convert Columns To Spline, Convert Grid To Columns, Convert Columns To Grid, Convert -->
+<a name="ConvertColumnsToSpline" ></a>
+<h4>9.3.4.2: `<font color="#82140F"><code>convert columns to spline</code></font>'</h4>
+
+<!-- latex: \index{convert columns to spline} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`convert columns to spline \
+    [.gamma.] \
+    [.xmin. .xmax. .xinc.]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Fit a normal or taut interpolating spline, y=y(x), through the (x,y)
+data.  Then subsample this spline to get a new set of (x,y) data.  If
+the spline x-values, `<font color="#82140F"><code>.xmin.</code></font>', etc, are not specified, the spline
+ranges from the smallest x-value with legitimate data to the largest
+one, with 200 steps in between.
+<p>
+The parameter `<font color="#82140F"><code>.gamma.</code></font>' determines the type of spline used.  If
+`<font color="#82140F"><code>.gamma.</code></font>' is not specified, or is given as zero, a standard
+interpolating spline is used.  A knot appears at each x location, with
+cubic polynomials spanning the space between the knots.  If
+`<font color="#82140F"><code>.gamma.</code></font>' lies between 0 and 6, a taut spline is used; this tends
+to have fewer wiggles than a normal spline.  If `<font color="#82140F"><code>.gamma.</code></font>'  lies in
+the range 0 to 3, a taut spline is used, with the possible insertion of
+knots between interior x pairs.  The value 2.5 is used commonly.  If
+`<font color="#82140F"><code>.gamma.</code></font>' lies in the range 3 to 6, extra knots are permitted in
+the x pairs at the ends of the domain.  A value of 5.5 is used commonly.
+<p>
+<b>Reference</b> Chapter 16 of Carl de Boar, 1987. ``A Practical Guide
+to Splines'' Springer-Verlag.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+read columns x y  # function is y=x^2
+0 0
+1 1
+2 4
+3 9
+4 16
+<p>
+set symbol size 0.2
+draw symbol bullet
+convert columns to spline
+draw curve
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+<!-- @node   Convert Grid To Columns, Convert Grid To Image, Convert Columns To Spline, Convert  -->
+<a name="ConvertGridToColumns" ></a>
+<h4>9.3.4.3: `<font color="#82140F"><code>convert grid to columns</code></font>'</h4>
+
+<!-- latex: \index{convert grid to columns} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`convert grid to columns'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Create column data from grid data.  Each non-missing gridpoint is
+translated into a single (x,y,z) triplet.  If column data already exist,
+then they are first erased.  This command is useful in changing the grid
+configuration, perhaps from a non-uniform grid to a uniform grid.  In
+the following example, a new grid with x=(0, 0.05, 0.1, ..., 0.1) and
+y=(10, 11, ..., 20) is created.  The default gridding method
+(`<font color="#82140F"><code>convert columns to grid</code></font>') is used here, but of course one is free
+to adjust the method as usual.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+# ... read/create grid
+convert grid to columns
+delete grid
+set x grid  0  1 0.05
+set y grid 10 20 1
+convert columns to grid
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+<!-- @node   Convert Grid To Image, Convert Image To Grid, Convert Grid To Columns, Convert -->
+<a name="ConvertGridToImage" ></a>
+<h4>9.3.4.4: `<font color="#82140F"><code>convert grid to image</code></font>'</h4>
+
+<!-- latex: \index{convert grid to image} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`convert grid to image [size .width. .height.] \
+    [box .xleft. .ybottom. .xright. .ytop.]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+With no options specified, convert grid to a 128x128 image,
+using an image range as previously set by `<font color="#82140F"><code>set image range</code></font>'.  
+<p>
+
+<b>Interpolation method:</b> The interpolation scheme is the same used for
+contouring.  Image points that lie outside the grid domain are
+considered missing.  For points within the grid, the first step is to
+locate the patch of the grid upon which the pixel lies.  Then the 4
+neighboring grid points are examined, and one of the following cases
+holds.
+<ol>
+<li>
+If 3 or more of them are missing, the pixel is considered missing.
+<li>
+If just one of the neighboring grid points is missing, then the image
+pixel value is determined by bilinear interpolation on the remaining 3
+non-missing grid points.  (This amounts to fitting a plane to three
+measurements of height.)
+<li>
+If all 4 of the grid points are non-missing, then the rectangle defined
+by the grid patch is subdivided into four triangles.  The triangles are
+defined by the two diagonal lines joining opposite corners of the
+rectangle.  An ``image point'' is constructed at the center of the grid
+patch, with f(x,y) value taken to be the average of the values of the
+four neighbors.  This value is taken to be the value at the common
+vertex of the four triangles, and then bilinear interpolation is used to
+calculate the image pixel value.
+</ol>
+<p>
+With the `<font color="#82140F"><code>size</code></font>' options `<font color="#82140F"><code>.width.</code></font>' and `<font color="#82140F"><code>.height.</code></font>'
+specified, they set the number of rectanglular patches in the image.
+<p>
+With the `<font color="#82140F"><code>box</code></font>' options specified, they set the bounding box for the
+image.  If `<font color="#82140F"><code>box</code></font>' is not given, the image spans the same bounding
+box as the grid as set by `<font color="#82140F"><code>set x grid</code></font>' and `<font color="#82140F"><code>set y grid</code></font>'.
+<p>
+Normally, missing values in the grid become white in the image, but this
+can be changed using the `<font color="#82140F"><code>set image missing value color to</code></font>'...
+command.
+<p>
+
+<!-- @node   Convert Image To Grid, Create, Convert Grid To Image, Convert -->
+<a name="ConvertImageToGrid" ></a>
+<h4>9.3.4.5: `<font color="#82140F"><code>convert image to grid</code></font>'</h4>
+
+<!-- latex: \index{convert image to grid} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`convert image to grid'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Convert image to grid, using current graylevel/colorlevel mapping.  For
+example, if one had a linear mapping of pixel values 0-&gt;255 into the
+user values 10-&gt;20, as in
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+set image range 10 20
+set image grayscale black 10 white 20
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+then the output grid will be of value 10 where the pixel value is 0,
+etc.  If the image is in color, the grid values will represent the
+result of mapping the colors to grayscale in the standard way (Foley and
+VanDam, 1984). [BUG: as of 1.063, the colorscale is ignored completely,
+and I'm not sure what happens.] The image data are interpolated onto the
+grid using a nearest-neighbor substitution.  This command insists that
+the image x/y grids have already been defined.
+<p>
+
+
+
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

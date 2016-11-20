@@ -1,0 +1,89 @@
+<html>
+<head>
+<title>../../../gri-2.12.10-src/doc/examples/example3.gri</title>
+</head>
+<body bgcolor="#FFFFFF">
+<i># This html document was prepared by gri2html based on the Gri script named</i>
+<br><i>#    <a href="../../../gri-2.12.10-src/doc/examples/example3.gri">../../../gri-2.12.10-src/doc/examples/example3.gri</a></i>
+<br># <i>Gri is available for free at <a href="http://gri.sourceforge.net">http://gri.sourceforge.net</a></i>
+<pre>
+<font color=#B22222># Example 3 -- Controlling scales, etc</font>
+
+<font color=#B22222>#</font>
+<font color=#B22222># Example of how to control axis scales, etc.  This example makes</font>
+<font color=#B22222># two panels, plotting the same data in different ways.</font>
+<font color=#B22222>#</font>
+<font color=#B22222>#</font>
+<font color=#B22222># ----- PANEL 2 ------------------------------------------------</font>
+<font color=#B22222>#</font>
+<font color=#B22222># Set up the x axis.</font>
+<font color=#B22222>#</font>
+<font color=#B22222># Make the x axis run from 0 to 1, with labelled tics each 0.25. </font>
+set x axis 0   1   .25
+<font color=#B22222># Make the plot 5 cm wide.</font>
+set x size 5
+<font color=#B22222># 2 cm of space between the left edge of the plot</font>
+<font color=#B22222># and the left edge of the paper.</font>
+set x margin 2
+<font color=#B22222># Give the x-axis the name "t" with subscript 0.</font>
+set x name <font color=#2F4F4F>"$t_0$"</font>
+<font color=#B22222>#</font>
+<font color=#B22222># Set up the y axis.</font>
+<font color=#B22222>#</font>
+<font color=#B22222># Make the y axis run from 10 to 20, with labelled tics at intervals</font>
+<font color=#B22222># of 5 and smaller, unlabelled, tics, at intervals of 1.  Other</font>
+<font color=#B22222># commands are similar to those for the x-axis.</font>
+set y axis 10 20 5 1
+set y size 10
+set y margin 2
+set y name <font color=#2F4F4F>"F"</font>
+<font color=#B22222>#</font>
+<font color=#B22222># Now, read our simple data set.</font>
+open example1.dat
+read columns x y
+close
+<font color=#B22222>#</font>
+<font color=#B22222># Draw a curve connecting these (x,y) data.  Note that the axes, as</font>
+<font color=#B22222># defined above, will be drawn automatically along with the curve.</font>
+draw curve 
+
+
+<font color=#B22222>#</font>
+<font color=#B22222># ----- PANEL 2 -----------------------------------------</font>
+<font color=#B22222>#</font>
+<font color=#B22222># OK, now for a more complicated version.  We'll keep the</font>
+<font color=#B22222># same data, but redraw it in a new panel, to the right of</font>
+<font color=#B22222># the first graph.  So, the first step is to increase the</font>
+<font color=#B22222># x margin.  The rpn command creates a number which is</font>
+<font color=#B22222># the sum of the old x margin (stored in the variable</font>
+<font color=#B22222># ..xmargin..) and the old plot width (stored in</font>
+<font color=#B22222># the variable ..xsize..), plus an extra 1 cm</font>
+set x margin {<font color=#9400D3>rpn</font> <font color=#006400>..xsize..</font> <font color=#006400>..xmargin..</font> + 1 +}
+<font color=#B22222># </font>
+<font color=#B22222># Set the line thickness for the curve to 1 point (0.3 mm) and the</font>
+<font color=#B22222># axis line thickness to 0.2 points (0.1 mm).</font>
+set line width 1.0		<font color=#B22222># points</font>
+set line width axis 0.2		<font color=#B22222># points</font>
+<font color=#B22222># Set the tics to be 1.5 mm.</font>
+set tic size 0.15		<font color=#B22222># centimetres</font>
+<font color=#B22222># Draw axes and frame, with axes offset from frame.  Some</font>
+<font color=#B22222># people find this more attractive.</font>
+set axes style offset
+draw axes 1
+<font color=#B22222># Now draw the actual curve.</font>
+draw curve
+<font color=#B22222># Superimpose dots (radius 1.5 mm) at the data.</font>
+set symbol size 0.15
+draw symbol bullet
+<font color=#B22222>#</font>
+<font color=#B22222># All done.</font>
+<font color=#B22222># Draw a title above the plot.</font>
+set font size 20
+<font color=#0000EE>\label =</font> <font color=#2F4F4F>"Example 3 -- scales, axes, etc"</font>
+draw label <font color=#2F4F4F>"\label"</font> centered at<font color=#0000EE> \
+</font>    {<font color=#9400D3>rpn</font> 2 5 + .5 + }<font color=#0000EE> \
+</font>    {<font color=#9400D3>rpn</font> <font color=#006400>..ytop..</font> yusertocm 2 +} cm
+
+</pre>
+</body>
+</html>

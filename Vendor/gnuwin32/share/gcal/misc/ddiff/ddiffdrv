@@ -1,0 +1,431 @@
+#! /bin/sh
+#
+#  Generated automatically from ddiffdrv.in by configure.
+#
+#  $Id: ddiffdrv.in 0.06 2000/03/24 00:00:06 tom Exp $
+#
+#  ddiffdrv.in:  First step:
+#                  Uses `ddiffdrv.rc' or any other Gcal location pool
+#                  resource file for creating all Gcal location response
+#                  files which can be generated from that file.
+#                  If no Gcal location pool resource file exists, this
+#                  script tries to create the `ddiffdrv.rc' file by
+#                  processing the ZONE file `zone.tab' by means of
+#                  AWK/Perl and the `ddiffdrv[.awk|.pl]' script.
+#                  A Gcal location response file is a Gcal response file
+#                  consisting of one line, which passes the location name
+#                  LOC, its country code CC, and the ISO-6709-co-ordinate
+#                  COORD via text variables to Gcal.  The line template of
+#                  a Gcal location response file is:
+#                    -r$l=CC-LOC:$c=COORD
+#                Second step (only if the `--create' option is given):
+#                  Creation of all Gcal location resource files, which
+#                  contain the day/night lengths and differences for all
+#                  days of the year YYYY for the location.
+#                Third step (also only if the `--create' option is given):
+#                  Creation of the Gcal include file `ddiff.rc', which
+#                  contains include statements of all Gcal location
+#                  resource files created.
+#
+#                Usage: ddiffdrv --help | --version
+#                Usage: ddiffdrv [--debug] [--create]
+#                                [--precise] [--year=YYYY]
+#                                [LOCATION-POOL-RESOURCE-FILE without `.rc' suffix]
+#
+#                `--debug':      Turn on shell debugging.
+#                `--create':     Automatical creation of all Gcal location
+#                                  resource files and the `ddiff.rc' include
+#                                  file.
+#                `--precise':    Use more precise time values.
+#                `--year=YYYY':  Create all Gcal location resource files for
+#                                  the year YYYY, otherwise for the actual year.
+#
+#  UN*X solution.
+#
+#  Needs `test', `echo', `expr', `eval', `/bin/sh', `set', `sed', `rm', `gcal',
+#  and `perl' or `awk' for processing!
+#
+#  Returns 0 if processing was successfully.
+#  Returns 1 in case an error occured while processing.
+#  Returns 2 if neither Perl nor AWK are present for further processing.
+#
+#  Copyright (c) 2000  Thomas Esken      <esken@uni-muenster.de>
+#                      Im Hagenfeld 84
+#                      D-48147 M"unster
+#                      GERMANY
+#
+#  This software doesn't claim completeness, correctness or usability.
+#  On principle I will not be liable for ANY damages or losses (implicit
+#  or explicit), which result from using or handling my software.
+#  If you use this software, you agree without any exception to this
+#  agreement, which binds you LEGALLY !!
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the `GNU General Public License' as published by
+#  the `Free Software Foundation'; either version 2, or (at your option)
+#  any later version.
+#
+#  You should have received a copy of the `GNU General Public License'
+#  along with this program; if not, write to the:
+#
+#    Free Software Foundation, Inc.
+#    59 Temple Place - Suite 330
+#    Boston, MA 02111-1307,  USA
+#
+#
+
+#
+# Basically used programs.
+#
+Shell=/bin/sh
+Rm=rm
+Sed=sed
+Set=set
+Test=test
+Echo=echo
+Expr=expr
+
+#
+# Basically used texts.
+#
+packagedatamiscdir=c:/progra~1/Gcal/share/gcal/misc/ddiff
+#
+PACKAGE=gcal
+VERSION=3.01
+transform=s,$$,,; s,^,,; s/i386-pc-mingw32//
+#
+mydefaultname=ddiffdrv
+#
+myname=`$Echo "$0" | $Sed -e 's,.*/,,' -e "$transform"`
+myversion=0.06
+myinternalname="$myname ($PACKAGE $VERSION) $myversion"
+#
+pool=$packagedatamiscdir/zone.tab
+runscriptname=ddiff
+gcal_resource_file_suffix=.rc
+outfile1_created=no
+outfile1=$mydefaultname""$gcal_resource_file_suffix
+outfile2=$runscriptname""$gcal_resource_file_suffix
+#
+info01="$myname: Creates all Gcal location response files which can be generated"
+info02="$myname: from the Gcal location pool resource file \`./$outfile1'."
+info03="$myname: By definition, a Gcal location response file is a text file of"
+info04="$myname: one line with a   \`-r\$l=CC-LOCATION:\$c=COORDINATE'   contents."
+info05="$myname: If no Gcal location pool resource file exists, this script tries"
+info06="$myname: to create the \`./$outfile1' file by processing the ZONE file"
+info07="$myname: \`$pool'."
+info08="$myname: Then, all Gcal location resource files are created, which "
+info09="$myname: contain the day/night lengths and differences for all days"
+info10="$myname: of the year YYYY for the location.  At last, the Gcal include"
+info11="$myname: file \`$outfile2' is created, which contains include statements"
+info12="$myname: of all Gcal location resource files.  These last two steps are"
+info13="$myname: done only if the \`--create' option is given!"
+info14="$myname:"
+usage1="usage: $myname  --help | --version"
+usage2="usage: $myname  [--debug] [--create] [--precise] [--year=YYYY] [LOCATION-POOL-RESOURCE-FILE]"
+usage3="usage: $myname  without LOCATION-POOL-RESOURCE-FILE uses file \`./$outfile1' by default"
+
+#
+# Some constant values (EXIT_SUCCESS(==0) and EXIT_FATAL(==2)
+#   are also returned by the processed AWK/Perl script.
+#
+EXIT_SUCCESS=0
+EXIT_FAILURE=1
+EXIT_FATAL=2
+
+#
+# The used programs.
+#
+Eval=eval
+ThisGcal=`$Echo "$PACKAGE" | $Sed "$transform"`
+#
+Awk=gawk
+Awk_script=$mydefaultname"".awk
+#
+Perl=perl
+Perl_script=$mydefaultname"".pl
+
+#
+# Let's check for command line arguments.
+#
+debug=""
+create=no
+precise=""
+commands=""
+previous=""
+for option in $*
+do
+  #
+  # If the previous option needs an argument, assign it.
+  #
+  if $Test -n "$previous";
+  then
+    $Eval "$previous=\$option"
+    previous=""
+    continue
+  fi
+
+  case "$option" in
+    -*=)  optarg="###error###" ;;
+    -*=*) optarg=`$Echo "$option" | $Sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *)    optarg="" ;;
+  esac
+
+  #
+  # Manage the options.
+  #
+  case "$option" in
+    -help=* | -hel=* | -he=* | -h=* | -help | -hel | -he | -h | \
+    --help=* | --hel=* | --he=* | --h=* | --help | --hel | --he | --h)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$info01"
+      $Echo "$info02"
+      $Echo "$info03"
+      $Echo "$info04"
+      $Echo "$info05"
+      $Echo "$info06"
+      $Echo "$info07"
+      $Echo "$info08"
+      $Echo "$info09"
+      $Echo "$info10"
+      $Echo "$info11"
+      $Echo "$info12"
+      $Echo "$info13"
+      $Echo "$info14"
+      $Echo "$usage1"
+      $Echo "$usage2"
+      $Echo "$usage3"
+      exit $EXIT_SUCCESS ;;
+
+    -version=* | -versio=* | -versi=* | -vers=* | -ver=* | -ve=* | -v=* | \
+    -version | -versio | -versi | -vers | -ver | -ve | -v | \
+    --version=* | --versio=* | --versi=* | --vers=* | --ver=* | --ve=* | --v=* | \
+    --version | --versio | --versi | --vers | --ver | --ve | --v)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$myinternalname"
+      exit $EXIT_SUCCESS ;;
+
+    -debug=* | -debu=* | -deb=* | -de=* | -d=* | \
+    -debug | -debu | -deb | -de | -d | \
+    --debug=* | --debu=* | --deb=* | --de=* | --d=* | \
+    --debug | --debu | --deb | --de | --d)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      debug="$optarg"
+      shift ;;
+
+    -create=* | -creat=* | -crea=* | -cre=* | -cr=* | -c=* | \
+    -create | -creat | -crea | -cre | -cr | -c | \
+    --create=* | --creat=* | --crea=* | --cre=* | --cr=* | --c=* | \
+    --create | --creat | --crea | --cre | --cr | --c)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      create=yes
+      shift ;;
+
+    -precise=* | -precis=* | -preci=* | -prec=* | -pre=* | -pr=* | -p=* | \
+    -precise | -precis | -preci | -prec | -pre | -pr | -p | \
+    --precise=* | --precis=* | --preci=* | --prec=* | --pre=* | --pr=* | --p=* | \
+    --precise | --precis | --preci | --prec | --pre | --pr | --p)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      precise="$optarg"
+      shift ;;
+
+    -year | -yea | -ye | -y | --year | --yea | --ye | --y)
+      previous=year ;;
+    -year=* | -yea=* | -ye=* | -y=* | --year=* | --yea=* | --ye=* | --y=*)
+      if $Test -z "$optarg" || $Test "$optarg" = "###error###";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=//g'`' requires an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      opt_year="$optarg"
+      shift ;;
+
+    -* | /*)
+      $Echo "$myname: error: $option: invalid option, use --help to show usage" 1>&2
+      exit $EXIT_FAILURE ;;
+
+    *)
+      if $Test -z "$commands";
+      then
+        commands="$option"
+      else
+        commands="$commands $option"
+      fi
+  esac
+done
+
+if $Test -n "$previous";
+then
+  $Echo "$myname: error: missing argument to --$previous" 1>&2
+  exit $EXIT_FAILURE
+fi
+
+#
+# Get the number of commands given and assign them to the local variables.
+#
+cmd_number=0
+cmd_1=""
+for cmd in $commands
+do
+  if $Test -z "$cmd_1";
+  then
+    cmd_1="$cmd"
+  fi
+  cmd_number=`$Expr $cmd_number + 1`
+done
+
+#
+# Enable tracing.
+#
+if $Test -n "$debug";
+then
+  $Set -x
+else
+  trap "$Rm -f $outfile1 $outfile2;exit $EXIT_FAILURE" 1 2 15
+fi
+
+#
+# Let's start processing now.
+#
+if $Test -n "$Awk" || $Test -n "$Perl";
+then
+  if $Test "$#" -gt 1;
+  then
+    $Echo "$info01"
+    $Echo "$info02"
+    $Echo "$info03"
+    $Echo "$info04"
+    $Echo "$info05"
+    $Echo "$info06"
+    $Echo "$info07"
+    $Echo "$info08"
+    $Echo "$info09"
+    $Echo "$info10"
+    $Echo "$info11"
+    $Echo "$info12"
+    $Echo "$info13"
+    $Echo "$info14"
+    $Echo "$usage1"
+    $Echo "$usage2"
+    $Echo "$usage3"
+    exit $EXIT_FAILURE
+  else
+    gcal_year=""
+    if $Test -n "$opt_year";
+    then
+      arg=`$Echo "$opt_year" | $Sed -e 's/[0-9]//g'`
+      if $Test -n "$arg";
+      then
+        $Echo "$myname: error: invalid option argument \`$opt_year' specified" 1>&2
+        $Echo "$myname: use --help to show usage" 1>&2
+        exit $EXIT_FAILURE
+      else
+        gcal_year="--year=$opt_year"
+      fi
+    fi
+    if $Test "$cmd_number" -eq 1 && $Test -s "$cmd_1";
+    then
+      outfile1="$cmd_1"
+    else
+      if $Test ! -s "$outfile1";
+      then
+        #
+        if $Test ! -s "$pool";
+        then
+          $Echo "$myname: error: file \`$pool' is missing" 1>&2
+          exit $EXIT_FAILURE
+        fi
+        #
+        # We prefer the use of Perl.
+        #
+        if $Test -n "$Perl";
+        then
+          if $Test ! -s "$packagedatamiscdir/$Perl_script";
+          then
+            $Echo "$myname: error: file \`$packagedatamiscdir/$Perl_script' is missing" 1>&2
+            exit $EXIT_FAILURE
+          fi
+          $Echo "$myname: creating the Gcal location pool resource file \`$outfile1', please wait..."
+          $Perl -- $packagedatamiscdir/$Perl_script -a0 -b$outfile1 -c$myname $pool > $outfile1
+        else
+          if $Test ! -s "$packagedatamiscdir/$Awk_script";
+          then
+            $Echo "$myname: error: file \`$packagedatamiscdir/$Awk_script' is missing" 1>&2
+            exit $EXIT_FAILURE
+          fi
+          $Echo "$myname: creating the Gcal location pool resource file \`$outfile1', please wait..."
+          $Awk -f $packagedatamiscdir/$Awk_script -- -a0 -b$outfile1 -c$myname $pool > $outfile1
+        fi
+        status=$?
+        if $Test "$status" -eq "$EXIT_FATAL";
+        then
+          if $Test -n "$Perl";
+          then
+            $Echo "$myinternalname: error: invalid option to \`$Perl' given" 1>&2
+          else
+            $Echo "$myinternalname: error: invalid option to \`$Awk' given" 1>&2
+          fi
+          if $Test -z "$debug";
+          then
+            $Rm -f $outfile1
+          fi
+          exit $status
+        else
+          outfile1_created=yes
+        fi
+      fi
+    fi
+  fi
+  #
+  $Echo "$myname: generating all Gcal location response files, please wait..."
+  if $Test "$outfile1_created" = yes;
+  then
+    $ThisGcal --execute -f ./$outfile1 -QUx --translate-string=\\_
+  else
+    $ThisGcal --execute -f $outfile1 -QUx --translate-string=\\_
+  fi
+  if $Test "$create" = yes;
+  then
+    #
+    # Create all Gcal location resource files.
+    #
+    for file in ??-*;
+    do
+      $Shell $runscriptname $debug $precise $gcal_year ./$file
+    done
+    #
+    # Create the Gcal include file.
+    #
+    $Echo "$myname: creating the Gcal include file \`$outfile2', please wait..."
+    $Echo "; $outfile2, includes the locations for Gcal-2.20 or newer" > $outfile2
+    $Echo ";" >> $outfile2
+    for file in ??-*$gcal_resource_file_suffix;
+    do
+      $Echo "#include \"$file\"" >> $outfile2
+    done
+  fi
+  exit $EXIT_SUCCESS
+else
+  $Echo "$myinternalname: error: neither \`perl' nor \`awk' available" 1>&2
+  exit $EXIT_FATAL
+fi

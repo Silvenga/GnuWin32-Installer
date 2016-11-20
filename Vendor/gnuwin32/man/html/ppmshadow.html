@@ -1,0 +1,295 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Ppmshadow User Manual</TITLE></HEAD>
+<BODY>
+<H1>ppmshadow</H1>
+Updated: 17 April 2005
+<BR><A HREF="ppmshadow.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+ppmshadow - add simulated shadows to a PPM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>ppmshadow</B>
+[<B>-b</B> <I>blur_size</I>]
+[<B>-k</B>]
+[<B>-t</B>]
+[<B>-x</B> <I>xoffset</I>]
+[<B>-y</B> <I>yoffset</I>]
+[<I>ppmfile</I>]
+
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><B>ppmshadow</B> adds a simulated shadow to an image, giving the
+appearance that the contents of the image float above the page,
+casting a diffuse shadow on the background.  Shadows can either be
+black, as cast by opaque objects, or translucent, where the shadow
+takes on the color of the object which casts it.  You can specify the
+crispness of the shadow and its displacement from the image with command
+line options.
+
+<p><b>ppmshadow</b> sees your image as a foreground on a background.
+The background color is whatever color the top left pixel of your image is.
+The background is all the pixels that are that color and the foreground
+is everything else.  The shadow that <b>ppmshadow</b> generates is a
+shadow of the foreground, cast on the background.
+
+<p>The shadow is the same size as the foreground, plus some fringes
+as determined by the <b>-b</b> option.  It is truncated to fit in your
+image.  The output image is the same dimensions as the input image.
+
+<p>You can use <b>pamcomp</b> to place a foreground image over a background
+before running <b>ppmshadow</b> on it.  You can use <b>ppmmake</b> to make
+the background image (just an image of a solid color).
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-b</B> <I>blur_size</I>
+
+<DD>
+Sets the distance of the light source from the image.  Larger values
+move the light source closer, casting a more diffuse shadow, while
+smaller settings move the light further away, yielding a sharper
+shadow.  <i>blur_size</i> is the number of pixels of fringe there is
+on the shadow, beyond where the shadow would be if there were no
+blurring.
+
+<p>The default is 11 pixels.
+
+<p>Note that this option controls only the fringing effect of moving
+the light source closer to the object.  It does not make the shadow
+grow or shrink as would happpen in the real world if you moved a point
+light source closer to and further from an object.
+
+<DT><B>-k</B>
+<DD>
+Keep the intermediate temporary image files.  When debugging, these
+intermediate files provide many clues as to the source of an error.
+See <a href="ppmshadow.html#files">below</a> for a list of the contents of each file.
+
+<DT><B>-t</B>
+<DD>
+Consider the non-background material in the image translucent -- it
+casts shadows of its own color rather than a black shadow, which is
+default.  This often results in fuzzy, difficult-to-read images but in
+some circumstances may look better.
+
+<DT><B>-x</B><I> xoffset</I>
+
+<DD>Specifies the displacement of the light source to the left of the
+image.  Larger settings of <B>xoffset</B> displace the shadow to the
+right, as would be cast by a light further to the left.  If not
+specified, the horizontal offset is half of <I>blur_size </I> (above),
+to the left.
+
+<DT><B>-y</B><I> yoffset</I>
+
+<DD> Specifies the displacement of the light source above the top of
+the image.  Larger settings displace the shadow downward,
+corresponding to moving the light further above the top of the image.
+If you don't specify <B>-y</B>, the vertical offset defaults to the
+same as the horizontal offset (above), upward.
+
+</DL>
+
+
+<A NAME="files"></a>
+<H2>FILES</H2>
+
+<p>Input is a PPM file named by the <I>ppmfile</I> command line
+argument; if you don't specify <I>ppmfile</I>, the input is Standard
+Input.
+
+<P>The output is a PPM file, written to Standard Output.
+
+<p><B>ppmshadow</B> creates a number of temporary files as it executes.  It
+creates a new directory for them, <b>/tmp/ppmshadow</b><i>pid</i>,
+where <i>pid</i> is the process ID of the <b>ppmshadow</b> process.
+If the <b>TMPDIR</b> environment variable is set, <b>ppmshadow</b> creates
+the directory there instead of <b>/tmp</b>.
+
+In normal operation, <B>ppmshadow</B> deletes each temporary file as
+soon as it is done with it and leaves no debris around after it
+completes.  To preserve the intermediate files for debugging, use the
+<B>-k</B> command line option.
+
+<p>The temporary files are: 
+<DL COMPACT>
+
+<DT><B>infile.ppm</b>
+<DD>
+A copy of the input.
+
+<DT><B>bgmask.ppm</B>
+<DD>
+Positive binary mask
+
+<DT><B>convkernel.ppm</B>
+<DD>
+Convolution kernel for blurring shadow
+
+<DT><B>blurred.ppm</B>
+<DD>
+Blurred, colored shadow image
+
+<DT><B>blurred2.ppm</B>
+<DD>
+Blurred shadow image before coloring
+
+<DT><B>shadow.ppm</B>
+<DD>
+Clipped shadow image, offset as requested
+
+<DT><B>background.ppm</B>
+<DD>
+Blank image with background of source image
+
+<DT><B>shadow.ppm</B>
+<DD>
+Offset shadow
+
+<DT><B>fgmask.ppm</B>
+<DD>
+Inverse mask file
+
+<DT><B>justfg.ppm</B>
+<DD>
+Just the foreground.  Rest is black.  Original image times inverse mask.
+
+<DT><B>shadback.ppm</B>
+<DD>
+Generated shadow times positive mask
+
+<DT><B>allbutfg.ppm</b>
+<dd>
+Everything but the foreground (foreground area is black).
+
+</DL>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>LIMITATIONS</H2>
+
+<p>The source image must contain sufficient space on the edges in the
+direction in which the shadow is cast to contain the shadow -- if it
+doesn't some of the internal steps may fail.  You can usually expand
+the border of a too-tightly-cropped image with <B>pnmmargin</B> before
+processing it with <B>ppmshadow</B>.
+
+<P>Black pixels and pixels with the same color as the image
+background don't cast a shadow.  If this causes unintentional
+&quot;holes&quot; in the shadow, fill the offending areas with a color
+which differs from black or the background by RGB values of 1, which
+will be imperceptible to the viewer.  Since the comparison is exact,
+the modified areas will now cast shadows.  
+
+<P>The background color of the source image (which is preserved in
+the output) is deemed to be the color of the pixel at the top left of
+the input image.  If that pixel isn't part of the background, simply
+add a one-pixel border at the top of the image, generate the shadow
+image, then delete the border from it.
+
+<P>If something goes wrong along the way, the error messages from the
+various Netpbm programs <B>ppmshadow</B> calls will, in general,
+provide little or no clue as to where <B>ppmshadow</B> went astray.
+In this case, Specify the <B>-k</B> option and examine the
+intermediate results in the temporary files (which this option causes
+to be preserved).  If you manually run the commands that
+<B>ppmshadow</B> runs on these files, you can figure out where the
+problem is.  In problem cases where you want to manually tweak the
+image generation process along the way, you can keep the intermediate
+files with the <B>-k </B> option, modify them appropriately with an
+image editor, then recombine them with the steps used by the code in
+<B>ppmshadow</B>.
+
+See the <B>ppmshadow.doc</B> file in the Netpbm source tree for
+additional details and examples of the intermediate files and debugging
+<b>ppmshadow</b>.
+
+<P>Shadows are by default black, as cast by opaque material in the
+image occluding white light.  Use the <B>-t</B> option to simulate
+translucent material, where the shadow takes on the color of the
+object that casts it.  If the contrast between the image and
+background is insufficient, the <B>-t</B> option may yield
+unattractive results which resemble simple blurring of the original
+image.
+
+<P>Because Netpbm used to have a maximum maxval of 255, which meant
+that the largest convolution kernel <B>pnmconvol</B> could use was 11
+by 11, <B>ppmshadow</B> includes a horrid, CPU-time-burning kludge
+which, if a blur of greater than 11 is requested, performs an initial
+convolution with an 11 x 11 kernel, then calls <B>pnmsmooth</B>
+(which is itself a program that calls <b>pnmconvol</b> with a 3 x 3
+kernel) as many times as the requested blur exceeds 11.  It's ugly,
+but it gets the job done on those rare occasions where you need a blur
+greater than 11.
+
+<P>If you wish to generate an image at high resolution, then scale it
+to publication size with <B>pamscale</B> in order to eliminate jagged
+edges by resampling, it's best to generate the shadow in the original
+high resolution image, prior to scaling it down in size.  If you scale
+first and then add the shadow, you'll get an unsightly jagged stripe
+between the edge of material and its shadow, due to resampled pixels
+intermediate between the image and background obscuring the shadow.
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>EXIT STATUS</H2>
+
+<B>ppmshadow</B> returns status 0 if processing was completed without
+errors, and a nonzero Unix error code if an error prevented generation
+of output.  Some errors may result in the script aborting, usually
+displaying error messages from various Netpbm components it uses,
+without returning a nonzero error code.  When this happens, the output
+file will be empty, so be sure to test this if you need to know if the
+program succeeded. 
+
+<A NAME="seealso">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pnm.html">pnm</A></B>,
+<B><A HREF="pnmmargin.html">pnmmargin</A></B>,
+<B><A HREF="pnmconvol.html">pnmconvol</A></B>,
+<B><A HREF="pamscale.html">pamscale</A></B>,
+<B><A HREF="pnmsmooth.html">pnmsmooth</A></B>,
+<B><A HREF="ppm.html">ppm</A></B>
+
+
+<A NAME="lbAJ">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+John Walker &lt;<A
+HREF="http://www.fourmilab.ch">http://www.fourmilab.ch</A>&gt; August
+8, 1997
+
+<A NAME="lbAK">&nbsp;</A>
+<H2>COPYRIGHT</H2>
+This software is in the public domain.  Permission to use, copy,
+modify, and distribute this software and its documentation for any
+purpose and without fee is hereby granted, without any conditions or
+restrictions.
+
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="ppmshadow.html#lbAB">NAME</A>
+<LI><A HREF="ppmshadow.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="ppmshadow.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="ppmshadow.html#lbAE">OPTIONS</A>
+<LI><A HREF="ppmshadow.html#files">FILES</A>
+<LI><A HREF="ppmshadow.html#lbAG">LIMITATIONS</A>
+<LI><A HREF="ppmshadow.html#lbAH">EXIT STATUS</A>
+<LI><A HREF="ppmshadow.html#seealso">SEE ALSO</A>
+<LI><A HREF="ppmshadow.html#lbAJ">AUTHOR</A>
+<LI><A HREF="ppmshadow.html#lbAK">COPYRIGHT</A>
+</UL>
+</BODY>
+</HTML>

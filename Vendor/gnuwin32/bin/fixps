@@ -1,0 +1,397 @@
+#! /bin/sh -e
+
+# fixps --- fix as much as possible PS errors that break the psutils
+
+# Copyright (c) 1998-2000 Akim Demaille, Miguel Santana
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, you can either send email to this
+# program's maintainer or write to: The Free Software Foundation,
+# Inc.; 59 Temple Place, Suite 330; Boston, MA 02111-1307, USA.
+
+# Author: Akim Demaille <Akim.Demaille@freefriends.org>
+
+# Get the name of the program
+program=`echo $0 | sed 's#.*/##g'`
+
+# Local vars
+debug=
+file=
+# Look for a running ghostscript
+gs=${GHOSTSCRIPT:-${GS:-gs}}
+# Run test in a subshell; some versions of sh will print an error if
+# an executable is not found, even if stderr is redirected.
+if ($gs -v) >/dev/null 2>&1; then :; else
+  gs=
+fi
+output=-	# Default is stdout
+run_gs=0
+# What action to perform: fixps, cat, check, and gs
+task=fixps
+tmpdir=`mktemp -d -t fixps.XXXXXX` || { echo "$program: Cannot create temporary dir!" >&2 ; exit 1; }
+verbose=echo
+
+# The version/usage strings
+version="fixps 1.5 (GNU a2ps 4.14)
+Written by Akim Demaille.
+
+Copyright (c) 1998-2000 Akim Demaille, Miguel Santana
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."
+
+usage="\
+Usage: $program [OPTIONS] FILE
+Try to fix common PostScript problems that break postprocessing.
+
+Options:
+ -h, --help              display this help and exit
+ -v, --version           display version information and exit
+ -q, --quiet             don't print informational messages
+ -o, --output=FILE       save result in FILE.  If FILE is \`-', send to stdout
+ -f, --force             force full rewrite by ghostscript
+ -n, --no-fix            don't fix the FILE, but still honor \`-o'
+ -c, --check, --dry-run  don't perform any action
+
+Fixes:
+ - Remove junk before and after PostScript content
+ - Use only Unix end of lines (\\n)
+ - Remove empty lines
+ - Fix Apple prologue (fixmacps)
+ - Fix FrameMaker prologue (fixfmps)
+ - Fix CorelDraw prologue (fixnt)
+ - Fix Windows NT 3.5/4.0 prologue (fixnt)
+ - Fix Windows 95 prologue
+ - Ensure there is a \`%%BeginSetup/%%EndSetup' section
+ - Removes Canvas' extraneaous \`%%EndDocument:' comments
+ - Split too long lines
+
+If the FILE seems really in a bad state, ghostscript may be used to perform
+a full rewrite.  The output might then be significantly bigger, but much
+safer.
+
+Report bugs to <bug-a2ps@gnu.org>"
+
+help="Try \`$program --help' for more information."
+
+# Parse command line arguments.
+option_without_arguments='vhsqDfn'
+
+# Push a token among the arguments that will be used to notice when
+# we ended options/arguments parsing.
+arg_sep="$$--$$"
+set dummy ${1+"$@"} "$arg_sep"
+shift
+while test "x$1" != "x$arg_sep"; do
+
+  # Handle --option=value by splitting apart and putting back on argv.
+  case "$1" in
+    --*=*)
+      opt=`echo "$1" | sed -e 's/=.*//'`
+      val=`echo "$1" | sed -e 's/[^=]*=//'`
+      shift
+      set dummy "$opt" "$val" ${1+"$@"}
+      shift
+      ;;
+
+    -[$option_without_arguments]?*)
+      # Prefix $1 with x to avoid running `echo -na' for instance.
+      opt=`echo "x$1" | sed -e 's/x-\(.\).*/-\1/'`
+      rest=`echo "x$1" | sed -e 's/x-.\(.*\)/-\1/'`
+      shift
+      set dummy "$opt" "$rest" ${1+"$@"}
+      shift
+      ;;
+
+    # This case needs to be protected so that the case `-??*' does
+    # not split long options without arguments
+    --*)
+      ;;
+
+    # This is an option with argument.  Split apart and put back on argv.
+    -??*)
+      opt=`echo "x$1" | sed -e 's/x-\(.\).*/-\1/'`
+      arg=`echo "x$1" | sed -e 's/x-.\(.*\)/\1/'`
+      shift
+      set dummy "$opt" "$arg" ${1+"$@"}
+      shift
+      ;;
+  esac
+
+  # Now, handle the options.  $1 is the option *only*.  If it has an
+  # argument, it is now necessarily in $2 etc.  Remember to shift
+  # when fetching an argument.
+  case "$1" in
+    -v | --v*) echo "$version"; exit 0;;
+    -h | --h*) echo "$usage"; exit 0;;
+    -q | -s | --s* | --q*) verbose=:;;
+    # Delay debugging so that options parsing does not appear
+    -D | --debug)  debug=: ;;
+    -o | --output) shift ; output=$1 ;;
+    -c | --check | --dry-run)     task=check ;;
+    -n | --no-fix) task=cat ;;
+    -f | --force)
+     # Refuse if gs does not seem to work
+     if test "x$gs" = x; then
+       echo "$program: error: ghostscript does not work." >&2
+       exit 1
+     else
+       run_gs=1
+     fi
+     ;;
+    -) # We are working with stdin ;;
+      set dummy "$@" "$1"; shift;;
+
+    --) # What remains are not options.
+      shift
+      while test "x$1" != "x$arg_sep"; do
+        set dummy ${1+"$@"} "$1"
+        shift
+	shift
+      done
+      break;;
+
+    -*)
+      echo "$program: Unknown or ambiguous option \`$1'." >&2
+      echo "$program: Try \`--help' for more information." >&2
+      exit 1;;
+    *) set dummy ${1+"$@"} "$1"
+       shift
+       ;;
+   esac
+   shift
+done
+# Pop the token
+shift
+
+
+# Check the number of arguments.
+case $# in
+  0)  file=-;;
+  1)  file=$1;;
+  *)  echo "$program: too many arguments" 1>&2
+      echo "$help"  1>&2
+      exit 1;;
+esac
+
+if test -n "$debug"; then
+  # Set -x now if debugging
+  set -x
+else
+  # Temp dir.  Get ready not to leave junk (if not debugging)
+  trap "/bin/rm -rf $tmpdir" 0 1 2 3 13 15
+fi
+
+fixps_sed=$tmpdir/fixps.sed
+
+# If printing from stdin, save into a tmp file
+if test $file = '-'; then
+  file=$tmpdir/stdin.ps
+  cat >$file
+fi
+
+## -------------- ##
+## Global fixes.  ##
+## -------------- ##
+
+# 1. Extract what looks like a real PS file, i.e. something between
+# a "%!" and a "%%EOF".  If the latter is not present, go until
+# the end of the file.
+# It typically remove JCL junk, but also permits to print the PS content
+# of a mail without having to remove by hand what is not part of the PS.
+# Beware of the non Unix end of lines.
+if sed 1q $file | grep '^%!' >/dev/null; then :; else
+  fix=1
+  $verbose "$program: removing junk around PostScript content." >&2
+  $verbose "$program: fixing broken magic number." >&2
+  # At the same time, make sure the first line does start by
+  # a valid magic number.  Use only '\n'.
+  tr '\015' '\012' < $file | sed -n -e '/%!/,/^%%EOF$/{
+  s/^.*%!/%!/
+  s/^%!$/%!PS/
+  p
+}' > $tmpdir/fixed-$fix.ps
+  file=$tmpdir/fixed-$fix.ps
+fi
+
+# If at this point the file does not start with a real PostScript
+# magic number, fail
+if sed 1q $file | grep '^%!' >/dev/null; then :; else
+  echo "$program: error: the file seems not to be PostScript." >&2
+  exit 1
+fi
+
+
+
+
+
+## ------------------------------------------------------- ##
+## After this comment everything can be done with a pipe.  ##
+## ------------------------------------------------------- ##
+
+
+: >$fixps_sed
+
+# For a start, use only '\n'.  Don't try to remove multiple end of
+# line, since you may break valid PostScript code (think of binary
+# sections).
+command="tr '\015' '\012' < $file | sed -f $fixps_sed"
+
+# 1. Broken end-of-line (Mac?)
+if sed 20q $file | grep '%%' > /dev/null; then
+  $verbose "$program: fixing Macintosh broken end of line." >&2
+fi
+
+# 2. Remove the ^M$, because they prevent some parsers to work normally
+if sed 20q $file | grep '$' > /dev/null; then #'
+  $verbose "$program: fixing PC broken end of line." >&2
+fi
+
+
+## ------------------------------ ##
+## Fixes on prologues/structure.  ##
+## ------------------------------ ##
+
+
+# Put in $COMMENT everything we will need to find out the nature
+# of the file. (This is to speed up the processind)
+# Fetch all the lines with ``%%'' at the beginning, but
+# also words `FMDEFINE'
+comments=`eval "$command" | sed -ne '1p;/^%%/p;/FMDEFINEFONT/p;/FMBEGINPAGE/p'`
+
+# If the file does not appear to have enough of the DSC features, just
+# let it be rewritten by gs.
+if echo "$comments" | grep "EPSF" >/dev/null 2>&1; then
+  # EPS files need at least the BBox
+  patterns="^%%BoundingBox:";
+else
+  # PS files really need page separation information
+  patterns="^%%Pages: ^%%Page:"
+fi
+
+# If some required DSC comments are not present, ask for a full rewrite.
+for pattern in $patterns
+do
+  if echo "$comments" | grep "$pattern" >/dev/null; then :; else
+    $verbose "$program: DSC broken.  $gs will be asked a full rewrite of the file." >&2
+    run_gs=1
+    break;
+  fi
+done
+
+if test $run_gs = 1 && test "x$gs" = x; then
+  echo "$program: warning: cannot run gs, except failures downstream." >&2
+  run_gs=0
+fi
+
+# The cleanup is to be made by hand.
+if test $run_gs = 0; then
+  # If there are lines too long, split them.
+  maxlen_awk=$tmpdir/maxlen.awk
+  cat >$maxlen_awk <<EOF
+length > max { max = length ; }
+END { print max ; }
+EOF
+  # Compute the max line length.
+  maxlen=`eval "$command" | awk -f $maxlen_awk`
+  if test "$maxlen" -ge "128"; then
+    cutline_sed=$tmpdir/cut.sed
+    # A script that split in piece hexa lines longer than 81 chars.
+    cat >$cutline_sed <<'EOF'
+/^[A-Fa-f0-9]\{81,\}$/b big
+  p
+  b
+:big
+  h
+  s/^\([A-Fa-f0-9]\{72\}\).*/\1/
+  p
+  g
+  s/^[A-Fa-f0-9]\{72\}\(.*\)/\1/
+t big
+EOF
+    $verbose "$program: splitting lines too long." >&2
+    command="$command | sed -n -f $cutline_sed"
+  fi
+
+  # 7. Broken AppleDict procset
+  if echo $comments | fgrep 'AppleDict' > /dev/null; then
+    $verbose "$program: fixing Macintosh broken prologue." >&2
+    command="$command | fixmacps"
+  fi
+
+  # 8. Broken Frame Maker procset
+  if echo $comments | fgrep 'Frame' > /dev/null; then
+    $verbose "$program: fixing Frame Maker broken prologue." >&2
+    command="$command | fixfmps"
+  fi
+
+  # 9. Broken CorelDRAW ps, with fixnt
+  if echo "$comments" | grep '^%%Title:.*CorelDRAW' > /dev/null; then
+    $verbose "$program: fixing CorelDRAW broken prologue." >&2
+    command="$command | fixnt"
+    # 10. Broken Windows NT 4.0 ps, still fixnt
+  elif echo "$comments" | grep 'NTPSOct95' > /dev/null; then
+    $verbose "$program: fixing Windows NT 4.0 broken PostScript." >&2
+    command="$command | fixnt"
+    # 11. Broken Windows NT 3.5 ps, yet another fixnt
+  elif echo "$comments" | grep 'NTPSOct94' > /dev/null; then
+    $verbose "$program: fixing Windows NT 3.5 broken PostScript." >&2
+    echo 's/NTPSOct94/NTPSOct95/g' >>$fixps_sed
+    command="$command | fixnt"
+  fi
+
+  # 12. Broken Windows 95 PS driver v4.0
+  if echo "$comments" | grep 'Pscript_Win_Utils' > /dev/null; then
+    $verbose "$program: fixing Broken Windows 95 PS driver v4.0 prologue." >&2
+    echo 's!|/LH/showpage ,!|/LH {showpage}!' >>$fixps_sed
+  fi
+
+  # 14. Canvas' superfluous `EndDocument:'
+  if echo "$comments" | grep 'CanvasDict' >/dev/null; then
+    $verbose "$program: removing Canvas' extraneous \`%%EndDocument:' comment." >&2
+    echo '/^%%EndDocument:/d' >>$fixps_sed
+  fi
+
+  # This should be the last one.
+  # 13. Missing BeginSetup/EndSetup
+  if echo "$comments" | grep '^%%BeginSetup' >/dev/null; then :; else
+    $verbose "$program: adding a %%BeginSetup/%%EndSetup section." >&2
+    # Because the command will be `eval'ed, it is hard to keep the eol.
+    # Making a script is much easier.
+    cat >>$fixps_sed <<EOF
+/^%%EndProlog/a\\
+%%BeginSetup\\
+%%EndSetup
+EOF
+  fi
+fi
+
+test $run_gs = 1 && task=gs
+
+# For dry runs, the output should not even be redirected
+if test $task != check; then
+  (
+    test "$output" != "-" && exec >"$output"
+    case $task in
+      cat)
+  	cat "$file"     ;;
+      fixps)
+  	# FIXME: We should fail when the program fails
+  	eval "$command" ;;
+      gs)
+        $verbose "$program: making a full rewrite of the file ($gs)." >&2
+  	$gs -q -dNOPAUSE -dBATCH -sDEVICE=pswrite -sOutputFile=- -c save pop -f $file ;;
+    esac
+  )
+fi
+
+exit 0

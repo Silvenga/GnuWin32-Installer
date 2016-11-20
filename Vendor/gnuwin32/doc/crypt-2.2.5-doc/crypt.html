@@ -1,0 +1,1740 @@
+<HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- Created on January, 3  2002 by texi2html 1.64 -->
+<!-- 
+Written by: Lionel Cons <Lionel.Cons@cern.ch> (original author)
+            Karl Berry  <karl@freefriends.org>
+            Olaf Bachmann <obachman@mathematik.uni-kl.de>
+            and many others.
+Maintained by: Olaf Bachmann <obachman@mathematik.uni-kl.de>
+Send bugs and suggestions to <texi2html@mathematik.uni-kl.de>
+ 
+-->
+<HEAD>
+<TITLE>The GNU C Library: </TITLE>
+
+<META NAME="description" CONTENT="The GNU C Library: ">
+<META NAME="keywords" CONTENT="The GNU C Library: ">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+<META NAME="Generator" CONTENT="texi2html 1.64">
+
+</HEAD>
+
+<BODY LANG="" BGCOLOR="#FFFFFF" TEXT="#000000" LINK="#0000FF" VLINK="#800080" ALINK="#FF0000">
+
+<A NAME="SEC_Top"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1>The GNU C Library</H1>This is Edition 0.09 DRAFT, last updated 28 Aug 1999, of
+<CITE>The GNU C Library Reference Manual</CITE>, for Version 2.2 Beta
+of the GNU C Library.
+</P><P>
+
+<BLOCKQUOTE><TABLE BORDER=0 CELLSPACING=0> 
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC1">1. DES Encryption and Password Handling</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">DES encryption and password handling.</TD></TR>
+</TABLE>
+
+<br>
+Indices
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC9">Concept Index</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Index of concepts and names.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC10">Type Index</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Index of types and type qualifiers.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC11">Function and Macro Index</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Index of functions and function-like macros.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC12">Variable and Constant Macro Index</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Index of variables and variable-like macros.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC13">Program and File Index</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Index of programs and files.</TD></TR>
+</TABLE>
+
+<br>
+&nbsp;--&nbsp;The&nbsp;Detailed&nbsp;Node&nbsp;Listing&nbsp;---
+<br>
+
+<br>
+Cryptographic&nbsp;Functions
+<br>
+
+<br>
+<TABLE BORDER=0 CELLSPACING=0>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC2">1.1 Legal Problems</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">This software can get you locked up, or worse.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC3">1.2 Reading Passwords</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Prompting the user for a password.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC4">1.3 Encrypting Passwords</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">A one-way function for UNIX passwords.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Routines for DES encryption.</TD></TR>
+</TABLE>
+
+<br>
+</BLOCKQUOTE>
+<HR SIZE=1>
+<A NAME="SEC1"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC2"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[ &lt;&lt; ]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC6"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<A NAME="Cryptographic Functions"></A>
+<H1> 1. DES Encryption and Password Handling </H1>
+<!--docid::SEC1::-->
+<P>
+
+On many systems, it is unnecessary to have any kind of user
+authentication; for instance, a workstation which is not connected to a
+network probably does not need any user authentication, because to use
+the machine an intruder must have physical access.
+</P><P>
+
+Sometimes, however, it is necessary to be sure that a user is authorised
+to use some service a machine provides--for instance, to log in as a
+particular user id (@xref{Users and Groups}).  One traditional way of
+doing this is for each user to choose a secret <EM>password</EM>; then, the
+system can ask someone claiming to be a user what the user's password
+is, and if the person gives the correct password then the system can
+grant the appropriate privileges.
+</P><P>
+
+If all the passwords are just stored in a file somewhere, then this file
+has to be very carefully protected.  To avoid this, passwords are run
+through a <EM>one-way function</EM>, a function which makes it difficult to
+work out what its input was by looking at its output, before storing in
+the file.
+</P><P>
+
+The GNU C library already provides a one-way function based on MD5 and
+for compatibility with Unix systems the standard one-way function based
+on the Data Encryption Standard.
+</P><P>
+
+It also provides support for Secure RPC, and some library functions that
+can be used to perform normal DES encryption.
+</P><P>
+
+<BLOCKQUOTE><TABLE BORDER=0 CELLSPACING=0> 
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC2">1.1 Legal Problems</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">This software can get you locked up, or worse.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC3">1.2 Reading Passwords</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Prompting the user for a password.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC4">1.3 Encrypting Passwords</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">A one-way function for UNIX passwords.</TD></TR>
+<TR><TD ALIGN="left" VALIGN="TOP"><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD><TD>&nbsp;&nbsp;</TD><TD ALIGN="left" VALIGN="TOP">Routines for DES encryption.</TD></TR>
+</TABLE></BLOCKQUOTE>
+<P>
+
+<A NAME="Legal Problems"></A>
+<HR SIZE="6">
+<A NAME="SEC2"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC1"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC3"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[ &lt;&lt; ]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC1"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC6"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 1.1 Legal Problems </H2>
+<!--docid::SEC2::-->
+<P>
+
+Because of the continuously changing state of the law, it's not possible
+to provide a definitive survey of the laws affecting cryptography.
+Instead, this section warns you of some of the known trouble spots; this
+may help you when you try to find out what the laws of your country are.
+</P><P>
+
+Some countries require that you have a licence to use, posess, or import
+cryptography.  These countries are believed to include Byelorussia,
+Burma, India, Indonesia, Israel, Kazakhstan, Pakistan, Russia, and Saudi
+Arabia.
+</P><P>
+
+Some countries restrict the transmission of encrypted messages by radio;
+some telecommunications carriers restrict the transmission of encrypted
+messages over their network.
+</P><P>
+
+Many countries have some form of export control for encryption software.
+The Wassenaar Arrangement is a multilateral agreement between 33
+countries (Argentina, Australia, Austria, Belgium, Bulgaria, Canada, the
+Czech Republic, Denmark, Finland, France, Germany, Greece, Hungary,
+Ireland, Italy, Japan, Luxembourg, the Netherlands, New Zealand, Norway,
+Poland, Portugal, the Republic of Korea, Romania, the Russian
+Federation, the Slovak Republic, Spain, Sweden, Switzerland, Turkey,
+Ukraine, the United Kingdom and the United States) which restricts some
+kinds of encryption exports.  Different countries apply the arrangement
+in different ways; some do not allow the exception for certain kinds of
+"public domain" software (which would include this library), some
+only restrict the export of software in tangible form, and others impose
+significant additional restrictions.
+</P><P>
+
+The United States has additional rules.  This software would generally
+be exportable under 15 CFR 740.13(e), which permits exports of
+"encryption source code" which is "publicly available" and which is
+"not subject to an express agreement for the payment of a licensing fee or
+royalty for commercial production or sale of any product developed with
+the source code" to most countries.
+</P><P>
+
+The rules in this area are continuously changing.  If you know of any
+information in this manual that is out-of-date, please report it using
+the <CODE>glibcbug</CODE> script. @xref{Reporting Bugs}.
+</P><P>
+
+<A NAME="getpass"></A>
+<HR SIZE="6">
+<A NAME="SEC3"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC2"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC4"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC4"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC1"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC6"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 1.2 Reading Passwords </H2>
+<!--docid::SEC3::-->
+<P>
+
+When reading in a password, it is desirable to avoid displaying it on
+the screen, to help keep it secret.  The following function handles this
+in a convenient way.
+</P><P>
+
+<A NAME="IDX1"></A>
+<DL>
+<DT><U>Function:</U> char * <B>getpass</B> <I>(const char *<VAR>prompt</VAR>)</I>
+<DD></P><P>
+
+<CODE>getpass</CODE> outputs <VAR>prompt</VAR>, then reads a string in from the
+terminal without echoing it.  It tries to connect to the real terminal,
+<TT>`/dev/tty'</TT>, if possible, to encourage users not to put plaintext
+passwords in files; otherwise, it uses <CODE>stdin</CODE> and <CODE>stderr</CODE>.
+<CODE>getpass</CODE> also disables the INTR, QUIT, and SUSP characters on the
+terminal using the <CODE>ISIG</CODE> terminal attribute (@xref{Local Modes}).
+The terminal is flushed before and after <CODE>getpass</CODE>, so that
+characters of a mistyped password are not accidentally visible.
+</P><P>
+
+In other C libraries, <CODE>getpass</CODE> may only return the first
+<CODE>PASS_MAX</CODE> bytes of a password.  The GNU C library has no limit, so
+<CODE>PASS_MAX</CODE> is undefined.
+</P><P>
+
+The prototype for this function is in <TT>`unistd.h'</TT>.  <CODE>PASS_MAX</CODE>
+would be defined in <TT>`limits.h'</TT>.
+</DL>
+</P><P>
+
+This precise set of operations may not suit all possible situations.  In
+this case, it is recommended that users write their own <CODE>getpass</CODE>
+substitute.  For instance, a very simple substitute is as follows:
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=smallexample><FONT SIZE=-1><pre>#include &#60;termios.h&#62;
+#include &#60;stdio.h&#62;
+
+ssize_t
+my_getpass (char **lineptr, size_t *n, FILE *stream)
+{
+  struct termios old, new;
+  int nread;
+
+  /* Turn echoing off and fail if we can't. */
+  if (tcgetattr (fileno (stream), &#38;old) != 0)
+    return -1;
+  new = old;
+  new.c_lflag &#38;= ~ECHO;
+  if (tcsetattr (fileno (stream), TCSAFLUSH, &#38;new) != 0)
+    return -1;
+  
+  /* Read the password. */
+  nread = getline (lineptr, n, stream);
+
+  /* Restore terminal. */
+  (void) tcsetattr (fileno (stream), TCSAFLUSH, &#38;old);
+  
+  return nread;
+}
+</FONT></pre></td></tr></table></P><P>
+
+The substitute takes the same parameters as <CODE>getline</CODE>
+(@xref{Line Input}); the user must print any prompt desired.
+</P><P>
+
+<A NAME="crypt"></A>
+<HR SIZE="6">
+<A NAME="SEC4"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC3"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC5"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC5"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC1"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC6"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 1.3 Encrypting Passwords </H2>
+<!--docid::SEC4::-->
+<P>
+
+<A NAME="IDX2"></A>
+<DL>
+<DT><U>Function:</U> char * <B>crypt</B> <I>(const char *<VAR>key</VAR>, const char *<VAR>salt</VAR>)</I>
+<DD></P><P>
+
+The <CODE>crypt</CODE> function takes a password, <VAR>key</VAR>, as a string, and
+a <VAR>salt</VAR> character array which is described below, and returns a
+printable ASCII string which starts with another salt.  It is believed
+that, given the output of the function, the best way to find a <VAR>key</VAR>
+that will produce that output is to guess values of <VAR>key</VAR> until the
+original value of <VAR>key</VAR> is found.
+</P><P>
+
+The <VAR>salt</VAR> parameter does two things.  Firstly, it selects which
+algorithm is used, the MD5-based one or the DES-based one.  Secondly, it
+makes life harder for someone trying to guess passwords against a file
+containing many passwords; without a <VAR>salt</VAR>, an intruder can make a
+guess, run <CODE>crypt</CODE> on it once, and compare the result with all the
+passwords.  With a <VAR>salt</VAR>, the intruder must run <CODE>crypt</CODE> once
+for each different salt.
+</P><P>
+
+For the MD5-based algorithm, the <VAR>salt</VAR> should consist of the string
+<CODE>$1$</CODE>, followed by up to 8 characters, terminated by either
+another <CODE>$</CODE> or the end of the string.  The result of <CODE>crypt</CODE>
+will be the <VAR>salt</VAR>, followed by a <CODE>$</CODE> if the salt didn't end
+with one, followed by 22 characters from the alphabet
+<CODE>./0-9A-Za-z</CODE>, up to 34 characters total.  Every character in the
+<VAR>key</VAR> is significant.
+</P><P>
+
+For the DES-based algorithm, the <VAR>salt</VAR> should consist of two
+characters from the alphabet <CODE>./0-9A-Za-z</CODE>, and the result of
+<CODE>crypt</CODE> will be those two characters followed by 11 more from the
+same alphabet, 13 in total.  Only the first 8 characters in the
+<VAR>key</VAR> are significant.
+</P><P>
+
+The MD5-based algorithm has no limit on the useful length of the
+password used, and is slightly more secure.  It is therefore preferred
+over the DES-based algorithm.
+</P><P>
+
+When the user enters their password for the first time, the <VAR>salt</VAR>
+should be set to a new string which is reasonably random.  To verify a
+password against the result of a previous call to <CODE>crypt</CODE>, pass
+the result of the previous call as the <VAR>salt</VAR>.
+</DL>
+</P><P>
+
+The following short program is an example of how to use <CODE>crypt</CODE> the
+first time a password is entered.  Note that the <VAR>salt</VAR> generation
+is just barely acceptable; in particular, it is not unique between
+machines, and in many applications it would not be acceptable to let an
+attacker know what time the user's password was last set.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=smallexample><FONT SIZE=-1><pre>#include &#60;stdio.h&#62;
+#include &#60;time.h&#62;
+#include &#60;unistd.h&#62;
+#include &#60;crypt.h&#62;
+
+int 
+main(void)
+{
+  unsigned long seed[2];
+  char salt[] = "$1$........";
+  const char *const seedchars = 
+    "./0123456789ABCDEFGHIJKLMNOPQRST"
+    "UVWXYZabcdefghijklmnopqrstuvwxyz";
+  char *password;
+  int i;
+  
+  /* Generate a (not very) random seed.  
+     You should do it better than this... */
+  seed[0] = time(NULL);
+  seed[1] = getpid() ^ (seed[0] &#62;&#62; 14 &#38; 0x30000);
+  
+  /* Turn it into printable characters from `seedchars'. */
+  for (i = 0; i &#60; 8; i++)
+    salt[3+i] = seedchars[(seed[i/5] &#62;&#62; (i%5)*6) &#38; 0x3f];
+  
+  /* Read in the user's password and encrypt it. */
+  password = crypt(getpass("Password:"), salt);
+  
+  /* Print the results. */
+  puts(password);
+  return 0;
+}
+</FONT></pre></td></tr></table></P><P>
+
+The next program shows how to verify a password.  It prompts the user
+for a password and prints "Access granted." if the user types
+<CODE>GNU libc manual</CODE>.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=smallexample><FONT SIZE=-1><pre>#include &#60;stdio.h&#62;
+#include &#60;string.h&#62;
+#include &#60;unistd.h&#62;
+#include &#60;crypt.h&#62;
+
+int 
+main(void)
+{
+  /* Hashed form of "GNU libc manual". */
+  const char *const pass = "$1$/iSaq7rB$EoUw5jJPPvAPECNaaWzMK/";
+
+  char *result;
+  int ok;
+  
+  /* Read in the user's password and encrypt it,
+     passing the expected password in as the salt. */
+  result = crypt(getpass("Password:"), pass);
+
+  /* Test the result. */
+  ok = strcmp (result, pass) == 0;
+
+  puts(ok ? "Access granted." : "Access denied.");
+  return ok ? 0 : 1;
+}
+</FONT></pre></td></tr></table></P><P>
+
+<A NAME="IDX3"></A>
+<DL>
+<DT><U>Function:</U> char * <B>crypt_r</B> <I>(const char *<VAR>key</VAR>, const char *<VAR>salt</VAR>, {struct crypt_data *} <VAR>data</VAR>)</I>
+<DD></P><P>
+
+The <CODE>crypt_r</CODE> function does the same thing as <CODE>crypt</CODE>, but
+takes an extra parameter which includes space for its result (among
+other things), so it can be reentrant.  <CODE>data-&#62;initialized</CODE> must be
+cleared to zero before the first time <CODE>crypt_r</CODE> is called.
+</P><P>
+
+The <CODE>crypt_r</CODE> function is a GNU extension.
+</DL>
+</P><P>
+
+The <CODE>crypt</CODE> and <CODE>crypt_r</CODE> functions are prototyped in the
+header <TT>`crypt.h'</TT>.
+</P><P>
+
+<A NAME="DES Encryption"></A>
+<HR SIZE="6">
+<A NAME="SEC5"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC4"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC6"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[ &lt;&lt; ]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC1"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC6"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> 1.4 DES Encryption </H2>
+<!--docid::SEC5::-->
+<P>
+
+The Data Encryption Standard is described in the US Government Federal
+Information Processing Standards (FIPS) 46-3 published by the National
+Institute of Standards and Technology.  The DES has been very thoroughly
+analysed since it was developed in the late 1970s, and no new
+significant flaws have been found.
+</P><P>
+
+However, the DES uses only a 56-bit key (plus 8 parity bits), and a
+machine has been built in 1998 which can search through all possible
+keys in about 6 days, which cost about US$200000; faster searches would
+be possible with more money.  This makes simple DES unsecure for most
+purposes, and NIST no longer permits new US government systems
+to use simple DES.
+</P><P>
+
+For serious encryption functionality, it is recommended that one of the
+many free encryption libraries be used instead of these routines.
+</P><P>
+
+The DES is a reversible operation which takes a 64-bit block and a
+64-bit key, and produces another 64-bit block.  Usually the bits are
+numbered so that the most-significant bit, the first bit, of each block
+is numbered 1.
+</P><P>
+
+Under that numbering, every 8th bit of the key (the 8th, 16th, and so
+on) is not used by the encryption algorithm itself.  But the key must
+have odd parity; that is, out of bits 1 through 8, and 9 through 16, and
+so on, there must be an odd number of `1' bits, and this completely
+specifies the unused bits.
+</P><P>
+
+<A NAME="IDX4"></A>
+<DL>
+<DT><U>Function:</U> void <B>setkey</B> <I>(const char *<VAR>key</VAR>)</I>
+<DD></P><P>
+
+The <CODE>setkey</CODE> function sets an internal data structure to be an
+expanded form of <VAR>key</VAR>.  <VAR>key</VAR> is specified as an array of 64
+bits each stored in a <CODE>char</CODE>, the first bit is <CODE>key[0]</CODE> and
+the 64th bit is <CODE>key[63]</CODE>.  The <VAR>key</VAR> should have the correct
+parity.
+</DL>
+</P><P>
+
+<A NAME="IDX5"></A>
+<DL>
+<DT><U>Function:</U> void <B>encrypt</B> <I>(char *<VAR>block</VAR>, int <VAR>edflag</VAR>)</I>
+<DD></P><P>
+
+The <CODE>encrypt</CODE> function encrypts <VAR>block</VAR> if
+<VAR>edflag</VAR> is 0, otherwise it decrypts <VAR>block</VAR>, using a key
+previously set by <CODE>setkey</CODE>.  The result is
+placed in <VAR>block</VAR>.
+</P><P>
+
+Like <CODE>setkey</CODE>, <VAR>block</VAR> is specified as an array of 64 bits each
+stored in a <CODE>char</CODE>, but there are no parity bits in <VAR>block</VAR>.
+</DL>
+</P><P>
+
+<A NAME="IDX6"></A>
+<DL>
+<DT><U>Function:</U> void <B>setkey_r</B> <I>(const char *<VAR>key</VAR>, {struct crypt_data *} <VAR>data</VAR>)</I>
+<DD><A NAME="IDX7"></A>
+<DT><U>Function:</U> void <B>encrypt_r</B> <I>(char *<VAR>block</VAR>, int <VAR>edflag</VAR>, {struct crypt_data *} <VAR>data</VAR>)</I>
+<DD></P><P>
+
+These are reentrant versions of <CODE>setkey</CODE> and <CODE>encrypt</CODE>.  The
+only difference is the extra parameter, which stores the expanded
+version of <VAR>key</VAR>.  Before calling <CODE>setkey_r</CODE> the first time,
+<CODE>data-&#62;initialised</CODE> must be cleared to zero.
+</DL>
+</P><P>
+
+The <CODE>setkey_r</CODE> and <CODE>encrypt_r</CODE> functions are GNU extensions.
+<CODE>setkey</CODE>, <CODE>encrypt</CODE>, <CODE>setkey_r</CODE>, and <CODE>encrypt_r</CODE> are
+defined in <TT>`crypt.h'</TT>.
+</P><P>
+
+<A NAME="IDX8"></A>
+<DL>
+<DT><U>Function:</U> int <B>ecb_crypt</B> <I>(char *<VAR>key</VAR>, char *<VAR>blocks</VAR>, unsigned <VAR>len</VAR>, unsigned <VAR>mode</VAR>)</I>
+<DD></P><P>
+
+The function <CODE>ecb_crypt</CODE> encrypts or decrypts one or more blocks
+using DES.  Each block is encrypted independently.
+</P><P>
+
+The <VAR>blocks</VAR> and the <VAR>key</VAR> are stored packed in 8-bit bytes, so
+that the first bit of the key is the most-significant bit of
+<CODE>key[0]</CODE> and the 63rd bit of the key is stored as the
+least-significant bit of <CODE>key[7]</CODE>.  The <VAR>key</VAR> should have the
+correct parity.
+</P><P>
+
+<VAR>len</VAR> is the number of bytes in <VAR>blocks</VAR>.  It should be a
+multiple of 8 (so that there is a whole number of blocks to encrypt).
+<VAR>len</VAR> is limited to a maximum of <CODE>DES_MAXDATA</CODE> bytes.
+</P><P>
+
+The result of the encryption replaces the input in <VAR>blocks</VAR>.
+</P><P>
+
+The <VAR>mode</VAR> parameter is the bitwise OR of two of the following:
+</P><P>
+
+<DL COMPACT>
+<A NAME="IDX9"></A>
+<DT><CODE>DES_ENCRYPT</CODE>
+<DD><A NAME="IDX10"></A>
+This constant, used in the <VAR>mode</VAR> parameter, specifies that
+<VAR>blocks</VAR> is to be encrypted.
+<P>
+
+<A NAME="IDX11"></A>
+<DT><CODE>DES_DECRYPT</CODE>
+<DD><A NAME="IDX12"></A>
+This constant, used in the <VAR>mode</VAR> parameter, specifies that
+<VAR>blocks</VAR> is to be decrypted.
+<P>
+
+<A NAME="IDX13"></A>
+<DT><CODE>DES_HW</CODE>
+<DD><A NAME="IDX14"></A>
+This constant, used in the <VAR>mode</VAR> parameter, asks to use a hardware
+device.  If no hardware device is available, encryption happens anyway,
+but in software.
+<P>
+
+<A NAME="IDX15"></A>
+<DT><CODE>DES_SW</CODE>
+<DD><A NAME="IDX16"></A>
+This constant, used in the <VAR>mode</VAR> parameter, specifies that no
+hardware device is to be used.
+</DL>
+<P>
+
+The result of the function will be one of these values:
+</P><P>
+
+<DL COMPACT>
+<A NAME="IDX17"></A>
+<DT><CODE>DESERR_NONE</CODE>
+<DD><A NAME="IDX18"></A>
+The encryption succeeded.
+<P>
+
+<A NAME="IDX19"></A>
+<DT><CODE>DESERR_NOHWDEVICE</CODE>
+<DD><A NAME="IDX20"></A>
+The encryption succeeded, but there was no hardware device available.
+<P>
+
+<A NAME="IDX21"></A>
+<DT><CODE>DESERR_HWERROR</CODE>
+<DD><A NAME="IDX22"></A>
+The encryption failed because of a hardware problem.
+<P>
+
+<A NAME="IDX23"></A>
+<DT><CODE>DESERR_BADPARAM</CODE>
+<DD><A NAME="IDX24"></A>
+The encryption failed because of a bad parameter, for instance <VAR>len</VAR>
+is not a multiple of 8 or <VAR>len</VAR> is larger than <CODE>DES_MAXDATA</CODE>.
+</DL>
+</DL>
+<P>
+
+<A NAME="IDX25"></A>
+<DL>
+<DT><U>Function:</U> int <B>DES_FAILED</B> <I>(int <VAR>err</VAR>)</I>
+<DD>This macro returns 1 if <VAR>err</VAR> is a `success' result code from
+<CODE>ecb_crypt</CODE> or <CODE>cbc_crypt</CODE>, and 0 otherwise.
+</DL>
+</P><P>
+
+<A NAME="IDX26"></A>
+<DL>
+<DT><U>Function:</U> int <B>cbc_crypt</B> <I>(char *<VAR>key</VAR>, char *<VAR>blocks</VAR>, unsigned <VAR>len</VAR>, unsigned <VAR>mode</VAR>, char *<VAR>ivec</VAR>)</I>
+<DD></P><P>
+
+The function <CODE>cbc_crypt</CODE> encrypts or decrypts one or more blocks
+using DES in Cipher Block Chaining mode.
+</P><P>
+
+For encryption in CBC mode, each block is exclusive-ored with <VAR>ivec</VAR>
+before being encrypted, then <VAR>ivec</VAR> is replaced with the result of
+the encryption, then the next block is processed.  Decryption is the
+reverse of this process.
+</P><P>
+
+This has the advantage that blocks which are the same before being
+encrypted are very unlikely to be the same after being encrypted, making
+it much harder to detect patterns in the data.
+</P><P>
+
+Usually, <VAR>ivec</VAR> is set to 8 random bytes before encryption starts.
+Then the 8 random bytes are transmitted along with the encrypted data
+(without themselves being encrypted), and passed back in as <VAR>ivec</VAR>
+for decryption.  Another possibility is to set <VAR>ivec</VAR> to 8 zeroes
+initially, and have the first the block encrypted consist of 8 random
+bytes.
+</P><P>
+
+Otherwise, all the parameters are similar to those for <CODE>ecb_crypt</CODE>.
+</DL>
+</P><P>
+
+<A NAME="IDX27"></A>
+<DL>
+<DT><U>Function:</U> void <B>des_setparity</B> <I>(char *<VAR>key</VAR>)</I>
+<DD></P><P>
+
+The function <CODE>des_setparity</CODE> changes the 64-bit <VAR>key</VAR>, stored
+packed in 8-bit bytes, to have odd parity by altering the low bits of
+each byte.
+</DL>
+</P><P>
+
+The <CODE>ecb_crypt</CODE>, <CODE>cbc_crypt</CODE>, and <CODE>des_setparity</CODE>
+functions and their accompanying macros are all defined in the header
+<TT>`rpc/des_crypt.h'</TT>.
+</P><P>
+
+<A NAME="Copying"></A>
+</P><P>
+
+<HR SIZE="6">
+<A NAME="SEC6"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC5"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC7"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC1"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1> A. GNU LIBRARY GENERAL PUBLIC LICENSE </H1>
+<!--docid::SEC6::-->
+<center>
+ Version 2, June 1991
+</center>
+<P>
+
+<TABLE><tr><td>&nbsp;</td><td class=display><pre style="font-family: serif">Copyright (C) 1991 Free Software Foundation, Inc.
+59 Temple Place -- Suite 330, Boston, MA 02111-1307, USA
+
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+
+[This is the first released version of the library GPL.  It is
+ numbered 2 because it goes with version 2 of the ordinary GPL.]
+</pre></td></tr></table></P><P>
+
+<HR SIZE="6">
+<A NAME="SEC7"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC6"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC8"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[ &lt;&lt; ]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> Preamble </H2>
+<!--docid::SEC7::-->
+<P>
+
+  The licenses for most software are designed to take away your
+freedom to share and change it.  By contrast, the GNU General Public
+Licenses are intended to guarantee your freedom to share and change
+free software--to make sure the software is free for all its users.
+</P><P>
+
+  This license, the Library General Public License, applies to some
+specially designated Free Software Foundation software, and to any
+other libraries whose authors decide to use it.  You can use it for
+your libraries, too.
+</P><P>
+
+  When we speak of free software, we are referring to freedom, not
+price.  Our General Public Licenses are designed to make sure that you
+have the freedom to distribute copies of free software (and charge for
+this service if you wish), that you receive source code or can get it
+if you want it, that you can change the software or use pieces of it
+in new free programs; and that you know you can do these things.
+</P><P>
+
+  To protect your rights, we need to make restrictions that forbid
+anyone to deny you these rights or to ask you to surrender the rights.
+These restrictions translate to certain responsibilities for you if
+you distribute copies of the library, or if you modify it.
+</P><P>
+
+  For example, if you distribute copies of the library, whether gratis
+or for a fee, you must give the recipients all the rights that we gave
+you.  You must make sure that they, too, receive or can get the source
+code.  If you link a program with the library, you must provide
+complete object files to the recipients so that they can relink them
+with the library, after making changes to the library and recompiling
+it.  And you must show them these terms so they know their rights.
+</P><P>
+
+  Our method of protecting your rights has two steps: (1) copyright
+the library, and (2) offer you this license which gives you legal
+permission to copy, distribute and/or modify the library.
+</P><P>
+
+  Also, for each distributor's protection, we want to make certain
+that everyone understands that there is no warranty for this free
+library.  If the library is modified by someone else and passed on, we
+want its recipients to know that what they have is not the original
+version, so that any problems introduced by others will not reflect on
+the original authors' reputations.
+</P><P>
+
+  Finally, any free program is threatened constantly by software
+patents.  We wish to avoid the danger that companies distributing free
+software will individually obtain patent licenses, thus in effect
+transforming the program into proprietary software.  To prevent this,
+we have made it clear that any patent must be licensed for everyone's
+free use or not licensed at all.
+</P><P>
+
+  Most GNU software, including some libraries, is covered by the ordinary
+GNU General Public License, which was designed for utility programs.  This
+license, the GNU Library General Public License, applies to certain
+designated libraries.  This license is quite different from the ordinary
+one; be sure to read it in full, and don't assume that anything in it is
+the same as in the ordinary license.
+</P><P>
+
+  The reason we have a separate public license for some libraries is that
+they blur the distinction we usually make between modifying or adding to a
+program and simply using it.  Linking a program with a library, without
+changing the library, is in some sense simply using the library, and is
+analogous to running a utility program or application program.  However, in
+a textual and legal sense, the linked executable is a combined work, a
+derivative of the original library, and the ordinary General Public License
+treats it as such.
+</P><P>
+
+  Because of this blurred distinction, using the ordinary General
+Public License for libraries did not effectively promote software
+sharing, because most developers did not use the libraries.  We
+concluded that weaker conditions might promote sharing better.
+</P><P>
+
+  However, unrestricted linking of non-free programs would deprive the
+users of those programs of all benefit from the free status of the
+libraries themselves.  This Library General Public License is intended to
+permit developers of non-free programs to use free libraries, while
+preserving your freedom as a user of such programs to change the free
+libraries that are incorporated in them.  (We have not seen how to achieve
+this as regards changes in header files, but we have achieved it as regards
+changes in the actual functions of the Library.)  The hope is that this
+will lead to faster development of free libraries.
+</P><P>
+
+  The precise terms and conditions for copying, distribution and
+modification follow.  Pay close attention to the difference between a
+"work based on the library" and a "work that uses the library".  The
+former contains code derived from the library, while the latter only
+works together with the library.
+</P><P>
+
+  Note that it is possible for a library to be covered by the ordinary
+General Public License rather than by this special one.
+</P><P>
+
+<center>
+ TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+</center>
+</P><P>
+
+<OL>
+<LI>
+This License Agreement applies to any software library which
+contains a notice placed by the copyright holder or other authorized
+party saying it may be distributed under the terms of this Library
+General Public License (also called "this License").  Each licensee is
+addressed as "you".
+<P>
+
+  A "library" means a collection of software functions and/or data
+prepared so as to be conveniently linked with application programs
+(which use some of those functions and data) to form executables.
+</P><P>
+
+  The "Library", below, refers to any such software library or work
+which has been distributed under these terms.  A "work based on the
+Library" means either the Library or any derivative work under
+copyright law: that is to say, a work containing the Library or a
+portion of it, either verbatim or with modifications and/or translated
+straightforwardly into another language.  (Hereinafter, translation is
+included without limitation in the term "modification".)
+</P><P>
+
+  "Source code" for a work means the preferred form of the work for
+making modifications to it.  For a library, complete source code means
+all the source code for all modules it contains, plus any associated
+interface definition files, plus the scripts used to control compilation
+and installation of the library.
+</P><P>
+
+  Activities other than copying, distribution and modification are not
+covered by this License; they are outside its scope.  The act of
+running a program using the Library is not restricted, and output from
+such a program is covered only if its contents constitute a work based
+on the Library (independent of the use of the Library in a tool for
+writing it).  Whether that is true depends on what the Library does
+and what the program that uses the Library does.
+  
+<LI>
+You may copy and distribute verbatim copies of the Library's
+complete source code as you receive it, in any medium, provided that
+you conspicuously and appropriately publish on each copy an
+appropriate copyright notice and disclaimer of warranty; keep intact
+all the notices that refer to this License and to the absence of any
+warranty; and distribute a copy of this License along with the
+Library.
+<P>
+
+  You may charge a fee for the physical act of transferring a copy,
+and you may at your option offer warranty protection in exchange for a
+fee.
+</P><P>
+
+<LI>
+You may modify your copy or copies of the Library or any portion
+of it, thus forming a work based on the Library, and copy and
+distribute such modifications or work under the terms of Section 1
+above, provided that you also meet all of these conditions:
+<P>
+
+<OL>
+<LI>
+The modified work must itself be a software library.
+<P>
+
+<LI>
+You must cause the files modified to carry prominent notices
+stating that you changed the files and the date of any change.
+<P>
+
+<LI>
+You must cause the whole of the work to be licensed at no
+charge to all third parties under the terms of this License.
+<P>
+
+<LI>
+If a facility in the modified Library refers to a function or a
+table of data to be supplied by an application program that uses
+the facility, other than as an argument passed when the facility
+is invoked, then you must make a good faith effort to ensure that,
+in the event an application does not supply such function or
+table, the facility still operates, and performs whatever part of
+its purpose remains meaningful.
+<P>
+
+(For example, a function in a library to compute square roots has
+a purpose that is entirely well-defined independent of the
+application.  Therefore, Subsection 2d requires that any
+application-supplied function or table used by this function must
+be optional: if the application does not supply it, the square
+root function must still compute square roots.)
+</OL>
+<P>
+
+These requirements apply to the modified work as a whole.  If
+identifiable sections of that work are not derived from the Library,
+and can be reasonably considered independent and separate works in
+themselves, then this License, and its terms, do not apply to those
+sections when you distribute them as separate works.  But when you
+distribute the same sections as part of a whole which is a work based
+on the Library, the distribution of the whole must be on the terms of
+this License, whose permissions for other licensees extend to the
+entire whole, and thus to each and every part regardless of who wrote
+it.
+</P><P>
+
+Thus, it is not the intent of this section to claim rights or contest
+your rights to work written entirely by you; rather, the intent is to
+exercise the right to control the distribution of derivative or
+collective works based on the Library.
+</P><P>
+
+In addition, mere aggregation of another work not based on the Library
+with the Library (or with a work based on the Library) on a volume of
+a storage or distribution medium does not bring the other work under
+the scope of this License.
+</P><P>
+
+<LI>
+You may opt to apply the terms of the ordinary GNU General Public
+License instead of this License to a given copy of the Library.  To do
+this, you must alter all the notices that refer to this License, so
+that they refer to the ordinary GNU General Public License, version 2,
+instead of to this License.  (If a newer version than version 2 of the
+ordinary GNU General Public License has appeared, then you can specify
+that version instead if you wish.)  Do not make any other change in
+these notices.
+<P>
+
+  Once this change is made in a given copy, it is irreversible for
+that copy, so the ordinary GNU General Public License applies to all
+subsequent copies and derivative works made from that copy.
+</P><P>
+
+  This option is useful when you wish to copy part of the code of
+the Library into a program that is not a library.
+</P><P>
+
+<LI>
+You may copy and distribute the Library (or a portion or
+derivative of it, under Section 2) in object code or executable form
+under the terms of Sections 1 and 2 above provided that you accompany
+it with the complete corresponding machine-readable source code, which
+must be distributed under the terms of Sections 1 and 2 above on a
+medium customarily used for software interchange.
+<P>
+
+  If distribution of object code is made by offering access to copy
+from a designated place, then offering equivalent access to copy the
+source code from the same place satisfies the requirement to
+distribute the source code, even though third parties are not
+compelled to copy the source along with the object code.
+</P><P>
+
+<LI>
+A program that contains no derivative of any portion of the
+Library, but is designed to work with the Library by being compiled or
+linked with it, is called a "work that uses the Library".  Such a
+work, in isolation, is not a derivative work of the Library, and
+therefore falls outside the scope of this License.
+<P>
+
+  However, linking a "work that uses the Library" with the Library
+creates an executable that is a derivative of the Library (because it
+contains portions of the Library), rather than a "work that uses the
+library".  The executable is therefore covered by this License.
+Section 6 states terms for distribution of such executables.
+</P><P>
+
+  When a "work that uses the Library" uses material from a header file
+that is part of the Library, the object code for the work may be a
+derivative work of the Library even though the source code is not.
+Whether this is true is especially significant if the work can be
+linked without the Library, or if the work is itself a library.  The
+threshold for this to be true is not precisely defined by law.
+</P><P>
+
+  If such an object file uses only numerical parameters, data
+structure layouts and accessors, and small macros and small inline
+functions (ten lines or less in length), then the use of the object
+file is unrestricted, regardless of whether it is legally a derivative
+work.  (Executables containing this object code plus portions of the
+Library will still fall under Section 6.)
+</P><P>
+
+  Otherwise, if the work is a derivative of the Library, you may
+distribute the object code for the work under the terms of Section 6.
+Any executables containing that work also fall under Section 6,
+whether or not they are linked directly with the Library itself.
+</P><P>
+
+<LI>
+As an exception to the Sections above, you may also compile or
+link a "work that uses the Library" with the Library to produce a
+work containing portions of the Library, and distribute that work
+under terms of your choice, provided that the terms permit
+modification of the work for the customer's own use and reverse
+engineering for debugging such modifications.
+<P>
+
+  You must give prominent notice with each copy of the work that the
+Library is used in it and that the Library and its use are covered by
+this License.  You must supply a copy of this License.  If the work
+during execution displays copyright notices, you must include the
+copyright notice for the Library among them, as well as a reference
+directing the user to the copy of this License.  Also, you must do one
+of these things:
+</P><P>
+
+<OL>
+<LI>
+Accompany the work with the complete corresponding
+machine-readable source code for the Library including whatever
+changes were used in the work (which must be distributed under
+Sections 1 and 2 above); and, if the work is an executable linked
+with the Library, with the complete machine-readable "work that
+uses the Library", as object code and/or source code, so that the
+user can modify the Library and then relink to produce a modified
+executable containing the modified Library.  (It is understood
+that the user who changes the contents of definitions files in the
+Library will not necessarily be able to recompile the application
+to use the modified definitions.)
+<P>
+
+<LI>
+Accompany the work with a written offer, valid for at
+least three years, to give the same user the materials
+specified in Subsection 6a, above, for a charge no more
+than the cost of performing this distribution.
+<P>
+
+<LI>
+If distribution of the work is made by offering access to copy
+from a designated place, offer equivalent access to copy the above
+specified materials from the same place.
+<P>
+
+<LI>
+Verify that the user has already received a copy of these
+materials or that you have already sent this user a copy.
+</OL>
+<P>
+
+  For an executable, the required form of the "work that uses the
+Library" must include any data and utility programs needed for
+reproducing the executable from it.  However, as a special exception,
+the source code distributed need not include anything that is normally
+distributed (in either source or binary form) with the major
+components (compiler, kernel, and so on) of the operating system on
+which the executable runs, unless that component itself accompanies
+the executable.
+</P><P>
+
+  It may happen that this requirement contradicts the license
+restrictions of other proprietary libraries that do not normally
+accompany the operating system.  Such a contradiction means you cannot
+use both them and the Library together in an executable that you
+distribute.
+</P><P>
+
+<LI>
+You may place library facilities that are a work based on the
+Library side-by-side in a single library together with other library
+facilities not covered by this License, and distribute such a combined
+library, provided that the separate distribution of the work based on
+the Library and of the other library facilities is otherwise
+permitted, and provided that you do these two things:
+<P>
+
+<OL>
+<LI>
+Accompany the combined library with a copy of the same work
+based on the Library, uncombined with any other library
+facilities.  This must be distributed under the terms of the
+Sections above.
+<P>
+
+<LI>
+Give prominent notice with the combined library of the fact
+that part of it is a work based on the Library, and explaining
+where to find the accompanying uncombined form of the same work.
+</OL>
+<P>
+
+<LI>
+You may not copy, modify, sublicense, link with, or distribute
+the Library except as expressly provided under this License.  Any
+attempt otherwise to copy, modify, sublicense, link with, or
+distribute the Library is void, and will automatically terminate your
+rights under this License.  However, parties who have received copies,
+or rights, from you under this License will not have their licenses
+terminated so long as such parties remain in full compliance.
+<P>
+
+<LI>
+You are not required to accept this License, since you have not
+signed it.  However, nothing else grants you permission to modify or
+distribute the Library or its derivative works.  These actions are
+prohibited by law if you do not accept this License.  Therefore, by
+modifying or distributing the Library (or any work based on the
+Library), you indicate your acceptance of this License to do so, and
+all its terms and conditions for copying, distributing or modifying
+the Library or works based on it.
+<P>
+
+<LI>
+Each time you redistribute the Library (or any work based on the
+Library), the recipient automatically receives a license from the
+original licensor to copy, distribute, link with or modify the Library
+subject to these terms and conditions.  You may not impose any further
+restrictions on the recipients' exercise of the rights granted herein.
+You are not responsible for enforcing compliance by third parties to
+this License.
+<P>
+
+<LI>
+If, as a consequence of a court judgment or allegation of patent
+infringement or for any other reason (not limited to patent issues),
+conditions are imposed on you (whether by court order, agreement or
+otherwise) that contradict the conditions of this License, they do not
+excuse you from the conditions of this License.  If you cannot
+distribute so as to satisfy simultaneously your obligations under this
+License and any other pertinent obligations, then as a consequence you
+may not distribute the Library at all.  For example, if a patent
+license would not permit royalty-free redistribution of the Library by
+all those who receive copies directly or indirectly through you, then
+the only way you could satisfy both it and this License would be to
+refrain entirely from distribution of the Library.
+<P>
+
+If any portion of this section is held invalid or unenforceable under any
+particular circumstance, the balance of the section is intended to apply,
+and the section as a whole is intended to apply in other circumstances.
+</P><P>
+
+It is not the purpose of this section to induce you to infringe any
+patents or other property right claims or to contest validity of any
+such claims; this section has the sole purpose of protecting the
+integrity of the free software distribution system which is
+implemented by public license practices.  Many people have made
+generous contributions to the wide range of software distributed
+through that system in reliance on consistent application of that
+system; it is up to the author/donor to decide if he or she is willing
+to distribute software through any other system and a licensee cannot
+impose that choice.
+</P><P>
+
+This section is intended to make thoroughly clear what is believed to
+be a consequence of the rest of this License.
+</P><P>
+
+<LI>
+If the distribution and/or use of the Library is restricted in
+certain countries either by patents or by copyrighted interfaces, the
+original copyright holder who places the Library under this License may add
+an explicit geographical distribution limitation excluding those countries,
+so that distribution is permitted only in or among countries not thus
+excluded.  In such case, this License incorporates the limitation as if
+written in the body of this License.
+<P>
+
+<LI>
+The Free Software Foundation may publish revised and/or new
+versions of the Library General Public License from time to time.
+Such new versions will be similar in spirit to the present version,
+but may differ in detail to address new problems or concerns.
+<P>
+
+Each version is given a distinguishing version number.  If the Library
+specifies a version number of this License which applies to it and
+"any later version", you have the option of following the terms and
+conditions either of that version or of any later version published by
+the Free Software Foundation.  If the Library does not specify a
+license version number, you may choose any version ever published by
+the Free Software Foundation.
+</P><P>
+
+<LI>
+If you wish to incorporate parts of the Library into other free
+programs whose distribution conditions are incompatible with these,
+write to the author to ask for permission.  For software which is
+copyrighted by the Free Software Foundation, write to the Free
+Software Foundation; we sometimes make exceptions for this.  Our
+decision will be guided by the two goals of preserving the free status
+of all derivatives of our free software and of promoting the sharing
+and reuse of software generally.
+<P>
+
+<center>
+ NO WARRANTY
+</center>
+</P><P>
+
+<LI>
+BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
+WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
+OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY OF ANY
+KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+LIBRARY IS WITH YOU.  SHOULD THE LIBRARY PROVE DEFECTIVE, YOU ASSUME
+THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+<P>
+
+<LI>
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN
+WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY
+AND/OR REDISTRIBUTE THE LIBRARY AS PERMITTED ABOVE, BE LIABLE TO YOU
+FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+LIBRARY (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE LIBRARY TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.
+</OL>
+<P>
+
+<center>
+ END OF TERMS AND CONDITIONS
+</center>
+</P><P>
+
+<HR SIZE="6">
+<A NAME="SEC8"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC7"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[ &lt;&lt; ]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H2> How to Apply These Terms to Your New Libraries </H2>
+<!--docid::SEC8::-->
+<P>
+
+  If you develop a new library, and you want it to be of the greatest
+possible use to the public, we recommend making it free software that
+everyone can redistribute and change.  You can do so by permitting
+redistribution under these terms (or, alternatively, under the terms of the
+ordinary General Public License).
+</P><P>
+
+  To apply these terms, attach the following notices to the library.  It is
+safest to attach them to the start of each source file to most effectively
+convey the exclusion of warranty; and each file should have at least the
+"copyright" line and a pointer to where the full notice is found.
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=smallexample><FONT SIZE=-1><pre><VAR>one line to give the library's name and an idea of what it does.</VAR>
+Copyright (C) <VAR>year</VAR>  <VAR>name of author</VAR>
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Library General Public License as published
+by the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+</FONT></pre></td></tr></table></P><P>
+
+Also add information on how to contact you by electronic and paper mail.
+</P><P>
+
+You should also get your employer (if you work as a programmer) or your
+school, if any, to sign a "copyright disclaimer" for the library, if
+necessary.  Here is a sample; alter the names:
+</P><P>
+
+<TABLE><tr><td>&nbsp;</td><td class=smallexample><FONT SIZE=-1><pre>Yoyodyne, Inc., hereby disclaims all copyright interest in the library
+`Frob' (a library for tweaking knobs) written by James Random Hacker.
+
+<VAR>signature of Ty Coon</VAR>, 1 April 1990
+Ty Coon, President of Vice
+</FONT></pre></td></tr></table></P><P>
+
+That's all there is to it!
+</P><P>
+
+<A NAME="Concept Index"></A>
+<HR SIZE="6">
+<A NAME="SEC9"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC8"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC10"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC6"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC10"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1> Concept Index </H1>
+<!--docid::SEC9::-->
+<P>
+
+</P><P>
+
+<A NAME="Type Index"></A>
+<HR SIZE="6">
+<A NAME="SEC10"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC11"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC11"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1> Type Index </H1>
+<!--docid::SEC10::-->
+<P>
+
+</P><P>
+
+<A NAME="Function Index"></A>
+<HR SIZE="6">
+<A NAME="SEC11"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC10"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC12"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC10"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC12"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1> Function and Macro Index </H1>
+<!--docid::SEC11::-->
+<P>
+
+<table><tr><th valign=top>Jump to: &nbsp; </th><td><A HREF="crypt.html#fn_C" style="text-decoration:none"><b>C</b></A>
+ &nbsp; 
+<A HREF="crypt.html#fn_D" style="text-decoration:none"><b>D</b></A>
+ &nbsp; 
+<A HREF="crypt.html#fn_E" style="text-decoration:none"><b>E</b></A>
+ &nbsp; 
+<A HREF="crypt.html#fn_G" style="text-decoration:none"><b>G</b></A>
+ &nbsp; 
+<A HREF="crypt.html#fn_S" style="text-decoration:none"><b>S</b></A>
+ &nbsp; 
+</td></tr></table><br><P></P>
+<TABLE border=0>
+<TR><TD></TD><TH ALIGN=LEFT>Index Entry</TH><TH ALIGN=LEFT> Section</TH></TR>
+<TR><TD COLSPAN=3> <HR></TD></TR>
+<TR><TH><A NAME="fn_C"></A>C</TH><TD></TD><TD></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX26"><CODE>cbc_crypt</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX2"><CODE>crypt</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC4">1.3 Encrypting Passwords</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX3"><CODE>crypt_r</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC4">1.3 Encrypting Passwords</A></TD></TR>
+<TR><TD COLSPAN=3> <HR></TD></TR>
+<TR><TH><A NAME="fn_D"></A>D</TH><TD></TD><TD></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX25"><CODE>DES_FAILED</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX27"><CODE>des_setparity</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD COLSPAN=3> <HR></TD></TR>
+<TR><TH><A NAME="fn_E"></A>E</TH><TD></TD><TD></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX8"><CODE>ecb_crypt</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX5"><CODE>encrypt</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX7"><CODE>encrypt_r</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD COLSPAN=3> <HR></TD></TR>
+<TR><TH><A NAME="fn_G"></A>G</TH><TD></TD><TD></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX1"><CODE>getpass</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC3">1.2 Reading Passwords</A></TD></TR>
+<TR><TD COLSPAN=3> <HR></TD></TR>
+<TR><TH><A NAME="fn_S"></A>S</TH><TD></TD><TD></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX4"><CODE>setkey</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX6"><CODE>setkey_r</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD COLSPAN=3> <HR></TD></TR>
+</TABLE><P></P><table><tr><th valign=top>Jump to: &nbsp; </th><td><A HREF="crypt.html#fn_C" style="text-decoration:none"><b>C</b></A>
+ &nbsp; 
+<A HREF="crypt.html#fn_D" style="text-decoration:none"><b>D</b></A>
+ &nbsp; 
+<A HREF="crypt.html#fn_E" style="text-decoration:none"><b>E</b></A>
+ &nbsp; 
+<A HREF="crypt.html#fn_G" style="text-decoration:none"><b>G</b></A>
+ &nbsp; 
+<A HREF="crypt.html#fn_S" style="text-decoration:none"><b>S</b></A>
+ &nbsp; 
+</td></tr></table><br></P><P>
+
+<A NAME="Variable Index"></A>
+<HR SIZE="6">
+<A NAME="SEC12"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC11"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC13"> &gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC11"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC13"> &gt;&gt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1> Variable and Constant Macro Index </H1>
+<!--docid::SEC12::-->
+<P>
+
+<table><tr><th valign=top>Jump to: &nbsp; </th><td><A HREF="crypt.html#vr_D" style="text-decoration:none"><b>D</b></A>
+ &nbsp; 
+</td></tr></table><br><P></P>
+<TABLE border=0>
+<TR><TD></TD><TH ALIGN=LEFT>Index Entry</TH><TH ALIGN=LEFT> Section</TH></TR>
+<TR><TD COLSPAN=3> <HR></TD></TR>
+<TR><TH><A NAME="vr_D"></A>D</TH><TD></TD><TD></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX11"><CODE>DES_DECRYPT</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX12"><CODE>DES_DECRYPT</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX9"><CODE>DES_ENCRYPT</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX10"><CODE>DES_ENCRYPT</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX13"><CODE>DES_HW</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX14"><CODE>DES_HW</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX15"><CODE>DES_SW</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX16"><CODE>DES_SW</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX23"><CODE>DESERR_BADPARAM</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX24"><CODE>DESERR_BADPARAM</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX21"><CODE>DESERR_HWERROR</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX22"><CODE>DESERR_HWERROR</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX19"><CODE>DESERR_NOHWDEVICE</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX20"><CODE>DESERR_NOHWDEVICE</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX17"><CODE>DESERR_NONE</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD></TD><TD valign=top><A HREF="crypt.html#IDX18"><CODE>DESERR_NONE</CODE></A></TD><TD valign=top><A HREF="crypt.html#SEC5">1.4 DES Encryption</A></TD></TR>
+<TR><TD COLSPAN=3> <HR></TD></TR>
+</TABLE><P></P><table><tr><th valign=top>Jump to: &nbsp; </th><td><A HREF="crypt.html#vr_D" style="text-decoration:none"><b>D</b></A>
+ &nbsp; 
+</td></tr></table><br></P><P>
+
+<A NAME="File Index"></A>
+<HR SIZE="6">
+<A NAME="SEC13"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC12"> &lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt; ]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC12"> &lt;&lt; </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top"> Up </A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[ &gt;&gt; ]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT"> &nbsp; <TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1> Program and File Index </H1>
+<!--docid::SEC13::-->
+<P>
+
+</P><P>
+
+<HR SIZE="6">
+<A NAME="SEC_Contents"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1>Table of Contents</H1>
+<UL>
+<A NAME="TOC1" HREF="crypt.html#SEC1">1. DES Encryption and Password Handling</A>
+<BR>
+<UL>
+<A NAME="TOC2" HREF="crypt.html#SEC2">1.1 Legal Problems</A>
+<BR>
+<A NAME="TOC3" HREF="crypt.html#SEC3">1.2 Reading Passwords</A>
+<BR>
+<A NAME="TOC4" HREF="crypt.html#SEC4">1.3 Encrypting Passwords</A>
+<BR>
+<A NAME="TOC5" HREF="crypt.html#SEC5">1.4 DES Encryption</A>
+<BR>
+</UL>
+<A NAME="TOC6" HREF="crypt.html#SEC6">A. GNU LIBRARY GENERAL PUBLIC LICENSE</A>
+<BR>
+<UL>
+<A NAME="TOC7" HREF="crypt.html#SEC7">Preamble</A>
+<BR>
+<A NAME="TOC8" HREF="crypt.html#SEC8">How to Apply These Terms to Your New Libraries</A>
+<BR>
+</UL>
+<A NAME="TOC9" HREF="crypt.html#SEC9">Concept Index</A>
+<BR>
+<A NAME="TOC10" HREF="crypt.html#SEC10">Type Index</A>
+<BR>
+<A NAME="TOC11" HREF="crypt.html#SEC11">Function and Macro Index</A>
+<BR>
+<A NAME="TOC12" HREF="crypt.html#SEC12">Variable and Constant Macro Index</A>
+<BR>
+<A NAME="TOC13" HREF="crypt.html#SEC13">Program and File Index</A>
+<BR>
+</UL>
+<HR SIZE=1>
+<A NAME="SEC_OVERVIEW"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1>Short Table of Contents</H1>
+<BLOCKQUOTE>
+<A NAME="TOC1" HREF="crypt.html#SEC1">1. DES Encryption and Password Handling</A>
+<BR>
+<A NAME="TOC6" HREF="crypt.html#SEC6">A. GNU LIBRARY GENERAL PUBLIC LICENSE</A>
+<BR>
+<A NAME="TOC9" HREF="crypt.html#SEC9">Concept Index</A>
+<BR>
+<A NAME="TOC10" HREF="crypt.html#SEC10">Type Index</A>
+<BR>
+<A NAME="TOC11" HREF="crypt.html#SEC11">Function and Macro Index</A>
+<BR>
+<A NAME="TOC12" HREF="crypt.html#SEC12">Variable and Constant Macro Index</A>
+<BR>
+<A NAME="TOC13" HREF="crypt.html#SEC13">Program and File Index</A>
+<BR>
+
+</BLOCKQUOTE>
+<HR SIZE=1>
+<A NAME="SEC_About"></A>
+<TABLE CELLPADDING=1 CELLSPACING=1 BORDER=0>
+<TR><TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Top">Top</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_Contents">Contents</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC9">Index</A>]</TD>
+<TD VALIGN="MIDDLE" ALIGN="LEFT">[<A HREF="crypt.html#SEC_About"> ? </A>]</TD>
+</TR></TABLE>
+<H1>About this document</H1>
+This document was generated on <I>January, 3  2002</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+<P></P>  
+The buttons in the navigation panels have the following meaning:
+<P></P>
+<table border = "1">
+<TR>
+<TH> Button </TH>
+<TH> Name </TH>
+<TH> Go to </TH>
+<TH> From 1.2.3 go to</TH>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+ [ &lt; ] </TD>
+<TD ALIGN="CENTER">
+Back
+</TD>
+<TD>
+previous section in reading order
+</TD>
+<TD>
+1.2.2
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+ [ &gt; ] </TD>
+<TD ALIGN="CENTER">
+Forward
+</TD>
+<TD>
+next section in reading order
+</TD>
+<TD>
+1.2.4
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+ [ &lt;&lt; ] </TD>
+<TD ALIGN="CENTER">
+FastBack
+</TD>
+<TD>
+previous or up-and-previous section 
+</TD>
+<TD>
+1.1
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+ [ Up ] </TD>
+<TD ALIGN="CENTER">
+Up
+</TD>
+<TD>
+up section
+</TD>
+<TD>
+1.2
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+ [ &gt;&gt; ] </TD>
+<TD ALIGN="CENTER">
+FastForward
+</TD>
+<TD>
+next or up-and-next section
+</TD>
+<TD>
+1.3
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+ [Top] </TD>
+<TD ALIGN="CENTER">
+Top
+</TD>
+<TD>
+cover (top) of document
+</TD>
+<TD>
+ &nbsp; 
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+ [Contents] </TD>
+<TD ALIGN="CENTER">
+Contents
+</TD>
+<TD>
+table of contents
+</TD>
+<TD>
+ &nbsp; 
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+ [Index] </TD>
+<TD ALIGN="CENTER">
+Index
+</TD>
+<TD>
+concept index
+</TD>
+<TD>
+ &nbsp; 
+</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+ [ ? ] </TD>
+<TD ALIGN="CENTER">
+About
+</TD>
+<TD>
+this page
+</TD>
+<TD>
+ &nbsp; 
+</TD>
+</TR>
+</TABLE>
+<P></P>
+where the <STRONG> Example </STRONG> assumes that the current position 
+is at <STRONG> Subsubsection One-Two-Three </STRONG> of a document of 
+the following structure:
+<UL>
+<LI> 1. Section One  </LI>
+<UL>
+<LI>1.1 Subsection One-One</LI>
+<UL>
+<LI> ... </LI>
+</UL>
+<LI>1.2 Subsection One-Two</LI>
+<UL>
+<LI>1.2.1 Subsubsection One-Two-One
+</LI><LI>1.2.2 Subsubsection One-Two-Two
+</LI><LI>1.2.3 Subsubsection One-Two-Three &nbsp; &nbsp; <STRONG>
+&lt;== Current Position </STRONG>
+</LI><LI>1.2.4 Subsubsection One-Two-Four
+</LI></UL>
+<LI>1.3 Subsection One-Three</LI>
+<UL>
+<LI> ... </LI>
+</UL>
+<LI>1.4 Subsection One-Four</LI>
+</UL>
+</UL>
+
+<HR SIZE=1>
+<BR>  
+<FONT SIZE="-1">
+This document was generated
+on <I>January, 3  2002</I>
+using <A HREF="http://www.mathematik.uni-kl.de/~obachman/Texi2html
+"><I>texi2html</I></A>
+
+</BODY>
+</HTML>

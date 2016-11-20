@@ -1,0 +1,508 @@
+PLOT(1)              GNU Plotting Utilities             PLOT(1)
+
+
+
+
+
+NAME
+       plot - translate GNU metafiles to other graphics formats
+
+SYNOPSIS
+       plot [ options ] [ files ]
+
+DESCRIPTION
+       plot translates files in GNU metafile  format  to  other
+       graphics formats, or displays them on an X Window System
+       display.  GNU metafile format  is  a  device-independent
+       format  for  the  storage  of  graphic  data.  It is the
+       default  output  format  of   the   programs   graph(1),
+       pic2plot(1),  tek2plot(1),  and plotfont(1), and is fur-
+       ther documented in plot(5), since it is an enhanced ver-
+       sion  of the traditional plot(5) format found on non-GNU
+       systems.  It can also be produced by the GNU libplot 2-D
+       graphics export library (see plot(3)).
+
+       The  output format or display type is specified with the
+       -T option.  The  possible  output  formats  and  display
+       types are the same as those supported by graph(1), plot-
+       font(1), pic2plot(1), and  tek2plot(1).   If  an  output
+       file is produced, it is written to standard output.
+
+       Options  and  file names may be interspersed on the com-
+       mand line, but the options are processed before the file
+       names are read.  If -- is seen, it is interpreted as the
+       end of the options.  If no file names are specified,  or
+       the  file  name  - is encountered, the standard input is
+       read.
+
+OPTIONS
+   General Options
+       -T type
+       --display-type type
+              Select type as the output format or display type.
+              It  may be "X", "png", "pnm", "gif", "svg", "ai",
+              "ps",  "cgm",  "fig",  "pcl",  "hpgl",   "regis",
+              "tek",  or  "meta"  (the  default).   These refer
+              respectively to the X Window System, PNG  (Porta-
+              ble  Network  Graphics)  format,  portable anymap
+              format (PBM/PGM/PPM), a  pseudo-GIF  format  that
+              does  not  use  LZW  encoding,  the new XML-based
+              Scalable Vector Graphics format, the format  used
+              by  Adobe Illustrator, Postscript or Encapsulated
+              Postscript  (EPS)  that  can   be   edited   with
+              idraw(1),  CGM  format (by default, confirming to
+              the WebCGM  profile),  the  format  used  by  the
+              xfig(1) drawing editor, the Hewlett-Packard PCL 5
+              printer language,  the  Hewlett-Packard  Graphics
+              Language,  ReGIS  graphics  format  (which can be
+              displayed by the dxterm(1) terminal  emulator  or
+              by  a  VT330 or VT340 terminal), Tektronix format
+              (which can be displayed by the xterm(1)  terminal
+              emulator),  and  device-independent  GNU metafile
+              format itself.  Unless type  is  "X",  an  output
+              file  is produced and written to standard output.
+
+              Omitting the -T option is equivalent to  specify-
+              ing -T meta.  Translating from metafile format to
+              itself is occasionally useful,  since  there  are
+              two  versions  of  metafile  format  (see  the -O
+              option below).
+
+              A listing of the fonts available in any specified
+              output   format   may   be   obtained   with  the
+              --help-fonts option (see below).  If a  requested
+              font  is unavailable, a default font will be sub-
+              stituted.  The default font  is  "Helvetica"  for
+              "X",   "svg",   "ai",  "ps",  "cgm",  and  "fig",
+              "Univers"  for  "pcl",  and  "HersheySerif"   for
+              "png",  "pnm", "gif", "hpgl", "regis", "tek", and
+              "meta".
+
+       -p n
+       --page-number n
+              Output only page number n, within the metafile or
+              sequence of metafiles that is being translated.
+
+              Metafiles  may consist of one or more pages, num-
+              bered beginning with 1.  Also, each page may con-
+              tain  multiple  `frames'.   plot  -T  X,  plot -T
+              regis, and plot -T tek, which plot in real  time,
+              will  separate  successive  frames by screen era-
+              sures.  plot -T png, plot -T pnm,  plot  -T  gif,
+              plot -T svg, plot -T ai, plot -T ps, plot -T cgm,
+              plot -T fig, plot -T pcl, and plot -T hpgl, which
+              do  not  plot  in real time, will output only the
+              last frame of any multi-frame page.
+
+              The default behavior, if -p is not  used,  is  to
+              output  all  pages.   For example, plot -T X dis-
+              plays each page in its own X window.  If  the  -T
+              png,  -T  pnm, -T gif, -T ai, or -T fig option is
+              used, the default behavior is to output only  the
+              first  nonempty page, since files in those output
+              formats contain only a single page of graphics.
+
+              Metafiles produced by  graph(1)  and  plotfont(1)
+              contain  only a single page (page #1), which con-
+              sists of two frames: an empty frame to clear  the
+              display,  and  a  second  frame that contains the
+              graphics.
+
+       -s
+       --merge-pages
+              Merge all displayed pages into a single page, and
+              also merge all `frames'.
+
+              This  option is useful when merging together sin-
+              gle-page plots from different sources.  For exam-
+              ple,  it  can  be  used  to  merge together plots
+              obtained from separate invocations of graph(1).
+
+       --bitmap-size bitmap_size
+              Set the size of the graphics display in which the
+              plot  will  be  drawn,  in terms of pixels, to be
+              bitmap_size.  The default is "570x570".  This  is
+              relevant  only to plot -T X, plot -T png, plot -T
+              pnm, and plot -T gif, all of which  produce  bit-
+              maps.   If  you choose a rectangular (non-square)
+              window size, the fonts in the plot will be scaled
+              anisotropically,  i.e.,  by  different factors in
+              the horizontal and vertical directions.  For plot
+              -T  X,  this requires an X11R6 display.  Any font
+              that  cannot  be  scaled  in  this  way  will  be
+              replaced  by a default scalable font, such as the
+              vector font "HersheySerif".
+
+              The environment variable BITMAPSIZE  can  equally
+              well  be  used  to  specify the window size.  For
+              backward   compatibility,    the    X    resource
+              Xplot.geometry may be used instead.
+
+       --emulate-color option
+              If  option is yes, replace each color in the out-
+              put by an appropriate shade  of  gray.   This  is
+              seldom  useful,  except when using plot -T pcl to
+              prepare output for a PCL 5 device.   (Many  mono-
+              chrome  PCL  5 devices, such as monochrome Laser-
+              Jets, do a poor job of emulating color  on  their
+              own.)   You may equally well request color emula-
+              tion by setting  the  environment  variable  EMU-
+              LATE_COLOR to "yes".
+
+       --max-line-length max_line_length
+              Set the maximum number of points that a polygonal
+              line may contain, before it is flushed out, to be
+              max_line_length.   If  this  flushing occurs, the
+              polygonal line will be split  into  two  or  more
+              sub-lines,  though  the  splitting  should not be
+              noticeable.  The default value of max_line_length
+              is 500.
+
+              The  reason for splitting long polygonal lines is
+              that some display devices (e.g.,  old  Postscript
+              printers  and  pen  HP-GL  plotters) have limited
+              buffer   sizes.    The    environment    variable
+              MAX_LINE_LENGTH  can  also be used to specify the
+              maximum line length.
+
+       --page-size pagesize
+              Set the size of the page on which the  plot  will
+              be  positioned.  This is relevant only to plot -T
+              svg, plot -T ai, plot -T ps, plot -T cgm, plot -T
+              fig,  plot -T pcl, and plot -T hpgl.  The default
+              is "letter", which means an 8.5 inch by  11  inch
+              page.  Any ISO page size in the range "a0"..."a4"
+              or ANSI page size in the range "a"..."e"  may  be
+              specified  ("letter"  is  an  alias  for  "a" and
+              "tabloid" is an  alias  for  "b").   "legal"  and
+              "ledger"  are  recognized  page  sizes also.  The
+              environment variable PAGESIZE can equally well be
+              used to specify the page size.
+
+              The  graphics  display in which the plot is drawn
+              will, by default, be a square region  that  occu-
+              pies nearly the full width of the specified page.
+              An alternative size for the graphics display  can
+              be  specified.   For example, the page size could
+              be specified as "letter,xsize=4in,ysize=6in",  or
+              "a4,xsize=5.0cm,ysize=100mm".   For  all  of  the
+              above except plot -T hpgl, the  graphics  display
+              will,  by  default, be centered on the page.  For
+              all of the above except plot -T svg and  plot  -T
+              cgm,  the  graphics  display  may be repositioned
+              manually, by specifying the location of its lower
+              left corner, relative to the lower left corner of
+              the page.  For example, the page  size  could  be
+              specified as "letter,xorigin=2in,yorigin=3in", or
+              "a4,xorigin=0.5cm,yorigin=0.5cm".   It  is   also
+              possible  to specify an offset vector.  For exam-
+              ple, the page size could be  specified  as  "let-
+              ter,xoffset=1in",   or  "letter,xoffset=1in,yoff-
+              set=1.2in", or "a4,yoffset=-1cm".  In SVG  format
+              and  WebCGM  format it is possible to specify the
+              size of the graphics display, but not  its  posi-
+              tion.
+
+       --rotation angle
+              Rotate  the  graphics  display  by angle degrees.
+              Recognized  values  are  "0",  "90",  "180",  and
+              "270".   "no" and "yes" are equivalent to "0" and
+              "90",  respectively.   The  environment  variable
+              ROTATION  can  also be used to specify a rotation
+              angle.
+
+   Parameter Initialization Options
+       The following options set the initial values of  drawing
+       parameters.   However, all of these may be overridden by
+       directives in a metafile.  In fact,  these  options  are
+       useful primarily when plotting old metafiles in the tra-
+       ditional (pre-GNU) plot(5) format, which did not support
+       such directives.
+
+       --bg-color name
+              Set  the  color initially used for the background
+              to be name.  This is relevant only to plot -T  X,
+              plot  -T  png,  plot -T pnm, plot -T gif, plot -T
+              svg, plot -T cgm, and plot -T regis.  An unrecog-
+              nized  name  sets the color to the default, which
+              is "white".  The  environment  variable  BG_COLOR
+              can  equally  well  be  used to specify the back-
+              ground color.
+
+              If the -T png or -T gif option is used, a  trans-
+              parent  PNG  file  or  a  transparent pseudo-GIF,
+              respectively, may  be  produced  by  setting  the
+              TRANSPARENT_COLOR  environment  variable  to  the
+              name of the background color.  If the -T  svg  or
+              -T  cgm  option is used, an output file without a
+              background may be produced by setting  the  back-
+              ground color to "none".
+
+       -f size
+       --font-size size
+              Set  the size of the font initially used for ren-
+              dering text, as a fraction of the  width  of  the
+              graphics  display,  to  be  size.  The default is
+              0.0525.
+
+       -F name
+       --font-name name
+              Set the font initially used for text to be  name.
+              Font  names  are case-insensitive.  If the speci-
+              fied font is not available, the default font will
+              be  used.   Which  fonts  are  available, and the
+              default font, depend on which -T option is speci-
+              fied  (see above).  A list of available fonts can
+              be obtained with  the  --help-fonts  option  (see
+              below).
+
+       -W line_width
+       --line-width line_width
+              Set  the initial width of lines, as a fraction of
+              the width of the display, to  be  line_width.   A
+              negative  value means that a default value should
+              be used.  This value  is  format-dependent.   The
+              interpretation of zero line width is also format-
+              dependent (in some output formats,  a  zero-width
+              line  is  the thinnest line that can be drawn; in
+              others, a zero-width line is invisible).
+
+       --pen-color name
+              Set the initial pen color to be name.  An  unrec-
+              ognized  name  sets the pen color to the default,
+              which is "black".
+
+   Options for Metafile Output
+       The following option is relevant only if the  -T  option
+       is omitted or if -T meta is used.  In this case the out-
+       put of plot, like the input, will  be  in  GNU  graphics
+       metafile format.
+
+       -O
+       --portable-output
+              Output  the  portable (human-readable) version of
+              GNU metafile format, rather than the binary  ver-
+              sion  (the  default).   The  format of the binary
+              version is machine-dependent.
+
+   Options for Backward Compatibility
+       By default, plot assumes that its input file(s)  are  in
+       either the binary version or the portable version of GNU
+       metafile format.  You may specify  that  the  input  is,
+       instead,  in  the  traditional  Unix  (pre-GNU) graphics
+       metafile format, which is documented  in  plot(5).   The
+       traditional  graphics  metafile  format  was produced by
+       pre-GNU versions of graph(1).
+
+       -h
+       --high-byte-first-input
+              Input file(s) are assumed to be  in  the  binary,
+              `high byte first' version of traditional metafile
+              format.  This variant is uncommon.
+
+       -l
+       --low-byte-first-input
+              Input file(s) are assumed to be  in  the  binary,
+              `low  byte first' version of traditional metafile
+              format.  This variant is the most common.
+
+       -A
+       --ascii-input
+              Input file(s) are assumed  to  be  in  the  ASCII
+              (human-readable)  variant of traditional metafile
+              format.  On some older Unix systems, this variant
+              was produced by plottoa(1).
+
+   Informational Options
+       --help Print a list of command-line options, and exit.
+
+       --help-fonts
+              Print  a table of available fonts, and exit.  The
+              table will depend on which output format or  dis-
+              play  type is specified with the -T option.  plot
+              -T X, plot -T svg, plot -T ai, plot -T  ps,  plot
+              -T cgm, and plot -T fig each support the 35 stan-
+              dard Postscript fonts.  plot -T svg, plot -T pcl,
+              and  plot  -T  hpgl support the 45 standard PCL 5
+              fonts, and the latter two  support  a  number  of
+              Hewlett-Packard  vector fonts.  All seven support
+              a set of 22 Hershey vector fonts, as do  plot  -T
+              png, plot -T pnm, plot -T gif, plot -T regis, and
+              plot -T tek.  plot without a -T option in princi-
+              ple supports any of these fonts, since its output
+              must be translated to other formats by a  further
+              invocation of plot.
+
+              The  plotfont(1)  utility may be used to obtain a
+              character map of any supported font.
+
+       --list-fonts
+              Like --help-fonts, but lists the fonts in a  sin-
+              gle  column  to  facilitate  piping to other pro-
+              grams.  If no output format is specified with the
+              -T  option,  the  full  set of supported fonts is
+              listed.
+
+       --version
+              Print the version number of plot and the plotting
+              utilities package, and exit.
+
+ENVIRONMENT
+       The    environment   variables   BITMAPSIZE,   PAGESIZE,
+       BG_COLOR, EMULATE_COLOR,  MAX_LINE_LENGTH  and  ROTATION
+       serve   as   backups   for  the  options  --bitmap-size,
+       --page-size,        --bg-color,         --emulate-color,
+       --max-line-length,  and  --rotation,  respectively.  The
+       remaining environment variables are specific to individ-
+       ual output formats.
+
+       plot  -T X, which pops up a window on an X Window System
+       display and draws graphics in  it,  checks  the  DISPLAY
+       environment  variable.  Its value determines the display
+       that will be used.
+
+       plot -T png and plot -T gif, which produce output in PNG
+       format  and pseudo-GIF format respectively, are affected
+       by the INTERLACE environment variable.  If its value  is
+       "yes",  the  output  will  be  interlaced.  Also, if the
+       TRANSPARENT_COLOR environment variable  is  set  to  the
+       name of a color, that color will be treated as transpar-
+       ent in the output.
+
+       plot -T pnm, which produces output  in  portable  anymap
+       (PBM/PGM/PPM)  format,  is  affected by the PNM_PORTABLE
+       environment variable.  If its value is "yes", the output
+       will  be  in  a human-readable format rather than binary
+       (the default).
+
+       plot -T cgm, which  produces  output  in  CGM  (Computer
+       Graphics   Metafile)   format,   is   affected   by  the
+       CGM_MAX_VERSION and CGM_ENCODING environment  variables.
+       By  default, it produces a binary-encoded version of CGM
+       version 3 format.  For backward compatibility, the  ver-
+       sion number may be reduced by setting CGM_MAX_VERSION to
+       "2" or "1".  Irrespective of  version,  the  output  CGM
+       file  will use the human-readable clear text encoding if
+       CGM_ENCODING is  set  to  "clear_text".   However,  only
+       binary-encoded  CGM files conform to the WebCGM profile.
+
+       plot  -T  pcl,  which  produces   PCL   5   output   for
+       Hewlett-Packard  printers  and  plotters, is affected by
+       the environment variable PCL_ASSIGN_COLORS.   It  should
+       be  set to "yes" when producing PCL 5 output for a color
+       printer or other color device.  This will  ensure  accu-
+       rate color reproduction by giving the output device com-
+       plete freedom in assigning colors,  internally,  to  its
+       "logical  pens".  If it is "no" then the device will use
+       a fixed set of colored pens, and will emulate other col-
+       ors  by shading.  The default is "no" because monochrome
+       PCL 5 devices, which are much more common  than  colored
+       ones, must use shading to emulate color.
+
+       plot  -T  hpgl,  which produces Hewlett-Packard Graphics
+       Language output,  is  affected  by  several  environment
+       variables.   The  most  important is HPGL_VERSION, which
+       may be set to "1", "1.5", or  "2"  (the  default).   "1"
+       means  that  the  output  should be generic HP-GL, "1.5"
+       means that the output should be suitable for the HP7550A
+       graphics  plotter  and  the  HP758x, HP7595A and HP7596A
+       drafting plotters (HP-GL with some HP-GL/2  extensions),
+       and  "2" means that the output should be modern HP-GL/2.
+       If the version is "1" or "1.5" then the  only  available
+       fonts  will be vector fonts, and all lines will be drawn
+       with a default width (the  -W  option  will  not  work).
+       Additionally,  if the version is "1" then the filling of
+       arbitrary curves with solid color will not be  supported
+       (circles and rectangles aligned with the coordinate axes
+       may be filled, though).
+
+       The position of the plot -T hpgl graphics display on the
+       page  can  be  rotated  90  degrees  counterclockwise by
+       setting the HPGL_ROTATE environment variable  to  "yes".
+       This  is  not the same as the rotation obtained with the
+       --rotation option, since it both  rotates  the  graphics
+       display  and  repositions  its  lower left corner toward
+       another corner of the page.   Besides  "no"  and  "yes",
+       recognized  values for HPGL_ROTATE are "0", "90", "180",
+       and "270".  "no" and "yes" are  equivalent  to  "0"  and
+       "90",  respectively.  "180" and "270" are supported only
+       if HPGL_VERSION is "2" (the default).
+
+       By default, plot -T hpgl will draw with a fixed  set  of
+       pens.   Which  pens are present may be specified by set-
+       ting the HPGL_PENS environment variable.   If  HPGL_VER-
+       SION   is   "1",  the  default  value  of  HPGL_PENS  is
+       "1=black"; if HPGL_VERSION is "1.5" or "2", the  default
+       value   of  HPGL_PENS  is  "1=black:2=red:3=green:4=yel-
+       low:5=blue:6=magenta:7=cyan".   The  format  should   be
+       self-explanatory.   By setting HPGL_PENS you may specify
+       a color for any pen in the range  #1...#31.   All  color
+       names  recognized  by  the  X Window System may be used.
+       Pen #1 must always be present, though  it  need  not  be
+       black.  Any other pen in the range #1...#31 may be omit-
+       ted.
+
+       If HPGL_VERSION is "2" then plot -T hpgl  will  also  be
+       affected by the environment variable HPGL_ASSIGN_COLORS.
+       If its value is "yes", then plot -T  hpgl  will  not  be
+       restricted  to  the  palette  specified in HPGL_PENS: it
+       will assign  colors  to  "logical  pens"  in  the  range
+       #1...#31,  as needed.  The default value is "no" because
+       other than color LaserJet printers and  DesignJet  plot-
+       ters,  not  many HP-GL/2 devices allow the assignment of
+       colors to logical pens.
+
+       Opaque filling and the drawing of  visible  white  lines
+       are  supported only if HPGL_VERSION is "2" and the envi-
+       ronment  variable   HPGL_OPAQUE_MODE   is   "yes"   (the
+       default).   If  its  value  is "no" then white lines (if
+       any), which are normally drawn with pen #0, will not  be
+       drawn.   This  feature  is  to accommodate older HP-GL/2
+       devices.  HP-GL/2 pen plotters, for example, do not sup-
+       port  opacity or the use of pen #0 to draw visible white
+       lines.  Some older HP-GL/2 devices may,  in  fact,  mal-
+       function if asked to draw opaque objects.
+
+       plot  -T tek, which produces output for a Tektronix ter-
+       minal or emulator, checks the TERM environment variable.
+       If the value of TERM is a string beginning with "xterm",
+       "nxterm", or "kterm", it is taken as a sign that plot is
+       running in an X Window System VT100 terminal emulator: a
+       copy of xterm(1), nxterm(1), or kterm(1).  Before  draw-
+       ing  graphics,  plot -T tek will emit an escape sequence
+       that causes the terminal emulator's auxiliary  Tektronix
+       window,  which is normally hidden, to pop up.  After the
+       graphics are drawn, an escape sequence that returns con-
+       trol  to the original VT100 window will be emitted.  The
+       Tektronix window will remain on the screen.
+
+       If the value of TERM is a string  beginning  with  "ker-
+       mit",  "ansi.sys", or "nansi.sys", it is taken as a sign
+       that plot is running in the VT100 terminal emulator pro-
+       vided  by the MS-DOS version of kermit(1).  Before draw-
+       ing graphics, plot -T tek will emit an  escape  sequence
+       that  switches  the terminal emulator to Tektronix mode.
+       Also, some of the Tektronix  control  codes  emitted  by
+       plot  -T  tek  will be kermit-specific.  There will be a
+       limited amount of color support, which is  not  normally
+       the  case  (the 16 `ansi.sys' colors will be supported).
+       After drawing graphics, plot -T tek will emit an  escape
+       sequence  that  returns the emulator to VT100 mode.  The
+       key sequence `ALT minus' can be employed manually within
+       kermit to switch between the two modes.
+
+SEE ALSO
+       graph(1),    pic2plot(1),    tek2plot(1),   plotfont(1),
+       plot(3), plot(5), and "The GNU Plotting  Utilities  Man-
+       ual".
+
+AUTHORS
+       plot  was  written  by  Robert  S.  Maier (rsm@math.ari-
+       zona.edu).
+
+BUGS
+       Email bug reports to bug-gnu-utils@gnu.org.
+
+
+
+FSF                         Jun 2000                    PLOT(1)

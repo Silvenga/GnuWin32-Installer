@@ -1,0 +1,731 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>User manual for old ppm functions</TITLE>
+<META NAME="manual_section" CONTENT="3">
+</HEAD>
+<BODY>
+<H1>libppm</H1>
+Updated: 22 July 2004
+<BR>
+<A HREF="libppm.html#index">Table Of Contents</A>
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+libppm - functions for PPM programs
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>#include &lt;<A HREF="file:/usr/include/ppm.h">ppm.h</A>&gt;</B>
+
+<P>
+<B>void ppm_init( </B>
+
+<B>int *</B><I>argcP</I><B>,</B>
+
+<B>char *</B><I>argv</I><B>[]</B>
+
+<B>);</B>
+
+<P>
+<B>pixel ** ppm_allocarray(</B>
+
+<B>int </B><I>cols</I><B>,</B>
+
+<B>int </B><I>rows</I><B> );</B>
+
+<P>
+<B>pixel * ppm_allocrow(</B>
+
+<B>int </B><I>cols</I><B> );</B>
+
+<P>
+<B>void ppm_freearray(</B>
+
+<B>pixel **</B><I>pixels</I><B>,</B>
+
+<B>int </B><I>rows</I><B> );</B>
+
+<P>
+<B>void ppm_freerow(</B>
+
+<B>pixel *</B><I>pixelrow</I><B>);</B>
+
+<P>
+<B>void ppm_readppminit( </B>
+
+<B>FILE *</B><I>fp</I><B>,</B>
+
+<B>int *</B><I>colsP</I><B>,</B>
+
+<B>int *</B><I>rowsP</I><B>,</B>
+
+<B>pixval *</B><I>maxvalP</I><B>,</B>
+
+<B>int *</B><I>formatP</I><B> );</B>
+
+<P>
+<B>void ppm_readppmrow( </B>
+
+<B>FILE *</B><I>fp</I><B>,</B>
+
+<B>pixel *</B><I>pixelrow</I><B>,</B>
+
+<B>int </B><I>cols</I><B>,</B>
+
+<B>pixval </B><I>maxval</I><B>,</B>
+
+<B>int </B><I>format</I><B> );</B>
+
+<P>
+<B>pixel ** ppm_readppm( </B>
+
+<B>FILE *</B><I>fp</I><B>,</B>
+
+<B>int *</B><I>colsP</I><B>,</B>
+
+<B>int *</B><I>rowsP</I><B>,</B>
+
+<B>pixvalP *</B><I>maxvalP</I><B> );</B>
+
+<P>
+<B>void ppm_writeppminit( </B>
+
+<B>FILE *  fp , </B>
+
+<B>int </B><I>cols</I><B>,</B>
+
+<B>int </B><I>rows</I><B>,</B>
+
+<B>pixval </B><I>maxval</I><B>,</B>
+
+<B>int </B><I>forceplain</I><B> );</B>
+
+<P>
+<B>void ppm_writeppmrow( </B>
+
+<B>FILE *</B><I>fp</I><B>,</B>
+
+<B>pixel *</B><I>pixelrow</I><B>,</B>
+
+<B>int cols</B><I>,</I>
+
+<B>pixval </B><I>maxval</I><B>,</B>
+
+<B>int </B><I>forceplain</I><B> );</B>
+
+<P>
+<B>void ppm_writeppm( </B>
+
+<B>FILE *</B><I>fp</I><B>,</B>
+
+<B>pixel ** </B><I>pixels</I><B>,</B>
+
+<B>int </B><I>cols</I><B>,</B>
+
+<B>int </B><I>rows</I><B>,</B>
+
+<B>pixval </B><I>maxval</I><B>,</B>
+
+<B>int </B><I>forceplain</I><B> );</B>
+
+<P>
+<B>void ppm_writeppm( </B>
+
+<B>FILE *</B><I>fp</I><B>,</B>
+
+<B>pixel **</B><I>pixels</I><B>,</B>
+
+<B>int </B><I>cols</I><B>,</B>
+
+<B>int </B><I>rows</I><B>,</B>
+
+<B>pixval </B><I>maxval</I><B>,</B>
+
+<B>int </B><I>forceplain</I><B> );</B>
+
+<P>
+<B>void ppm_nextimage(</B>
+
+<B>FILE *</B><I>file</I><B>,</B>
+
+<B>int * const </B><I>eofP</I><B>);</B>
+
+<P>
+<B>void ppm_check(</B>
+
+<B>FILE * </B><I>file</I><B>,</B>
+
+<B>const enum pm_check_type </B><I>check_type</I><B>,</B>
+
+<B>const int </B><I>format</I><B>,</B>
+
+<B>const int </B><I>cols</I><B>,</B>
+
+<B>const int </B><I>rows</I><B>,</B>
+
+<B>const int </B><I>maxval</I><B>,</B>
+
+<BR>
+
+<B>enum pm_check_code * const </B><I>retval</I><B>);</B>
+
+<P>
+<B>typedef ... pixel;</B>
+
+<B>typedef ... pixval;</B>
+
+<P>
+<B>#define PPM_MAXMAXVAL ...</B>
+
+<P>
+<B>#define PPM_OVERALLMAXVAL ...</B>
+
+<P>
+<B>#define PPM_FORMAT ...</B>
+
+<P>
+<B>#define RPPM_FORMAT ...</B>
+
+<P>
+<B>#define PPM_TYPE PPM_FORMAT</B>
+
+<P>
+<B>#define </B>
+
+<B>PPM_FORMAT_TYPE(</B><I>format</I><B>)</B>
+
+<B>...</B>
+
+<P>
+<B>extern pixval ppm_pbmmaxval;</B>
+
+<P>
+<B>pixval PPM_GETR( pixel </B><I>p</I><B>)</B>
+
+<B>pixval PPM_GETG( pixel </B><I>p</I><B>)</B>
+
+<B>pixval PPM_GETB( pixel </B><I>p</I><B>)</B>
+
+<P>
+<B>void PPM_ASSIGN( pixel </B><I>p</I><B>, </B>
+
+<B>pixval </B><I>red</I><B>, pixval </B><I>grn</I><B>, pixval </B><I>blu</I><B>)</B>
+
+<P>
+<B>int PPM_EQUAL( pixel </B><I>p</I><B>, pixel </B><I>q</I><B>)</B>
+
+<P>
+<B>int PPM_ISGRAY( pixel </B><I>p</I><B>)</B>
+
+<P>
+<B>void PPM_DEPTH( pixel </B><I>newp</I><B>, pixel </B><I>p</I><B>, </B>
+
+<B>pixval </B><I>oldmaxval</I><B>, pixval </B><I>newmaxval</I><B>)</B>
+
+<P>
+<B>float PPM_LUMIN( pixel </B><I>p</I><B>)</B>
+
+<P>
+<B>float PPM_CHROM_R( pixel </B><I>p</I><B>)</B>
+
+<P>
+<B>float PPM_CHROM_B( pixel </B><I>p</I><B>)</B>
+
+<P>
+<B>pixel ppm_parsecolor( char *</B><I>colorname</I><B>, pixval </B><I>maxval</I><B>)</B>
+
+<P>
+<B>char * ppm_colorname( pixel *</B><I>colorP</I><B>, pixval </B><I>maxval</I><B>, int </B><I>hexok</I><B>)</B>
+
+<P>
+<B>void ppm_readcolornamefile(</b>
+<b>const char *</b><i>fileName</i>, 
+<b>int</b> <i>mustOpen</i>,
+<b>colorhash_table *</b> <i>chtP</i>, 
+<b>const char *** </b> <i>colornamesP</i>
+<b>)</b>
+
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>These library functions are part of <a href="index.html">Netpbm</a>.
+
+<A NAME="lbAE">&nbsp;</A>
+<H3>TYPES AND CONSTANTS</H3>
+
+Each <B>pixel</B> contains three <B>pixval</B>s, each of which should
+contain only the values between <B>0</B> and <B>PPM_MAXMAXVAL</B>.
+<B>ppm_pbmmaxval</B> is the maxval used when a PPM program reads a PBM
+file.  Normally it is 1; however, for some programs, a larger value
+gives better results.
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H3>MANIPULATING PIXELS</H3>
+
+<p>The macros <B>PPM_GETR</B>, <B>PPM_GETG</B>, and <B>PPM_GETB</B>
+retrieve the red, green, or blue sample, respectively, from the given
+pixel.
+
+<P>The <B>PPM_ASSIGN</B> macro assigns the given values to the red,
+green, and blue samples of the given pixel.
+
+<P>The <B>PPM_EQUAL</B> macro tests two pixels for equality.
+
+<P>The <B>PPM_ISGRAY</B> macro tests a pixel for being gray.  It
+returns true if and only if the color of pixel <i>p</i> is black,
+white, or gray.
+
+<P>The <B>PPM_DEPTH</B> macro scales the colors of pixel <I>p</I>
+according the old and new maxvals and assigns the new values to
+<I>newp</I>.  It is intended to make writing ppmtowhatever easier.
+
+<P>The <B>PPM_LUMIN</B>, <B>PPM_CHROM_R</B>, and <B>PPM_CHROM_B</B>
+macros determine the luminance, red chrominance, and blue chrominance,
+respectively, of the pixel <I>p</I>.  The scale of all these values is
+the same as the scale of the input samples (i.e. 0 to maxval for
+luminance, -maxval/2 to maxval/2 for chrominance).
+
+<P>Note that the macros do it by floating point multiplication.  If
+you are computing these values over an entire image, it may be
+significantly faster to do it with multiplication tables instead.
+Compute all the possible products once up front, then for each pixel,
+just look up the products in the tables.
+
+<A NAME="lbAG">&nbsp;</A>
+<H3>INITIALIZATION</H3>
+
+<P><b>ppm_init()</b> is identical to <b>pm_init</b>.
+
+<A NAME="lbAH">&nbsp;</A>
+<H3>MEMORY MANAGEMENT</H3>
+
+<B>ppm_allocarray()</B> allocates an array of pixels.
+
+<P><B>ppm_allocrow()</B> allocates a row of the given number of
+pixels.
+
+<P><B>ppm_freearray()</B> frees the array allocated with
+<B>ppm_allocarray()</B> containing the given number of rows.
+
+<P><B>ppm_freerow()</B> frees a row of pixelss allocated with
+<B>ppm_allocrow()</B>.
+
+<A NAME="lbAI">&nbsp;</A>
+<H3>READING FILES</H3>
+
+<P>If a function in this section is called on a PBM or PGM format
+file, it translates the PBM or PGM file into a PPM file on the fly and
+functions as if it were called on the equivalent PPM file.  The
+<I>format</I> value returned by <B>ppm_readppminit()</B> is, however,
+not translated.  It represents the actual format of the PBM or PGM
+file.
+
+<P><B>ppm_readppminit()</B> reads the header of a PPM file, returning
+all the information from the header and leaving the file positioned
+just after the header.
+
+<P><B>ppm_readppmrow()</B> reads a row of pixels into the
+<I>pixelrow</I> array.  <I>format</I>, <I>cols</I>, and <I>maxval</I>
+are the values returned by <B>ppm_readppminit()</B>.
+
+<P><B>ppm_readppm()</B> reads an entire PPM image into memory,
+returning the allocated array as its return value and returning the
+information from the header as <I>rows</I>, <I>cols</I>, and
+<I>maxval</I>.  This function combines <B>ppm_readppminit()</B>,
+<B>ppm_allocarray()</B>, and <B>ppm_readppmrow()</B>.
+
+
+<A NAME="lbAJ">&nbsp;</A>
+<H3>WRITING FILES</H3>
+
+<B>ppm_writeppminit()</B> writes the header for a PPM file and leaves
+it positioned just after the header.
+
+<P><I>forceplain</I> is a logical value that tells
+<B>ppm_writeppminit() </B> to write a header for a plain PPM format
+file, as opposed to a raw PPM format file.
+
+<P><B>ppm_writeppmrow()</B> writes the row <I>pixelrow</I> to a PPM
+file.  For meaningful results, <I>cols</I>, <I>maxval</I>, and
+<I>forceplain</I> must be the same as was used with
+<B>ppm_writeppminit()</B>.
+
+<P><B>ppm_writeppm()</B> write the header and all data for a PPM
+image.  This function combines <B>ppm_writeppminit()</B> and
+<B>ppm_writeppmrow()</B>.
+
+<A NAME="lbAK">&nbsp;</A>
+<H3>MISCELLANEOUS</H3>
+
+<P><B>ppm_nextimage()</B> positions a PPM input file to the next image
+in it (so that a subsequent <B>ppm_readppminit()</B> reads its
+header).
+
+<P><B>ppm_nextimage()</B> is analogous to <B>pbm_nextimage()</B>, but
+works on PPM, PGM, and PBM files.
+
+<P><B>ppm_check() </B> checks for the common file integrity error
+where the file is the wrong size to contain all the image data.
+
+<P><B>ppm_check() </B> is analogous to <B>pbm_check()</B>, but works
+on PPM, PGM, and PBM files.
+
+<A NAME="colorname">&nbsp;</A>
+<H3>COLOR NAMES</H3>
+
+<A NAME="rgb.txt">&nbsp;</a>
+<h4>System Color Dictionary</h4>
+
+<P>Netpbm uses the system's X11 color dictionary (usually in
+<b>/usr/lib/X11/rgb.txt</b>).  This is the same file the X Window
+System typically uses to associate colors with their names.
+
+<p>The color dictionary that Netpbm uses is in the file whose name is
+the value of the <B>RGBDEF</B> environment variable.  If <B>RGBDEF</B>
+is not set, Netpbm defaults to the first existing file from this list:
+
+<ol>
+<li><b>/usr/lib/X11/rgb.txt</b>
+<li><b>/usr/openwinlib/rgb.txt</b>
+<li><b>/usr/X11R6/lib/X11/rgb.txt</b>
+</ol>
+
+<P>You can see the color names from a typical X11 color dictionary,
+which is probably very close to what is on your system, along with the
+colors, <a
+href="http://www.swiss.ai.mit.edu/~jaffer/Color/x11.pdf">here</a>.  <a
+href="http://www.swiss.ai.mit.edu/~jaffer/Color/Dictionaries.html">This
+website</a> shows a bunch of other versions you could use.
+
+<P>Netpbm is packaged with a color dictionary.  A standard Netpbm
+installation installs this file as "misc/rgb.txt" in the Netpbm
+directory.  This color dictionary has colors from everywhere the
+Netpbm maintainer could find them, and is a superset of XFree 86's
+color dictionary.
+
+<H4>ppm_parsecolor</H4>
+
+<p><B>ppm_parsecolor()</B> interprets a color specification and returns a
+pixel of the color that it indicates.  The color specification is
+ASCII text, in one of these formats:
+
+<ul>
+
+<li>a name, as defined in the <a href="libppm.html#rgb.txt">system color dictionary
+</a>.
+
+<LI> An X11-style hexadecimal specifier:
+<tt>rgb:<i>r</i>/<i>g</i>/<i>b</i></tt>, where <i>r</i>, <i>g</i>, and
+<i>b</i> are each 1- to 4-digit hexadecimal numbers.  For each, the maxval
+is the maximum number that can be represented in the number of hexadecimal
+digits given.  Example: <tt>rgb:01/ff/8000</tt> specifies 1/255 red
+intensity, maximum green intensity, and about half blue intensity.
+
+<LI> An X11-style decimal specifier:
+<tt>rgbi:<i>r</i>/<i>g</i>/<i>b</i></tt>, where <i>r</i>, <i>g</i>,
+and <i>b</i> are floating point numbers from 0 to 1.
+
+<li>an old-X11-style hexadecimal triple: <tt>#rgb</tt>, <tt>#rrggbb</tt>, 
+<tt>#rrrgggbbb</tt>, or <tt>#rrrrggggbbbb</tt>.
+
+<li>A triplet of decimal floating point numbers from 0.0 to 1.0,
+representing red, green, and blue intensities respectively, separated
+by commas.  E.g. <tt>1.0,0.5,.25</tt>.  This is for backwards compatibility;
+it was in use before MIT came up with the similar and preferred rgbi style).
+
+</ul>
+
+<P>If the color specification does not conform to any of these
+formats, including the case that it is a name, but is not in the
+system color dictionary, <B>ppm_parsecolor()</B> <a
+href="error.html">throws an error</a>.
+
+<h4>ppm_colorname</h4>
+
+<P><B>ppm_colorname()</B> returns a string that describes the color
+of the given pixel.  If a <a href="libppm.html#rgb.txt">system color dictionary</a>
+is available and the color appears in it, <B>ppm_colorname()</B>
+returns the name of the color from the file.  If the color does not
+appear in a system color dictionary and <I>hexok</I> is true,
+<B>ppm_colorname()</B> returns a hexadecimal color specification
+triple (#rrggbb).  If a system color dictionary is available but the
+color does not appear in it and <I>hexok</I> is false,
+<B>ppm_colorname()</B> returns the name of the closest matching color
+in the color file.  Finally, if there is no system color dictionary
+available and <I>hexok</I> is false, <B>ppm_colorname()</B> fails and
+exits the program with an error message.
+
+<P>The string returned is in static libppm library storage which is
+overwritten by every call to <B>ppm_colorname()</B>.
+
+
+<h4>ppm_readcolornamefile</h4>
+
+<P><b>ppm_readcolornamefile()</b> reads the entire contents of the color
+dictionary in the file named <i>fileName</i> into data structures you
+can use to access it easily.
+
+<p>The function returns all the color names as an array of
+null-terminated strings.  It mallocs the space for this array and
+returns its address at <i>colornamesP</i>.
+<b>(*colornamesP)[</b><i>i</i><b>]</b> is the address of the first
+character in the null-terminated string that is the name of the
+<i>i</i>th color in the dictionary.
+
+<p>The function also returns a <b>colorhash_table</b> (see <a
+href="libppm.html#colorindex">COLOR INDEXING</a>) that matches all these color names
+up to the colors they represent.  It mallocs the space for the
+<b>colorhash_table</b> and returns its address at <i>chtP</i>.  The
+number that the <b>colorhash_table</b> associates with each color is
+the index into the color name array described above of the name of
+that color.
+
+<p>You may specify a null pointer for <i>fileName</i> to indicate the
+default color dictionary.
+
+<p><i>mustOpen</i> is a boolean.  If it is nonzero, the function fails
+and aborts the program if it is unable to open the specified color dictionary
+file.  If it is zero, though, it simply treats an unopenable color dictionary
+as an empty one.  The colorhash and color name array it returns contain no
+colors or names.
+
+<p><b>ppm_readcolornamefile()</b> was new in Netpbm 10.15 (April 2003).
+
+
+<A NAME="colorindex">&nbsp;</A>
+<H3>COLOR INDEXING</H3>
+
+<P>Sometimes in processing images, you want to associate a value with
+a particular color.  Most often, that's because you're generating a
+color mapped graphics format.  In a color mapped graphics format, the
+raster contains small numbers, and the file contains a color map that
+tells what color each of those small numbers refers to.  If your image
+has only 256 colors, but each color takes 24 bits to describe, this
+can make your output file much smaller than a straightforward RGB
+raster would.
+
+<P>So, continuing the above example, say you have a <B>pixel</B> value
+for chartreuse and in your output file and you are going to represent
+chartreuse by the number 12.  You need a data structure that allows
+your program quickly to find out that the number for a chartreuse
+<B>pixel</B> is 12.  Netpbm's color indexing data types and functions
+give you that.
+
+<P><B>colorhash_table</B> is a C data type that associates an integer
+with each of an arbitrary number of colors.  It is a hash table, so it
+uses far less space than an array indexed by the color's RGB values
+would.
+
+<P>The problem with a <B>colorhash_table</B> is that you can only look
+things up in it.  You can't find out what colors are in it.  So Netpbm
+has another data type for representing the same information, the
+poorly but historically named <B>colorhist_vector</B>.  A
+<B>colorhist_vector</B> is just an array.  Each entry represents a
+color and contains the color's value (as a <B>pixel</B>) and the
+integer value associated with it.  The entries are filled in starting
+with subscript 0 and going consecutively up for the number of colors
+in the histogram.
+
+<P>(The reason the name is poor is because a color histogram is only
+one of many things that could be represented by it).
+
+<P><B>colorhash_table ppm_alloccolorhash()</B>
+
+<P>This creates a <B>colorhash_table</B> using dynamically allocated
+storage.  There are no colors in it.  If there is not enough storage,
+it exits the program with an error message.
+
+<P><B>void ppm_freecolorhash()</B>
+
+<P>This destroys a <B>ppm_freecolorhash </B> and frees all the storage
+associated with it.
+
+<P><B>int ppm_addtocolorhash( colorhash_table cht, const pixel * const
+colorP, const int value)</B>
+
+<P>This adds the specified color to the specified <B>colorhash_table
+</B> and associates the specified value with it.
+
+<P>You must ensure that the color you are adding isn't already present
+in the <B>colorhash_table</B>.
+
+<P>There is no way to update an entry or delete an entry from a 
+<B>colorhash_table</B>.
+
+<P><B>int ppm_lookupcolor( const colorhash_table cht, const pixel *
+const colorP )</B>
+
+<P>This looks up the specified color in the specified
+<B>colorhash_table</B>.  It returns the integer value associated with
+that color.
+
+<P>If the specified color is not in the hash table, the function
+returns -1.  (So if you assign the value -1 to a color, the return
+value is ambiguous).
+
+<P><B>colorhist_vector ppm_colorhashtocolorhist( const colorhash_table cht,</B>
+
+<B>const int ncolors )</B>
+
+<P>This converts a <B>colorhash_table</B> to a
+<B>colorhist_vector</B>.  The return value is a new
+<B>colorhist_vector</B> which you must eventually free with
+<B>ppm_freecolorhist()</B>.
+
+<P><B>ncolors</B> is the number of colors in <B>cht</B>.  If it has
+more colors than that, <B>ppm_colorhashtocolorhist</B> does not create
+a <B>colorhist_vector</B> and returns NULL.
+
+<P><B>colorhash_table ppm_colorhisttocolorhash( const colorhist_vector chv, 
+const int ncolors ) </B>
+
+<P>This poorly named function does <em>not</em> convert from a
+<B>colorhist_vector</B> to a <B>colorhash_table</B>.
+
+<P>It does create a <B>colorhash_table</B> based on a
+<B>colorhist_vector</B> input, but the integer value for a given color
+in the output is not the same as the integer value for that same color
+in the input.  <B>ppm_colorhisttocolorhash()</B> ignores the integer
+values in the input.  In the output, the integer value for a color is
+the index in the input <B>colorhist_vector</B> for that color.
+
+<P>You can easily create a color map for an image by running
+<B>ppm_computecolorhist() </B> over the image, then
+<B>ppm_colorhisttocolorhash()</B> over the result.  Now you can use
+<B>ppm_lookupcolor()</B> to find a unique color index for any pixel in
+the input.
+
+<P>If the same color appears twice in the input,
+<B>ppm_colorhisttocolorhash() </B> exit the program with an error
+message.
+
+<P><B>ncolors</B> is the number of colors in <B>chv</B>.
+
+<P>The return value is a new <B>colorhash_table</B> which you must
+eventually free with <B>ppm_freecolorhash()</B>.
+
+<A NAME="lbAN">&nbsp;</A>
+<H3>COLOR HISTOGRAMS</H3>
+
+<P>The Netpbm libraries give you functions to examine a Netpbm image
+and determine what colors are in it and how many pixels of each color
+are in it.  This information is known as a color histogram.  Netpbm
+uses its <B>colorhash_table</B> data type to represent a color
+histogram.
+
+<P><B>colorhash_table ppm_computecolorhash( pixel ** const pixels,
+const int cols, const int rows, const int maxcolors, int* const colorsP )</B>
+
+<P>This poorly but historically named function generates a
+<B>colorhash_table</B> whose value for each color is the number of
+pixels in a specified image that have that color.  (I.e. a color
+histogram).  As a bonus, it returns the number of colors in the image.
+
+<P>(It's poorly named because not all <B>colorhash_table</B>s are
+color histograms, but that's all it generates).
+
+<P><B>pixels</B>, <B>cols</B>, and <B>rows</B> describe the input
+image.
+
+<P><B>maxcolors</B> is the maximum number of colors you want
+processed.  If there are more colors that that in the input image,
+<B>ppm_computecolorhash()</B> returns NULL as its return value and
+stops processing as soon as it discovers this.  This makes it run
+faster and use less memory.  One use for <B>maxcolors</B> is when you
+just want to find out whether or not the image has more than N colors
+and don't want to wait to generate a huge color table if so.  If you
+don't want any limit on the number of colors, specify
+<B>maxcolors</B>=<B>0</B>.
+
+<P><B>ppm_computecolorhash()</B> returns the actual number of colors
+in the image as <B>*colorsP</B>, but only if it is less than or equal
+to <B>maxcolors</B>.
+
+<P><B>colorhash_table ppm_computecolorhash2( FILE * const ifp,
+const int cols, const int rows, const pixval maxval, const int format,</B>
+
+<B>const int maxcolors, int* const colorsP )</B>
+
+<P>This is the same as <B>ppm_computecolorhash()</B> except that
+instead of feeding it an array of pixels in storage, you give it an
+open file stream and it reads the image from the file.  The file must
+be positioned after the header, at the raster.  Upon return, the file
+is still open, but its position is undefined.
+
+<P><B>maxval</B> and <B>format</B> are the values for the image
+(i.e. information from the file's header).
+
+<P><B>colorhist_vector ppm_computecolorhist( pixel ** pixels,
+int cols, int rows, int maxcolors, int * colorsP )</B>
+
+<P>This is like <B>ppm_computecolorhash()</B> except that it creates a
+<B>colorhist_vector</B> instead of a <B>colorhash_table</B>.
+
+<P>If you supply a nonzero <B>maxcolors</B> argument, that is the
+maximum number of colors you expect to find in the input image.  If
+there are more colors than you say in the image,
+<B>ppm_computecolorhist()</B> returns a null pointer as its return
+value and nothing meaningful as <B>*colorsP</B>.
+
+<P>If not, the function returns the new <B>colorhist_vector </B> as
+its return value and the actual number of colors in the image as
+<B>*colorsP</B>.  The returned array has space allocated for the
+specified number of colors regardless of how many actually exist.  The
+extra space is at the high end of the array and is available for your
+use in expanding the <B>colorhist_vector</B>.
+
+<P>If you specify <B>maxcolors</B>=<B>0</B>, there is no limit on the
+number of colors returned and the return array has space for 5 extra
+colors at the high end for your use in expanding the
+<B>colorhist_vector</B>.
+
+<P><B>colorhist_vector ppm_computecolorhist2( FILE * ifp,
+int cols, int rows, int maxcolors, pixval maxval, int format,
+int * colorsP )</B>
+
+<P>This is the same as <B>ppm_computecolorhist()</B> except that
+instead of feeding it an array of pixels in storage, you give it an
+open file stream and it reads the image from the file.  The file must
+be positioned after the header, at the raster.  Upon return, the file
+is still open, but its position is undefined.
+
+<A NAME="lbAO">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pbm.html">pbm</A></B>,
+<B><A HREF="pgm.html">pgm</A></B>,
+<B><A HREF="libpbm.html">libpbm</A></B>
+
+<A NAME="lbAP">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1989, 1991 by Tony Hansen and Jef Poskanzer.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="libppm.html#lbAB">NAME</A>
+<LI><A HREF="libppm.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="libppm.html#lbAD">DESCRIPTION</A>
+<UL>
+<LI><A HREF="libppm.html#lbAE">TYPES AND CONSTANTS</A>
+<LI><A HREF="libppm.html#lbAF">MANIPULATING PIXELS</A>
+<LI><A HREF="libppm.html#lbAG">INITIALIZATION</A>
+<LI><A HREF="libppm.html#lbAH">MEMORY MANAGEMENT</A>
+<LI><A HREF="libppm.html#lbAI">READING FILES</A>
+<LI><A HREF="libppm.html#lbAJ">WRITING FILES</A>
+<LI><A HREF="libppm.html#lbAK">MISCELLANEOUS</A>
+<LI><A HREF="libppm.html#colorname">COLOR NAMES</A>
+<LI><A HREF="libppm.html#colorindex">COLOR INDEXING</A>
+<LI><A HREF="libppm.html#lbAN">COLOR HISTOGRAMS</A>
+</UL>
+<LI><A HREF="libppm.html#lbAO">SEE ALSO</A>
+<LI><A HREF="libppm.html#lbAP">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

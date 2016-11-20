@@ -1,0 +1,89 @@
+WRJPGCOM(1)                                         WRJPGCOM(1)
+
+
+
+
+
+NAME
+       wrjpgcom - insert text comments into a JPEG file
+
+SYNOPSIS
+       wrjpgcom  [ -replace ] [ -comment text ] [ -cfile name ]
+       [ filename ]
+
+
+DESCRIPTION
+       wrjpgcom reads the named JPEG/JFIF file, or the standard
+       input if no file is named, and generates a new JPEG/JFIF
+       file on standard output.  A comment block  is  added  to
+       the file.
+
+       The JPEG standard allows "comment" (COM) blocks to occur
+       within a JPEG file.  Although the standard doesn't actu-
+       ally  define  what  COM  blocks are for, they are widely
+       used to hold user-supplied text strings.  This lets  you
+       add  annotations,  titles, index terms, etc to your JPEG
+       files, and later retrieve them as text.  COM  blocks  do
+       not  interfere  with  the image stored in the JPEG file.
+       The maximum size of a COM block is 64K, but you can have
+       as many of them as you like in one JPEG file.
+
+       wrjpgcom  adds a COM block, containing text you provide,
+       to a JPEG file.  Ordinarily,  the  COM  block  is  added
+       after  any  existing  COM blocks; but you can delete the
+       old COM blocks if you wish.
+
+OPTIONS
+       Switch names may be abbreviated, and are not case sensi-
+       tive.
+
+       -replace
+              Delete any existing COM blocks from the file.
+
+       -comment text
+              Supply text for new COM block on command line.
+
+       -cfile name
+              Read text for new COM block from named file.
+
+       If  you  have  only one line of comment text to add, you
+       can provide it on the command line with  -comment.   The
+       comment  text  must be surrounded with quotes so that it
+       is treated as a single argument.  Longer comments can be
+       read from a text file.
+
+       If  you  give neither -comment nor -cfile, then wrjpgcom
+       will read the comment text  from  standard  input.   (In
+       this  case an input image file name MUST be supplied, so
+       that the source JPEG file comes  from  somewhere  else.)
+       You can enter multiple lines, up to 64KB worth.  Type an
+       end-of-file indicator (usually control-D)  to  terminate
+       the comment text entry.
+
+       wrjpgcom  will  not add a COM block if the provided com-
+       ment string is empty.  Therefore  -replace  -comment  ""
+       can be used to delete all COM blocks from a file.
+
+EXAMPLES
+       Add a short comment to in.jpg, producing out.jpg:
+
+              wrjpgcom  -c  "View  of  my  back  yard" in.jpg >
+              out.jpg
+
+       Attach a long comment previously stored in comment.txt:
+
+              wrjpgcom in.jpg < comment.txt > out.jpg
+
+       or equivalently
+
+              wrjpgcom -cfile comment.txt < in.jpg > out.jpg
+
+SEE ALSO
+       cjpeg(1), djpeg(1), jpegtran(1), rdjpgcom(1)
+
+AUTHOR
+       Independent JPEG Group
+
+
+
+                          15 June 1995              WRJPGCOM(1)

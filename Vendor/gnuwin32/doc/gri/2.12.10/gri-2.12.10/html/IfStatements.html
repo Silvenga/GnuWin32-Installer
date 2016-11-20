@@ -1,0 +1,241 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: if statements</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile IfStatements.html "Gri: if statements" "Programming Gri" --> 
+
+<!-- @node   If Statements, Loops, Local Synonyms, Programming -->
+<a name="IfStatements" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Programming.html#Programming" shape="rect" coords="516,2,532,24" href="Programming.html#Programming">
+<area alt="Gri: synonyms" shape="rect" coords="557,2,573,24" href="Synonyms.html">
+<area alt="Gri: Loops" shape="rect" coords="581,2,599,24" href="Loops.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: Loops" shape="rect" coords="581,2,599,24" href="Loops.html">
+</map>
+<h2>10.6: If Statements</h2>
+
+Gri has `<font color="#82140F"><code>if</code></font>' statements to make your programs more flexible.
+Here's an example:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+query \thick "Use thick lines? (0 or 1)" ("0")
+if \thick
+  set line width 2
+else
+  set line width 0.5
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+If you answer 1 to the question, the line thickness will be set at 2
+points.  If you answer 0 then a thin line will be used.  If you press
+carriage return a thin line will be used.
+<p>
+The item following the `<font color="#82140F"><code>if</code></font>' can be 
+<ul>
+<li>
+a number (1 means true; anything else means false)
+<li>
+a variable (1 means true; anything else means false). Example:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+if .plot_contours.
+  draw contour
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+a synonym which expands to a number (1 means true; anything else means
+false). Example:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\plot_contours = "1"
+if \plot_contours
+  draw contour
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+(Don't worry about the fact that synonyms are strings; Gri
+expands the string value before interpreting the `<font color="#82140F"><code>if</code></font>' statement.)
+<li>
+an expression of the form `<font color="#82140F"><code>{string1 == string2 }</code></font>'.  The symbol
+`<font color="#82140F"><code>==</code></font>' is an operator which tests for string equality.  This expands
+to `<font color="#82140F"><code>1</code></font>' if the strings are equal, or `<font color="#82140F"><code>0</code></font>' otherwise.  The
+strings may be either synonyms or string constants.  If the string
+constant contains only one word, then it is not necessary to enclose it
+in quotes, but it is clearer to do so.  Examples:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+if {"\variable" == "Salinity"}
+  set x name "Salinity"
+else 
+  set x name "Unknown"
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+a rpn (reverse polish notation) expression 
+(see <a href="ReversePolishMath.html#rpnMathematics">rpn Mathematics</a>):
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+if {rpn .time. 100 &lt;}
+  # ie, (100 &lt; time), not (time &lt; 100)
+  show "Time &gt; 100"
+else if {rpn .time. 100 &gt;}
+  show "Time &lt; 100"
+else if {rpn "\item" "later" ==}
+  show "Time ... later babe"
+else
+  show "Time is equal to 100"
+end if
+if {rpn .time. 10 * 100 ==}
+  show "Time is equal to 10"
+else
+  show "Time is not equal to 10"
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+</ul>
+<p>
+There is no need to put the else part in if you don't need it. You
+can do
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+set line width 0.5
+if \use_thick_lines
+  set line width 2
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+if you wish.
+<p>
+If you want just the else part, you can do
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+if ! \use_thick_lines
+  set line width 0.5
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+(The exclamation point denotes logical negation: `<font color="#82140F"><code>! true</code></font>' equals
+`<font color="#82140F"><code>false</code></font>'.)
+<p>
+If statements may be nested many levels deep.  You may also have
+`<font color="#82140F"><code>else if</code></font>' blocks, as in:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+if {"\variable" == "S"}
+  set x name "Salinity"
+  set x axis 32 33 0.5 .1
+else if {"\variable" == "T"}
+  set x name "Temperature"
+  set x axis 15 20 1 0.5
+else
+  set x name "Unknown"
+end if
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

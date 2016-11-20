@@ -1,0 +1,223 @@
+Libnetpbm Image Processing Libnetpbm Image Processing Manual(3)
+
+
+
+
+
+
+NAME
+       libnetpbm_ug - netpbm sample code
+
+       The  Libnetpbm programming library is part of Netpbm(1).
+
+
+Example
+       Here is an example of a C program that uses libnetpbm to
+       read  a  Netpbm  image  input and produce a Netpbm image
+       output.
+
+          /* Example program fragment to read a PAM or PNM image
+             from stdin, add up the values of every sample in it
+             (I don't know why), and write the image unchanged to
+             stdout. */
+
+          #include <pam.h>
+
+          struct pam inpam, outpam;
+          unsigned int row;
+
+          pnm_init(&argc, argv);
+
+          pnm_readpaminit(stdin, &inpam, PAM_STRUCT_SIZE(tuple_type));
+
+          outpam = inpam; outpam.file = stdout;
+
+          pnm_writepaminit(&outpam);
+
+          tuplerow = pnm_allocpamrow(&inpam);
+
+          for (row = 0; row < inpam.height; row++) {
+              unsigned int column;
+              pnm_readpamrow(&inpam, tuplerow);
+              for (column = 0; column < inpam.width; ++column) {
+                  unsigned int plane;
+                  for (plane = 0; plane < inpam.depth; ++plane) {
+                      grand_total += tuplerow[column][plane];
+                  }
+              }
+              pnm_writepamrow(&outpam, tuplerow); }
+
+          pnm_freepamrow(tuplerow);
+
+
+
+Guide To Using Libnetpbm
+   libnetpbm classes
+       In this section, we cover only the PAM functions in lib-
+       netpbm.   As  described in the introduction to libnetpbm
+       (1), there are four other classes  of  image  processing
+       functions  (PBM,  PGM,  PPM, PNM).  They are less impor-
+       tant, since you can do everything more easily  with  the
+       PAM  functions, but if you're working on old programs or
+       need the extra  efficiency  those  older  functions  can
+       sometimes provide, you can find them documented as here:
+       PBMFunctionManual(1), PGMFunctionManual(1), PPMFunction-
+       Manual(1),and PNMFunctionManual(1).
+
+       In  case  you're wondering, what makes the PAM functions
+       easier to use is:
+
+
+       o      Each function handles all the formats.   It  does
+              so without converting to a common format, so your
+              program can treat the different  formats  differ-
+              ently  if it wants.  However, the interface makes
+              it easy for your program to  ignore  the  differ-
+              ences  between  the  formats  if  that's what you
+              want.
+
+
+       o      The PAM  function  parameter  lists  convey  most
+              information  about  the  image  with which you're
+              working with a single pam  structure,  which  you
+              can build once and use over and over, whereas the
+              older functions require  you  to  pass  up  to  5
+              pieces of image information (height, width, etc.)
+              as separate arguments to every function.
+
+
+
+   THE pam STRUCTURE
+       The PAM functions take most of their  arguments  in  the
+       form  of  a single pam structure.  This is not an opaque
+       object, but just a convenient way to organize the infor-
+       mation upon which most the functions depend.  So you are
+       free to access or set the elements of the structure how-
+       ever  you  want.   But you will find in most cases it is
+       most   convenient   to   call    pnm_readpaminit()    or
+       pnm_writepaminit()  to  set the fields in the pam struc-
+       ture before calling any other pam  functions,  and  then
+       just to pass the structure unchanged in all future calls
+       to pam functions.
+
+       The fields are:
+
+
+
+       size   The storage size in bytes of this  entire  struc-
+              ture.
+
+
+       len    The  length, in bytes, of the information in this
+              structure.  The information starts in  the  first
+              byte  and  is contiguous.  This cannot be greater
+              than size.  size and len can be used to make pro-
+              grams compatible with newer and older versions of
+              the Netpbm libraries.
+
+
+       file   The file.
+
+
+       format The format  code  of  the  raw  image.   This  is
+              PAM_FORMAT  unless the PAM image is really a view
+              of a PBM, PGM, or PPM image.  Then it's  PBM_FOR-
+              MAT, RPBM_FORMAT, etc.
+
+
+       plainformat
+              This  is  a  boolean  value and means: The format
+              above is a plain (text) format as  opposed  to  a
+              raw  (binary) format.  This is entirely redundant
+              with the format member and exists as  a  separate
+              member only for computational speed.
+
+
+       height The height of the image in rows.
+
+
+       width  The  width  of  the  image  in  number of columns
+              (tuples per row).
+
+
+       depth  The depth of the image (degree of  or  number  of
+              samples in each tuple).
+
+
+       maxval The  maxval  of  the  image.   See definitions in
+              pam(1).
+
+
+       bytes_per_sample
+              The number of bytes used to represent each sample
+              in  the image file.  See the format definition in
+              pam(1).This is entirely  redundant  with  maxval.
+              It  exists as a separate member for computational
+              speed.
+
+
+       tuple_type
+              The tuple type of the image.  See definitions  in
+              pam(1).Netpbmdoesnotdefineanyvaluesforthis except
+              the following, which are used  for  a  PAM  image
+              which  is  really  a  view  of a PBM, PGM, or PPM
+              image:   PAM_PBM_TUPLETYPE,    PAM_PGM_TUPLETYPE,
+              PAM_PPM_TUPLETYPE.
+
+
+       allocation_depth
+              The  number  of samples for which memory is allo-
+              cated for any  tuple  associated  with  this  PAM
+              structure.   This  must  be  at least as great as
+              'depth'.  Only the first 'depth' of  the  samples
+              of a tuple are meaningful.
+
+              The  purpose of this is to make it possible for a
+              program to change the type of a tuple to one with
+              more or fewer planes.
+
+              0  means  the allocation depth is the same as the
+              image depth.
+
+
+
+
+
+
+   PLAIN VERSUS RAW FORMAT
+       The PNM formats each come in two  varieties:  the  older
+       plain  (text)  format and the newer raw (binary) format.
+       There are different format codes for the plain  and  raw
+       formats,  but  which  of the two formats the pnm and pam
+       functions write is independent of the  format  code  you
+       pass to them.
+
+       The  pam  functions  always  write  raw formats.  If you
+       specify the format code for a plain format, a pam  func-
+       tion assumes instead the raw version of that format.
+
+       The  pnm functions choose between plain and raw based on
+       the forceplain parameter that every write-type pnm func-
+       tion  has.   If this boolean value is true, the function
+       writes the plain version of the format specified by  the
+       format  code.   If  it is false, the function writes the
+       raw version of the format specified by the format  code.
+
+       We  are  trying to stamp out the older plain formats, so
+       it would be a wise choice not to write  a  program  that
+       sets forceplain true under any circumstance.  A user who
+       needs a plain format can use the  pnmtoplainpnm  program
+       to convert the output of your program to plain format.
+
+
+   Reference
+       The LibnetpbmNetpbmImage Processing Manual (1) describes
+       the the libnetpbm functions for processing image data.
+
+       The LibnetpbmUtilityManual(1)  describes  the  functions
+       that  are  not  specifically related to the Netpbm image
+       formats.
+
+
+
+netpbm documentation       Libnetpbm Image Processing Manual(3)

@@ -1,0 +1,1506 @@
+This is gcal.info, produced by makeinfo version 4.0 from gcal.texi.
+
+INFO-DIR-SECTION GNU packages
+START-INFO-DIR-ENTRY
+* Gcal: (gcal).                       GNU calendar program.
+* Tcal: (gcal)Invoking tcal.          Run Gcal with tomorrow's date.
+* Txt2gcal: (gcal)Invoking txt2gcal.  Calendar text to resource file.
+* Gcal2txt: (gcal)Invoking gcal2txt.  Calendar resource to text file.
+END-INFO-DIR-ENTRY
+
+  This file documents Gcal, a program for calculating and printing
+calendars.
+
+  Copyright (c) 1994, 95, 96, 1997, 2000 Thomas Esken
+
+  This edition is for Gcal version 3.01.
+
+  Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+  Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+  Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation approved by the Free Software Foundation.
+
+  Any suggestions, improvements, extensions, bug reports, donations,
+proposals for contract work, and so forth are welcome!  Please send
+them directly to my eMail address <esken@gmx.net>.  If you like my
+work, I'd appreciate a postcard from you!
+
+------------------------oOO      \\\_''/      OOo---------------------------
+Thomas Esken               O     (/o-o\)     O  eMail: esken@gmx.net
+Im Hagenfeld 84                 ((  ^  ))       Phone: +49 251 232585
+D-48147 Muenster; Germany    \____) ~ (____/    MotD : 2old2live, 2young2die
+
+
+File: gcal.info,  Node: Fixed date options-Footnotes,  Up: Fixed date options
+
+  (1) Except the date variable E which is internally reserved for the
+Easter Sunday's date, so it cannot be assigned or operated therefore.
+And except the date variable T which is internally reserved for today's
+date, so it likewise cannot be assigned or operated.
+
+  (2) Or another global date variable name which is already defined,
+but *no* date given in the `e|t|DVAR[+|-]N[WWW]', `MMWWWN', or the
+`*d|wN[WWW]' format.
+
+  (3) Refraction is an optical phenomenon caused by the Earth's
+atmosphere, which leads to an apparent raising of the location of a
+celestial body.  The amount of refraction increases with growing air
+pressure and sinking temperature and vice-versa.
+
+  (4) Correct, the `--time-offset' option has multiple modes of
+operation that are depending on the context of its use!
+
+  (5) Except Gcal's line break-up characters `~' and `^', so you have
+to use `\~' and `\\^' in the PATTERN argument if you want to search
+texts which contain these characters.
+
+  (6) This means, exclusive the `--include-today' option respectively
+`d' modifier, the `--list-mode' option or the `l' modifier, and the
+`--leap-day=february|march' option.
+
+  (7) Respectively their according long-style options.
+
+  (8) Or their according alias names, like `--today', `--tomorrow'....
+
+  (9) Or their according long-style options.
+
+  (10) `RC_GROUP_SEP' "" == empty line only.
+
+  (11) Only if the `--alternative-format' option or the `A' modifier is
+not given.
+
+  (12) The 29th February.
+
+  (13) That is either the 51st, 52nd or 53rd Sunday.
+
+  (14) That is either the 51st, 52nd or 53rd Sunday.
+
+  (15) That is either the Sunday of the 51st, 52nd or 53rd week.
+
+  (16) That is either the Sunday of the 51st, 52nd or 53rd week.
+
+
+File: gcal.info,  Node: Response file,  Next: Actual date modifier,  Prev: Options,  Up: Command line arguments
+
+Response file
+-------------
+
+  If a `@FILE' command line argument is given, a "response file" by the
+name of FILE will be used, i.e. options and commands are preloaded from
+that file.  A response FILE may contain options and commands --which
+are preloaded by Gcal--, but *no* references to further response files.
+If such references to further response files are found, they are
+ignored.  *Note Global option `--response-file=NAME': x-response-file,
+for hints how to generate a response file automatically.
+
+  The searching scheme for a response file is the same as that for
+resource files, except *no* standard response file is respected.  *Note
+File searching mechanism: x-File-searching-mechanism, for more details.
+Multiple response files may be given in the command line when Gcal is
+started, and they are processed exactly in that order as given, i.e.
+strictly sequential.
+
+  Each option and command must be on a single line, i.e. separated by a
+real `\n' (newline) character.  A line beginning with a `;' (semicolon)
+character in the response file is treated as a remark and will not be
+used by Gcal (*note Comment line::).
+
+  Options must be defined before commands.  If a response file contains
+any commands, then all further arguments after the `@FILE' option of
+the command line are ignored.
+
+For example:
+
+  1. Contents of response file `file':
+
+          Line     Text
+          1        -j
+          2        -Cw
+          EOF
+          
+          $ gcal -i -b 3 @file -s 3 1994
+          
+          ==> gcal -i -b 3 -j -Cw -s 3 1994
+
+  2. Contents of response file `file':
+
+          Line     Text
+          1        -j
+          2        -Cw
+          3        may 1992
+          EOF
+          
+          $ gcal -i -b 3 @file -s 3 1994
+          
+          ==> gcal -i -b 3 -j -Cw may
+
+  3. Contents of response file `file':
+
+          Line     Text
+          1        -j
+          2        -Cw
+          3        may
+          4        1992
+          EOF
+          
+          $ gcal -i -b 3 @file -s 3 1994
+          
+          ==> gcal -i -b 3 -j -Cw may 1992
+
+
+File: gcal.info,  Node: Actual date modifier,  Next: Commands,  Prev: Response file,  Up: Command line arguments
+
+Actual date modifier
+--------------------
+
+  It is allowed to use that date --instead of the actual system date--
+which is defined by the `%DATE' command line argument.  This means,
+fixed dates can be checked for *any* year and are respected in the same
+way, as if they would be fixed dates of the actual year.
+
+  The date must be denoted in one of these formats:
+
+   * `YYYY[MM[DD|WWWN]]'
+
+   * `YYYY*d|wN[WWW]'
+
+   * `YYYY@e|t|DVAR[[+|-]N[WWW]]'
+
+   * `MONTH NAME[DD]'
+
+   * `WEEKDAY NAME[N]'
+
+   * DD
+
+Some examples to this:
+
+     *Please note:*
+     The following examples assumes the actual system date is
+     *Wednesday, the 17th February 1993* (19930217), weeks start on
+     Mondays and ISO week numbers are used!
+
+The `YYYY[MM[DD|WWWN]]' format:
+        * `gcal %1994' (== YYYY)
+          The actual date is set to the date 17th February 1994
+          => 19940217.
+
+        * `gcal %1994Mar'
+
+        * `gcal %19943'
+
+        * `gcal %199403' (== YYYYMM)
+          The actual date is set to the date 17th March 1994
+          => 19940317.
+
+        * `gcal %1994Mar3'
+
+        * `gcal %1994033'
+
+        * `gcal %19940303' (== YYYYMMDD)
+          The actual date is set to the date 3rd March 1994 => 19940303.
+
+        * `gcal %1994MarWed3'
+
+        * `gcal %199403wed3' (== YYYYMMWWWN)
+          The actual date is set to the date 3rd Wednesday in March 1994
+          (N == `1...5|9') => 19940316.
+
+        * `gcal %0'
+
+        * `gcal %00'
+
+        * `gcal %000'
+
+        * `gcal %0000' (== YYYY)
+          The actual date remains unchanged => 19930217.
+
+        * `gcal %0000Mar'
+
+        * `gcal %00003'
+
+        * `gcal %000003' (== YYYYMM)
+          The actual date is set to the date 17th March 1993
+          => 19930317.
+
+        * `gcal %0000Mar3'
+
+        * `gcal %0000033'
+
+        * `gcal %00000303' (== YYYYMMDD)
+          The actual date is set to the date 3rd March 1993 => 19930303.
+
+        * `gcal %0000MarWed3'
+
+        * `gcal %000003wed3' (== YYYYMMWWWN)
+          The actual date is set to the date 3rd Wednesday in March 1993
+          (N == `1...5|9') => 19930317.
+
+The `YYYY*d|wN[WWW]' format:
+        * `gcal %1994*d10' (== `YYYY*dN')
+          The actual date is set to the date 10th absolute day in 1994
+          (N == `1...365|366|999') => 19940110.
+
+        * `gcal %1994*d10sun' (== `YYYY*dNWWW')
+          The actual date is set to the date 10th Sunday in 1994
+          (N == `1...51|52|53|99') => 19940306.
+
+        * `gcal %0*d10' (== `YYYY*dN')
+          The actual date is set to the date 10th absolute day in 1993
+          => 19930110.
+
+        * `gcal %0*d10sun' (== `YYYY*dNWWW')
+          The actual date is set to the date 10th Sunday in 1993
+          => 19930307.
+
+        * `gcal %1994*w10' (== `YYYY*wN')
+          The actual date is set to the date Monday of the 10th week in
+          1994
+          (N == `0|1...52|53|99') => 19940307.
+
+        * `gcal %1994*w10sun' (== `YYYY*wNWWW')
+          The actual date is set to the date Sunday of the 10th week in
+          1994 => 19940313.
+
+        * `gcal %0*w10' (== `YYYY*wN')
+          The actual date is set to the date Monday of the 10th week in
+          1993 => 19930308.
+
+        * `gcal %0*w10sun' (== `YYYY*wNWWW')
+          The actual date is set to the date Sunday of the 10th week in
+          1993 => 19930314.
+
+The `YYYY@e|t|DVAR[[+|-]N[WWW]]' format:
+        * `gcal %1994@e' (== `YYYY@e')
+          The actual date is set to the date Easter Sunday 1994
+          => 19940403.
+
+        * `gcal %1994@e10'
+
+        * `gcal %1994@e+10' (== `YYYY@e[+]N')
+          The actual date is set to the date 10 days after Easter
+          Sunday 1994 => 19940413.
+
+        * `gcal %1994@e-10' (== `YYYY@e-N')
+          The actual date is set to the date 10 days before Easter
+          Sunday 1994 => 19940324.
+
+        * `gcal %0@e'
+
+        * `gcal %00@e'
+
+        * `gcal %000@e'
+
+        * `gcal %0000@e' (== `YYYY@e')
+          The actual date is set to the date Easter Sunday 1993
+          => 19930411.
+
+        * `gcal %0@e10'
+
+        * `gcal %0@e+10' (== `YYYY@e[|]N')
+          The actual date is set to the date 10 days after Easter
+          Sunday 1993 => 19930421.
+
+        * `gcal %0@e-10' (== `YYYY@e-N')
+          The actual date is set to the date 10 days before Easter
+          Sunday 1993 => 19930401.
+
+        * `gcal %1994@e3Wed'
+
+        * `gcal %1994@e+3Wed' (== `YYYY@e[+]NWWW')
+          The actual date is set to the date 3rd Wednesday after Easter
+          Sunday 1994 => 19940420.
+
+        * `gcal %1994@e-3wed' (== `YYYY@e-NWWW')
+          The actual date is set to the date 3rd Wednesday before
+          Easter Sunday 1994 => 19940316.
+
+        * `gcal %0@e3wed'
+
+        * `gcal %0@e+3wed' (== `YYYY@e[+]NWWW')
+          The actual date is set to the date 3rd Wednesday after Easter
+          Sunday 1993 => 19930428.
+
+        * `gcal %0@e-3we' (== `YYYY@e-NWWW')
+          The actual date is set to the date 3rd Wednesday before
+          Easter Sunday 1993 => 19930324.
+
+        * `gcal %1994@t' (== `YYYY@t')
+          The actual date is set to today's date in 1994 => 199400217.
+
+        * `gcal %1994@t10'
+
+        * `gcal %1994@t+10' (== `YYYY@t[+]N')
+          The actual date is set to the date 10 days after today's date
+          in 1994 => 19940227.
+
+        * `gcal %1994@t-10' (== `YYYY@e-N')
+          The actual date is set to the date 10 days before today's
+          date in 1994 => 19940207.
+
+        * `gcal %0@t'
+
+        * `gcal %00@t'
+
+        * `gcal %000@t'
+
+        * `gcal %0000@t' (== `YYYY@t')
+          The actual date is set to today's date => 19930217.
+
+        * `gcal %0@t10'
+
+        * `gcal %0@t+10' (== `YYYY@t[|]N')
+          The actual date is set to the date 10 days after today's date
+          => 19930227.
+
+        * `gcal %0@t-10' (== `YYYY@t-N')
+          The actual date is set to the date 10 days before today's date
+          => 19930207.
+
+        * `gcal %1994@t3Wed'
+
+        * `gcal %1994@t+3Wed' (== `YYYY@t[+]NWWW')
+          The actual date is set to the date 3rd Wednesday after
+          today's date in 1994 => 19940309.
+
+        * `gcal %1994@t-3wed' (== `YYYY@t-NWWW')
+          The actual date is set to the date 3rd Wednesday before
+          today's date in 1994 => 19940302.
+
+        * `gcal %0@t3wed'
+
+        * `gcal %0@t+3wed' (== `YYYY@t[+]NWWW')
+          The actual date is set to the date 3rd Wednesday after
+          today's date => 19930310.
+
+        * `gcal %0@t-3we' (== `YYYY@t-NWWW')
+          The actual date is set to the date 3rd Wednesday before
+          today's date => 19930127.
+
+        * `gcal -v a=0303 %1994@a' (== `YYYY@DVAR')
+          The actual date is set to the date 3rd March 1994 => 19940303.
+
+        * `gcal -v a=0303 %1994@a10'
+
+        * `gcal -v a=0303 %1994@a+10' (== `YYYY@DVAR[+]N')
+          The actual date is set to the date 10 days after 3rd March
+          1994 => 19940313.
+
+        * `gcal -v a=0303 %1994@a-10' (== `YYYY@DVAR-N')
+          The actual date is set to the date 10 days before 3rd March
+          1994 => 19940221.
+
+        * `gcal -v a=0303 %0@a' (== `YYYY@DVAR')
+          The actual date is set to the date 3rd March 1993 => 19930303.
+
+        * `gcal -v a=0303 %0@a10'
+
+        * `gcal -v a=0303 %0@a+10' (== `YYYY@DVAR[+]N')
+          The actual date is set to the date 10 days after 3rd March
+          1993 => 19930313.
+
+        * `gcal -v a=0303 %0@a-10' (== `YYYY@DVAR-N')
+          The actual date is set to the date 10 days before 3rd March
+          1993 => 19930221.
+
+        * `gcal -v a=0303 %1994@a3wed'
+
+        * `gcal -v a=0303 %1994@a+3wed' (== `YYYY@DVAR[+]NWWW')
+          The actual date is set to the date 3rd Wednesday after 3rd
+          March 1994 => 19940323.
+
+        * `gcal -v a=0303 %1994@a-3wed' (== `YYYY@DVAR-NWWW')
+          The actual date is set to the date 3rd Wednesday before 3rd
+          March 1994 => 19940216.
+
+        * `gcal -v a=0303 %0@a3wed'
+
+        * `gcal -v a=0303 %0@a+3wed' (== `YYYY@DVAR[+]NWWW')
+          The actual date is set to the date 3rd Wednesday after 3rd
+          March 1993 => 19930324.
+
+        * `gcal -v a=0303 %0@a-3wed' (== `YYYY@DVAR-NWWW')
+          The actual date is set to the date 3rd Wednesday before 3rd
+          March 1993 => 19930210.
+
+The `MONTH NAME[DD]' format:
+        * `gcal %April' (== MONTH NAME)
+          The actual date is set to the date 17th April 1993
+          => 19930417.
+
+        * `gcal %april3'
+
+        * `gcal %april03' (== MONTH NAME DD)
+          The actual date is set to the date 3rd April 1993 => 19930403.
+
+The `WEEKDAY NAME[N]' format:
+        * `gcal %Friday' (== WEEKDAY NAME)
+          The actual date is set to the date Friday of current week in
+          February 1993 => 19930219.
+
+        * `gcal %Friday2'
+
+        * `gcal %Friday02' (== WEEKDAY NAME N)
+          The actual date is set to the date 2nd Friday in February 1993
+          (N == `1...5|9') => 19930212.
+
+The DD format:
+        * `gcal %3'
+
+        * `gcal %03' (== DD)
+          The actual date is set to the date 3rd February 1993
+          => 19930203.
+
+
+File: gcal.info,  Node: Commands,  Prev: Actual date modifier,  Up: Command line arguments
+
+Commands
+--------
+
+* Menu:
+
+* Single commands::        How to use a Single command.
+* 3-Month mode commands::  How to use a 3-Month mode command.
+* Lists of commands::      How to use a List of commands.
+* Ranges of commands::     How to use a Range of commands.
+
+  The commands control the periods Gcal respects.  They can be
+partitioned into four major classes, namely "single" commands, special
+"3-Month mode" commands, "lists" of commands and "ranges" of commands.
+Single commands and special 3-Month mode commands only create *one*
+calendar sheet, ranges of commands or list of commands create *more
+than one* calendar sheet per program run.  If a list of commands is
+given, Gcal works sequentially on each single command given in the
+list, one by one.  A range of commands is expanded first by Gcal and
+after expansion is done, Gcal works sequentially on each single command
+produced during the internal expansion step.
+
+  For understanding the notation used in the text below, MM is either a
+number, a month name or one of the special 3-Month mode commands `.',
+`..', `.+' and `.-'.  No lists or ranges of months or years can be
+created in case a special 3-Month mode command is given.
+
+  The range of MM is valid from 1 to 12 or valid from January to
+December.  Both notations may be mixed.  Month names may be abbreviated
+up to their first three characters.  YYYY is a number.  The range of
+YYYY is valid from 1 to 9999.  A range (`MM-MM' or `YYYY+YYYY' or ...)
+must consist of two elements.  A list (`MM,...,MM' or `YYYY;...;YYYY'
+or ...)  must contain two elements minimum and may have any number of
+elements.
+
+Here is a list of all ranges of commands, lists of commands and other
+command separator characters:
+
+   * The `-' character is the _range of months_ separator.
+
+   * The `,' character is the _list of months_ separator.
+
+   * The `+' character is the _range of years_ separator.
+
+   * The `;' character is the _list of years_ separator.
+
+   * The `/' character is the _month of year_ separator.
+
+   * The `:' character is the _fiscal year_ separator.
+
+
+File: gcal.info,  Node: Single commands,  Next: 3-Month mode commands,  Prev: Commands,  Up: Commands
+
+Single commands
+...............
+
+`NOTHING'
+     Current month of current year, called "single month mode" in the
+     further context.
+
+`MONTH NAME'
+     Selected month of current year, e.g.:
+
+          gcal may
+          gcal OCTOBER
+          gcal ja
+
+`YYYY'
+     Selected year, called "single year mode" in the further context,
+     e.g.:
+
+          gcal 1992
+
+     But there is an exception of this general rule.  If the specified
+     year number is less or equal twelve, Gcal assumes that a selected
+     month of the current year is wanted.  If you want to have a
+     selected year less or equal twelve, call Gcal like this
+
+          gcal 1:6
+
+     or like this
+
+          gcal 6+6
+
+     to obtain the year AD 6.
+
+`MM YYYY'
+`MM/YYYY'
+     Single month of selected year, e.g.:
+
+          gcal 9 1992
+          gcal 9/1992
+          gcal Nov 1777
+          gcal Nov/1777
+
+`:'
+     Single fiscal year, starting on the _actual month_ of the _actual
+     year_ and ending on month _actual month_-1 of the _actual year_+1,
+     called "implicit fiscal year" in the further context, e.g.:
+
+          gcal :
+
+`MM:'
+     Single fiscal year, starting on month MM of the _actual year_ and
+     ending on month MM-1 of the _actual year_+1, called "explicit
+     fiscal year" in the further context, e.g.:
+
+          gcal 6:
+          gcal feb:
+          gcal NOVEMBER:
+
+`:YYYY'
+     Single fiscal year, starting on the _actual month_ of year YYYY
+     and ending on month _actual month_-1 of year YYYY+1, also called
+     "explicit fiscal year" in the further context, e.g.:
+
+          gcal :1999
+
+`MM:YYYY'
+     Single fiscal year, starting on month MM of year YYYY and ending
+     at month MM-1 of year YYYY+1, called "explicit fiscal year" too in
+     the further context, e.g.:
+
+          gcal 7:1999
+          gcal oct:1992
+          gcal February:1777
+
+
+File: gcal.info,  Node: 3-Month mode commands,  Next: Lists of commands,  Prev: Single commands,  Up: Commands
+
+3-Month mode commands
+.....................
+
+`.'
+     Previous, actual and next month of the current year, e.g.:
+
+          gcal .
+
+`. YYYY'
+     Previous, actual and next month of selected year, e.g.:
+
+          gcal . 1992
+
+`..'
+     Actual quarter of the current year, e.g.:
+
+          gcal ..
+
+`.. YYYY'
+     Actual quarter of selected year, e.g.:
+
+          gcal .. 1992
+
+`.+'
+     Actual and next two months of the current year, e.g.:
+
+          gcal .+
+
+`.+ YYYY'
+     Actual and next two months of selected year, e.g.:
+
+          gcal .+ 1992
+
+`.-'
+     Actual and previous two months of the current year, e.g.:
+
+          gcal .-
+
+`.- YYYY'
+     Actual and previous two months of selected year, e.g.:
+
+          gcal .- 1992
+
+
+File: gcal.info,  Node: Lists of commands,  Next: Ranges of commands,  Prev: 3-Month mode commands,  Up: Commands
+
+Lists of commands
+.................
+
+`MM,...,MM'
+     List of specified months of the current year, e.g.:
+
+          gcal 1,5,12
+          gcal 3,1,5,3
+          gcal june,9,jan
+
+`MM/YYYY,...,MM/YYYY'
+     List of months in specified year, e.g.:
+
+          gcal 1/1992,5,12/2001
+          gcal june/1991,9/1801,jan
+
+`MM,...,MM YYYY'
+     List of specified months of selected year, e.g.:
+
+          gcal 3,7 1999
+          gcal 1,dec,july 1777
+
+`YYYY;...;YYYY'
+     List of specified years, e.g.:
+
+          gcal 1992;1777;1899
+
+`MM:YYYY;...;MM:YYYY'
+     List of specified fiscal years, e.g.:
+
+          gcal 7:1999;8:1992;April:3
+
+*Other valid lists:*
+
+`MM,MM/YYYY,...'
+     Mixed list of months consisting of: `MM MM/YYYY'
+
+          gcal 6,8,3/1999,feb/3,january
+
+`MM:;MM:YYYY;...'
+     Mixed list of fiscal years of the given / actual year consisting
+     of: `MM: :YYYY MM:YYYY YYYY'
+
+          gcal 3:;1994;february:1999;:1777;JAN:
+
+`MM:;MM:;...'
+     List of fiscal years of the actual year consisting of: `MM:'
+
+          gcal 3:;august:;DEC:
+
+
+File: gcal.info,  Node: Ranges of commands,  Prev: Lists of commands,  Up: Commands
+
+Ranges of commands
+..................
+
+`MM-MM'
+     Range of current months, e.g.:
+
+          gcal 3-7
+          gcal 11-8
+          gcal MAY-dec
+          gcal 12-aug
+
+`MM/YYYY-MM/YYYY'
+     Range of months of year, e.g.:
+
+          gcal 3/1991-july/1992
+          gcal dec/1994-3
+          gcal sep-dec/2000
+
+`MM-MM YYYY'
+     Range of specified months of selected year, e.g.:
+
+          gcal 3-7 1999
+          gcal nov-3 1777
+          gcal aug-dec 1992
+
+`MM-MM YYYY+YYYY'
+     Range of specified months of selected years, e.g.:
+
+          gcal 3-7 1999+2001
+          gcal nov-3 1777+1600
+          gcal aug-dec 1992+1994
+
+`MM YYYY-YYYY'
+`MM/YYYY-YYYY'
+     Range of specified month of selected years, e.g.:
+
+          gcal AUGUST 1494-1497
+          gcal 3/1993-1999
+          gcal nov/3-1777
+
+`YYYY+YYYY'
+     Range of specified years, e.g.:
+
+          gcal 1992+1994
+
+`MM:YYYY+MM:YYYY'
+     Range of specified fiscal years, e.g.:
+
+          gcal 7:1999+8:1992
+          gcal aug:1992+july:1999
+
+
+File: gcal.info,  Node: The GCAL environment variable,  Prev: Command line arguments,  Up: Invoking Gcal
+
+The `GCAL' environment variable
+===============================
+
+  The environment variable `GCAL' can hold a set of default options for
+Gcal (*note Environment Variable `GCAL': x-GCAL.).  These options are
+interpreted first at program start-up, and some can be overwritten by
+explicit command line arguments or values found in a `@FILE' response
+file.  *Note Command line arguments::, and *Note Response file::, for
+further information.
+
+For example:
+
+   * for *sh*:
+          GCAL="-i @color -b 3"; export GCAL
+
+   * for *csh*:
+          setenv GCAL "-i @color -b 3"
+
+   * for *MS-DOS*:
+          set GCAL=-i @color -b 3
+
+  On Vax/VMS, the name of the environment variable is `GCAL_OPT', to
+avoid a conflict with the symbol `GCAL' set for invocation of the
+program.
+
+For example:
+
+   * for *VMS*:
+          define GCAL_OPT "-i @color -b 3"
+
+
+File: gcal.info,  Node: Eternal Holidays,  Next: Fixed Dates,  Prev: Invoking Gcal,  Up: Top
+
+Eternal Holidays
+****************
+
+  The _eternal holiday list_ is created only for dates after AD 29.  It
+is assumed that the Gregorian Reformation has occurred from 10th till
+22nd March 1924 for all Christian-Orthodox holidays, which are inserted
+into the _eternal holiday list_.
+
+  The _eternal holiday list_ can be displayed in different ways:
+
+  If you start Gcal without an explicit (fiscal) date and the _eternal
+holiday list_ argument (*note Calendar option
+`--holiday-list[=long|short]': x-holiday-list.), e.g.:
+
+     gcal -qfr --holiday-list
+     gcal -qfr -n
+     gcal -qfr -n :
+
+Gcal displays all holidays of the eternal holiday list that refer to
+the actual / fiscal year, without a leading calendar sheet.
+
+  In case you start Gcal with the _eternal holiday list_ argument and a
+month (plus an additional year), e.g.:
+
+     gcal -qbe --holiday-list july
+     gcal -qbe -n july
+     gcal -qbe -n 7 1993
+     gcal -qbe -n 7/1993
+
+Gcal displays a month calendar sheet of the specified month (of year),
+and trailing those holidays of the eternal holiday list that refer to
+the given month (of the given year).
+
+  If you start Gcal with the _eternal holiday list_ argument and a
+simple year (or an explicit fiscal year), e.g.:
+
+     gcal -qbe --holiday-list 1993
+     gcal -qbe -n 1993
+     gcal -qbe -n july:
+     gcal -qbe -n :1993
+     gcal -qbe -n 7:1993
+
+Gcal displays a year calendar sheet of the specified year or fiscal
+year, and trailing all holidays of the eternal holiday list that refer
+to the given year or fiscal year.
+
+  In case you start Gcal with the _eternal holiday list_ argument and a
+special 3-Month mode command (*note 3-Month mode commands::), e.g.:
+
+     gcal -qbe --holiday-list .
+     gcal -qbe -n .
+     gcal -qbe -n ..
+     gcal -qbe -n .+
+     gcal -qbe -n .-
+
+Gcal displays the according three months by using a fixed-style year
+calendar sheet, and trailing all holidays of the eternal holiday list
+that refer to these months.
+
+  In case you start Gcal with the _eternal holiday list_ argument and a
+_list_ or _range_ of commands, it produces the according series of
+eternal holiday lists.  *Note Lists of commands::, and *Note Ranges of
+commands::, for further details.
+
+Some annotations:
+
+  The following table lists all those characters which are used for
+marking an entry in the eternal holiday list, i.e. directly lead its
+date:
+
+*Character*   *Description*
+
+`+'           Legal holiday which is valid in the whole country.  Is
+              automatically provided with highlighting sequences
+              respectively marking characters.
+`#'           Legal holiday which is valid in major parts of the whole
+              country.  Is automatically provided with highlighting
+              sequences respectively marking characters.
+`*'           Legal holiday which is valid in minor parts of the whole
+              country.  Is not provided with highlighting sequences
+              respectively marking characters.
+`-'           Other holiday which serves for memorial or remarking
+              purposes only.  Is not provided with highlighting
+              sequences respectively marking characters.
+
+  By using the `--cc-holidays=CC[+...]' option, it is possible to
+provide the eternal holiday list with additional country specific
+holidays.  Thereafter, those country specific holidays are part of the
+list.  *Note Calendar option `--cc-holidays=CC[+...]': x-cc-holidays.
+For example:
+
+     --cc-holidays=be+fr
+
+causes the inclusion of Belgian and French holidays into the eternal
+holiday list.  The inclusion of country specific holidays is not
+coupled to Gcal's internationalization (*note Aspects in
+Internationalization: Internationalization.).  This means, no country
+specific holidays are automatically respected at program start-up for a
+definite territory or country.  So it is up to the user to decide which
+country specific holidays are included into the eternal holiday list.
+*Note The `GCAL' environment variable: The GCAL environment variable,
+for information how Gcal can be induced to include the country specific
+holidays automatically into the eternal holiday list at program
+start-up.
+
+  The free selection of the different country specific holidays can be
+used very ingenious in case information of a definite territory or
+country is required.  Assuming a business man from Germany proposes to
+travel to Italy in November and needs the information which legal
+holidays are celebrated there on working days so he is able to plan his
+dates.  This can be determined as follows:
+
+     gcal -f /dev/null -q IT -D r -cE nov
+
+
+File: gcal.info,  Node: Fixed Dates,  Next: Todays Calendar,  Prev: Eternal Holidays,  Up: Top
+
+Fixed Dates
+***********
+
+* Menu:
+
+* Resource file::           How to use a Resource file.
+* Resource file examples::  Examples of Resource file entries.
+
+  This chapter describes how to use the _fixed date_ feature of Gcal.
+Normally, the fixed dates are stored line by line in a so-called
+resource file (*note Resource file::).  On request, Gcal searches any
+of such resource files for those fixed dates, that are happening in the
+period for which a fixed date list is wanted.  If Gcal has found any
+fixed dates that are happening in the requested period, the program
+displays them collectively as a fixed date list.
+
+  Thus, each time you execute Gcal in simple single month mode, i.e. no
+explicit month, year or fiscal year is given in the command line, but
+the _fixed date_ argument, e.g.:
+
+     gcal --list-of-fixed-dates
+     gcal -c
+
+it checks the resource file for dates and processes those that refer to
+the actual system date (==today).  Then Gcal displays all fixed dates
+found in the resource file which refer to the actual day
+(week/month/year) of the actual year, without a leading calendar sheet.
+
+Some more examples:
+
+     gcal --ast -ce
+     gcal -cw-
+     gcal -c-m
+     gcal -c-y-
+     gcal -qbe -jcb -c-et
+     gcal --zod -cey-
+     gcal -qfr -jc -cey
+
+  The fixed date list can be embraced by different other leading and
+trailing output, respectively, that is also created by Gcal:
+
+  In case you start Gcal with the _fixed date_ argument and/or a month
+and/or an explicit year or fiscal year; respectively with the special
+3-Month mode command, e.g.:
+
+     gcal -c july
+     gcal -qfr -ce 7 1994
+     gcal -c-y 7/1994
+     gcal -c 7:1993
+     gcal -c 1993
+     gcal -c .
+     gcal -c .+
+
+Gcal displays a (three) month / year calendar sheet of the specified
+respectively actual month / year, and trailing those fixed dates found
+in the resource file that refer to the given period; the intensity level
+is the same as the `-cy' option if the period refers to a year or
+fiscal year or to a three month period, respectively, is the same as the
+`-cm' option if the period refers to a month.
+
+  If you start Gcal without an explicit date and the _fixed date_
+argument *in connection with* the _eternal holiday list_ argument, e.g.:
+
+     gcal -qbe -n -c
+     gcal -qbe -n -Cm
+     gcal -qbe -n -Cl1224
+     gcal -qbe -n -cl3+
+     gcal -qbe -n -4-
+
+then Gcal displays all fixed dates found in the resource file that
+refer to the requested period, and after that all holidays of the
+eternal holiday list that refer to the whole actual year, without a
+leading calendar sheet.  *Note Eternal Holidays::, for more details how
+to use an _eternal holiday list_.
+
+Annotation to previous examples:
+
+  Each time you execute Gcal in simple single year mode, i.e. no
+explicit month, year or fiscal year is given in the command line, but
+the _fixed date_ argument (with optional modifiers) and the _number of
+blocks_ argument (*note Calendar option `--blocks=NUMBER': x-blocks.),
+e.g.:
+
+     gcal -c --blocks=3
+     gcal -C-em -b 3 --cc-holidays=be
+     gcal -c-t -b 6 -jc
+
+it checks the resource file for dates and processes those that refer to
+the actual system date (==today).  Gcal displays a leading year calendar
+sheet, and all fixed dates found in the resource file that refer to the
+actual day (week/month/year) of the actual year.
+
+  You can list fixed dates of past, present or future month/years, too.
+This can be done on the one hand, if you use the `%DATE' option in the
+way you require (*note Actual date modifier::), and on the other hand,
+if a command respectively a _list_ or _range_ of commands is used.
+
+For example:
+
+`gcal -qbe -c -n- 1993'
+     Lists all fixed dates of entire 1993 in ascending order, and the
+     eternal holiday list of entire 1993 in descending order; the
+     intensity level is the same as the `-cy' option.
+
+`gcal -c- july:1993'
+     Lists all fixed dates of fiscal year --starting in July 1993 and
+     ending in June 1994-- in descending order; the intensity level is
+     the same as the `-cy' option.
+
+`gcal -qbe -ce july 1993'
+     Lists all fixed dates of July 1993 inclusive all eternal holidays
+     merged into this list in ascending order; the intensity level is
+     the same as the `-cm' option.
+
+`gcal -qbe -c-e -n 1993+1996'
+     Lists all fixed dates of entire 1993, 1994, 1995 and 1996 (series
+     of years) inclusive all eternal holidays merged into this list in
+     descending order, and the eternal holiday list related to all
+     above years in ascending order; the intensity level is the same as
+     the `-cy' option.
+
+`gcal -cm %19920317'
+     Lists all fixed dates of March 1992 in ascending order.
+
+`gcal -qbe %1994@e -n -c'
+     Lists all fixed dates of Easter Sunday 1994 in ascending order,
+     and the eternal holiday list of entire 1994 in ascending order.
+
+
+File: gcal.info,  Node: Resource file,  Next: Resource file examples,  Prev: Fixed Dates,  Up: Fixed Dates
+
+Resource file
+=============
+
+* Menu:
+
+* Structure of resource file::    How to write a Resource file.
+* Date part of a line::           How to write the Date part.
+* Further date part attributes::  What are Further date part attributes?
+* Text part of a line::           How to write the Text part.
+* Special Texts processed::       What are `%?'... Special Texts?
+* Comment line::                  What is a Comment line?
+* Include directives::            What are Include directives.
+* Date variables::                How Date variables can be used.
+* Text variables::                How Text variables can be used.
+
+  This section describes how to use a "resource file" that contains
+fixed dates and appointments.  The name of the standard resource file is
+``HOME'/.gcalrc'(1) (*note Resource file-Footnote-1::).
+
+Gcal uses a special file searching mechanism:
+
+  1. The Gcal program scans the file directories which are referenced
+     in the environment variable `GCALPATH' (*note Environment Variable
+     `GCALPATH': x-GCALPATH.)  to find the standard resource file.  The
+     `GCALPATH' environment variable contains a (`:')
+     colon-separated(2) (*note Resource file-Footnote-2::) list of file
+     directories.  If no such environment variable is defined and set,
+     Gcal omits this step.
+
+  2. If the above action fails, Gcal looks for the standard resource
+     file in the file directory which is referenced in the environment
+     variable `HOME'.  If no `HOME' environment variable is defined and
+     set, Gcal also omits this step.  *Note Environment Variable
+     `HOME': x-HOME.
+
+  3. If the above action fails, Gcal inspects the _user data_ file
+     directory(3) (*note Resource file-Footnote-3::) to find the
+     standard resource file.  This file directory is a file directory
+     relative to the `HOME' file directory.  If an environment variable
+     `GCAL_USR_DATADIR' is set, Gcal appends the contents of this
+     environment variable to the contents of the `HOME' environment
+     variable, and tries to use this file directory instead of using
+     the burned-in default name of this file directory (*note
+     Environment Variable `GCAL_USR_DATADIR': x-GCAL_USR_DATADIR.).  If
+     no `HOME' environment variable is defined and set, Gcal of course
+     also omits this step.
+
+  4. If all above actions fail, Gcal inspects the _system data_ file
+     directory(4) (*note Resource file-Footnote-4::) to find the
+     standard resource file.  This file directory is a file directory
+     absolute to the _root_/$PREFIX file directory.  If an environment
+     variable `GCAL_SYS_DATADIR' is set, Gcal tries to use this file
+     directory instead of using the burned-in default name of this file
+     directory (*note Environment Variable `GCAL_SYS_DATADIR':
+     x-GCAL_SYS_DATADIR.).
+
+  If the standard resource file is not found during the steps 1...4 of
+the file searching mechanism, no fixed date messages will be created!
+
+  In case the `--debug=abort' option is given and no standard resource
+file is found during the steps 1...4 of the file searching mechanism,
+the Gcal program will be aborted with an error code.  *Note Error Code
+118: x-118-Error-code, and *Note Global option `--debug=abort':
+x-debug-abort, for more information.
+
+  If a `-f|F NAME[+...]' respectively `--resource-file=NAME' command
+line argument is given, a file NAME will be used for the resource file
+instead of the standard resource file.  *Note Fixed date option
+`--resource-file=NAME': x-resource-file.
+
+Annotation:
+
+  An "extended file name" contains one ore more `/' (slash)
+characters(5) (*note Resource file-Footnote-5::) and denotes a file,
+whose fixed access path either starts from the root file directory,
+like `/foo/bar/file', or from the actual file directory, like
+`./bar/file' or `../bar/file'.  If NAME is an extended file name:
+
+   * In case file NAME is found, Gcal will use it.
+
+   * In case file NAME is not found, Gcal will not use it.
+
+  A "simple file name" denotes a file, whose access-path either does not
+start from the root file directory or from the actual file directory,
+like `file' or `bar/file'.  If NAME is a simple file name:
+
+   * Gcal tries to find this file NAME by using the previously explained
+     file searching mechanism.
+
+
+File: gcal.info,  Node: Resource file-Footnotes,  Up: Resource file
+
+  (1) On MS-DOS, OS/2 and some other operating systems, the name of the
+_standard resource file_ is ``HOME'/gcalrc' (without a leading `.').
+
+  (2) On MS-DOS, OS/2 and some other operating systems, another
+character will be used, e.g. `;' on MS-DOS and OS/2.
+
+  (3) Normally ``HOME'/share/gcal'.
+
+  (4) Normally `/usr/local/share/gcal' or `$PREFIX/share/gcal'.
+
+  (5) Operating systems like MS-DOS or OS/2 use the `\' (Backslash)
+character for separating a file directory from a file name.
+
+
+File: gcal.info,  Node: Structure of resource file,  Next: Date part of a line,  Prev: Resource file,  Up: Resource file
+
+Structure of resource file
+--------------------------
+
+  First of all, a Gcal resource file is a plain ASCII text file.  This
+text file may be created by any text editor or by redirecting the
+_standard output channel_ to a file, e.g.:
+
+     $ echo '19930217 Text'>> resource-file <RET>
+
+  A special --but simple-- line structure is required so Gcal is able to
+interpret its contents.  Each fixed date entry in a resource file must
+be split into two parts, namely a _date part_ and an optional _text
+part_ which *must* be separated by *one* "whitespace"(1) (*note
+Structure of resource file-Footnote-1::) character minimum.  It is
+unnecessary to give a whitespace separator character if no _text part_
+is specified.
+
+  A line must always end with a `\n' (newline) character, except it is
+the last line of a resource file.  The maximum length of a line is
+limited to `INT_MAX'(2) (*note Structure of resource file-Footnote-2::)
+characters.  A newline character is automatically appended to the line
+if the _standard output channel_ is directed to a file.  A newline
+character is appended to the typed line in a text editor window if it
+is completed by pressing the <RET> key.  In case the used text editor
+does not generate the newline character in this way, it should be set
+to this mode of operation, otherwise this text editor is useless for
+creating Gcal resource files.
+
+The line structure of fixed date entries is:
+
+     DATE PART [ _whitespace_ TEXT PART ] _newline_
+
+or more concrete, e.g.:
+
+     YYYY[MM[DD|WWWN]] [ _whitespace_ TEXT ] _newline_
+
+or much more concrete, e.g.:
+
+     19940217 Hi, I'm the text!
+
+Besides fixed date entries, a resource file may contain further entries
+like:
+
+Comments...
+
+     ; A remarked line
+     ;     A formatted and multi-line \
+           remark
+
+Include directives...
+
+     #include <FILE NAME>
+     #include "FILE NAME"
+
+Date variable assignments respectively operations...
+
+     DVAR=NOTHING
+     DVAR=MMDD
+     DVAR=MMWWWN
+     DVAR=*dN[WWW]
+     DVAR=*wN[WWW]
+     DVAR=DVAR[[+|-]N[WWW]]
+     DVAR++
+     DVAR--
+     DVAR+=[+|-]N
+     DVAR-=[+|-]N
+     DVAR+=NWWW
+     DVAR-=NWWW
+
+Text variable assignments respectively operations...
+
+     TVAR=[TEXT]
+     TVAR?[COMMAND]
+     TVAR:[COMMAND]
+     TVAR++
+     TVAR--
+     TVAR+=[+|-]N
+     TVAR-=[+|-]N
+
+Text variable references...
+
+     TVAR
+
+  Text variable references at the beginning of a Gcal resource file line
+may only be used if it is ensured that they are expanded to a valid Gcal
+resource file line.
+
+
+File: gcal.info,  Node: Structure of resource file-Footnotes,  Up: Structure of resource file
+
+  (1) For example _Tab_, _Space_, _Form-feed_ and similar characters.
+
+  (2) Normally, this is for example equivalent to a value of 32,767 ==
+(2^15)-1 on a 16-Bit machine architecture; to a value of 2,147,483,648
+== (2^31)-1 on a 32-Bit machine architecture etc.
+
+
+File: gcal.info,  Node: Date part of a line,  Next: Further date part attributes,  Prev: Structure of resource file,  Up: Resource file
+
+Date part of a line
+-------------------
+
+  The structure of a "date part" --which gives Gcal the information at
+which date a fixed date happens-- of a line in the resource file is
+
+*either*: `YYYY[MM[DD|WWWN]]'
+
+    `YYYY'
+          (4 digits), is the year including the century (range
+          `0000...9999').  Leading zeroes are required in case the
+          defined year is less than `1000' and other components of the
+          date part are trailing the year.
+
+    `MM'
+          (2 digits or 3 characters), is the month (range `00...12' or
+          `99', respectively `Jan', `Feb'...).  A given `99' for the
+          month means the last month of the year (== December).  Leading
+          zeroes are required in case the defined month is less than
+          `10' and other components of the date part are trailing the
+          month.
+
+    `DD'
+          (2 digits), is the day (range `00...31' or `99').  A given
+          `99' for the day means the last day of the month.  Leading
+          zeroes are required in case the defined day is less than `10'
+          and other components of the date part are trailing the day.
+
+    `WWW'
+          (2...3 characters), is a short weekday name (range
+          `Mon...Sun').
+
+    `N'
+          (1 digit), is the N'th weekday WWW of month (range `1...5' or
+          `9').
+
+             * N == `1...5'
+               N'th weekday WWW of month.
+
+             * N == `9'
+               Last weekday WWW of month.
+
+*or*: `YYYY*d|wN[WWW]'
+
+    `YYYY'
+          (4 digits), is the year including the century (range
+          `0000...9999').  Leading zeroes are required in case the
+          defined year is less than `1000' and other components of the
+          date part are trailing the year.
+
+    `*d'
+          (2 characters), is the reference to an ordinary date.
+
+    `*w'
+          (2 characters), is either the reference to a date of an ISO
+          week or the reference to a date of a standard week.
+
+    `N'
+          (1...3 digits), is the value in days or in weeks, the fixed
+          date occurs.  A given `99' connected with a short weekday
+          name means the last weekday WWW of the year.  A given `999'
+          connected with `*d' means the last day of a year, i.e. the
+          31st December.  If the computed date does not occur in the
+          year, i.e. exceeds the year bounds, the fixed date message is
+          suppressed.
+
+    `WWW'
+          (2...3 characters), is a short weekday name (range
+          `Mon...Sun').
+
+*or*: `YYYY@e|t|DVAR[[+|-]N]'
+
+    `YYYY'
+          (4 digits), is the year including the century (range
+          `0000...9999').  Leading zeroes are required in case the
+          defined year is less than `1000' and other components of the
+          date part are trailing the year.
+
+    `@e'
+          (2 characters), is the reference to the Easter Sunday's date.
+
+    `@t'
+          (2 characters), is the reference to today's date.
+
+    `@DVAR'
+          (2 characters), is the reference to a date variable.
+
+    `[+|-]N'
+          (1...4 alphanumeric characters), is the optional displacement
+          value in days, the fixed date occurs relative to the Easter
+          Sunday's date, relative to today's date, or relative to a
+          date variables date.  A given `-999' means the first day of a
+          year, i.e. the 1st January.  A given `+999' or `999' means
+          the last day of a year, i.e. the 31st December.  If the
+          computed date does not occur in the year, i.e. exceeds the
+          year bounds, the fixed date message is suppressed.
+
+*or*: `YYYY@e|t|DVAR[+|-]NWWW'
+
+    `YYYY'
+          (4 digits), is the year including the century (range
+          `0000...9999').  Leading zeroes are required in case the
+          defined year is less than `1000' and other components of the
+          date part are trailing the year.
+
+    `@e'
+          (2 characters), is the reference to the Easter Sunday's date.
+
+    `@t'
+          (2 characters), is the reference to today's date.
+
+    `@DVAR'
+          (2 characters), is the reference to a date variable.
+
+    `[+|-]NWWW'
+          (3...7 alphanumeric characters), is the optional displacement
+          value in weekdays, the fixed date occurs relative to the
+          Easter Sunday's date, relative to today's date, or relative
+          to a date variables date.  A given `-99' means the first
+          weekday WWW of the year.  A given `+99' or `99' means the
+          last weekday WWW of the year.  If the computed date does not
+          occur in the year, i.e. exceeds the year bounds, the fixed
+          date message is suppressed.
+
+*Please note:*
+
+   * If YYYY is specified as `0000', `000', `00' or `0':
+     The month and day are assumed to be annual events and the _text
+     part_ will be displayed for any year.
+
+   * If MM is not defined or specified as `00' or `0':
+     The day is assumed to be a monthly event for the specified year
+     and the _text part_ will be displayed for any month.
+
+   * If DD is not defined or specified as `00' or `0':
+     Each day is assumed to be a daily event for the specified year and
+     month and the _text part_ will be displayed for any day.
+
+   * If WWW is specified as a short (2...3 characters) weekday name:
+     The given weekday name is assumed to be a weekly event for the
+     specified year and month and the _text part_ will be displayed for
+     any week.
+
+*Hint:*
+Preceding table ease misleading assumption that a fixed date, which
+shall be valid for any days of the year, can be defined with a date
+part only consisting of a `0'.  But that is only correct in that the
+so-defined fixed date is respected in some few fixed date periods only
+(*note Coding Scheme::).
+
+  If a fixed date is defined which shall be respected for any days of
+the year, it must be designed with a `0*d1#999' date part.  For example,
+the same is likewise valid for fixed dates which represent a weekly
+event, and that shall be valid during all the year.  Instead of
+creating such a fixed date with a `000000WWW' date part (that is
+likewise respected in some few fixed date periods only), it should be
+defined with a date part like `0*d1WWW#99WWW.7'.  *Note Ranges of
+days::, and *Note Appearance factor of days::, for further information.
+
+
+File: gcal.info,  Node: Further date part attributes,  Next: Text part of a line,  Prev: Date part of a line,  Up: Resource file
+
+Further date part attributes
+----------------------------
+
+* Menu:
+
+* Lists of days::              How Lists of days can be used.
+* Ranges of days::             How Ranges of days can be used.
+* Repetition factor of days::  How to use such a factor.
+* Appearance factor of days::  How to use such a factor.
+
+  The date part --which is leading a fixed date text of a Gcal resource
+file line-- may be provided with further attributes, that are either
+specifications of lists of days or ranges of days, which provide the
+information at which date a fixed date happens.  More further attributes
+are the repetition factor as well as the appearance factor.
+
+  All of those date parts in a Gcal resource file line, which are
+structured as follows, may generally be provided with further
+attributes:
+
+   * `YYYYMM...'
+
+   * `YYYY*d|w...'
+
+   * `YYYY@e|t|DVAR...'
+
+*Attention:*
+If the date part is supplied with further attributes and the year of
+the fixed date is not given in a concrete manner, i.e. the year YYYY is
+set to zero, such kinds of fixed dates are *only* computed correctly in
+simple year bounds --which means during a current year-- and not in
+fixed dates shown after the current year has changed, e.g. in *fiscal
+years*.
+
+
+File: gcal.info,  Node: Lists of days,  Next: Ranges of days,  Prev: Further date part attributes,  Up: Further date part attributes
+
+Lists of days
+.............
+
+  A list of days is used to define recurrent fixed dates and to use only
+one line in the resource file for them, instead of using several lines
+in a resource file needed for defining these recurrent fixed dates
+separately.
+
+  A list of days is specified by a `,' separator character; it must
+contain two elements minimum and may have any number of elements.  A
+single element of the list may not be set to a zero value and be not
+concrete therefore.  (This would not make any sense in this context.)
+
+  Assuming a fixed date shall always occur on the 1st and the 15th day
+in every month of the year 1996, e.g. `Tax returns', one solution would
+be on the one hand a fixed date entry in the resource file for the 1st
+of the month and another entry for the 15th of the month, which would
+be a total of two entries in the resource file for such a fixed date.
+
+  On the other hand, this expense can be reduced to a total of only one
+entry in the resource file by using a list of days, which is likewise
+valid for the 1st and the 15th day in every month, that is
+
+     19960001,15 Tax returns
+
+The use of lists of days in the date part is permitted as follows:
+
+   * `YYYYMMDD|WWW|WWWN,[MM]DD|[MM]WWW|[MM]WWWN ...'
+
+   * `YYYY*d|wN|NWWW,N|NWWW ...'
+
+   * `YYYY@e|t|DVAR,|[+|-]N[WWW],[+|-]N[WWW] ...'
+
+Some examples to this:
+
+`000001fr3,12,99,mon,apr14,993,julfri3,08fr'
+     In every year in January: on the 3rd Friday, on the 12th, on the
+     last day of the month and on every Monday.  And in every year: on
+     the 14th April, on the 3rd December, on the 3rd Friday in July and
+     on every Friday in August.
+
+`199600mon,fr,12'
+     In the year 1996 in every month: on every Monday, on every Friday
+     and on the 12th.
+
+`0*d1,1fr,999,17mo'
+     In every year: on the first day of the year, on the 1st Friday of
+     the year, on the last day of the year and on the 17th Monday of
+     the year.
+
+`1996*w1fr,1,17mo,99fr'
+     In the year 1996: on Friday of the 1st week, on Monday of the first
+     week, on Monday of the 17th week and on Friday of the last week.
+
+`0@a,+1,-3,5,+4fr,2fr,-10sa'
+     In every year: on the date of the date variable A, one day after
+     the date of A, three days before the date of A, five days after the
+     date of A, four Fridays after the date of A, two Fridays after the
+     date of A and ten Saturdays before the date of A.
+
+`1996@e+1,-3,5,+4fr,2fr,-10sa'
+     In the year 1996: one day after the Easter Sunday's date, three
+     days before the Easter Sunday's date, five days after the Easter
+     Sunday's date, four Fridays after the Easter Sunday's date, two
+     Fridays after the Easter Sunday's date and ten Saturdays before
+     the Easter Sunday's date.
+
+`1996@t+1,-3,5,+4fr,2fr,-10sa'
+     In the year 1996: one day after today's date, three days before
+     today's date, five days after today's date, four Fridays after the
+     today's date, two Fridays after today's date and ten Saturdays
+     before today's date.
+

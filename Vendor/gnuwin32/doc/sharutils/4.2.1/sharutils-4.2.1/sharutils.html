@@ -1,0 +1,634 @@
+<html lang="en">
+<head>
+<title>GNU `shar' utilities</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU `shar' utilities">
+<meta name="generator" content="makeinfo 4.6">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+--></style>
+</head>
+<body>
+<h1 class="settitle">GNU `shar' utilities</h1>
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Introduction">Introduction</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#shar%20invocation">shar invocation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">1 Introduction to both programs</h2>
+
+<p>GNU <code>shar</code> makes so-called shell archives out of many files,
+preparing them for transmission by electronic mail services. 
+A <dfn>shell archive</dfn> is a collection of files that can be unpacked by
+<code>/bin/sh</code>.  A wide range of features provide extensive flexibility
+in manufacturing shars and in specifying shar <em>smartness</em>.  For
+example, <code>shar</code> may compress files, uuencode binary files, split
+long files and construct multi-part mailings, ensure correct unsharing
+order, and provide simplistic checksums.  See <a href="#shar%20invocation">shar invocation</a>.
+
+   <p>GNU <code>unshar</code> scans a set of mail messages looking for the start
+of shell archives.  It will automatically strip off the mail headers
+and other introductory text.  The archive bodies are then unpacked by
+a copy of the shell.  <code>unshar</code> may also process files containing
+concatenated shell archives.  See <a href="#unshar%20invocation">unshar invocation</a>.
+
+   <p>GNU <code>shar</code> has a long history.  All along this long road, numerous
+users contributed various improvements.  The file <code>THANKS</code>, from
+the GNU <code>shar</code> distribution, contain all names still having
+valid email addresses, as far as we know.
+
+   <p>Please help me getting the history straight, for the following
+information is approximative.  James Gosling wrote the public domain
+<code>shar 1.x</code>.  William Davidsen rewrote it as <code>shar 2.x</code>. 
+Warren Tucker brought modifications and called it <code>shar 3.x</code>. 
+Richard Gumpertz maintained it until 1990.  {No value for `Francois'} Pinard,
+from the public domain <code>shar 3.49</code>, made <code>GNU shar 4.x</code>,
+in 1994.  Some modules and other code sections were freely borrowed
+from other GNU distributions, bringing this <code>shar</code> under the
+terms of the GNU General Public License.
+
+   <p>Your feedback helps us to make a better and more portable product. 
+Mail suggestions and bug reports (including documentation errors)
+for these programs to <code>bug-gnu-utils@prep.ai.mit.edu</code>.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="shar%20invocation">shar invocation</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#unshar%20invocation">unshar invocation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Introduction">Introduction</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">2 Invoking the <code>shar</code> program</h2>
+
+<p>The format of the <code>shar</code> command is one of:
+
+<pre class="example">     shar [ <var>option</var> ] ... <var>file</var> ...
+     shar -S [ <var>option</var> ] ...
+     </pre>
+
+   <p>In the first form, the file list is given as command arguments.  In the
+second form, the file list is read from standard input.  The resulting
+archive is sent to standard output unless the <code>-o</code> option is given.
+
+   <p>Options can be given in any order.  Some options depend on each other:
+the <code>-o</code> option is required if the <code>-l</code> or <code>-L</code> option
+is used.  The <code>-n</code> option is required if the <code>-a</code> option
+is used.  Also see <code>-V</code> below.
+
+   <p>Some options are special purpose:
+
+     <dl>
+
+     <br><dt><code>--help</code>
+     <dd>Print a help summary on standard output, then immediately exits.
+
+     <br><dt><code>--version</code>
+     <dd>Print the version number of the program on standard output, then
+immediately exits.
+
+     <br><dt><code>-q</code>
+     <dd><dt><code>--quiet</code>
+     <dd>Verbose <em>off</em> at <code>shar</code> time.  Messages are usually issued
+on standard error to let the user follow the progress, while making
+the archives.  This option inhibits these messages.
+
+   </dl>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Selecting">Selecting</a>:                    Selecting files
+<li><a accesskey="2" href="#Splitting">Splitting</a>:                    Splitting output
+<li><a accesskey="3" href="#Headers">Headers</a>:                      Controlling the shar headers
+<li><a accesskey="4" href="#Stocking">Stocking</a>:                     Selecting how files are stocked
+<li><a accesskey="5" href="#Transmission">Transmission</a>:                 Protecting against transmission
+<li><a accesskey="6" href="#Kinds">Kinds</a>:                        Producing different kinds of shar
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Selecting">Selecting</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Splitting">Splitting</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#shar%20invocation">shar invocation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#shar%20invocation">shar invocation</a>
+<br>
+</div>
+
+<h3 class="section">2.1 Selecting files</h3>
+
+     <dl>
+
+     <br><dt><code>-p</code>
+     <dd><dt><code>--intermix-type</code>
+     <dd>Allow positional parameter options.  The options <code>-M</code>, <code>-B</code>,
+<code>-T</code>, <code>-z</code> and <code>-Z</code> may be embedded, and files to
+the right of the option will be processed in the specified mode. 
+Without the <code>-p</code> option, embedded options would be interpreted
+as file names.  See <a href="#Stocking">Stocking</a> for more information on these options.
+
+     <br><dt><code>-S</code>
+     <dd><dt><code>--stdin-file-list</code>
+     <dd>Read list of files to be packed from the standard input rather
+than from the command line.  Input must be one file name per line. 
+This switch is especially useful when the command line will not hold
+the list of files to be packed.  For example:
+
+     <pre class="example">          find . -type f -print | shar -S -o /tmp/big.shar
+          </pre>
+
+     <p>If <code>-p</code> is specified on the command line, then the options
+<code>-M</code>, <code>-B</code>, <code>-T</code>, <code>-z</code> and <code>-Z</code> may be
+included in the standard input (on a line separate from file names). 
+The maximum number of lines of standard input, file names and options,
+may not exceed 1024.
+
+</dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Splitting">Splitting</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Headers">Headers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Selecting">Selecting</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#shar%20invocation">shar invocation</a>
+<br>
+</div>
+
+<h3 class="section">2.2 Splitting output</h3>
+
+     <dl>
+
+     <br><dt><code>-o </code><var>prefix</var><code></code>
+     <dd><dt><code>--output-prefix=</code><var>prefix</var><code></code>
+     <dd>Save the archive to files <code></code><var>prefix</var><code>.01</code> through
+<code></code><var>prefix</var><code>.</code><var>nnn</var><code></code> instead of standard output.  This option
+<em>must</em> be used when the <code>-l</code> or the <code>-L</code> switches
+are used.
+
+     <p>When <var>prefix</var> contains any <code>%</code> character, <var>prefix</var> is then
+interpreted as a <code>sprintf</code> format, which should be able to display
+a single decimal number.  When <var>prefix</var> does not contain such a
+<code>%</code> character, the string <code>.%02d</code> is internally appended.
+
+     <br><dt><code>-l </code><var>size</var><code></code>
+     <dd><dt><code>--whole-size-limit=</code><var>size</var><code></code>
+     <dd>Limit the output file size to <var>size</var> times 1024 bytes but don't
+split input files.  This allows the recipient of the shell archives
+to unpack them in any order.
+
+     <br><dt><code>-L </code><var>size</var><code></code>
+     <dd><dt><code>--split-size-limit=</code><var>size</var><code></code>
+     <dd>Limit output file size to <var>size</var> times 1024 bytes and split files
+if necessary.  The archives created with this option must be unpacked
+in the correct order.  If the recipient of the shell archives wants to
+put all of them in a single folder, she shall save them in the correct
+order for <code>unshar</code>, used with option <code>-e</code>, to unpack them
+all at once.  See <a href="#unshar%20invocation">unshar invocation</a>.
+
+     <p>For people used to saving all the shell archives into a single mail
+folder, care must be taken to save them in the appropriate order. 
+For those having the appropriate tools (like Masanobu Umeda's
+<code>rmailsort</code> package for GNU Emacs), shell archives can be saved
+in any order, then sorted by increasing date (or send time) before
+massive unpacking.
+
+</dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Headers">Headers</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Stocking">Stocking</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Splitting">Splitting</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#shar%20invocation">shar invocation</a>
+<br>
+</div>
+
+<h3 class="section">2.3 Controlling the shar headers</h3>
+
+     <dl>
+
+     <br><dt><code>-n </code><var>name</var><code></code>
+     <dd><dt><code>--archive-name=</code><var>name</var><code></code>
+     <dd>Name of archive to be included in the header of the shar files. 
+Also see the <code>-a</code> switch further down.
+
+     <br><dt><code>-s </code><var>address</var><code></code>
+     <dd><dt><code>--submitter=</code><var>address</var><code></code>
+     <dd>The <code>-s</code> option allows for overriding the email address for the
+submitter, for when the default is not appropriate.  The automatically
+determined address looks like <code></code><var>username</var><code>@</code><var>hostname</var><code></code>.
+
+     <br><dt><code>-a</code>
+     <dd><dt><code>--net-headers</code>
+     <dd>Allows automatic generation of headers:
+
+     <pre class="example">          Submitted-by: <var>address</var>
+          Archive-name: <var>name</var>/part<var>nn</var>
+          </pre>
+
+     <p>The <var>name</var> must be given with the <code>-n</code> switch.  If name
+includes a <code>/</code>, then <code>/part</code> isn't used. Thus
+<code>-n xyzzy</code> produces:
+     <pre class="example">          xyzzy/part01
+          xyzzy/part02
+          </pre>
+
+     <p>while <code>-n xyzzy/patch</code> produces:
+     <pre class="example">          xyzzy/patch01
+          xyzzy/patch02
+          </pre>
+
+     <p>and <code>-n xyzzy/patch01.</code> produces:
+     <pre class="example">          xyzzy/patch01.01
+          xyzzy/patch01.02
+          </pre>
+
+     <br><dt><code>-c</code>
+     <dd><dt><code>--cut-mark</code>
+     <dd>Start the shar with a cut line.  A line saying <code>Cut here</code> is
+placed at the start of each output file.
+
+</dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Stocking">Stocking</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Transmission">Transmission</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Headers">Headers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#shar%20invocation">shar invocation</a>
+<br>
+</div>
+
+<h3 class="section">2.4 Selecting how files are stocked</h3>
+
+     <dl>
+
+     <br><dt><code>-T</code>
+     <dd><dt><code>--text-files</code>
+     <dd>Treat all files as text, regardless of their contents.
+
+     <br><dt><code>-B</code>
+     <dd><dt><code>--uuencode</code>
+     <dd>Treat all files as binary, use <code>uuencode</code> prior to packing. This
+increases the size of the archive. The recipient must have
+<code>uudecode</code> in order to unpack.
+
+     <pre class="display">          Use of <code>uuencode</code> is not appreciated by many on the net, because
+          people like to readily see, by mere inspection of a shell archive,
+          what it is about.
+          </pre>
+
+     <br><dt><code>-M</code>
+     <dd><dt><code>--mixed-uuencode</code>
+     <dd>Mixed mode.  Automatically determine if the files are text or binary
+and archive correctly.  Files found to be binary are uuencoded prior
+to packing.  This option is selected by default.
+
+     <p>For a file is considered to be a text file, instead of a binary file,
+all the following should be true simultaneously:
+          <ol type=1 start=1>
+<li>The file does not contain any ASCII control character besides &lt;BS&gt;
+(backspace), &lt;HT&gt; (horizontal tab), &lt;LF&gt; (new line) or &lt;FF&gt;
+(form feed). 
+<li>The file does not contains a &lt;DEL&gt; (delete). 
+<li>The file contains no character with its eighth-bit set. 
+<li>The file, unless totally empty, terminates with a &lt;LF&gt; (newline). 
+<li>No line in the file contains more than 200 characters.  For counting
+purpose, lines are separated by a &lt;LF&gt; (newline).
+          </ol>
+
+     <br><dt><code>-z</code>
+     <dd><dt><code>--gzip</code>
+     <dd>Use <code>gzip</code> and <code>uuencode</code> on all files prior to packing. 
+The recipient must have <code>uudecode</code> and <code>gzip</code> (used with
+<code>-d</code>) in order to unpack.
+
+     <p>Usage of <code>-z</code> in net shars will cause you to be flamed off
+the earth.
+
+     <br><dt><code>-g </code><var>level</var><code></code>
+     <dd><dt><code>--level-for-gzip=</code><var>level</var><code></code>
+     <dd>When doing compression, use <code>-</code><var>level</var><code></code> as a parameter to
+<code>gzip</code>.  The <code>-g</code> option turns on the <code>-z</code> option
+by default.  The default value is 9, that is, maximum compression.
+
+     <br><dt><code>-Z</code>
+     <dd><dt><code>--compress</code>
+     <dd>Use <code>compress</code> and <code>uuencode</code> on all files prior to packing. 
+The recipient must have <code>uudecode</code> and <code>compress</code> (used
+with <code>-d</code>) in order to unpack.  Option <code>-C</code> is a synonymous
+for <code>-Z</code>, but is deprecated.
+
+     <p>Usage of <code>-Z</code> in net shars will cause you to be flamed off
+the earth.
+
+     <br><dt><code>-b </code><var>bits</var><code></code>
+     <dd><dt><code>--bits-per-code=</code><var>bits</var><code></code>
+     <dd>When doing compression, use <code>-b</code><var>x</var><code></code> as a parameter to
+<code>compress</code>.  The <code>-B</code> option turns on the <code>-Z</code>
+option by default.  The default value is 12, foreseeing the memory
+limitations of some <code>compress</code> programs on smallish systems, at
+<code>unshar</code> time.
+
+</dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Transmission">Transmission</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Kinds">Kinds</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Stocking">Stocking</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#shar%20invocation">shar invocation</a>
+<br>
+</div>
+
+<h3 class="section">2.5 Protecting against transmission errors</h3>
+
+<p>Transmission of shell archives is not always free of errors.  So one
+should make consistency checks on the receiving site.  A very simple
+(and unreliable) method is running the UNIX <code>wc</code> tool on the output
+file.  This can report the number of characters in the file.
+
+   <p>As one can guess this does not catch all errors.  Especially changing of
+a character value does not change the computed check sum.  To achieve
+this goal better method were invented and standardized.  One very strong
+is MD5 (MD = message digests).  This is standardized in RFC 1321.  The
+produced shell scripts do not force the <code>md5sum</code> program to be
+installed on the system.  This is necessary because it is not yet part
+of every UNIX.  The program is however not necessary for producing the
+shell archive.
+
+     <dl>
+
+     <br><dt><code>-w</code>
+     <dd><dt><code>--no-character-count</code>
+     <dd>Do <em>not</em> check with <code>wc -c</code> after unpack.  The default is
+to check.
+
+     <br><dt><code>-D</code>
+     <dd><dt><code>--no-md5-digest</code>
+     <dd>Do <em>not</em> check with <code>md5sum</code> after unpack.  The default is
+to check.
+
+     <br><dt><code>-F</code>
+     <dd><dt><code>--force-prefix</code>
+     <dd>Prepend the prefix character to every line even if not required. 
+This option may slightly increase the size of the archive, especially
+if <code>-B</code> or <code>-Z</code> is used.  Normally, the prefix character
+is <code>X</code>.  If the parameter to the <code>-d</code> option starts with
+<code>X</code>, then the prefix character becomes <code>Y</code>.
+
+     <br><dt><code>-d </code><var>string</var><code></code>
+     <dd><dt><code>--here-delimiter=</code><var>string</var><code></code>
+     <dd>Use <var>string</var> to delimit the files in the shar instead of
+<code>SHAR_EOF</code>.  This is for those who want to personalize their
+shar files.
+
+   </dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Kinds">Kinds</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Transmission">Transmission</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#shar%20invocation">shar invocation</a>
+<br>
+</div>
+
+<h3 class="section">2.6 Producing different kinds of shars</h3>
+
+     <dl>
+
+     <br><dt><code>-V</code>
+     <dd><dt><code>--vanilla-operation</code>
+     <dd>This option produces <dfn>vanilla</dfn> shars which rely only upon the
+existence of <code>echo</code>, <code>test</code> and <code>sed</code> in the unpacking
+environment.
+
+     <p>The <code>-V</code> disables options offensive to the <dfn>network cop</dfn>
+(or <dfn>brown shirt</dfn>).  It also changes the default from mixed mode
+<code>-M</code> to text mode <code>-T</code>.  Warnings are produced if option
+<code>-B</code>, <code>-z</code>, <code>-Z</code>, <code>-p</code> or <code>-M</code> is specified
+(any of which does or might require <code>uudecode</code>, <code>gzip</code> or
+<code>compress</code> in the unpacking environment).
+
+     <br><dt><code>-P</code>
+     <dd><dt><code>--no-piping</code>
+     <dd>In the shar file, use a temporary file to hold the file to
+<code>uudecode</code>, instead of using pipes.  This option is mandatory
+when you know the unpacking <code>uudecode</code> is unwilling to merely
+read its standard input.  Richard Marks wrote what is certainly the
+most (in)famous of these, for MSDOS :-).
+
+     <p>(Here is a side note from the maintainer.  Why isnt't this option
+the default?  In the past history of <code>shar</code>, it was decided
+that piping was better, surely because it is less demanding on disk
+space, and people seem to be happy with this.  Besides, I think
+that the <code>uudecode</code> from Richard Marks, on MSDOS, is wrong in
+refusing to handle <code>stdin</code>.  So far that I remember, he has
+the strong opinion that a program without any parameters should
+give its <code>--help</code> output.  Besides that, should I say, his
+<code>uuencode</code> and <code>uudecode</code> programs are full-featured, one
+of the most complete set I ever saw.  But Richard will not release
+his sources, he wants to stay in control.)
+
+     <br><dt><code>-x</code>
+     <dd><dt><code>--no-check-existing</code>
+     <dd>Overwrite existing files without checking.  If neither <code>-x</code> nor
+<code>-X</code> is specified, when unpacking itself, the shell archive will
+check for and not overwrite existing files (unless <code>-c</code> is passed
+as a parameter to the script when unpacking).
+
+     <br><dt><code>-X</code>
+     <dd><dt><code>--query-user</code>
+     <dd>Interactively overwrite existing files.
+
+     <p>Use of <code>-X</code> produces shars which <em>will</em> cause problems
+with some <code>unshar</code>-style procedures, particularily when used
+together with vanilla mode (<code>-V</code>).  Use this feature mainly for
+archives to be passed among agreeable parties.  Certainly, <code>-X</code>
+is <em>not</em> for shell archives which are to be submitted to Usenet
+or other public networks.
+
+     <p>The problem is that <code>unshar</code> programs or procedures often feed
+<code>/bin/sh</code> from its standard input, thus putting <code>/bin/sh</code>
+and the shell archive script in competition for input lines.  As an
+attempt to alleviate this problem, <code>shar</code> will try to detect if
+<code>/dev/tty</code> exists at the receiving site and will use it to read
+user replies.  But this does not work in all cases, it may happen that
+the receiving user will have to avoid using <code>unshar</code> programs
+or procedures, and call <code>/bin/sh</code> directly.  In vanilla mode,
+using <code>/dev/tty</code> is not even attempted.
+
+     <br><dt><code>-m</code>
+     <dd><dt><code>--no-timestamp</code>
+     <dd>Avoid generating <code>touch</code> commands to restore the file modification
+dates when unpacking files from the archive.
+
+     <p>When the timestamp relationship is not preserved, some files like
+<code>configure</code> or <code>*.info</code> may be uselessly remade after
+unpacking.  This is why, when this option is not used, a special
+effort is made to restore timestamps,
+
+     <br><dt><code>-Q</code>
+     <dd><dt><code>--quiet-unshar</code>
+     <dd>Verbose <em>off</em> at <code>unshar</code> time.  Disables the inclusion of
+comments to be output when the archive is unpacked.
+
+     <br><dt><code>-f</code>
+     <dd><dt><code>--basename</code>
+     <dd>Use only the last file name component of each input file name, ignoring
+any prefix directories.  This is sometimes useful when building a shar
+from several directories, or another directory.  If a directory name
+is passed to <code>shar</code>, the substructure of that directory will be
+restored whether <code>-f</code> is specified or not.
+
+</dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="unshar%20invocation">unshar invocation</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Miscellaneous">Miscellaneous</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#shar%20invocation">shar invocation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">3 Invoking the <code>unshar</code> program</h2>
+
+<p>The format of the <code>unshar</code> command is:
+
+<pre class="example">     unshar [ <var>option</var> ] ... [ <var>file</var> ... ]
+     </pre>
+
+   <p>Each <var>file</var> is processed in turn, as a shell archive or a
+collection of shell archives.  If no files are given, then standard
+input is processed instead.
+
+   <p>Options:
+
+     <dl>
+
+     <br><dt><code>--version</code>
+     <dd>Print the version number of the program on standard output, then
+immediately exits.
+
+     <br><dt><code>--help</code>
+     <dd>Print an help summary on standard output, then immediately exits.
+
+     <br><dt><code>-d </code><var>directory</var><code></code>
+     <dd><dt><code>--directory=</code><var>directory</var><code></code>
+     <dd>Change directory to <var>directory</var> before unpacking any files.
+
+     <br><dt><code>-c</code>
+     <dd><dt><code>--overwrite</code>
+     <dd><br><dt><code>-f</code>
+     <dd><dt><code>--force</code>
+     <dd>Passed as an option to the shar file.  Many shell archive scripts
+(including those produced by <code>shar</code> 3.40 and newer) accepts
+a <code>-c</code> argument to indicate that existing files should be
+overwritten.
+
+     <p>The option <code>-f</code> is provided for a more unique interface.  Many
+programs (such as <code>cp</code> and <code>mv</code>) use this option to trigger
+the very same action.
+
+     <br><dt><code>-e</code>
+     <dd><dt><code>--exit-0</code>
+     <dd>This option exists mainly for people who collect many shell archives
+into a single mail folder.  With this option, <code>unshar</code> isolates
+each different shell archive from the others which have been put in the
+same file, unpacking each in turn, from the beginning of the file
+towards its end.  Its proper operation relies on the fact that many shar
+files are terminated by a <code>exit&nbsp;0</code> at the beginning of a line.
+
+     <p>Option <code>-e</code> is internally equivalent to <code>-E&nbsp;"exit&nbsp;0"</code>.
+
+     <br><dt><code>-E </code><var>string</var><code></code>
+     <dd><dt><code>--split-at=</code><var>string</var><code></code>
+     <dd>This option works like <code>-e</code>, but it allows you to specify the
+string that separates archives if <code>exit 0</code> isn't appropriate.
+
+     <p>For example, noticing that most <code>.signatures</code> have a <code>--</code> on
+a line right before them, one can sometimes use <code>--split-at=--</code>
+for splitting shell archives which lack the <code>exit 0</code> line at end. 
+The signature will then be skipped altogether with the headers of
+the following message.
+
+   </dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Miscellaneous">Miscellaneous</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#unshar%20invocation">unshar invocation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">4 Miscellaneous considerations</h2>
+
+<p>Here is a place-holder for many considerations which do not fit
+elsewhere, while not worth a section for themselves.
+
+   <p>Be careful that the output file(s) are not included in the inputs
+or <code>shar</code> may loop until the disk fills up.  Be particularly
+careful when a directory is passed to <code>shar</code> that the output
+files are not in that directory (or a subdirectory of that directory).
+
+   <p>When a directory is passed to <code>shar</code>, it may be scanned more
+than once, to conserve memory.  Therefore, one should be careful to
+not change the directory contents while <code>shar</code> is running.
+
+   <p>No attempt is made to restore the protection and modification dates
+for directories, even if this is done by default for files.  Thus, if
+a directory is given to <code>shar</code>, the protection and modification
+dates of corresponding unpacked directory may not match those of
+the original.
+
+   <p>Use of the <code>-M</code> or <code>-B</code> options will slow down the archive
+process.  Use of the <code>-z</code> or <code>-Z</code> options may slow the
+archive process considerably.
+
+   <p>Let us conclude by a showing a few examples of <code>shar</code> usage:
+
+<pre class="example">     shar *.c &gt; cprog.shar
+     shar -Q *.[ch] &gt; cprog.shar
+     shar -B -l28 -oarc.sh. *.arc
+     shar -f /lcl/src/u*.c &gt; u.sh
+     </pre>
+
+<p>The first shows how to make a shell archive out of all C program
+sources.  The second produces a shell archive with all <code>.c</code>
+and <code>.h</code> files, which unpacks silently.  The third gives a shell
+archive of all uuencoded <code>.arc</code> files, into files <code>arc.sh.01</code>
+through to <code>arc.sh.</code><var>nnn</var><code></code>.  The last example gives a shell
+archive which will use only the file names at unpack time.
+
+
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Introduction" href="#Introduction">1 Introduction to both programs</a>
+<li><a name="toc_shar%20invocation" href="#shar%20invocation">2 Invoking the <code>shar</code> program</a>
+<ul>
+<li><a href="#Selecting">2.1 Selecting files</a>
+<li><a href="#Splitting">2.2 Splitting output</a>
+<li><a href="#Headers">2.3 Controlling the shar headers</a>
+<li><a href="#Stocking">2.4 Selecting how files are stocked</a>
+<li><a href="#Transmission">2.5 Protecting against transmission errors</a>
+<li><a href="#Kinds">2.6 Producing different kinds of shars</a>
+</li></ul>
+<li><a name="toc_unshar%20invocation" href="#unshar%20invocation">3 Invoking the <code>unshar</code> program</a>
+<li><a name="toc_Miscellaneous" href="#Miscellaneous">4 Miscellaneous considerations</a>
+</li></ul>
+</div>
+
+   </body></html>
+

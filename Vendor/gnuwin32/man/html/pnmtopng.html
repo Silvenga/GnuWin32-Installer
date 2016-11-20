@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD><TITLE>Pnmtopng User Manual</TITLE></HEAD>
+<BODY>
+<H1>pnmtopng</H1>
+Updated: June 2002
+<BR>
+<A HREF="pnmtopng.html#index">Table Of Contents</A>
+<A NAME="lbAB">&nbsp;</A>
+
+<H2>NAME</H2>
+pnmtopng - convert a PNM image to PNG
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pnmtopng</B>
+[<b>-verbose</b>]
+[<b>-downscale</b>]
+[<b>-interlace</b>]
+[<b>-alpha </b><i>file</i>]
+[<b>-transparent </b>[<b>=</b>]<i>color</i>]
+[<b>-background </b><i>color</i>]
+[<b>-palette </b><i>palettefile</i>]
+[<b>-gamma </b><i>value</i>]
+[<b>-hist</b>]
+[<b>-chroma</b> <i>wx wy rx ry gx gy bx by</i>]
+[<b>-phys</b> <i>x</i> <i>y</i> <i>unit</i>]
+[<b>-text </b><i>file</i>]
+[<b>-ztxt </b><i>file</i>]
+[<b>-time </b>[<i>yy</i>]<i>yy</i><b>-</b><i>mm</i><b>-</b><i>dd</i>
+<i>hh</i><b>:</b><i>mm</i><b>:</b><i>ss</i>]
+[<b>-nofilter</b>]
+[<b>-sub</b>]
+[<b>-up</b>]
+[<b>-avg</b>]
+[<b>-paeth</b>]
+[<b>-compression </b>level]
+[<b>-force</b>]
+[<b>-version</b>]
+[<I>pnmfile</I>]
+
+<?makeman .SH OPTION USAGE ?>
+<p>
+Obsolete options:
+<p>
+[<b>-filter </b>type]
+
+<P>You may abbreviate any option to its shortest unique prefix.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pnmtopng</b> reads a PNM image as input and produces a PNG image as
+output.
+
+<P>Color values in PNG files are either eight or sixteen bits wide, so
+<I>pnmtopng</I> will automatically scale colors to have a maxval of
+255 or 65535.  Grayscale files will be produced with bit depths 1, 2,
+4, 8 or 16.  An extra <B>pnmdepth</B> step is not necessary.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-verbose</B>
+<DD>
+     Display the format of the output file.
+<DT><B>-downscale</B>
+<DD>
+     Enables scaling of maxvalues of more then 65535 to 16 bit. Since
+     this means loss of image data, the step is not performed by default.
+<DT><B>-interlace</B>
+<DD>
+     Creates an interlaced PNG file (Adam7).
+<DT><B>-alpha </b> <i>file</i>
+
+<DD> This specifies the transparency (alpha channel) of the image.
+You supply the alpha channel as a standard PGM alpha mask (see the <a
+href="pgm.html">PGM</a> specification.  <b>pnmtopng</b> does not
+necessarily represents the transparency information as an alpha channel in
+the PNG format.  If it can represent the transparency information through
+a palette, it will do so in order to make a smaller PNG file.
+<b>pnmtopng</b> even sorts the palette so it can omit the opaque colors
+from the transparency part of the palette and save space for the palette.
+
+<DT><B>-transparent </b><i>color</i>
+<DD>
+<B>pnmtopng</B> marks the specified color as transparent in the PNG image.
+
+<P>Specify the color (<i>color</i>) as described for the <a
+href="libppm.html#colorname">argument of the <b>ppm_parsecolor()</b>
+library routine</a>.
+E.g. <B>red</B> or
+<B>rgb:ff/00/0d</B>.  If the color you specify is not present in the
+image, <B>pnmtopng</B> selects instead the color in the image that is
+closest to the one you specify.  Closeness is measured as a cartesian
+distance between colors in RGB space.  If multiple colors are
+equidistant, <B>pnmtopng</B> chooses one of them arbitrarily.
+
+<P>However, if you prefix your color specification with
+&quot;=&quot;, e.g.
+
+<pre>
+                    -transparent =red
+
+</pre>
+
+<P> only the exact color you specify will be transparent.  If that
+color does not appear in the image, there will be no transparency.
+<B>pnmtopng</B> issues an information message when this is the case.
+
+<DT><B>-background </b><i>color</i>
+<DD>
+Causes <b>pnmtopng</b> to create a background color chunk in the PNG output
+which can be used for subsequent alpha channel or transparent color
+conversions.  Specify <i>color</i> the same as for <b>-transparent</b>.
+
+<DT><B>-palette </b><i>palettefile</i>
+
+<DD>This option specifies a palette to use in the PNG.  It forces
+<b>pnmtopng</b> to create the paletted (colormapped) variety of PNG --
+if that isn't possible, <b>pnmtopng</b> fails.  If the palette you
+specify doesn't contain exactly the colors in the image,
+<b>pnmtopng</b> fails.  Since <b>pnmtopng</b> will automatically
+generate a paletted PNG, with a correct palette, when appropriate, the
+only reason you would specify the <b>-palette</b> option is if you care
+in what order the colors appear in the palette.  The PNG palette has colors
+in the same order as the palette you specify.
+
+<P>
+You specify the palette by naming a PPM file that has one pixel for each 
+color in the palette.
+
+<P>Alternatively, consider the case that have a palette and you want
+to make sure your PNG contains only colors from the palette,
+approximating if necessary.  You don't care what indexes the PNG uses
+internally for the colors (i.e. the order of the PNG palette).  In
+this case, you don't need <b>-palette</b>.  Pass the Netpbm input
+image and your palette PPM through <b>pnmremap</b>.  Though you might
+think it would, using <b>-palette</b> in this case wouldn't even save
+<b>pnmtopng</b> any work.
+
+<DT><B>-gamma </b><i>value</i>
+
+<DD>Causes <b>pnmtopng</b> to create an gAMA chunk.  This information helps
+describe how the color values in the PNG must be interpreted.  Without
+the gAMA chunk, whatever interprets the PNG must get this information
+separately (or just assume something standard).  If your input is a true
+PPM or PGM image, you should specify <b>-gamma .45</b>.  But sometimes 
+people generate images which are ostensibly PPM except the image uses a 
+different gamma transfer function than the one specified for PPM.  A common
+case of this is when the image is created by simple hardware that doesn't
+have digital computational ability.  Also, some simple programs that generate
+images from scratch do it with a gamma transfer in which the gamma value is
+1.0.
+
+<DT><B>-hist</B>
+
+<DD>Use this parameter to create a chunk that specifies the frequency
+(or histogram) of the colors in the image.
+
+<DT><B>-chroma</b> white point X and Y, red X and Y, green X and Y, 
+                   and blue X and Y
+
+<DD>This option specifies the white point and rgb values following
+the CIE-1931 spec.
+
+<DT><B>-phys</b> <i>x</i> <i>y</i> <i>unit</i>
+
+<DD>This option determines the aspect ratio of the individual pixels
+of your image as well as the physical resolution of it.
+
+<p><i>unit</i> is either <b>0</b> or <i>1</i>.  When it is <i>1</i>,
+the option specifies the physical resolution of the image in pixels
+per meter.  For example, <b>-phys 10000 15000 1</b> means that when
+someone displays the image, he should make it so that 10,000 pixels
+horizontally occupy 1 meter and 15,000 pixels vertically occupy one
+meter.  And even if he doesn't take this advice on the overall size
+of the displayed image, he should at least make it so that each pixel
+displays as 1.5 times as high as wide.
+
+<p>When <i>unit</i> is <b>0</b>, that means there is no advice on
+the absolute physical resolution; just on the ratio of horizontal to 
+vertical physical resolution.
+
+<p>This information goes into the PNG's pHYS chunk.
+
+<p>When you don't specify <b>-phys</b>, <b>pnmtopng</b> creates the image
+with no pHYS chunk, which means square pixels of no absolute resolution.
+
+<DT><B>-text</b> <i>file</i>
+
+<DD>
+This option lets you include comments in the text chunk of the PNG output.
+<i>file</i> is the name of a file that contains your text comments.
+
+<p>Here is an example of a comment file:
+<pre>
+           Title           PNG file
+           
+           Author          Bryan Henderson
+           
+           Description     how to include a text chunk
+                           PNG file
+           "Creation date" 3-feb-1987
+           
+           Software        pnmtopng
+</pre>
+
+<p>The format of the file is as follows:  The file is divided into lines,
+delimited by newline characters.  The last line need not end with a newline
+character.  A group of consecutive lines represents a comment.  
+
+<p>A "delimiter character" is a blank or tab or null character.  The
+first line representing a comment must not start with a delimiter
+character.  Every other line in the group is a "continuation line" and
+must start with a delimiter character.
+
+<p>The first line representing a comment consists of a keyword and the
+first line of comment text.  The keyword begins in Column 1 of the
+file line and continues up to, but not including, the first delimiter
+character, or the end of the line, whichever is first.  Exception: you
+can enclose the keyword in double quotes and spaces and tabs within
+the double quotes are part of the keyword.  The quotes are not part of
+the keyword.  A NUL character is not allowed in a keyword.
+
+<p>The first line of the comment text is all the text in the file line
+beginning after the keyword and any delimiter characters after it.
+immediately after the delimiter character that marks the end of the
+keyword.
+
+<p>A continuation line defines a subsequent line of the comment.  The
+comment line is all the text on the continuation line starting with the
+first non-delimiter character.
+
+<p>There is one newline character between every two comment lines.  There
+is no newline character after the last line of comment text.
+
+<p>There is no limit on the length of a file line or keyword or comment text
+line or comment text.  There is no limit on the number of comments or
+size of or number of lines in the file.
+
+<DT><B>-ztxt</b> <i>file</i>
+
+<DD>The same as -text, except <b>pnmtopng</b> considers the text compressed.
+
+<DT><B>-time </b> <i>yy-mm-dd hh:mm:ss</i> 
+or <b>-time </b><i>yyyy-mm-dd hh:mm:ss</i>
+
+<DD>This option allows you to specify the modification time value to be
+placed in the PNG output.
+You can specify the year parameter either as a two digit or four digit value.
+
+<DT><B>-filter </b><i>type</i>
+
+<DD>This option is obsolete.  Before Netpbm 10.22 (April 2004), this was
+the only way to specify a row filter.  It specifies a single type of
+row filter, by number, that <b>pnmtopng</b> must use on each row.
+
+<p>Use <b>-nofilter</b>, <b>-sub</b>, <b>-up</b>, <b>-avg</b>, and
+<b>-paeth</b> in current Netpbm.
+
+<dt><b>-nofilter</b>
+<dt><b>-sub</b>
+<dt><b>-up</b>
+<dt><b>-avg</b>
+<dt><b>-paeth</b>
+
+<dd>Each of these options permits <b>pnmtopng</b> to use one type of
+row filter.  <b>pnmtopng</b> chooses whichever of the permitted
+filters it finds to be optimal.  If you specify none of these options,
+it is the same as specifying all of them -- <b>pnmtopng</b> uses any
+row filter type it finds optimal.
+
+<p>These options were new with Netpbm 10.22 (April 2004).  Before that,
+you could use the <b>-filter</b> option to specify one permitted row
+filter type.  The default, when you specify no filter options, was the
+same.
+
+<DT><B>-compression </b><i>level</i>
+
+<DD> To explicitly set the compression level of zlib use this
+parameter.  Select a level between 0 for no compression (maximum speed)
+and 9 for maximum compression (minimum speed).
+
+<DT><B>-force</B>
+
+<DD>
+When you specify this, <b>pnmtopng</b> limits its optimizations.
+The resulting PNG output is as similar to the Netpbm input as possible.
+For example, the PNG output will not be paletted and the alpha channel
+will be represented as a full alpha channel even if the information could
+be represented more succinctly with a transparency chunk.
+
+
+<DT><B>-libversion</B>
+
+<DD>
+This option causes <b>pnmtopng</b> to do nothing but display version
+information about the libraries it uses.
+     
+</DL>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<A HREF="pngtopnm.html">pngtopnm</A>, 
+<A HREF="pnmremap.html">pnmremap</A>,
+<A HREF="pnmgamma.html">pnmgamma</A>, 
+<A HREF="pnm.html">pnm</A>
+
+<p>For information on the PNG format, see <a
+href="http://schaik.com/png">http://schaik.com/png</a>.
+
+<A NAME="lbAI">&nbsp;</A>
+<H2>AUTHORS</H2>
+
+Copyright (C) 1995-1997 by Alexander Lehmann and Willem van Schaik.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pnmtopng.html#lbAB">NAME</A>
+<LI><A HREF="pnmtopng.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pnmtopng.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pnmtopng.html#lbAE">OPTIONS</A>
+<LI><A HREF="pnmtopng.html#lbAF">SEE ALSO</A>
+<LI><A HREF="pnmtopng.html#lbAI">AUTHORS</A>
+</UL>
+</BODY>
+</HTML>

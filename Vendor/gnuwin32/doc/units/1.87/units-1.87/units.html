@@ -1,0 +1,1176 @@
+<html lang="en">
+<head>
+<title>Units: A Unit Conversion Program</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Units: A Unit Conversion Program">
+<meta name="generator" content="makeinfo 4.7">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc { font-variant:small-caps }
+  span.roman { font-family: serif; font-weight: normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">Units: A Unit Conversion Program</h1>
+<div class="node">
+<p><hr>
+<a name="Top"></a>Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+<br>
+</div>
+
+<!-- noman -->
+<!-- end noman -->
+<ul class="menu">
+<li><a accesskey="1" href="#Overview">Overview</a>:             What does <code>units</code> do? 
+<li><a accesskey="2" href="#Interactive-use">Interactive use</a>:      How to use <code>units</code>. 
+<li><a accesskey="3" href="#Command-line-use">Command line use</a>:     How to use <code>units</code> noninteractively. 
+<li><a accesskey="4" href="#Invoking-units">Invoking units</a>:       Command line options. 
+<li><a accesskey="5" href="#Unit-expressions">Unit expressions</a>:     Forming compound units. 
+<li><a accesskey="6" href="#Unit-definitions">Unit definitions</a>:     What units are defined? 
+<li><a accesskey="7" href="#Defining-new-units">Defining new units</a>:   How to write your own units definitions. 
+<li><a accesskey="8" href="#Nonlinear-units">Nonlinear units</a>:      How to define nonlinear units. 
+<li><a accesskey="9" href="#Localization">Localization</a>:         How to define and use regional unit names. 
+<li><a href="#Environment-vars">Environment vars</a>:     Environment variables used by <code>units</code>. 
+<li><a href="#Readline-support">Readline support</a>:     Unit name completion and editing. 
+<li><a href="#Index">Index</a>:                General index
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Overview"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Interactive-use">Interactive use</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">1 Overview of <code>units</code></h2>
+
+<p>The <code>units</code> program converts quantities expressed in various scales
+to their equivalents in other scales.  The <code>units</code> program can
+handle multiplicative scale changes as well as nonlinear
+conversions such as Fahrenheit to
+<!-- man Celsius. -->
+<!-- noman -->
+Celsius.<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a>
+<!-- end noman -->
+Temperature conversions require a special
+syntax. 
+<!-- noman -->
+See <a href="#Temperature-Conversion-Example">Temperature Conversion Example</a>. 
+<!-- end noman -->
+<!-- man See the examples below. -->
+
+   <p>The units are defined in an external data file.  You can use the
+extensive data file that comes with this program, or you can
+provide your own data file to suit your needs.
+
+   <p>You can use the program interactively
+with prompts, or you can use it
+from the command line.
+
+<div class="node">
+<p><hr>
+<a name="Interactive-use"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Command-line-use">Command line use</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">2 Interacting with <code>units</code></h2>
+
+<p><a name="index-interactive-use-1"></a>
+To invoke units for interactive use, type <kbd>units</kbd> at your shell
+prompt.  The program will print something like this:
+
+<pre class="example">         2131 units, 53 prefixes, 24 nonlinear units
+     
+         You have:
+</pre>
+   <p class="noindent">At the <span class="samp">You have:</span> prompt, type the quantity and units that
+you are converting <em>from</em>.  For example, if you want to convert ten
+meters to feet, type <kbd>10 meters</kbd>.  Next, <code>units</code> will print
+<span class="samp">You want:</span>.  You should type the type of units you want to convert
+<em>to</em>.  To convert to feet, you would type <kbd>feet</kbd>.  Note that if
+the readline library was compiled in then the tab key can be used to
+complete unit names.  See <a href="#Readline-support">Readline support</a>, for more information
+about readline.
+
+   <p>The answer will be displayed in two ways.  The first line of output,
+which is marked with a <span class="samp">*</span> to indicate multiplication,
+gives the result of the conversion you have asked for.  The second line
+of output, which is marked with a <span class="samp">/</span> to indicate division, gives
+the inverse of the conversion factor.  If you convert 10 meters to feet,
+<code>units</code> will print
+
+<pre class="example">             * 32.808399
+             / 0.03048
+</pre>
+   <p class="noindent">which tells you that 10 meters equals about 32.8 feet. 
+The second number gives the conversion in the opposite direction. 
+In this case, it tells you that 1 foot is equal to about
+0.03 dekameters since the dekameter is 10 meters. 
+It also tells you that 1/32.8 is about .03.
+
+   <p>The <code>units</code> program prints the inverse because sometimes it is a
+more convenient number.  In the example above, for example, the inverse
+value is an exact conversion: a foot is exactly .03048 dekameters. 
+But the number given the other direction is inexact.
+
+   <p>If you try to convert grains to pounds, you will see the following:
+
+<pre class="example">         You have: grains
+         You want: pounds
+                 * 0.00014285714
+                 / 7000
+</pre>
+   <p class="noindent">From the second line of the output you can immediately see that a grain
+is equal to a seven thousandth of a pound.  This is not so obvious from
+the first line of the output. 
+If you find  the output format  confusing, try using the
+<span class="samp">--verbose</span> option:
+<a name="index-verbose-output-2"></a>
+<pre class="example">         You have: grain
+         You want: aeginamina
+                 grain = 0.00010416667 aeginamina
+                 grain = (1 / 9600) aeginamina
+</pre>
+   <p>If you request a conversion between units which measure reciprocal
+dimensions, then <code>units</code> will display the conversion results with an extra
+note indicating that reciprocal conversion has been done:
+<a name="index-reciprocal-conversion-3"></a>
+<pre class="example">         You have: 6 ohms
+         You want: siemens
+                 reciprocal conversion
+                 * 0.16666667
+                 / 6
+</pre>
+   <p>Reciprocal conversion can be suppressed by using the <span class="samp">--strict</span> option. 
+As usual, use
+the <span class="samp">--verbose</span> option to get more comprehensible output:
+<a name="index-verbose-output-4"></a><a name="index-strict-conversion-5"></a>
+<pre class="example">         You have: tex
+         You want: typp
+                 reciprocal conversion
+                 1 / tex = 496.05465 typp
+                 1 / tex = (1 / 0.0020159069) typp
+     
+         You have: 20 mph
+         You want: sec/mile
+                 reciprocal conversion
+                 1 / 20 mph = 180 sec/mile
+                 1 / 20 mph = (1 / 0.0055555556) sec/mile
+</pre>
+   <p>If you enter incompatible unit types, the <code>units</code> program will
+print a message indicating that the units are not conformable and
+it will display the reduced form for each unit:
+<a name="index-incompatible-units-6"></a><a name="index-non_002dconformable-units-7"></a>
+<pre class="example">         You have: ergs/hour
+         You want: fathoms kg^2 / day
+         conformability error
+                 2.7777778e-11 kg m^2 / sec^3
+                 2.1166667e-05 kg^2 m / sec
+</pre>
+   <p>If you only want to find the reduced form or definition of a unit,
+simply press return at the <span class="samp">You want:</span> prompt.  Here is an example:
+
+<pre class="example">         You have: jansky
+         You want:
+                 Definition: fluxunit = 1e-26 W/m^2 Hz = 1e-26 kg / s^2
+</pre>
+   <p class="noindent">The output from <code>units</code> indicates that the jansky is defined to be
+equal to a fluxunit which in turn is defined to be a certain combination
+of watts, meters, and hertz.  The fully reduced (and in this case
+somewhat more cryptic) form appears on the far right.
+
+   <p>Some named units are treated as dimensionless in some situations. 
+These include the radian and steradian.  These units will be treated
+as equal to 1 in units conversions.  Power is equal to torque times
+angular velocity.  This conversion can only be performed if the radian
+is dimensionless.
+
+<pre class="example">         You have: (14 ft lbf) (12 radians/sec)
+         You want: watts
+                 * 227.77742
+                 / 0.0043902509
+</pre>
+   <p class="noindent">Note that named dimensionaless units are not treated as dimensionless
+in other contexts.  They cannot be used as exponents
+so for example, <span class="samp">meter^radian</span> is not allowed. 
+<a name="index-dimensionless-units-8"></a>
+If you want a list of options you can type <kbd>?</kbd> at the
+<span class="samp">You want:</span> prompt.  The program will display a list of named
+units which are conformable with the unit that you entered at
+the <span class="samp">You have:</span> prompt above.  Note that conformable unit
+combinations will not appear on this list.
+
+   <p>Typing <kbd>help</kbd> at either prompt displays a short help message. 
+You can also type <kbd>help</kbd> followed by a unit name.  This will
+invoke a pager on the units data base at the point where that unit
+is defined.  You can read the definition and comments that may
+give more details or historical information about the unit.
+
+   <p>Typing <kbd>search text</kbd> will display a list of all of the units whose
+names contain <span class="samp">text</span> as a substring along with their definitions. 
+This may help in the case where you aren't sure of the right unit
+name.
+
+<div class="node">
+<p><hr>
+<a name="Command-line-use"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Unit-expressions">Unit expressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Interactive-use">Interactive use</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">3 Using <code>units</code> non-interactively</h2>
+
+<p><a name="index-command-line-unit-conversion-9"></a><a name="index-non_002dinteractive-unit-conversion-10"></a>
+The <code>units</code> program can perform units conversions non-interactively
+from the command line.  To do this, type the command, type the
+original units expression, and type the new units you want. 
+You will probably need to protect the units expressions from
+interpretation by the shell using single quote characters.
+
+   <p>If you type
+
+<pre class="example">         units '2 liters' 'quarts'
+</pre>
+   <p class="noindent">then <code>units</code> will print
+
+<pre class="example">             * 2.1133764
+             / 0.47317647
+</pre>
+   <p class="noindent">and then exit. 
+The output tells you that 2 liters is about 2.1 quarts, or alternatively that
+a quart is about 0.47 times 2 liters.
+
+   <p>If the conversion is successful, then <code>units</code> will return success (0)
+to the calling environment.  If <code>units</code> is given non-conformable
+units to convert, it will print a message giving the reduced form of
+each unit and it will return failure (nonzero) to the calling environment.
+
+   <p>When <code>units</code> is invoked with only one argument, it will print out
+the definition of the specified unit.  It will return failure if the
+unit is not defined and success if the unit is defined.
+
+<div class="node">
+<p><hr>
+<a name="Unit-expressions"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Invoking-units">Invoking units</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Command-line-use">Command line use</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<!-- node-name,  next,  previous,  up -->
+<h2 class="chapter">4 Unit expressions</h2>
+
+<p><a name="index-unit-expressions-11"></a>
+In order to enter more complicated units or fractions,
+you will need to use operations such as powers, products and division. 
+Powers of units can be specified using the <span class="samp">^</span> character as shown in
+the following example, or by simple concatenation: <span class="samp">cm3</span> is equivalent to
+<span class="samp">cm^3</span>. 
+If the exponent is more than one digit, the <span class="samp">^</span> is required.  An
+exponent like <span class="samp">2^3^2</span> is evaluated right to left.  The <span class="samp">^</span>
+operator has the second highest precedence.  The <span class="samp">**</span> operator is
+provided as an alternative exponent operator. 
+<a name="index-powers-12"></a><a name="index-products-13"></a>
+<pre class="example">         You have: cm^3
+         You want: gallons
+                 * 0.00026417205
+                 / 3785.4118
+     
+         You have: arabicfoot * arabictradepound * force
+         You want: ft lbf
+                 * 0.7296
+                 / 1.370614
+</pre>
+   <p>Multiplication of units can be specified by using spaces, or an asterisk
+(<span class="samp">*</span>).  If <code>units</code> is invoked with the <span class="samp">--product</span>
+option then the hyphen (<span class="samp">-</span>) also acts as a multiplication
+operator.  Division of units is indicated
+by the slash (<span class="samp">/</span>) or by <span class="samp">per</span>. 
+<a name="index-multiplication-of-units-14"></a><a name="index-division-of-units-15"></a>
+<pre class="example">         You have: furlongs per fortnight
+         You want: m/s
+                 * 0.00016630986
+                 / 6012.8727
+</pre>
+   <p>Historically, multiplication in units was assigned a higher precedence
+than division.  This disagrees with the usual precedence rules which
+give multiplication and division equal precedence, and it has been a
+source of confusion for people who think of units as a calculator.
+
+   <p>By default, multiplication using the star (<span class="samp">*</span>) now has the same
+precedence as division and hence follows the usual precedence rules. 
+If units is invoked with the the <span class="samp">--oldstar</span> option then then the
+old behavior is activated and <span class="samp">*</span> will have the same precedence
+as the other multiplication operators described next.
+
+   <p>Multiplication using a space or using the hyphen has a higher
+precedence than division and is evaluated left to right.  So <span class="samp">m/s
+s/day</span> is equivalent to <span class="samp">m / s s day</span> and has dimensions of
+length per time cubed.  Similarly, <span class="samp">1/2 meter</span> refers to a unit
+of reciprocal length equivalent to .5/meter, which is probably not
+what you would intend if you entered that expression.
+
+   <p>You can indicate division of numbers with the vertical dash
+(<span class="samp">|</span>), so if you wanted half a meter you could write <span class="samp">1|2
+meter</span>.  This operator has the highest precedence so the square root
+of two thirds could be written <span class="samp">2|3^1|2</span>.
+
+   <p><a name="index-fractions-16"></a><a name="index-division-of-numbers-17"></a>
+<pre class="example">         You have: 1|2 inch
+         You want: cm
+                 * 1.27
+                 / 0.78740157
+</pre>
+   <p class="noindent">Parentheses can be used for grouping as desired.
+
+<pre class="example">         You have: (1/2) kg / (kg/meter)
+         You want: league
+                 * 0.00010356166
+                 / 9656.0833
+</pre>
+   <p>Prefixes are defined separately from base units.  In order to get
+centimeters, the units database defines <span class="samp">centi-</span> and <span class="samp">c-</span> as
+prefixes.  Prefixes can appear alone with no unit following them. 
+An exponent applies only to the immediately preceding unit and its
+prefix so that <span class="samp">cm^3</span> or <span class="samp">centimeter^3</span> refer to cubic centimeters
+but <span class="samp">centi*meter^3</span> refers to hundredths of cubic meters.  Only one
+prefix is permitted per unit, so <span class="samp">micromicrofarad</span> will fail, but
+<span class="samp">micro*microfarad</span> will work, as will <span class="samp">micro microfarad</span>..
+
+   <p>For <code>units</code>, numbers are just another kind of unit.  They can
+appear as many times as you like and in any order in a unit expression. 
+For example, to find the volume of a box which is 2 ft by 3 ft by 12 ft
+in steres, you could do the following:
+
+<pre class="example">         You have: 2 ft 3 ft 12 ft
+         You want: stere
+                 * 2.038813
+                 / 0.49048148
+     
+         You have: $ 5 / yard
+         You want: cents / inch
+                 * 13.888889
+                 / 0.072
+</pre>
+   <p class="noindent">And the second example shows how the dollar sign in the units conversion
+can precede the five.  Be careful:  <code>units</code> will interpret
+<span class="samp">$5</span> with no space as equivalent to dollars^5.
+
+   <p>Outside of the SI system, it is often desirable to add values of
+different units together.  You may also wish to use <code>units</code> as a
+calculator that keeps track of units.  Sums of conformable units are written with
+the <span class="samp">+</span> character. 
+<a name="index-sums-of-units-18"></a><a name="index-addition-of-units-19"></a>
+<pre class="example">         You have: 2 hours + 23 minutes + 32 seconds
+         You want: seconds
+                 * 8612
+                 / 0.00011611705
+     
+         You have: 12 ft + 3 in
+         You want: cm
+                 * 373.38
+                 / 0.0026782366
+     
+         You have: 2 btu + 450 ft lbf
+         You want: btu
+                 * 2.5782804
+                 / 0.38785542
+</pre>
+   <p class="noindent">The expressions which are added together must reduce to identical
+expressions in primitive units, or an error message will be displayed:
+
+<pre class="example">         You have: 12 printerspoint + 4 heredium
+                                               ^
+         Illegal sum of non-conformable units
+</pre>
+   <p class="noindent">Historically <span class="samp">-</span> has been used for products of units, which complicates
+its iterpretation in <code>units</code>.  Because <code>units</code> provides
+several other ways to obtain unit products, and because <span class="samp">-</span> is a
+subtraction operator in general algebraic expressions, <code>units</code>
+treats the binary <span class="samp">-</span> as a subtraction operator by default.  This
+behavior can be altered using the <span class="samp">--product</span> option which
+causes <code>units</code> to treat the binary <span class="samp">-</span> operator as a product
+operator.  Note that when <span class="samp">-</span> is a multiplication operator it has
+the same precedence as <span class="samp">*</span>, but when <span class="samp">-</span> is a subtraction operator
+it has the lower precedence as the addition operator.
+
+   <p>When <span class="samp">-</span> is used as a unary operator it negates its operand. 
+Regardless of the <code>units</code> options, if
+<span class="samp">-</span> appears after <span class="samp">(</span> or after
+<span class="samp">+</span> then it will act as a negation operator.  So you can always compute 20
+degrees minus 12 minutes by entering <span class="samp">20 degrees + -12 arcmin</span>. 
+You must use this construction when you define new units because you
+cannot know what options will be in force when your definition is
+processed.
+
+   <p>The <span class="samp">+</span> character sometimes appears in exponents like
+<span class="samp">3.43e+8</span>.  This leads to an ambiguity in an expression like
+<span class="samp">3e+2 yC</span>.  The unit <span class="samp">e</span> is a small unit of charge, so this
+can be regarded as equivalent to <span class="samp">(3e+2) yC</span> or <span class="samp">(3 e)+(2 yC)</span>. 
+This ambiguity is resolved by always interpreting <span class="samp">+</span> as part
+of an exponent if possible.
+
+   <p><a name="index-functions_002c-built-in-20"></a>Several built in functions are provided: <span class="samp">sin</span>, <span class="samp">cos</span>,
+<span class="samp">tan</span>, <span class="samp">ln</span>, <span class="samp">log</span>, <span class="samp">log2</span>, <span class="samp">exp</span>, <span class="samp">acos</span>,
+<span class="samp">atan</span> and <span class="samp">asin</span>.  The <span class="samp">sin</span>, <span class="samp">cos</span>, and <span class="samp">tan</span>
+functions require either a dimensionless argument or an argument with
+dimensions of angle.
+
+<pre class="example">         You have: sin(30 degrees)
+         You want:
+                 Definition: 0.5
+     
+         You have: sin(pi/2)
+         You want:
+                 Definition: 1
+     
+         You have: sin(3 kg)
+                           ^
+         Unit not dimensionless
+</pre>
+   <p class="noindent">The other functions on the list require dimensionless arguments.  The
+inverse trigonometric functions return arguments with dimensions of
+angle.
+
+   <p><a name="index-roots-21"></a><a name="index-square-roots-22"></a>If you wish to take roots of units, you may use the <span class="samp">sqrt</span> or
+<span class="samp">cuberoot</span> functions.  These functions require that the argument
+have the appropriate root.  Higher roots can  be obtained by using
+fractional exponents:
+
+<pre class="example">         You have: sqrt(acre)
+         You want: feet
+                 * 208.71074
+                 / 0.0047913202
+     
+         You have: (400 W/m^2 / stefanboltzmann)^(1/4)
+         You have:
+                 Definition: 289.80882 K
+     
+         You have: cuberoot(hectare)
+                                   ^
+         Unit not a root
+</pre>
+   <h5 class="unnumberedsubsubsec">Temperature Conversion Example</h5>
+
+<p><a name="index-temperature-conversions-23"></a><a name="Temperature-Conversion-Example"></a>
+Nonlinear units are represented using functional notation.  They make
+possible nonlinear unit conversions such temperature.  This is different
+from the linear units that convert temperature differences.  Note the
+difference below.  The absolute temperature conversions are handled by
+units starting with <span class="samp">temp</span>, and you must use functional notation. 
+The temperature differences are done using units starting with
+<span class="samp">deg</span> and they do not require functional notation.
+
+<pre class="example">         You have: tempF(45)
+         You want: tempC
+                 7.2222222
+     
+         You have: 45 degF
+         You want: degC
+                 * 25
+                 / 0.04
+</pre>
+   <p>Think of <span class="samp">tempF(x)</span> not as a function but as a notation which
+indicates that <span class="samp">x</span> should have units of <span class="samp">tempF</span> attached to
+it.  See <a href="#Nonlinear-units">Nonlinear units</a>.  The first conversion shows that if it's 45
+degrees Fahrehneit outside it's 7.2 degrees Celsius.  The second
+conversions indicates that a change of 45 degrees Fahrenheit corresponds
+to a change of 25 degrees Celsius.
+
+   <p>Some other examples of nonlinears units are ring size and wire gauge. 
+There are numerous different gauges and ring sizes.  See the units
+database for more details.  Note that wire gauges
+with multiple zeroes are signified using negative numbers where two
+zeroes is -1.  Alternatively, you can use the synonyms <span class="samp">g00</span>,
+<span class="samp">g000</span>, and so on that are defined in the units database.
+
+<pre class="example">         You have: wiregauge(11)
+         You want: inches
+                 * 0.090742002
+                 / 11.020255
+     
+         You have: brwiregauge(g00)
+         You want: inches
+                 * 0.348
+                 / 2.8735632
+     
+         You have: 1 mm
+         You want: wiregauge
+                 18.201919
+</pre>
+   <div class="node">
+<p><hr>
+<a name="Invoking-units"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Unit-definitions">Unit definitions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Unit-expressions">Unit expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">5 Invoking <code>units</code></h2>
+
+<p><a name="index-invoking-units-24"></a><a name="index-command-line-options-25"></a>
+You invoke <code>units</code> like this:
+
+<pre class="example">         units [<var>options</var>] [<var>from-unit</var> [<var>to-unit</var>]]
+</pre>
+   <p class="noindent">If the <var>from-unit</var> and <var>to-unit</var> are omitted, then the program
+will use interactive prompts to determine which conversions to perform. 
+See <a href="#Interactive-use">Interactive use</a>. 
+If both <var>from-unit</var> and <var>to-unit</var> are given, <code>units</code> will
+print the result of that single conversion and then exit. 
+If only <var>from-unit</var> appears on the command line, <code>units</code> will
+display the definition of that unit and exit. 
+Units specified on the command line will need
+to be quoted to protect them from shell interpretation and to group
+them into two arguments.  See <a href="#Command-line-use">Command line use</a>.
+
+   <p>The following options allow you to read in an alternative units file,
+check your units file, or change the output format:
+
+     <dl>
+<dt><span class="samp">-c</span><dt><span class="samp">--check</span><dd><a name="index-_002dc-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-26"></a><a name="index-_002d_002dcheck-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-27"></a>Check that all units and prefixes defined in the units data file reduce
+to primitive units.  Print a list of all units that
+cannot be reduced.  Also display some other diagnostics about
+suspicious definitions in the units data file.  Note that only
+definitions active in the current locale are checked.
+
+     <br><dt><span class="samp">--check-verbose</span><dd><a name="index-_002d_002dcheck_002dverbose-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-28"></a><a name="index-_002d_002dverbose_002dcheck-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-29"></a>Like the <span class="samp">-check</span> option, this option prints a list of units that
+cannot be reduced.  But to help find unit  definitions that cause
+endless loops,
+it lists the units as they are checked. 
+If <code>units</code> hangs, then the last unit to be printed has a bad
+definition.  Note that only
+definitions active in the current locale are checked.
+
+     <br><dt><span class="samp">-o format</span><dt><span class="samp">--output-format format</span><dd><a name="index-_002do-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-30"></a><a name="index-_002d_002doutput_002dformat-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-31"></a>Use the specified format for numeric output.  Format is the same
+as that for the printf function in the ANSI C standard. 
+For example, if you want more precision you might use <span class="samp">-o %.15g</span>.
+
+     <br><dt><span class="samp">-f filename</span><dt><span class="samp">--file filename</span><dd><a name="index-_002df-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-32"></a><a name="index-_002d_002dfile-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-33"></a>Instruct <code>units</code> to load the units file <code>filename</code>. 
+If <code>filename</code> is the empty string (<span class="samp">-f ''</span>)
+then the default units file will
+be loaded.  This enables you to load the default file plus a personal
+units file.  Up to 25 units files may be specified on the command line. 
+This option overrides the <code>UNITSFILE</code> environment variable.
+
+     <br><dt><span class="samp">-h</span><dt><span class="samp">--help</span><dd><a name="index-_002dh-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-34"></a><a name="index-_002d_002dhelp-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-35"></a>Print out a summary of the options for <code>units</code>.
+
+     <br><dt><span class="samp">-m</span><dt><span class="samp">--minus</span><dd><a name="index-_002dm-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-36"></a><a name="index-_002d_002dminus-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-37"></a>Causes <span class="samp">-</span> to be interpreted as a subtraction operator.  This is
+usually the default behavior.
+
+     <br><dt><span class="samp">-p</span><dt><span class="samp">--product</span><dd><a name="index-_002dp-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-38"></a><a name="index-_002d_002dproduct-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-39"></a>Causes <span class="samp">-</span> to be interpreted as a multiplication operator when it
+has two operands.  It will as a negation operator when it has only one
+operand: <span class="samp">(-3)</span>.  Note that by default <span class="samp">-</span> is treated as a
+subtraction operator.
+
+     <dt><span class="samp">--oldstar</span><dd><a name="index-_002d_002doldstar-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-40"></a>Causes <span class="samp">*</span> to have the old style precedence, higher than the
+precedence of division so that <span class="samp">1/2*3</span> will equal <span class="samp">6</span>.
+
+     <dt><span class="samp">--newstar</span><dd><a name="index-_002d_002dnewstar-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-41"></a>Forces <span class="samp">*</span> to have the new (default) precedence which follows
+the usual rules of algebra: the precedence of <span class="samp">*</span> is the same as
+the precedence of <span class="samp">/</span>, so that <span class="samp">1/2*3</span> will equal <span class="samp">3/2</span>.
+
+     <dt><span class="samp">--compact</span><dd><a name="index-_002d_002dcompact-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-42"></a>Give compact output featuring only the conversion factor.  This turns
+off the <span class="samp">--verbose</span> option.
+
+     <br><dt><span class="samp">-q</span><dt><span class="samp">--quiet</span><dt><span class="samp">--silent</span><dd><a name="index-_002dq-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-43"></a><a name="index-_002d_002dquiet-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-44"></a><a name="index-_002d_002dsilent-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-45"></a>Suppress prompting of the user for units and the display of statistics
+about the number of units loaded.
+
+     <br><dt><span class="samp">-s</span><dt><span class="samp">--strict</span><dd><a name="index-_002ds-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-46"></a><a name="index-_002d_002dstrict-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-47"></a>Suppress conversion of units to their reciprocal units.  For
+example, <code>units</code> will normally convert hertz to seconds
+because these units are reciprocals of each other.  The strict option
+requires that units be strictly conformable to perform a conversion, and
+will give an error if you attempt to convert hertz to seconds.
+
+     <br><dt><span class="samp">-1</span><dt><span class="samp">--one-line</span><dd><a name="index-_002d1-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-48"></a><a name="index-_002d_002done_002dline-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-49"></a>Give only one line of output (the forward conversion).  Do not print
+the reverse conversion.  Note that if a reciprocal conversion is
+performed then <code>units</code> will print still print the &ldquo;reciprocal
+conversion&rdquo; line.
+
+     <br><dt><span class="samp">-t</span><dt><span class="samp">--terse</span><dd><a name="index-_002dt-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-50"></a><a name="index-_002d_002dterse-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-51"></a>Give terse output when converting units.  This option can be used when
+calling <code>units</code> from another program so that the output is easy to
+parse.  This option has the combined
+effect of these options:  <span class="samp">--strict</span> <span class="samp">--quiet</span> <span class="samp">--one-line</span>
+<span class="samp">--compact</span>.
+
+     <br><dt><span class="samp">-v</span><dt><span class="samp">--verbose</span><dd><a name="index-_002dv-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-52"></a><a name="index-_002d_002dverbose-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-53"></a>Give slightly more verbose output when converting units.  When combined
+with the <span class="samp">-c</span> option this gives the same effect as
+<span class="samp">--check-verbose</span>.
+
+     <br><dt><span class="samp">-V</span><dt><span class="samp">--version</span><dd><a name="index-_002dV-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-54"></a><a name="index-_002d_002dversion-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-55"></a>Print program version number, tell whether the readline library
+has been included, and give the location of the default units
+data file.
+
+   </dl>
+
+<div class="node">
+<p><hr>
+<a name="Unit-definitions"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Defining-new-units">Defining new units</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invoking-units">Invoking units</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">6 Unit definitions</h2>
+
+<p><a name="index-unit-definitions-56"></a>
+The conversion information is read from a units data file which
+is called <span class="file">units.dat</span> and is probably located in
+the <span class="file">/usr/local/share</span> directory. 
+If you invoke <code>units</code> with the <span class="samp">-V</span> option, it will print
+the location of this file. 
+The default
+file includes definitions for all familiar units, abbreviations and
+metric prefixes.  It also includes many obscure or archaic units.
+
+   <p>Many constants of nature are defined, including these:
+<!-- noman -->
+<pre class="example">     pi          <span class="roman">ratio of circumference to diameter</span>
+     c           <span class="roman">speed of light</span>
+     e           <span class="roman">charge on an electron</span>
+     force       <span class="roman">acceleration of gravity</span>
+     mole        <span class="roman">Avogadro's number</span>
+     water       <span class="roman">pressure per unit height of water</span>
+     Hg          <span class="roman">pressure per unit height of mercury</span>
+     au          <span class="roman">astronomical unit</span>
+     k           <span class="roman">Boltzman's constant</span>
+     mu0         <span class="roman">permeability of vacuum</span>
+     epsilon0    <span class="roman">permitivity of vacuum</span>
+     G           <span class="roman">Gravitational constant</span>
+     mach        <span class="roman">speed of sound</span>
+</pre>
+   <p class="noindent"><!-- end noman -->
+<!-- man .RS -->
+<!-- man .TS -->
+<!-- man l l. -->
+<!-- man pi	ratio of circumference to diameter -->
+<!-- man c	speed of light -->
+<!-- man e	charge on an electron -->
+<!-- man force	acceleration of gravity -->
+<!-- man mole	Avogadro's number -->
+<!-- man water	pressure per unit height of water -->
+<!-- man Hg	pressure per unit height of mercury -->
+<!-- man au	astronomical unit -->
+<!-- man k	Boltzman's constant -->
+<!-- man mu0	permeability of vacuum -->
+<!-- man epsilon0	permitivity of vacuum -->
+<!-- man G	gravitational constant -->
+<!-- man mach	speed of sound -->
+<!-- man .TE -->
+<!-- man .RE -->
+The database includes atomic masses for all of the elements and numerous
+other constants.  Also included are the densities of various ingredients
+used in baking so that <span class="samp">2 cups flour_sifted</span> can be converted
+to <span class="samp">grams</span>.  This is not an exhaustive list.  Consult the units
+data file to see the complete list, or to see the definitions that are
+used.
+
+   <p>The unit <span class="samp">pound</span> is a unit of mass.  To get force, multiply by the
+force conversion unit <span class="samp">force</span> or use the shorthand <span class="samp">lbf</span>. 
+(Note that <span class="samp">g</span> is already taken as the standard abbreviation for
+the gram.)  The unit <span class="samp">ounce</span> is also a unit of mass.  The fluid
+ounce is <span class="samp">fluidounce</span> or <span class="samp">floz</span>.  British capacity units that
+differ from their US counterparts, such as the British Imperial gallon,
+are prefixed with <span class="samp">br</span>.  Currency is prefixed with its country
+name: <span class="samp">belgiumfranc</span>, <span class="samp">britainpound</span>.
+
+   <p>The US Survey foot,
+yard, and mile can be obtained by using the <span class="samp">US</span> prefix. 
+These units differ slightly from the international length units. 
+They were in general use until 1959, and are still used
+for geographic surveys. 
+The acre is officially defined in terms of the US Survey foot. 
+If you want an acre
+defined according to the international foot, use <span class="samp">intacre</span>.  The
+difference between these units is
+about 4 parts per million. 
+The British also used a slightly different length measure before 1959. 
+These can be obtained with the prefix <span class="samp">UK</span>.
+
+   <p>When searching for
+a unit, if the specified string does not appear exactly as a unit
+name, then the <code>units</code> program will try to remove a
+trailing <span class="samp">s</span> or a trailing <span class="samp">es</span>.  If that fails, <code>units</code>
+will check for a prefix. 
+All of the standard metric prefixes are defined.
+
+   <p>To find out what units and prefixes are available, read the standard
+units data file.
+
+<div class="node">
+<p><hr>
+<a name="Defining-new-units"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Nonlinear-units">Nonlinear units</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Unit-definitions">Unit definitions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">7 Defining new units</h2>
+
+<p><a name="index-defining-units-57"></a><a name="index-units_002c-redefinition-of-58"></a><a name="index-changing-units-definitions-59"></a>
+All of the units and prefixes that <code>units</code> can convert are defined
+in the units data file.  If you want to add your own units, you can
+supply your own file.  You can also add your own units definitions in
+the <span class="file">.units.dat</span> file in your home directory.  If this file
+exists it is read before the units data file.  It will not be read if
+any units files are specified on the command line.
+
+   <p>A unit is specified on a single line by giving its name and an
+equivalence.  Comments start with a <span class="samp">#</span> character, which can appear
+anywhere in a line.  The backslash character (<span class="samp">\</span>)
+acts as a continuation
+character if it appears as the last character on a line, making it
+possible to spread definitions out over several lines if desired. 
+A file can be included by giving the command <span class="samp">!include</span> followed by
+the file's name.  The file will be sought in the same directory as the
+parent file unless a full path is given. 
+<a name="index-include-files-60"></a>
+Unit names must not contain any of the operator characters <span class="samp">+</span>,
+<span class="samp">-</span>, <span class="samp">*</span>, <span class="samp">/</span>, <span class="samp">|</span>, <span class="samp">^</span> or the parentheses. 
+They cannot begin with a digit or a decimal point (<span class="samp">.</span>), nor can
+they end with a digit (except for zero). 
+Be careful to define
+new units in terms of old ones so that a reduction leads to the
+primitive units, which are marked with <span class="samp">!</span> characters. 
+Dimensionless units are indicated by using the string
+<span class="samp">!dimensionless</span> for the unit definition. 
+<a name="index-dimensionless-units-61"></a>
+When adding new units, be sure to use the <span class="samp">-c</span> option to check that
+the new units reduce properly. 
+If you create a loop in the units definitions, then <code>units</code> will
+hang when invoked with the <span class="samp">-c</span> options.  You will need to
+use the <span class="samp">--check-verbose</span> option which prints out each unit as it
+checks them.  The program will still hang, but the last unit printed
+will be the unit which caused the infinite loop.
+
+   <p>If you define any units which contain
+<span class="samp">+</span> characters, carefully check them because the <span class="samp">-c</span> option
+will not catch non-conformable sums.  Be careful with the <span class="samp">-</span>
+operator as well.  When used as a binary operator, the <span class="samp">-</span>
+character can perform addition or multiplication
+depending on the options used to invoke <code>units</code>. 
+To ensure consistent behavior use <span class="samp">-</span> only as a unary negation
+operator when writing units definitions.  To multiply two units leave a
+space or use the <span class="samp">*</span> operator with care, recalling that it has
+two possible precedence values and may require parentheses to ensure
+consistent behavior.  To compute the difference
+of <span class="samp">foo</span> and <span class="samp">bar</span> write <span class="samp">foo+(-bar)</span> or even <span class="samp">foo+-bar</span>.
+
+   <p>Here is an example of a short units file that defines some basic
+units:
+<!-- noman -->
+
+<pre class="example">     m       !               # The meter is a primitive unit
+     sec     !               # The second is a primitive unit
+     rad     !dimensionless  # A dimensionless primitive unit
+     micro-  1e-6            # Define a prefix
+     minute  60 sec          # A minute is 60 seconds
+     hour    60 min          # An hour is 60 minutes
+     inch    0.0254 m        # Inch defined in terms of meters
+     ft      12 inches       # The foot defined in terms of inches
+     mile    5280 ft         # And the mile
+</pre>
+   <!-- end noman -->
+<!-- man .RS -->
+<!-- man .TS -->
+<!-- man l l l. -->
+<!-- man m	!	# The meter is a primitive unit -->
+<!-- man sec	!	# The second is a primitive unit -->
+<!-- man rad	!dimensionless	# The second is a primitive unit -->
+<!-- man micro-	1e-6	# Define a prefix -->
+<!-- man minute	60 sec	# A minute is 60 seconds -->
+<!-- man hour	60 min	# An hour is 60 minutes -->
+<!-- man inch	0.0254 m	# Inch defined in terms of meters -->
+<!-- man ft	12 inches	# The foot defined in terms of inches -->
+<!-- man mile	5280 ft	# And the mile -->
+<!-- man .TE -->
+<!-- man .RS -->
+<p class="noindent">A unit which ends with a <span class="samp">-</span> character is a prefix.  If a prefix
+definition contains any <span class="samp">/</span> characters, be sure they are protected
+by parentheses.  If you define <span class="samp">half- 1/2</span> then <span class="samp">halfmeter</span>
+would be equivalent to <span class="samp">1 / 2 meter</span>.
+
+<div class="node">
+<p><hr>
+<a name="Nonlinear-units"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Localization">Localization</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Defining-new-units">Defining new units</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">8 Defining nonlinear units</h2>
+
+<p><a name="index-defining-nonlinear-units-62"></a><a name="index-nonlinear-units_002c-redefinition-of-63"></a><a name="index-changing-nonlinear-unit-definitions-64"></a><a name="index-nonlinear-unit-conversions-65"></a>Some units conversions of interest are nonlinear; for
+example, temperature conversions between the Fahrenheit and Celsius
+scales cannot be done by simply multiplying by conversions factors.
+
+   <p>When you give a linear unit definition such as <span class="samp">inch 2.54 cm</span> you
+are providing information that <code>units</code> uses to convert values in
+inches into primitive units of meters.  For nonlinear units, you give
+a functional definition that provides the same information.
+
+   <p>Nonlinear units are represented using a functional notation. 
+It is best to regard this notation not as a function call but
+as a way of adding units to a number, much the same way that
+writing a linear unit name after a number adds units to that number. 
+Internally, nonlinear units are defined by a pair of functions
+which convert to and from linear units in the data file, so that
+an eventual conversion to primitive units is possible.
+
+   <p>Here is an example nonlinear unit definition:
+
+<pre class="example">     tempF(x) [1;K] (x+(-32)) degF + stdtemp ; (tempF+(-stdtemp))/degF + 32
+</pre>
+   <p class="noindent">A nonlinear unit definition comprises a unit name, a dummy parameter
+name, two functions, and two corresponding units.  The functions tell
+<code>units</code> how to convert to and from the new unit.  In order to
+produce valid results, the arguments of these functions need to have
+the correct dimensions.  To facilitate error checking, you may specify
+the dimensions.
+
+   <p>The definition begins with the unit name followed immediately (with no
+spaces) by a <span class="samp">(</span> character.  In parentheses is the name of the
+parameter.  Next is an optional specification of the units required by
+the functions in this definition.  In the example above, the
+<span class="samp">tempF</span> function requires an input argument conformable with
+<span class="samp">1</span>.  For normal nonlinear units definitions the forward
+function will always take a dimensionless argument. 
+The inverse function requires an input argument conformable
+with <span class="samp">K</span>.  In general the inverse function will need units
+that match the quantity measured by your nonlinear unit. 
+The sole purpose of the expression in brackets to enable
+<code>units</code> to perform error checking on function arguments.
+
+   <p>Next the function definitions appear.  In the example above, the
+<span class="samp">tempF</span> function is defined by
+
+<pre class="example">         tempF(x) = (x+(-32)) degF + stdtemp
+</pre>
+   <p class="noindent">This gives a rule for converting <span class="samp">x</span> in the units <span class="samp">tempF</span>
+to linear units of absolute temperature, which makes it possible to
+convert from tempF to other units.
+
+   <p>In order to make conversions to Fahrenheit possible, you must give
+a rule for the inverse conversions. The inverse will be <span class="samp">x(tempF)</span> and
+its definition appears after a <span class="samp">;</span> character. 
+In our example, the inverse is
+
+<pre class="example">         x(tempF) = (tempF+(-stdtemp))/degF + 32
+</pre>
+   <p class="noindent">This inverse definition takes an absolute temperature as its argument
+and converts it to the Fahrenheit temperature.  The inverse can be
+omitted by leaving out the <span class="samp">;</span> character, but then conversions to
+the unit will be impossible.  If the inverse is omitted then the
+<span class="samp">--check</span> option will display a warning.  It is up to you to
+calculate and enter the correct inverse function to obtain proper
+conversions.  The <span class="samp">--check</span> option tests the inverse at one point
+and print an error if it is not valid there, but this is not a guarantee
+that your inverse is correct.
+
+   <p>If you wish to make synonyms for nonlinear units, you still need to define
+both the forward and inverse functions.  Inverse functions can be
+obtained using the <span class="samp">~</span> operator.  So to create a synonym
+for <span class="samp">tempF</span> you could write
+
+<pre class="example">         fahrenheit(x) [1;K] tempF(x); ~tempF(fahrenheit)
+</pre>
+   <p><a name="index-units-functions-66"></a><a name="index-functions-of-units-67"></a>You may occasionally wish to define a function that operates on units. 
+This can be done
+using a nonlinear unit definition.  For example, the definition below
+provides conversion between radius and the area of a circle.  Note
+that this definition requires a length as input and produces an
+area as output, as indicated by the specification in brackets.
+
+<pre class="example">         circlearea(r) [m;m^2] pi r^2 ; sqrt(circlearea/pi)
+</pre>
+   <p><a name="index-linear-interpolation-68"></a><a name="index-units_002c-piecewise-linear-69"></a><a name="index-piecewise-linear-units-70"></a>Sometimes you may be interested in a piecewise linear unit such as
+many wire gauges.  Piecewise linear units can be defined by specifying
+conversions to linear units on a list of points. 
+Conversion at other points will be done by linear interpolation. 
+A partial definition of zinc gauge is
+
+<pre class="example">         zincgauge[in] 1 0.002, 10 0.02, 15 0.04, 19 0.06, 23 0.1
+</pre>
+   <p class="noindent">In this example, <span class="samp">zincgauge</span> is the name of the piecewise linear
+unit.  The definition of such a unit is indicated by the
+embedded <span class="samp">[</span> character.  After the bracket, you should indicate the
+units to be attached to the numbers in the table. 
+No spaces can appear before the
+<span class="samp">]</span> character, so a definition like <span class="samp">foo[kg meters]</span> is
+illegal; instead write <span class="samp">foo[kg*meters]</span>.  The definition of the
+unit consists of a list of pairs optionally separated by commas. 
+This list defines a function for converting from the piecewise linear
+unit to linear units.  The
+first item in each pair is the function argument; the second item is the
+value of the function at that argument (in the units specified in brackets). 
+In this example,
+we define <span class="samp">zincgauge</span> at five points.  For example, we set
+<span class="samp">zincgauge(1)</span> equal to <span class="samp">0.002 in</span>.  Definitions like this
+may be  more readable  if written using  continuation characters as
+<!-- noman -->
+
+<pre class="example">         zincgauge[in] \
+              1 0.002  \
+             10 0.02   \
+             15 0.04   \
+             19 0.06   \
+             23 0.1
+</pre>
+   <!-- end noman -->
+<!-- man .RS -->
+<!-- man .nf -->
+<!-- man zincgauge[in]         \\ -->
+<!-- man         1        0.002 \\ -->
+<!-- man         10        0.02 \\ -->
+<!-- man         15        0.04 \\ -->
+<!-- man         19        0.06 \\ -->
+<!-- man         23        0.1 -->
+<!-- man .fi -->
+<!-- man .RE -->
+<p>With the preceeding definition, the following conversion can be
+performed:
+
+<pre class="example">         You have: zincgauge(10)
+         You want: in
+             * 0.02
+             / 50
+         You have: .01 inch
+         You want: zincgauge
+             5
+</pre>
+   <p>If you define a piecewise linear unit that is not strictly
+monotonic, then the inverse will not be well defined.  If the inverse is
+requested for such a unit, <code>units</code> will return the smallest
+inverse.  The <span class="samp">--check</span> option will print a warning if a
+non-monotonic piecewise linear unit is encountered.
+
+<div class="node">
+<p><hr>
+<a name="Localization"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Environment-vars">Environment vars</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Nonlinear-units">Nonlinear units</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">9 Localization</h2>
+
+<p><a name="index-localization-71"></a>
+Some units have different values in different locations.  The
+localization feature accomodates this by allowing the units database to
+specify region dependent definitions.   A locale region in the units
+database begins with <span class="samp">!locale</span> followed by the name of the locale. 
+The leading <span class="samp">!</span> must appear in the first column of the units
+database.  The locale region is terminated by <span class="samp">!endlocale</span>.  The
+following example shows how to define a couple units in a locale.
+
+<pre class="example">     !locale en_GB
+     ton                     brton
+     gallon                  brgallon
+     !endlocale
+</pre>
+   <p>The current locale is specified
+by the <code>LOCALE</code> environment variable.  Note that the <span class="samp">-c</span>
+option only checks the definitions which are active for the current locale.
+
+<div class="node">
+<p><hr>
+<a name="Environment-vars"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Readline-support">Readline support</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Localization">Localization</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">10 Environment variables</h2>
+
+<p><a name="index-environment-variables-72"></a>
+The <code>units</code> programs uses the following environment variables.
+
+     <dl>
+<dt><span class="samp">LOCALE</span><dd><a name="index-LOCALE-environment-variable-73"></a>Specifies the locale.  The default is <span class="samp">en_US</span>.  Sections of the
+units database are specific to certain locales.
+
+     <br><dt><span class="samp">PAGER</span><dd><a name="index-PAGER-environment-variable-74"></a>Specifies the pager to use for help and for displaying the conformable
+units.  The help function browses the units database and calls
+the pager using the <code>+nn</code> syntax for specifying a line number.  The
+default pager is <code>more</code>, but <code>less</code>, <code>emacs</code>, or
+<code>vi</code> are possible alternatives.
+
+     <br><dt><span class="samp">UNITSFILE</span><dd><a name="index-UNITSFILE-environment-variable-75"></a>Specifies the units database file to use (instead of the default). This
+will be overridden by the <span class="samp">-f</span> option.  Note that you can only
+specify a single units database using this environment variable.
+
+   </dl>
+
+<div class="node">
+<p><hr>
+<a name="Readline-support"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Index">Index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Environment-vars">Environment vars</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">11 Readline support</h2>
+
+<p><a name="index-readline_002c-use-with-_0040code_007bunits_007d-76"></a>
+If the <code>readline</code> package has been compiled in, then when
+<code>units</code> is used interactively, numerous command line editing
+features are available.  To check if your version of <code>units</code>
+includes the readline, invoke the program with the <span class="samp">--version</span>
+option.
+
+   <p>For complete information about readline, consult the documentation for
+the readline package.  Without any configuration, <code>units</code> will
+allow editing in the style of emacs.  Of particular use with
+<code>units</code> are the completion commands.
+
+   <p>If you type a few characters and then hit <span class="samp">ESC</span> followed by the
+<kbd>?</kbd> key then <code>units</code> will display a list of all the units which
+start with the characters typed.  For example, if you type <kbd>metr</kbd> and
+then request completion, you will see something like this:
+<a name="index-unit-name-completion-77"></a>
+<pre class="example">     You have: metr
+     metre             metriccup         metrichorsepower  metrictenth
+     metretes          metricfifth       metricounce       metricton
+     metriccarat       metricgrain       metricquart       metricyarncount
+     You have: metr
+</pre>
+   <p class="noindent">If there is a unique way to complete a unitname, you can hit the tab key
+and <code>units</code> will provide the rest of the unit name.  If <code>units</code>
+beeps, it means that there is no unique completion.  Pressing the tab
+key a second time will print the list of all completions.
+
+<div class="node">
+<p><hr>
+<a name="Index"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Readline-support">Readline support</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="unnumbered">Index</h2>
+
+<ul class="index-cp" compact>
+<li><a href="#index-_002d_002dcheck-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-27"><code>--check </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dcheck_002dverbose-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-28"><code>--check-verbose </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dcompact-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-42"><code>--compact </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dfile-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-33"><code>--file </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dhelp-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-35"><code>--help </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dminus-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-37"><code>--minus </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dnewstar-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-41"><code>--newstar </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002doldstar-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-40"><code>--oldstar </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002done_002dline-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-49"><code>--one-line </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002doutput_002dformat-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-31"><code>--output-format </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dproduct-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-39"><code>--product </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dquiet-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-44"><code>--quiet </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dsilent-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-45"><code>--silent </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dstrict-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-47"><code>--strict </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dterse-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-51"><code>--terse </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dverbose-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-53"><code>--verbose </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dverbose_002dcheck-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-29"><code>--verbose-check </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d_002dversion-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-55"><code>--version </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002d1-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-48"><code>-1 </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002dc-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-26"><code>-c </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002df-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-32"><code>-f </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002dh-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-34"><code>-h </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002dm-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-36"><code>-m </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002do-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-30"><code>-o </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002dp-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-38"><code>-p </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002dq-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-43"><code>-q </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002ds-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-46"><code>-s </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002dt-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-50"><code>-t </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002dv-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-52"><code>-v </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-_002dV-_0040r_007b_0028option-for_007d-_0040code_007bunits_007d_0040r_007b_0029_007d-54"><code>-V </code><span class="roman">(option for</span><code> units</code><span class="roman">)</span></a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-addition-of-units-19">addition of units</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-changing-nonlinear-unit-definitions-64">changing nonlinear unit definitions</a>: <a href="#Nonlinear-units">Nonlinear units</a></li>
+<li><a href="#index-changing-units-definitions-59">changing units definitions</a>: <a href="#Defining-new-units">Defining new units</a></li>
+<li><a href="#index-command-line-options-25">command line options</a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-command-line-unit-conversion-9">command line unit conversion</a>: <a href="#Command-line-use">Command line use</a></li>
+<li><a href="#index-defining-nonlinear-units-62">defining nonlinear units</a>: <a href="#Nonlinear-units">Nonlinear units</a></li>
+<li><a href="#index-defining-units-57">defining units</a>: <a href="#Defining-new-units">Defining new units</a></li>
+<li><a href="#index-dimensionless-units-8">dimensionless units</a>: <a href="#Interactive-use">Interactive use</a></li>
+<li><a href="#index-dimensionless-units-61">dimensionless units</a>: <a href="#Defining-new-units">Defining new units</a></li>
+<li><a href="#index-division-of-numbers-17">division of numbers</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-division-of-units-15">division of units</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-environment-variables-72">environment variables</a>: <a href="#Environment-vars">Environment vars</a></li>
+<li><a href="#index-fractions-16">fractions</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-functions-of-units-67">functions of units</a>: <a href="#Nonlinear-units">Nonlinear units</a></li>
+<li><a href="#index-functions_002c-built-in-20">functions, built in</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-include-files-60">include files</a>: <a href="#Defining-new-units">Defining new units</a></li>
+<li><a href="#index-incompatible-units-6">incompatible units</a>: <a href="#Interactive-use">Interactive use</a></li>
+<li><a href="#index-interactive-use-1">interactive use</a>: <a href="#Interactive-use">Interactive use</a></li>
+<li><a href="#index-invoking-units-24">invoking units</a>: <a href="#Invoking-units">Invoking units</a></li>
+<li><a href="#index-linear-interpolation-68">linear interpolation</a>: <a href="#Nonlinear-units">Nonlinear units</a></li>
+<li><a href="#index-LOCALE-environment-variable-73">LOCALE environment variable</a>: <a href="#Environment-vars">Environment vars</a></li>
+<li><a href="#index-localization-71">localization</a>: <a href="#Localization">Localization</a></li>
+<li><a href="#index-multiplication-of-units-14">multiplication of units</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-non_002dconformable-units-7">non-conformable units</a>: <a href="#Interactive-use">Interactive use</a></li>
+<li><a href="#index-non_002dinteractive-unit-conversion-10">non-interactive unit conversion</a>: <a href="#Command-line-use">Command line use</a></li>
+<li><a href="#index-nonlinear-unit-conversions-65">nonlinear unit conversions</a>: <a href="#Nonlinear-units">Nonlinear units</a></li>
+<li><a href="#index-nonlinear-units_002c-redefinition-of-63">nonlinear units, redefinition of</a>: <a href="#Nonlinear-units">Nonlinear units</a></li>
+<li><a href="#index-PAGER-environment-variable-74">PAGER environment variable</a>: <a href="#Environment-vars">Environment vars</a></li>
+<li><a href="#index-piecewise-linear-units-70">piecewise linear units</a>: <a href="#Nonlinear-units">Nonlinear units</a></li>
+<li><a href="#index-powers-12">powers</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-products-13">products</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-readline_002c-use-with-_0040code_007bunits_007d-76">readline, use with <code>units</code></a>: <a href="#Readline-support">Readline support</a></li>
+<li><a href="#index-reciprocal-conversion-3">reciprocal conversion</a>: <a href="#Interactive-use">Interactive use</a></li>
+<li><a href="#index-roots-21">roots</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-square-roots-22">square roots</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-strict-conversion-5">strict conversion</a>: <a href="#Interactive-use">Interactive use</a></li>
+<li><a href="#index-sums-of-units-18">sums of units</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-temperature-conversions-23">temperature conversions</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-unit-definitions-56">unit definitions</a>: <a href="#Unit-definitions">Unit definitions</a></li>
+<li><a href="#index-unit-expressions-11">unit expressions</a>: <a href="#Unit-expressions">Unit expressions</a></li>
+<li><a href="#index-unit-name-completion-77">unit name completion</a>: <a href="#Readline-support">Readline support</a></li>
+<li><a href="#index-units-functions-66">units functions</a>: <a href="#Nonlinear-units">Nonlinear units</a></li>
+<li><a href="#index-units_002c-piecewise-linear-69">units, piecewise linear</a>: <a href="#Nonlinear-units">Nonlinear units</a></li>
+<li><a href="#index-units_002c-redefinition-of-58">units, redefinition of</a>: <a href="#Defining-new-units">Defining new units</a></li>
+<li><a href="#index-UNITSFILE-environment-variable-75">UNITSFILE environment variable</a>: <a href="#Environment-vars">Environment vars</a></li>
+<li><a href="#index-verbose-output-4">verbose output</a>: <a href="#Interactive-use">Interactive use</a></li>
+   </ul>
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Overview" href="#Overview">1 Overview of <code>units</code></a>
+<li><a name="toc_Interactive-use" href="#Interactive-use">2 Interacting with <code>units</code></a>
+<li><a name="toc_Command-line-use" href="#Command-line-use">3 Using <code>units</code> non-interactively</a>
+<li><a name="toc_Unit-expressions" href="#Unit-expressions">4 Unit expressions</a>
+<ul>
+<ul>
+<ul>
+<li><a href="#Unit-expressions">Temperature Conversion Example</a>
+</li></ul>
+</li></ul>
+</li></ul>
+<li><a name="toc_Invoking-units" href="#Invoking-units">5 Invoking <code>units</code></a>
+<li><a name="toc_Unit-definitions" href="#Unit-definitions">6 Unit definitions</a>
+<li><a name="toc_Defining-new-units" href="#Defining-new-units">7 Defining new units</a>
+<li><a name="toc_Nonlinear-units" href="#Nonlinear-units">8 Defining nonlinear units</a>
+<li><a name="toc_Localization" href="#Localization">9 Localization</a>
+<li><a name="toc_Environment-vars" href="#Environment-vars">10 Environment variables</a>
+<li><a name="toc_Readline-support" href="#Readline-support">11 Readline support</a>
+<li><a name="toc_Index" href="#Index">Index</a>
+</li></ul>
+</div>
+
+<div class="footnote">
+<hr>
+<a name="texinfo-footnotes-in-document"></a><h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> But Fahrenheit to
+Celsius is linear, you insist.  Not so.  A transformation T is linear if
+T(x+y)=T(x)+T(y) and this fails for T(x)=ax+b.  This transformation is
+affine, but not linear. </p>
+
+   <p><hr></div>
+
+</body></html>
+

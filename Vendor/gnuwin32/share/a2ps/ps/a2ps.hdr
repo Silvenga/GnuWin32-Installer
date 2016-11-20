@@ -1,0 +1,165 @@
+% -*- PostScript -*-
+% Base of a2ps' prologues
+%
+% $Id: a2ps.hdr,v 1.1.1.1.2.1 2007/12/29 01:58:26 mhatta Exp $
+%
+
+%
+% This file is part of a2ps.
+% 
+% This program is free software; you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation; either version 3, or (at your option)
+% any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program; see the file COPYING.  If not, write to
+% the Free Software Foundation, 59 Temple Place - Suite 330,
+% Boston, MA 02111-1307, USA.
+
+% Variables and Functions
+%
+% Variables from `outside'
+%	v:		virtual page number in current page
+%	sx:		number of chars in lines' prefix
+%	tab:		tab size (in chars)
+% Functions
+%	title:		title
+%	footer:		footer
+%	border:		border around the body text
+% Coordinates
+%	x, y:		the virtual pages (arrays)
+%	x0, y0:		the current line content (x0 does not include
+% 			the line numbers)
+%	snx, sny:	left footer
+%	dx, dy:		the l-footer
+%	lx, ly:		the r-header
+%	fnx, fny:	the c-footer
+%	scx, scy:	the sheet center
+% Font sizes
+%	fnfs:		center title
+%	bfs:		body
+% Fonts
+%	df:		footer/header
+%	sf:		symbol
+%	fnf:		center title
+% Widths and heigths
+%	cw:		a Courier char
+%	pw, ph:		page
+%	sw, sh:		sheet
+%	th:		v.p. title
+% Margins
+%	hm:		header
+%	ury:		top
+%	urx:		right
+%	llx:		left
+
+% -- code follows this line --
+%%BeginResource: procset a2ps-a2ps-hdr 2.0 2
+%%Copyright: (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+%%Copyright: (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+%%DocumentProcessColors: Black
+% Function title: prints page header.
+% <ct> <rt> <lt> are passed as argument
+/title { 
+  % 1. Draw the background
+  x v get y v get moveto
+  gsave
+    0 th 2 div neg rmoveto 
+    th setlinewidth
+    0.95 setgray
+    pw 0 rlineto stroke
+  grestore
+  % 2. Border it
+  gsave
+    0.7 setlinewidth
+    pw 0 rlineto
+    0 th neg rlineto
+    pw neg 0 rlineto
+    closepath stroke
+  grestore
+  % stk: ct rt lt
+  x v get y v get th sub 1 add moveto
+%Font: Helvetica fnfs 0.8 mul
+  % 3. The left title
+  gsave
+    dup stringwidth pop fnfs 0.8 mul add exch % leave space took on stack
+    fnfs 0.8 mul hm rmoveto
+    show			% left title
+  grestore
+  exch
+  % stk: ct ltw rt
+  % 4. the right title
+  gsave
+    dup stringwidth pop fnfs 0.8 mul add exch % leave space took on stack
+    dup
+    pw exch stringwidth pop fnfs 0.8 mul add sub
+    hm
+    rmoveto
+    show			% right title
+  grestore
+  % stk: ct ltw rtw
+  % 5. the center title
+  gsave
+    pw 3 1 roll
+    % stk: ct pw ltw rtw
+    3 copy 
+    % Move to the center of the left room
+    sub add 2 div hm rmoveto
+    % What is the available space in here?
+    add sub fnfs 0.8 mul sub fnfs 0.8 mul sub
+    % stk: ct space_left
+%Font: Helvetica-Bold fnfs
+    cfshow
+  grestore
+} bind def
+
+% Function border: prints virtual page border
+/border { %def
+  gsave				% print four sides
+    0 setgray
+    x v get y v get moveto
+    0.7 setlinewidth		% of the square
+    pw 0 rlineto
+    0 ph neg rlineto
+    pw neg 0 rlineto
+    closepath stroke
+  grestore
+} bind def
+
+% Function water: prints a water mark in background
+/water { %def
+  gsave
+    scx scy moveto rotate
+%Font: Times-Bold 100
+    .97 setgray
+    dup stringwidth pop 2 div neg -50 rmoveto
+    show
+  grestore
+} bind def
+
+% Function rhead: prints the right header
+/rhead {  %def
+  lx ly moveto
+%Font: Helvetica fnfs 0.8 mul
+  l-show
+} bind def
+
+% Function footer (cf rf lf -> -)
+/footer {
+%Font: Helvetica fnfs 0.8 mul
+  dx dy moveto
+  show
+
+  snx sny moveto
+  l-show
+  
+  fnx fny moveto
+  c-show
+} bind def
+%%EndResource

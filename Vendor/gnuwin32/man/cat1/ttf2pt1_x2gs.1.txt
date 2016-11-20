@@ -1,0 +1,127 @@
+TTF2PT1_X2GS(1)      TTF2PT1 Font Converter     TTF2PT1_X2GS(1)
+
+
+
+
+
+NAME
+       ttf2pt1_x2gs - font installer for Ghostscript
+
+SYNOPSIS
+       ttf2pt1_x2gs [config-file]
+
+DESCRIPTION
+       The fonts generated with ttf2pt1 work fine with
+       Ghostscript by themselves. The script `x2gs' (or
+       `ttf2pt1_x2gs' when installed into a public directory,
+       to avoid name conflicts with other programs) links the
+       font files from the X11 direcotry into the Ghostscript
+       directory and automatically creates the description file
+       (Fontmap) in Ghostscript format.
+
+       If the configuration file is not specified as an
+       argument then the file `convert.cfg' in the current
+       directory is used, just like the `convert' script does.
+       Indeed, this configuration file is used for both
+       scripts.
+
+       The Ghostscript-related parameters in the configuration
+       file are:
+
+       DSTDIR - the X11 font directory used by `x2gs' as the
+       source of the fonts. This parameter is common with the
+       X11 configuration.
+
+       GSDIR - the base directory of Ghostsript. If this
+       parameter is set to an empty string then `convert' won't
+       call `x2gs'. So if you want to get only the X11 fonts
+       installed then set this parameter to an empty string.
+       This directory may vary on various system, so please
+       check your system and set this value accordingly before
+       running the script.
+
+       GSFONTDIR - the font directory of Ghostscript. In the
+       standard Ghostscript installation it's a subdirectory of
+       GSDIR but some systems may use completely different
+       directories.
+
+       GSCONFDIR - the configuration subdirectory of
+       Ghostscript that contains the Fontmap file.
+
+       INSTALLFONTMAP - if the value is set to YES then install
+       the entries for the new fonts right into the main
+       Fontmap file. Otherwise just leave the file Fontmap.ttf
+       in the Ghostscript configuration directory.
+
+       After preparing the configuration file run the script.
+       It symbolicaly links all the font files and creates the
+       description file Fontmap.ttf in GSCONDFIR. After that
+       there are two choices.
+
+       If the option INSTALLFONTMAP was set to YES then the
+       font descriptions are also automatically installed into
+       the master Fontmap file. The script is clever enough to
+       detect if it was run multiple times with the same
+       directories and if so it replaces the old Fontmap
+       entries with the new ones instead of just accumulating
+       all of them. You may also run it multiple times for
+       multiple X11 directories and all the results will be
+       properly collected in the Fontmap.  But it's your
+       responsibility to watch that the names of the font files
+       don't overlap. If the X11 font directory gets renamed
+       then you have to remove its font entries from the
+       Fontmap and only after that re-run `x2gs' for the new
+       directory.
+
+       On the other hand if the option INSTALLFONTMAP was set
+       to NO then go to the GSCONFDIR directory and insert the
+       contents of Fontmap.ttf into the Fontmap file manually.
+       This step may be left manual to make the installation a
+       little bit more safe.
+
+       After that you may also want to redefine some of the
+       aliases in Fontmap to refer to the newly installed
+       fonts.  But the redefinition of the aliases may be
+       dangerous if the width of characters in the new font
+       will be different from the old font.  Alas, there is no
+       visible solution of this problem yet.
+
+FILES
+       o c:/progra~1/Ttf2Pt1/share/ttf2pt1/scripts/convert.cfg.sample
+
+       o c:/progra~1/Ttf2Pt1/share/ttf2pt1/scripts/*
+
+       o c:/progra~1/Ttf2Pt1/share/ttf2pt1/README
+
+       o c:/progra~1/Ttf2Pt1/share/ttf2pt1/FONTS
+
+       o c:/progra~1/Ttf2Pt1/share/ttf2pt1/*
+
+       o c:/progra~1/Ttf2Pt1/bin/ttf2pt1
+
+SEE ALSO
+       o   the ttf2pt1(1) manpage
+
+       o   the ttf2pt1_convert(1) manpage
+
+       o   the t1asm(1) manpage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+December 31, 2003        version 3.4.4          TTF2PT1_X2GS(1)

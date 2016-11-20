@@ -1,0 +1,64 @@
+WCRTOMB(3)         Linux Programmer's Manual         WCRTOMB(3)
+
+
+
+
+
+NAME
+       wcrtomb  -  convert  a  wide  character  to  a multibyte
+       sequence
+
+SYNOPSIS
+       #include <wchar.h>
+
+       size_t wcrtomb (char* s, wchar_t wc, mbstate_t* ps);
+
+DESCRIPTION
+       The main case for this function is when s  is  not  NULL
+       and wc is not L'\0'.  In this case, the wcrtomb function
+       converts the wide character wc to its  multibyte  repre-
+       sentation  and stores it at the beginning of the charac-
+       ter array pointed to by s. It updates  the  shift  state
+       *ps,  and returns the length of said multibyte represen-
+       tation, i.e. the number of bytes written at s.
+
+       A different case is when s is not NULL but wc is  L'\0'.
+       In  this case the wcrtomb function stores at the charac-
+       ter array pointed to by s the shift sequence  needed  to
+       bring  *ps back to the initial state, followed by a '\0'
+       byte. It updates the shift state  *ps  (i.e.  brings  it
+       into  the  initial state), and returns the length of the
+       shift sequence plus one, i.e. the number of bytes  writ-
+       ten at s.
+
+       A  third  case  is  when  s  is NULL. In this case wc is
+       ignored,  and  the  function  effectively  returns  wcr-
+       tomb(buf,L'\0',ps)  where  buf  is an internal anonymous
+       buffer.
+
+       In all of the above cases, if ps is a  NULL  pointer,  a
+       static  anonymous  state only known to the wcrtomb func-
+       tion is used instead.
+
+RETURN VALUE
+       The wcrtomb function returns the number  of  bytes  that
+       have  been  or would have been written to the byte array
+       at s. If wc  can  not  be  represented  as  a  multibyte
+       sequence (according to the current locale), (size_t)(-1)
+       is returned, and errno set to EILSEQ.
+
+CONFORMING TO
+       ISO/ANSI C, UNIX98
+
+SEE ALSO
+       wcsrtombs(3)
+
+NOTES
+       The behaviour of wcrtomb depends on the  LC_CTYPE  cate-
+       gory of the current locale.
+
+       Passing NULL as ps is not multi-thread safe.
+
+
+
+GNU                      July 25, 1999               WCRTOMB(3)

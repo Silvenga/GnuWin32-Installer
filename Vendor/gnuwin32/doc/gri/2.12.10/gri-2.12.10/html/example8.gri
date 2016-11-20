@@ -1,0 +1,122 @@
+# Example 8 -- Plot T=T(x,rho) section of eubex data
+
+`Initialize Parameters'
+{
+    \FILE_DATA = "example8a.dat" # T vs rho
+    \FILE_LOCN = "example8b.dat" # section distances
+    set missing value -99.0
+    #
+    # Following values from ~/eubex/processing/to_rho_bins/do_rho_inter
+    \RHO_MIN = "28.1"
+    \RHO_MAX = "27.5"
+    \RHO_INC = "-0.002"
+    \NY = "301"
+    \xmin = "350"
+    \xmax = "0"
+    \xinc = "-100"
+    \ymin = "28.1"
+    \ymax = "27.8"
+    \yinc = "-0.1"
+    \zmin = "0"
+    \zmax = "2.5"
+}
+`Initialize Axes'
+/*
+Set up axes
+*/
+{
+    set x name "km"
+    set x size 10
+    set x axis \xmin \xmax \xinc
+    set y name "$\sigma_T$"
+    set y size 5
+    set y axis name horizontal
+    set y axis \ymin \ymax \yinc
+    set y format "%.1f"
+}
+`Initialize Files'
+{
+    query \data "Data file?   " ("\FILE_DATA")
+    query \locn "Station locn?" ("\FILE_LOCN")
+}
+`Read Data'
+{
+    # Read x-locations
+    system awk '{print $2}' < \locn > TMP
+    system wc TMP | awk '{print $1}' > NUM
+    open NUM
+    read .gridx_number.
+    close
+    system rm NUM 
+    open TMP
+    read grid x .gridx_number.
+    close
+    system rm TMP
+    # Create y-locations
+    set y grid \RHO_MIN \RHO_MAX \RHO_INC
+    #
+    # Read data
+    open \data
+    read grid data \NY .gridx_number.
+    close
+}
+`Plot Contours'
+{
+    set graylevel .contour_graylevel.
+    set clip on
+    set line width 0.5
+    draw contour -3 3 0.25 unlabelled
+    #
+    # wide line at 0 degrees
+    set line width 2
+    draw contour 0 unlabelled
+}
+`Plot Image And Maybe Contours'
+{
+    \imagefile = "image"
+    set image range \zmin \zmax
+    convert grid to image box \xmin  \ymin \xmax \ymax
+    query \dohisto "Do histogram scaling? (yes|no)" ("yes")
+    \incs = "no"
+    if {"\dohisto" == "yes"}
+	set image grayscale using histogram
+    else
+	\zinc = "0.25"
+	query \incs "In linear scaling, band at an increment of \zinc?" ("yes")
+	if {"\incs" == "yes"}
+	    set image grayscale black \zmin white \zmax increment \zinc
+	else
+	    set image grayscale black \zmin white \zmax
+	end if
+    end if
+    write image rasterfile to \imagefile
+    show "wrote image rasterfile `\imagefile '"
+    draw image
+    draw image palette
+    query \do_contours "Do contours as well (yes|no)" ("yes")
+    if {"\do_contours" == "yes"}
+	Plot Contours
+    end if
+    draw title "Example 8 -- \data black=\zmin white=\zmax"
+    if {"\dohisto" == "yes"}
+	draw title "Histogram enhanced grayscales"
+    else
+	if {"\incs" == "yes"}
+	    draw title "Grayscale banded at intervals of \zinc"
+	end if
+    end if
+}
+Initialize Parameters
+Initialize Axes
+Initialize Files
+Read Data
+query \doimage "Draw image (yes|no)" ("no")
+if {"\doimage" == "yes"}
+    .contour_graylevel. = 1	# white contours 
+    Plot Image And Maybe Contours
+else
+    .contour_graylevel. = 0	# black contours 
+    Plot Contours
+    draw title "Example 8"
+end if
+

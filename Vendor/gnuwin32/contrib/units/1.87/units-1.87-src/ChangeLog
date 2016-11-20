@@ -1,0 +1,331 @@
+2007-05-18  adrian  <adrian@cox.net>
+
+	* units.c (personalunitsfile): Added personalunitsfile() function
+	to find ~/.units.dat if it exists.  Added code in main() to load
+	this file (first) when no -f specifications occur. 
+	(tryallunits): Modified to perform searching either for
+	conformable units or for text matching units.  This required
+	changes to addtolist() as well.
+
+	* parse.y: Added entry to support x^-y when - is not a multiply
+	operator.  Added MULTSTAR type and support for lower multiply
+	precedence for '*'.  Added special check for '**' operator as the
+	old code didn't work.  
+
+2006-02-26  adrian  <adrian@cox.net>
+
+	* units.c: Added -1/--one-line option to display one line of
+	output only.
+
+	* units.c: Added --compact option to print output with only the
+	conversion factor.  
+
+	* units.c: Changed verbose variable.  Now it is 1 for normal
+	output, zero for less output and 2 for more verbose output.  The
+	--compact option sets it to zero, and --verbose sets it to 2.  The
+	--terse option now simply sets other options. 
+
+2005-09-10  adrian  <adrian@cox.net>
+
+	* parse.y: Declared err as static and added %name-prefix to parser
+	to make it possible to use units as a library.  Note that
+	declaring err as static also averts a bus error on the Intel Mac.
+
+2004-12-12  adrian  <adrian@cox.net>
+
+	* units.c (checkunits): Added check for units that use '-' as a
+	binary operator.  These units will act differently depending on
+	the way the program is invoked, so print a warning.  
+
+	* units.c (compareproducts): Modified to use a pointer to a function
+	to decide whether a unit should be regarded as dimensionless.  Added
+	functions ignore_dimless(), ignore_primitive() and ignore_nothing()
+        to use for invoking compareproducts.  Modified compareunits to take
+	this parameter as well.  
+	
+2004-06-20  Adrian Mariano  <adrian@vizcacha.cox.net>
+
+        * parse.y: Added MINUS token and changed lexer to treat '-'
+	according to the global variable minusminus either as MINUS or in
+	the old fashion as MULTMINUS.
+ 
+	* parse.y (funcunit): Added call to freeunit() to close memory leak.
+
+	* units.c (compareproducts): Altered this function to use
+	isdimless() when comparing units so that dimensionless units can
+	be ignored in the comparison.  Added isdimless() which checks
+	whether a unit is defined as NODIM. 
+
+2003-12-04  Adrian Mariano  <adrian@vizcacha.cox.net>
+
+	* units.c (lookupunit): Added check for -ies plural
+
+2003-09-20  Adrian Mariano  <adrian@vizcacha.cox.net>
+
+	* units.c (readunits): Wrote in a file to capture error messages,
+	pass back an error return instead of calling exit(), do included
+	units files with "!include", give error on nested "!locale"
+	statements.  
+
+2003-05-09  Adrian Mariano  <adrian@vizcacha.cox.net>
+
+	* units.c: (readunits): Added error checking for function and
+	prefix names.  
+
+2002-05-06  Adrian Mariano  <adrian@vizcacha.cox.rr.com>
+
+	* units.c (reduceunit): The last change to reduceunit was screwed
+	up.  Corrected it.  
+
+2001-11-26  Adrian Mariano  <adrian@vizcacha.cox.rr.com>
+
+	* units.c (readunits): Added locale checks to support the
+	'!locale' syntax in units.dat.
+	
+	* configure.in: Added --enable-path-search option which replaces
+	the use of an empty datadir for specifying path searching.  
+
+2001-08-30  Adrian Mariano  <adrian@vizcacha.cox.rr.com>
+
+	* units.c (reduceunit): Separated two calls to reduceproduct().
+	This fixes a bug where "Unit reduction error" occurs instead of
+	"Unknown unit".  
+
+2001-08-17  Adrian Mariano  <adrian@vizcacha.cox.rr.com>
+
+	* units.c (tryallunits): Added signal() calls to ignore the
+	SIGPIPE signal and hopefully prevent premature termination.
+
+2000-05-28  Adrian Mariano  <adrian@vizcacha.cox.rr.com>
+
+	* units.c (addtolist): Modified tryallunits() to search function
+	definitions and produce a sorted list, piped through the pager.
+	Modified ishelpquery to invoke ishelpquery to produce a list.
+
+2000-04-18  Adrian Mariano  <adrian@vizcacha.mgfairfax.rr.com>
+
+	* units.c (fgetscont): Added fix for backslash at the end of the
+	buffer.  
+
+2000-04-13  Adrian Mariano  <adrian@vizcacha.mgfairfax.rr.com>
+
+	* units.c (readunits): Set "userfile" when a path search is
+	performed so that "help" can find the data file.  
+	(ishelpquery): Modified to find functions and prefixes.
+
+2000-04-12  Adrian Mariano  <adrian@vizcacha.mgfairfax.rr.com>
+
+	* units.c (ishelpquery): Wrote new function to print help messages
+	by invoking a pager on units.dat.  This required new field in
+	unitlist structure, and code in main() to check for the "help"
+	command.  
+
+2000-04-10  Adrian Mariano  <adrian@vizcacha.mgfairfax.rr.com>
+
+	* parse.y: rewrote parser rules for correct unary '-'.
+
+	* units.c (showdefinition): Substantially simplified and made
+	correct for expressions that start with an operator (/ or -).
+
+2000-04-09  Adrian Mariano  <adrian@vizcacha.mgfairfax.rr.com>
+
+	* units.c (isfunction): Fixed call to removepadding()
+
+2000-02-12  Adrian Mariano  <adrian@vizcacha.mgfairfax.rr.com>
+
+	* units.c (fgetscont): Fixed buffer full test
+
+1999-04-27  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c (addsubunit,addsubunitlist): Changed overflow test.
+
+Mon Aug 17 13:12:01 1998  Adrian Mariano  <adrian@avalanche.cam.cornell.edu>
+
+	* units.c (addunit): Added declaration for handlesum() so that it
+	isn't called before being declared.  Moved handlesum down the code
+	past completereduce() so that handlesum doesn't call
+	completereduce() before its definition.  
+
+Sun Mar  8 10:08:56 1998  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c (main): Set rl_basic_word_break_characters to delimit
+	words properly for unit completion.
+
+Mon Jun  9 19:12:08 1997  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c (lookupunit): Switched order of prefix and plural
+	handling so that plurals are handled first.  (This fixes the
+	problem of "pints" being interpreted as p- plus ints.)
+
+Sun Apr  6 01:01:24 1997  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c (removepadding): Added check for zero length strings.
+	This caused units to hang when invoked with arguments that
+	consisted only of whitespace.  
+
+Mon Mar 10 19:23:21 1997  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c: Changed 2 strdup() calls into dupstr() calls. 
+
+Sun Mar  2 18:02:16 1997  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c: replaced sscanf with strtod affecting numlength() and
+	addnumber().  This circumvents a bug in NeXT's C library and
+	yields simpler code.  
+
+Wed Feb 12 22:28:42 1997  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c (showanswer): Fixed to give slightly better display when
+	verbose mode is active.
+
+Tue Jan 21 18:51:58 1997  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c: Changed showanswer() to convert reciprocal units.
+	Added -s,--strict option to disable this conversion.  
+
+Mon Jan 13 20:37:26 1997  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c: Added addnumber() because recursive call to addunit()
+	was causing problems with strtok.
+
+Tue Dec 31 00:57:42 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c (prefixhash): Changed to AND with 127 because signed
+	chars seem to be causing segmentation faults with 8 bit
+	characters.  Changed size of the table to 128 to correspond.
+
+Thu Dec 26 13:54:59 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c (completeunits): Added 1 to mymalloc() call so there is
+	enough space.  (This fixes the tab bug.)
+
+Mon Dec  9 23:46:27 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* unit.c (addunit): Changed logic for calling handlesum() to check
+	that the character immediately before the '+' is not an 'e' since
+	this would probably be an exponent.
+
+Mon Dec  7 10:47:43 1996  Adrian Mariano  <adrian@macomb.cam.cornell.edu>
+
+	* units.c (lookupunit): Added tempbuf variable to prevent problems
+	when the output from one call to lookupunit is used as input to a
+	later call to lookupunit.
+
+	* units.c: Changed main() and processargs() to allow invoking
+	units with just one unit specified on the command line.  
+
+Tue Dec  3 14:19:33 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c: added verbose option, changed showanswer() to give
+	verbose display, removed first argument from showunit(), added new
+	function removepadding() to trim whitespace.  
+
+	* New file: texi2man, a perl script for converting the texinfo
+	documentation into the man page format.  Makefile.in changed to
+	generate units.man from units.texinfo.  
+
+Mon Dec  2 14:10:56 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c: New functions handlesum(), addsubunitlist(), and
+        productoverflow().
+	(addunit): Call handlesum() if there are '+' characters in the
+	string to be added.  This handles sums of conformable units.
+	Added free() calls to free savescr when returning with an error.
+
+Sun Dec  1 17:30:52 1996  Adrian Mariano  <adrian@esther.cam.cornell.edu>
+
+	* units.c: Added isblank() and showdefinition().  Changed main()
+	to call showdefinition if the second unit entered is blank.  Also
+	changed the loop to re-prompt the user for the first unit until
+	something nonblank is entered. Changed showunit() to take two
+	arguments.  
+
+Wed Nov 27 23:08:33 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c: Added function completeunits() for doing completion
+	when readline is in use.
+
+	* makefile.in: added support for LDFLAGS.  
+
+	* units.c (lookupunits): Added tests to avoid trying plurals on
+	one character long base units.
+
+Fri Nov 22 19:25:23 1996  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* Makefile.in, configure.in, units.c: add ansi2knr support.
+
+	* New files: aclocal.m4, ansi2knr.1 and ansi2knr.c.
+
+Fri Nov 22 10:33:43 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c: Added removespaces() function called from addunits() to
+	remove spaces around '^' characters so the user doesn't have to be
+	so careful.
+
+Thu Nov 21 23:39:09 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c (lookupunit): Added check to return the input if it is a
+	number.  This was made necessary by the change in the handling of
+	numbers which broke the '^' operator on numbers. 
+
+Thu Nov 21 15:22:40 1996  Adrian Mariano  <adrian@esther.cam.cornell.edu>
+
+	* units.c (numlength): Changed test for sscanf to require a return
+	value of exactly 1.  For some reason, sscanf sometimes returns -1
+	instead of 0 when no fields were read.
+
+Thu Nov 21 09:17:26 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* Makefile.in:  Added ALL_CFLAGS so that CFLAGS can be used by the
+	user.   
+
+	* configure.in: Added fix to look for ncurses library to go with
+	readline.  (Required by some linux version.)  
+
+Wed Nov 20 14:03:22 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* configure.in: Added check for const support.
+
+	* Makefile.in: added VPATH, fixed a few places where $(srcdir) was
+	needed, fixed the install targets to create directories if
+	necessary by calling mkinstalldirs.  Fixed man pages install
+	target.
+
+Sun Nov 17 00:05:12 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c: Added numlength() to handle "numbers" with multiple 'e'
+	or '.' characters.  Changed number evaluation in addunit() to do
+	something reasonable when multiple '|' characters appear.  Now
+	number evaluation is done by sscanf() instead of atof().  Removed
+	handling of numbers with no trailing space from lookupunit() and
+	added it to addunit() with a recursive call.
+
+Thu Nov  1 16:18:08 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c: Fixed up portability for string.h, stdlib.h.  Added
+	declarations for string functions and atof().
+
+        * units.c: Removed calls to tolower() since they turned out to be
+	unportable.  
+
+Sun Sep  8 10:19:43 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c: Added long options, made option flag variables global.
+
+	* units.c: Added freeunit() function to free units (which was
+	never done), and uncommented two free() calls in cancelunit().
+
+	* units.c: Added processargs() function to tidy things up. 
+
+Thu Sep  5 01:18:52 1996  Adrian Mariano  <adrian@kilburn.cam.cornell.edu>
+
+	* units.c: Removed all the static char * buffers and added
+	support for readline().  Added growbuffer() and fgetslong() and
+	getuser().  
+
+	* units.c (readunits): Rewrote parsing to be cleaner and to remove
+	trailing white space in units.
+
+Copyright (C) 1996, 1997, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+Free Software Foundation, Inc
+	

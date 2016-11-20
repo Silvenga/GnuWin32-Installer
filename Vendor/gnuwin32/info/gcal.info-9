@@ -1,0 +1,311 @@
+This is gcal.info, produced by makeinfo version 4.0 from gcal.texi.
+
+INFO-DIR-SECTION GNU packages
+START-INFO-DIR-ENTRY
+* Gcal: (gcal).                       GNU calendar program.
+* Tcal: (gcal)Invoking tcal.          Run Gcal with tomorrow's date.
+* Txt2gcal: (gcal)Invoking txt2gcal.  Calendar text to resource file.
+* Gcal2txt: (gcal)Invoking gcal2txt.  Calendar resource to text file.
+END-INFO-DIR-ENTRY
+
+  This file documents Gcal, a program for calculating and printing
+calendars.
+
+  Copyright (c) 1994, 95, 96, 1997, 2000 Thomas Esken
+
+  This edition is for Gcal version 3.01.
+
+  Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+  Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+  Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation approved by the Free Software Foundation.
+
+  Any suggestions, improvements, extensions, bug reports, donations,
+proposals for contract work, and so forth are welcome!  Please send
+them directly to my eMail address <esken@gmx.net>.  If you like my
+work, I'd appreciate a postcard from you!
+
+------------------------oOO      \\\_''/      OOo---------------------------
+Thomas Esken               O     (/o-o\)     O  eMail: esken@gmx.net
+Im Hagenfeld 84                 ((  ^  ))       Phone: +49 251 232585
+D-48147 Muenster; Germany    \____) ~ (____/    MotD : 2old2live, 2young2die
+
+
+File: gcal.info,  Node: Contents of Environment variable,  Prev: Moon data,  Up: Replacements with other argument
+
+Environment variable `%[FORMAT]-[ARGUMENT]' special text
+........................................................
+
+  `%[FORMAT]-[ARGUMENT]' references the contents of an *environment
+variable*, e.g.:
+
+     The text `I am `%-USER '-user' will be expanded to
+     ==> `I am `guest'-user', in case you logged-in as guest on your
+     system.
+
+  This special text *must* always be trailed by a _whitespace_
+character which is removed in output!
+
+
+File: gcal.info,  Node: Replacements without any argument,  Prev: Replacements with other argument,  Up: Replacements
+
+Replacements without any argument `%?' special texts
+----------------------------------------------------
+
+* Menu:
+
+* Other difference values::
+* Highlighting::
+
+  Apart from further useful difference values, the text of a fixed date
+can be provided with different texts used for highlighting.
+
+
+File: gcal.info,  Node: Other difference values,  Next: Highlighting,  Prev: Replacements without any argument,  Up: Replacements without any argument
+
+Difference value `%[FORMAT]?' special texts
+...........................................
+
+  The use of the other difference values as listed here is to calculate
+distance values between two dates.  In case these special texts are
+directly lead by a `-' character, e.g. `-%d', Gcal switches the sign of
+the computed value.
+
+  You may depreciate the special meaning of the `-' character --in case
+this character itself is needed-- by placing a `\' (backslash)
+character before it, e.g. `\-'.  If you need the `\-' characters
+themselves, you have to protect the `\' (backslash) character by
+another `\' (backslash) character, e.g. `\\-'.
+
+  The following other difference values `%[FORMAT]?' special texts are
+respected:
+
+`%d'
+     Specifies the current respectively queried *day* relative to the
+     actual system date (==today), e.g.:
+
+          The resource file line `0 %d days gone' will be expanded to
+          ==> `-10 days gone', in case you call Gcal with the `-c10-'
+          option and no command.
+
+`%w'
+     Specifies the current respectively queried *week* relative to the
+     actual system date (==today).  Started weeks are counted as
+     complete weeks.
+
+`%m'
+     Specifies the current respectively queried *month* relative to the
+     actual system date (==today).  Started months are counted as
+     complete months.
+
+`%y'
+     Specifies the current respectively queried *year* relative to the
+     actual system date (==today).  Started years are counted as
+     complete years.  This special text *must* always be trailed by a
+     _whitespace_ character which is removed in output!
+
+  An example:
+
+  Supposing, the actual system date is the 4th September 1999.  To
+calculate, how many days, weeks, months and years are between the
+actual system date and the birthday of a person, who is born on 21st
+September 1962, Gcal can be called as follows:
+
+     $ gcal -f/dev/null -Ux -u -#'19620921 %y %m %w %d~' 1962
+     -|
+     -| -37 -444 -1928 -13497
+     -|
+     $ gcal -f/dev/null -Ux -u -#'19620921 \\-%y \-%m %w -%d~' 1962
+     -|
+     -| \--37 --444 -1928 13497
+     -|
+     $ gcal -f/dev/null -Ux -u -#'00000904 %y %m %w %d~' %19620921 1999
+     -|
+     -| 37 444 1928 13497
+     -|
+     $ gcal -f/dev/null -Ux -u -#'00000904 %y %B19620921' %19620921 1962
+     -|
+     -| 37 36
+
+Please do not confound the relative year number `%[FORMAT]y' special
+text with the age value `%B' special text (*note Age value
+`%[FORMAT]B[DATE]' special text: x-Age-value.).  The `%y' special text
+counts started years as complete years, while the `%B' special text
+does not.
+
+
+File: gcal.info,  Node: Highlighting,  Prev: Other difference values,  Up: Replacements without any argument
+
+Highlighting `%?' special texts
+...............................
+
+  The following highlighting `%?' special texts are respected:
+
+`%1'
+     `%1' is replaced by the starting highlighting sequence respectively
+     the starting marking character that is used for highlighting the
+     actual day (*note Global option `--highlighting=TEXT':
+     x-highlighting.).  This attains, that all succeeding text of the
+     line after this special text is displayed in the same way as the
+     highlighted respectively marked actual day.  `%1' is used together
+     with the `%2' special text, which turns off this enabled
+     highlighting sequence respectively produces the ending marking
+     character.  If a `%1' text is not succeeded by a `%2' text on the
+     line, Gcal automatically inserts such a `%2' text at the end of
+     the line.
+
+     For example:
+
+          Only %1THIS%2 word is highlighted in this line.
+          %1This text is highlighted up to%2 here.
+          All from %1here up to the end of the line is highlighted.
+
+`%2'
+     `%2' is replaced by the ending highlighting sequence respectively
+     the ending marking character that is used for highlighting the
+     actual day.  This attains, that a possibly active highlighting
+     according to the actual day is turned off respectively an ending
+     marking character is produced.  `%2' is used together with the
+     `%1' special text.  The `%2' text has no affect if no preceding
+     `%1' text was found on the line.
+
+`%3'
+     `%3' is replaced by the starting highlighting sequence respectively
+     the starting marking character that is used for highlighting a
+     holiday, (*note Global option `--highlighting=TEXT':
+     x-highlighting.).  This attains, that all succeeding text of the
+     line after this special text is displayed in the same way as the
+     highlighted respectively marked holiday.  `%3' is used together
+     with the `%4' special text, which turns off this enabled
+     highlighting sequence respectively produces the ending marking
+     character.  If a `%3' text is not succeeded by a `%4' text on the
+     line, Gcal automatically inserts such a `%4' text at the end of
+     the line.
+
+     For example:
+
+          Only %3THIS%4 word is highlighted in this line.
+          %3This text is highlighted up to%4 here.
+          All from %3here up to the end of the line is highlighted.
+
+`%4'
+     `%4' is replaced by the ending highlighting sequence respectively
+     the ending marking character that is used for highlighting a
+     holiday.  This attains, that a possibly active highlighting
+     according to a holiday is turned off respectively an ending
+     marking character is produced.  `%4' is used together with the
+     `%3' special text.  The `%4' text has no affect if no preceding
+     `%3' text was found on the line.
+
+`%5'
+     `%5' is replaced by the starting highlighting sequence respectively
+     the starting marking character that is used for highlighting the
+     actual day if a fixed date is on today's date, (*note Global
+     option `--highlighting=TEXT': x-highlighting.).  This attains,
+     that all succeeding text of the line after this special text is
+     displayed in the same way as the highlighted respectively marked
+     actual day.  `%5' is used together with the `%6' special text,
+     which turns off this enabled highlighting sequence respectively
+     produces the ending marking character.  If a `%5' text is not
+     succeeded by a `%6' text on the line, Gcal automatically inserts
+     such a `%6' text at the end of the line.
+
+`%6'
+     `%6' is replaced by the ending highlighting sequence respectively
+     the ending marking character that is used for highlighting the
+     actual day if a fixed date is on today's date.  This attains, that
+     a possibly active highlighting according to the actual day is
+     turned off respectively an ending marking character is produced.
+     `%6' is used together with the `%5' special text.  The `%6' text
+     has no affect if no preceding `%5' text was found on the line.
+
+`%7'
+     `%7' is replaced by the starting highlighting sequence respectively
+     the starting marking character that is used for highlighting a
+     holiday if a fixed date is on a legal holiday date, (*note Global
+     option `--highlighting=TEXT': x-highlighting.).  This attains,
+     that all succeeding text of the line after this special text is
+     displayed in the same way as the highlighted respectively marked
+     holiday.  `%7' is used together with the `%8' special text, which
+     turns off this enabled highlighting sequence respectively produces
+     the ending marking character.  If a `%7' text is not succeeded by
+     a `%8' text on the line, Gcal automatically inserts such a `%8'
+     text at the end of the line.
+
+`%8'
+     `%8' is replaced by the ending highlighting sequence respectively
+     the ending marking character that is used for highlighting a
+     holiday if a fixed date is on a legal holiday date.  This attains,
+     that a possibly active highlighting according to a holiday is
+     turned off respectively an ending marking character is produced.
+     `%8' is used together with the `%7' special text.  The `%8' text
+     has no affect if no preceding `%7' text was found on the line.
+
+`%9'
+     `%9' is replaced by the starting highlighting sequence
+     respectively the starting marking character that is used for
+     highlighting the actual day if a fixed date is on today's date;
+     otherwise `%9' is replaced by the starting highlighting sequence
+     respectively the starting marking character that is used for
+     highlighting a holiday if a fixed date is on a legal holiday date,
+     (*note Global option `--highlighting=TEXT': x-highlighting.).
+     This attains, that all succeeding text of the line after this
+     special text is displayed in the same way as the highlighted
+     respectively marked actual day or holiday.  `%9' is used together
+     with the `%0' special text, which turns off this enabled
+     highlighting sequence respectively produces the ending marking
+     character.  If a `%9' text is not succeeded by a `%0' text on the
+     line, Gcal automatically inserts such a `%0' text at the end of
+     the line.
+
+`%0'
+     `%0' is replaced by the ending highlighting sequence respectively
+     the ending marking character that is used for highlighting the
+     actual day if a fixed date is on today's date; otherwise `%0' is
+     replaced by the ending highlighting sequence respectively the
+     ending marking character that is used for highlighting a holiday
+     if a fixed date is on a legal holiday date.  This attains, that a
+     possibly active highlighting according to today's date or a
+     holiday is turned off respectively an ending marking character is
+     produced.  `%0' is used together with the `%9' special text.  The
+     `%0' text has no affect if no preceding `%9' text was found on the
+     line.
+
+
+File: gcal.info,  Node: Shell Command,  Prev: Replacements,  Up: Special Texts
+
+Shell command `%![ARGUMENT]' special text
+=========================================
+
+  The ARGUMENT which trails `%!' until the end of the line, is passed
+to the shell as a command for further processing.  But before, all text
+variable references and `%?'... special texts for replacing particular
+texts which are given in ARGUMENT are interpreted by Gcal.  *Note Text
+variables::, and *Note `%?'... special texts for text replacement:
+Replacements.  All leading text before the `%!' special text is
+processed by Gcal as usual.  If the simple `--debug' respectively
+`--debug=internal' option is given at program start-up, informational
+messages about the executed command and its _exit code_ will be shown
+on the _standard error channel_ (*note Global option
+`--debug=internal': x-debug-internal.).
+
+  If the `--debug=abort' option is given, the Gcal program will be
+aborted with an error code in case an _exit code_ not equal zero has
+occurred during the execution of the command.  *Note Error Code 2:
+x-2-Error-code, and *Note Global option `--debug=abort': x-debug-abort,
+for further information.
+
+  Use the `--execute-command' option if you want to execute all
+`%![ARGUMENT]' special texts by the shell instead of seeing them
+textually only.  *Note Fixed date option `--execute-command':
+x-execute-command, for more details.
+

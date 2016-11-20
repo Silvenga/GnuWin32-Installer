@@ -1,0 +1,1752 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: About draw commands</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile Draw.html "Gri: About draw commands" "Gri Commands" --> 
+
+<!-- @node   Draw, Draw Arc, Differentiate, List Of Gri Commands -->
+<a name="Draw" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="ListOfGriCommands.html#ListOfGriCommands" shape="rect" coords="516,2,532,24" href="ListOfGriCommands.html#ListOfGriCommands">
+<area alt="Gri: `differentiate' command" shape="rect" coords="557,2,573,24" href="Differentiate.html">
+<area alt="Gri: `end group' command" shape="rect" coords="581,2,599,24" href="EndGroup.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: `end group' command" shape="rect" coords="581,2,599,24" href="EndGroup.html">
+</map>
+<h3>9.3.9: The `<font color="#82140F"><code>draw</code></font>' commands</h3>
+
+<!-- latex: \index{draw} -->
+Draw commands do actual drawing on the page.  You can draw axes,
+lineplots, symbols, contours, images, and text.  
+<p>
+<b>NOTE</b> Gri likes drawings to have axes, so if a `<font color="#82140F"><code>draw</code></font>' command
+is executed before any axes have been drawn, Gri will draw axes after it
+draws the item.  (You can get drawings without axes by preceding any
+other `<font color="#82140F"><code>draw</code></font>' commands with the command `<font color="#82140F"><code>draw axes none</code></font>'.)
+Many users have been surprised by the results of this rule.  For
+example, if you do `<font color="#82140F"><code>set graylevel 0.5</code></font>' before `<font color="#82140F"><code>draw curve</code></font>',
+you'll find that the axes are drawn in gray also.  To avoid this, make
+sure to do `<font color="#82140F"><code>draw axes</code></font>' before you modify the graylevel.)
+<p>
+<UL>
+<LI><a href="Draw.html#DrawArc">Draw Arc</a>: Draw an arc segment
+<LI><a href="Draw.html#DrawArrow">Draw Arrow</a>: Draw single arrow
+<LI><a href="Draw.html#DrawArrows">Draw Arrows</a>: Draw many arrows (using columns)
+<LI><a href="Draw.html#DrawAxesIfNeeded">Draw Axes If Needed</a>: Draw axes if haven't done so yet
+<LI><a href="Draw.html#DrawAxes">Draw Axes</a>: Draw axes
+<LI><a href="Draw.html#DrawBorderBox">Draw Border Box</a>: Draw border around plot
+<LI><a href="Draw.html#DrawBox">Draw Box</a>: Draw a box, possibly filled
+<LI><a href="Draw.html#DrawCircle">Draw Circle</a>: Draw a circle
+<LI><a href="Draw.html#DrawContour">Draw Contour</a>: Draw contour(s)
+<LI><a href="Draw.html#DrawCurve">Draw Curve</a>: Draw a curve of y(x) column data
+<LI><a href="Draw.html#DrawEssay">Draw Essay</a>: Draw text, adjusting position for each line
+<LI><a href="Draw.html#DrawGriLogo">Draw Gri Logo</a>: Draw a Gri logo
+<LI><a href="Draw.html#DrawGrid">Draw Grid</a>: Draw the location of grid points
+<LI><a href="Draw.html#DrawImageHistogram">Draw Image Histogram</a>: Draw histogram of values in image
+<LI><a href="Draw.html#DrawImagePalette">Draw Image Palette</a>: Draw palette used in image plots
+<LI><a href="Draw.html#DrawImage">Draw Image</a>: Draw image
+<LI><a href="Draw.html#DrawIsopycnal">Draw Isopycnal</a>: Draw isopycnal line on TS plot
+<LI><a href="Draw.html#DrawIsospice">Draw Isospice</a>: Draw iso-spice line on TS plot
+<LI><a href="Draw.html#DrawLabelBoxed">Draw Label Boxed</a>: Draw a label in a box
+<LI><a href="Draw.html#DrawLabelWhiteunder">Draw Label Whiteunder</a>: Draw a label with white ink under it
+<LI><a href="Draw.html#DrawLabelForLastCurve">Draw Label For Last Curve</a>: What it says
+<LI><a href="Draw.html#DrawLabel">Draw Label</a>: Draw text somewhere
+<LI><a href="Draw.html#DrawLineFrom">Draw Line From</a>: Draw line segment
+<LI><a href="Draw.html#DrawLineLegend">Draw Line Legend</a>: Draw legend displaying line types
+<LI><a href="Draw.html#DrawLines">Draw Lines</a>: Draw sequence of parallel lines
+<LI><a href="Draw.html#DrawPatches">Draw Patches</a>: Draw grayscale patches showing z(x,y)
+<LI><a href="Draw.html#DrawPolygon">Draw Polygon</a>: Draw a polygon
+<LI><a href="Draw.html#DrawRegressionLine">Draw Regression Line</a>: Draw line from regression between x and y
+<LI><a href="Draw.html#DrawSymbolAt">Draw Symbol At</a>: Draw a symbol at a point
+<LI><a href="Draw.html#DrawSymbolLegend">Draw Symbol Legend</a>: Draw a symbol and a string describing it
+<LI><a href="Draw.html#DrawSymbol">Draw Symbol</a>: Draw symbols at (x,y), or at a point
+<LI><a href="Draw.html#DrawTimeStamp">Draw Time Stamp</a>: Draw a timestamp at top of plot
+<LI><a href="Draw.html#DrawTitle">Draw Title</a>: Draw a title for plot
+<LI><a href="Draw.html#DrawValues">Draw Values</a>: Draw numbers beside z(x,y)
+<LI><a href="Draw.html#DrawXAxis">Draw X Axis</a>: Draw the x axis
+<LI><a href="Draw.html#DrawXBoxPlot">Draw X Box Plot</a>: Draw box plots showing x spread
+<LI><a href="Draw.html#DrawYAxis">Draw Y Axis</a>: Draw the y axis
+<LI><a href="Draw.html#DrawYBoxPlot">Draw Y Box Plot</a>: Draw box plots showing y spread
+<LI><a href="Draw.html#DrawZeroLine">Draw Zero Line</a>: Draw y=0 or x=0
+</UL>
+
+<!-- @node   Draw Arc, Draw Arrow, Draw, Draw -->
+<a name="DrawArc" ></a>
+<h4>9.3.9.1: The `<font color="#82140F"><code>draw arc</code></font>' command</h4>
+
+<!-- latex: \index{draw arc} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw arc [filled] .xc_cm. .yc_cm. .r_cm. .angle_1. .angle_2.'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Draw an "arc", that is, a portion of a circle.  The center of the
+circle is at the coordinate (`<font color="#82140F"><code>.xc_cm.</code></font>', `<font color="#82140F"><code>.yc_cm.</code></font>'), and the
+circle radius is `<font color="#82140F"><code>.r_cm.</code></font>', all three quantities being in cm on
+the page, <em>not</em> in user-units.  The arc starts at angle
+`<font color="#82140F"><code>.angle_1.</code></font>', measured in degrees counterclockwise from a
+horizontal line, and extends to angle `<font color="#82140F"><code>.angle_2.</code></font>', in the same
+units.
+<p>
+If the keyword `<font color="#82140F"><code>filled</code></font>' is present, the arc is filled with the
+current color.  Otherwise it is drawn with the current "curve"
+linewidth see <a href="Set.html#SetLineWidth">Set Line Width</a>.
+<p>
+<!-- @node   Draw Arrow, Draw Arrows, Draw Arc, Draw -->
+<a name="DrawArrow" ></a>
+<h4>9.3.9.2: `<font color="#82140F"><code>draw arrow</code></font>'</h4>
+
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw arrow from .x0. .y0. to .x1. .y1. [cm]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+With no optional parameters, draw an arrow from (`<font color="#82140F"><code>.x0.</code></font>',
+`<font color="#82140F"><code>.y0.</code></font>') to (`<font color="#82140F"><code>.x1.</code></font>', `<font color="#82140F"><code>.y1.</code></font>'), where coordinates are in
+user units.  The arrow head will be at (`<font color="#82140F"><code>.x1.</code></font>', `<font color="#82140F"><code>.y1.</code></font>'), and
+its size is as set by most recent call to `<font color="#82140F"><code>set arrow size</code></font>'.  With
+the `<font color="#82140F"><code>cm</code></font>' keyword present, the coordinates are in centimetres on the
+page.  NOTE: This will not cause auto-drawing of axes.
+<p>
+<!-- @node   Draw Arrows, Draw Axes If Needed, Draw Arrow, Draw -->
+<a name="DrawArrows" ></a>
+<h4>9.3.9.3: `<font color="#82140F"><code>draw arrows</code></font>'</h4>
+
+<!-- latex: \index{draw arrows} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw arrows'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw a vector field consisting of arrows emanating from the coordinates
+stored in the (x, y) columns.  The lengths and orientations of the
+arrows are stored in the (u, v) columns, and the scale for the (u,v)
+columns is set by `<font color="#82140F"><code>set u scale</code></font>' and `<font color="#82140F"><code>set v scale</code></font>'.  <b>See also</b>
+(1) To set arrow size, use `<font color="#82140F"><code>set arrow size</code></font>'.  (2) To get a single
+arrow, use `<font color="#82140F"><code>draw arrow</code></font>'.
+<p>
+
+<!-- @node   Draw Axes If Needed, Draw Axes, Draw Arrows, Draw -->
+<a name="DrawAxesIfNeeded" ></a>
+<!-- latex: \index{draw axes if needed} -->
+<h4>9.3.9.4: `<font color="#82140F"><code>draw axes if needed</code></font>'</h4>
+
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw axes if needed'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw axes frame if required.  Used within gri commands that auto-draw axes.
+NOTE: this should only be done by developers.
+<p>
+
+
+<!-- @node   Draw Axes, Draw Border Box, Draw Axes If Needed, Draw -->
+<a name="DrawAxes" ></a>
+<!-- latex: \index{draw axes} -->
+<h4>9.3.9.5: `<font color="#82140F"><code>draw axes</code></font>'</h4>
+
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw axes [.style.|frame|none]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+With no style (`<font color="#82140F"><code>.style.</code></font>') specified, draw x-y axes frame labelled
+at left and bottom. The value of `<font color="#82140F"><code>.style.</code></font>' determines the style of
+axes: 
+<ul>
+<p>
+<li> `<font color="#82140F"><code>.style. = 0</code></font>'
+Draw x-y axes frame labelled at left and bottom.  Since this is the
+default, it's best to leave it out altogether to make your code easier to
+understand.
+<p>
+<li> `<font color="#82140F"><code>.style. = 1</code></font>'
+Draw axes without tics at top and right
+<p>
+<li> `<font color="#82140F"><code>.style. = 2</code></font>'
+Draw axes frame with no tics or labels; same as `<font color="#82140F"><code>draw axes frame</code></font>'
+</ul>
+<p>
+With the keyword `<font color="#82140F"><code>frame</code></font>' specified, draw axes frame with no tics or
+labels (just like `<font color="#82140F"><code>.style.</code></font>' = 2, but preferable because it makes for
+code that is easier to read and understand).
+<p>
+With the keyword `<font color="#82140F"><code>none</code></font>' specified, prevent Gri from automatically
+drawing axes when drawing curves.
+<p>
+Note: `<font color="#82140F"><code>set axes style</code></font>' can also be used to set axes properties,
+and then simply using `<font color="#82140F"><code>draw axes</code></font>', or letting axes be auto-drawn,
+will result in the desired effect (see <a href="Set.html#SetAxesStyle">Set Axes Style</a>).  However, if
+the `<font color="#82140F"><code>draw axes</code></font>' command explicitly asks for a particular style,
+then it over-rides the style set by `<font color="#82140F"><code>Set Axes Style</code></font>'.
+<p>
+
+<!-- @node   Draw Border Box, Draw Box, Draw Axes, Draw -->
+<a name="DrawBorderBox" ></a>
+<!-- latex: \index{draw border box} -->
+<h4>9.3.9.6: `<font color="#82140F"><code>draw border box</code></font>'</h4>
+
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw border box .xleft. .ybottom. .xright. .ytop. \
+    .width_cm. .brightness.'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw gray box, as decoration or alignment key for pastup. The box, with
+outer lower left corner at (`<font color="#82140F"><code>.xleft.</code></font>', `<font color="#82140F"><code>.ybottom.</code></font>') and outer
+upper right corner at (`<font color="#82140F"><code>.xright</code></font>'., `<font color="#82140F"><code>.ytop.</code></font>') -- both coordinates
+being in centimetres on the page -- is drawn with thickness
+`<font color="#82140F"><code>.width_cm.</code></font>' and with graylevel `<font color="#82140F"><code>.brightness.</code></font>' (0 for black; 1
+for white).  The gray line is drawn inside the box.  After drawing the
+gray line, a thin black line is drawn along the outside edge.
+<p>
+If the geometry is not specified with `<font color="#82140F"><code>.xleft.</code></font>' and the other
+parameters, then a reasonable margin is used around the present axes
+area, and the defaults (`<font color="#82140F"><code>.border.</code></font>' = 0.2, `<font color="#82140F"><code>.brightness.</code></font>' =
+0.75) are used.
+<p>
+NOTE: This command does not cause auto-drawing of axes.
+<p>
+
+<!-- @node   Draw Box, Draw Circle, Draw Border Box, Draw -->
+<a name="DrawBox" ></a>
+<h4>9.3.9.7: `<font color="#82140F"><code>draw box</code></font>'</h4>
+
+<!-- latex: \index{draw box} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw box filled .xleft. .ybottom. .xright. .ytop. [cm|pt]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+ 
+Draw filled box spanning indicated range, with lower-left corner at
+(`<font color="#82140F"><code>.xleft.</code></font>', `<font color="#82140F"><code>.ybottom.</code></font>') and upper-right corner at
+(`<font color="#82140F"><code>.xright.</code></font>', `<font color="#82140F"><code>.ytop.</code></font>').  The corners are specified in user
+coordinates, unless the optional `<font color="#82140F"><code>cm</code></font>' or `<font color="#82140F"><code>pt</code></font>' keyword is
+present, in which case they are in centimetres or points on the page.
+An error will result if you specify user coordinates but they aren't
+defined yet.
+<p>
+No checking is done on the rectangle; for example, there is no
+requirement that `<font color="#82140F"><code>.xleft.</code></font>' be to the left of `<font color="#82140F"><code>.xright.</code></font>' in your
+coordinate system.
+<p>
+NOTE: if the box is specified in user units, this command will cause
+auto-drawing of axes, but not if the box is specified in `<font color="#82140F"><code>cm</code></font>'
+or `<font color="#82140F"><code>pt</code></font>' units
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw box .xleft. .ybottom. .xright. .ytop. [cm|pt]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw box spanning indicated range, with lower-left corner at
+(`<font color="#82140F"><code>.xleft.</code></font>', `<font color="#82140F"><code>.ybottom.)</code></font>' and upper-right corner at (`<font color="#82140F"><code>.xright.</code></font>',
+`<font color="#82140F"><code>.ytop.</code></font>').
+<p>
+The corners are specified in user coordinates, unless the optional
+`<font color="#82140F"><code>cm</code></font>' or `<font color="#82140F"><code>pt</code></font>' keyword is present, in which case they are in
+centimetres or points on the page.  An error will result if you
+specify user coordinates but they aren't defined yet.
+<p>
+No checking is done on the rectangle; for example, there is no
+requirement that `<font color="#82140F"><code>.xleft.</code></font>' be to the left of `<font color="#82140F"><code>.xright.</code></font>' in your
+coordinate system.
+<p>
+
+<!-- @node   Draw Circle, Draw Contour, Draw Box, Draw -->
+<a name="DrawCircle" ></a>
+<h4>9.3.9.8: `<font color="#82140F"><code>draw circle</code></font>'</h4>
+
+<!-- latex: \index{draw circle} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw circle with radius .r_cm. at .x_cm. .y_cm.
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw circle of specified radius (in cm) at the specified
+location (in cm on the page).
+<p>
+
+<!-- @node   Draw Contour, Draw Curve, Draw Circle, Draw -->
+<a name="DrawContour" ></a>
+<h4>9.3.9.9: `<font color="#82140F"><code>draw contour</code></font>'</h4>
+
+<!-- latex: \index{draw contour} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw contour [{.value. \
+  [unlabelled | {labelled "\label"}]} \
+  | {.min. .max. .inc. \
+    [.inc_unlabelled.] [unlabelled]}]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+This command draws contours based on the "grid" data previously read in
+by a `<font color="#82140F"><code>read grid data</code></font>' command or created by gridding column data
+with a `<font color="#82140F"><code>create grid from columns</code></font>' command.  If the grid data don't
+exist, or if the x and y locations of the grid points do not exist (see
+`<font color="#82140F"><code>set x grid</code></font>', `<font color="#82140F"><code>set y grid</code></font>', etc), Gri will complain.
+<p>
+With no optional parameters, draw labelled contours at an interval
+that is picked automatically based on the range of the data.
+     
+With a single numerical value (`<font color="#82140F"><code>.value.</code></font>'), draw the indicated
+contour.  With the addition of `<font color="#82140F"><code>labelled "\label"</code></font>', put the
+indicated label instead of a numeric label.  This can be useful for
+using scientific notation instead of computer notation for exponents,
+e.g.  `<font color="#82140F"><code>draw contour 1e-5 labelled "10$^{-5}$"</code></font>'.
+<p>
+With (`<font color="#82140F"><code>.min.</code></font>', `<font color="#82140F"><code>.max.</code></font>' and `<font color="#82140F"><code>.inc.</code></font>') given, draw
+contours for z(x,y) = `<font color="#82140F"><code>.min.</code></font>', z(x,y) = `<font color="#82140F"><code>.min. + .inc.</code></font>',
+z(x,y) = `<font color="#82140F"><code>.min. + 2*.inc.</code></font>', ..., z(x,y) = `<font color="#82140F"><code>.max.</code></font>'
+<p>
+With the additional value `<font color="#82140F"><code>.inc_unlabelled.</code></font>' specified, extra
+unlabelled contours are drawn at this finer interval.
+<p>
+With the optional parameter `<font color="#82140F"><code>unlabelled</code></font>' at the end of any form
+of this command (except the `<font color="#82140F"><code>labelled "\label"</code></font>' variation, of
+course), Gri will not label the contour(s).
+<p>
+<b>Hint:</b> It can be effective to draw contours at a certain interval
+with labels, and a thicker pen, e.g.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+set line width rapidograph 3x0
+draw contour -2 5 1 0.25
+set line width rapidograph 1
+draw contour -2 5 1
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<b>Interpolation method:</b> The interpolation scheme is the same used for
+converting grid-values to image values (see <a href="Convert.html#ConvertGridToImage">Convert Grid To Image</a>).
+<p>
+<b>See also</b> `<font color="#82140F"><code>set contour labels</code></font>'
+<p>
+
+<!-- @node   Draw Curve, Draw Essay, Draw Contour, Draw -->
+<a name="DrawCurve" ></a>
+<h4>9.3.9.10: `<font color="#82140F"><code>draw curve</code></font>'</h4>
+
+<!-- latex: \index{draw curve} -->
+Several forms exist.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw curve'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draws a curve connecting the points (x,y), which have been read in by a
+command like `<font color="#82140F"><code>read columns x y</code></font>'.  Line segments are drawn between
+all (x,y) points, except: (1) no line segments are drawn to any missing
+data (see `<font color="#82140F"><code>set missing value</code></font>'), and (2) if clipping is turned on
+(see `<font color="#82140F"><code>set clip on</code></font>'), no line segments are drawn outside the
+clipping region.  <b>See also</b> `<font color="#82140F"><code>draw curve overlying</code></font>'
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw curve overlying'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Like `<font color="#82140F"><code>draw curve</code></font>', except that before drawing, the area underneath
+the curve (+/- one linewidth) is whited out.  This clarifies graphs
+where curves overlie other curves or the axes.  
+<b>See also</b> `<font color="#82140F"><code>draw curve</code></font>'.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw curve filled [to {.y. y}|{.x. x}]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+The form `<font color="#82140F"><code>draw curve filled ...</code></font>' draws filled curves.  If the
+`<font color="#82140F"><code>to .value.</code></font>' is not specified, fill the region defined by the x-y points
+using the current paint colour (see `<font color="#82140F"><code>set graylevel</code></font>').  To complete
+the shape, an extra line is drawn between the first and last points.
+<p>
+The form `<font color="#82140F"><code>draw curve filled to .y. y</code></font>' fills the region between y(x)
+and y = `<font color="#82140F"><code>.y.</code></font>'; do not connect the first and last points as in the
+case where `<font color="#82140F"><code>to .yvalue.</code></font>' is not specified.
+<p>
+The form `<font color="#82140F"><code>draw curve filled to .x. x</code></font>' fills the region between x(y)
+and x = `<font color="#82140F"><code>.x.</code></font>'
+<p>
+
+
+
+
+<!-- @node   Draw Essay, Draw Gri Logo, Draw Curve, Draw -->
+<a name="DrawEssay" ></a>
+<h4>9.3.9.11: `<font color="#82140F"><code>draw essay</code></font>'</h4>
+
+<!-- latex: \index{draw essay} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw essay "text"|reset'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw indicated text on the page.  Succeeding calls draw text further and
+further down the page, starting at the top.
+<p>
+The current font size is used; to alter this, use `<font color="#82140F"><code>set font size</code></font>'
+before `<font color="#82140F"><code>draw essay</code></font>'.
+<p>
+When `<font color="#82140F"><code>reset</code></font>' is present instead of text, the drawing position is
+reset to the top of the page.  Use this after a `<font color="#82140F"><code>new page</code></font>' command
+to ensure that the next text lines will appear at the top of the page as
+expected.  EXAMPLE:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+set font size 2 cm
+draw essay "Line 1, at top of page"
+draw essay "Line 2, below top line"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+<!-- @node   Draw Gri Logo, Draw Grid, Draw Essay, Draw -->
+<a name="DrawGriLogo" ></a>
+<h4>9.3.9.12: `<font color="#82140F"><code>draw gri logo</code></font>'</h4>
+
+<!-- latex: \index{draw gri logo} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw gri logo .x_cm. .y_cm. .height_cm. .style. \fgcolor \bgcolor'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw a Gri logo at given location with given style and colors.  The
+lower-left corner of the logo will be `<font color="#82140F"><code>.x_cm.</code></font>' centimeters from the
+left-hand side of the page and `<font color="#82140F"><code>.y_cm.</code></font>' centimeters from the bottom
+of the page.  The logo will be `<font color="#82140F"><code>.height_cm.</code></font>' centimeters tall.  The
+textual parameters `<font color="#82140F"><code>\fgcolor</code></font>' and `<font color="#82140F"><code>\bgcolor</code></font>' give the foreground and
+background colors, respectively, and these are used in styles as noted
+in the table below
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.style.    style
+=======    ===================
+   0       stroke curve
+   1       fill with color \fgcolor, no background
+   2       fill with color \fgcolor it in tight box of color \bgcolor
+   3       as 2 but in square box
+   4       draw in \fgcolor on top of shifted copy in \bgcolor
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+An example is given below
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw gri logo 1 1 3 4 blue green
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<!-- @node   Draw Grid, Draw Image Histogram, Draw Gri Logo, Draw -->
+<a name="DrawGrid" ></a>
+<h4>9.3.9.13: `<font color="#82140F"><code>draw grid</code></font>'</h4>
+
+<!-- latex: \index{draw grid} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw grid'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw plus-signs at locations where grid data are non-missing.
+<p>
+<!-- @node   Draw Image Histogram, Draw Image Palette, Draw Grid, Draw -->
+<a name="DrawImageHistogram" ></a>
+<h4>9.3.9.14: `<font color="#82140F"><code>draw image histogram</code></font>'</h4>
+
+<!-- latex: \index{draw image histogram} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw image histogram \
+  [box .llx_cm. .lly_cm. .urx_cm. .ury_cm.]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+With no optional parameters, draw histogram of all unmasked parts of the
+image, placing it above the current top of the plot.
+<p>
+When the `<font color="#82140F"><code>box</code></font>' options are present, they specify the box (in
+centimetre coordinates on the page) in which the histogram plot is to be
+done.
+<p>
+
+
+<!-- @node   Draw Image Palette, Draw Image, Draw Image Histogram, Draw -->
+<a name="DrawImagePalette" ></a>
+<h4>9.3.9.15: `<font color="#82140F"><code>draw image palette</code></font>'</h4>
+
+<!-- latex: \index{draw image palette} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw image palette 
+   [axisleft|axisright|axistop|axisbottom] 
+   [left .left. right .right. [increment .inc.]] 
+   [box .xleft_cm. .ybottom_cm. .xright_cm. .ytop_cm.]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+With no optional parameters, draw palette for image, placed above the
+current top showing values ranging from `<font color="#82140F"><code>.min_value.</code></font>' to
+`<font color="#82140F"><code>.max_value.</code></font>' as given in `<font color="#82140F"><code>set image range</code></font>'.
+<p>
+Optional keywords (`<font color="#82140F"><code>axisleft</code></font>', etc) control the orientation of the
+palette, the default being `<font color="#82140F"><code>axisbottom</code></font>'.
+<p>
+The optional parameters `<font color="#82140F"><code>.left.</code></font>' and `<font color="#82140F"><code>.right.</code></font>' may be used to
+specify the range to be drawn in the palette.  If the additional
+optional parameter `<font color="#82140F"><code>.inc.</code></font>' is present, it specifies the interval
+between tics on the scale; if not present, the tics are at increments of
+2 * (`<font color="#82140F"><code>.right.</code></font>' - `<font color="#82140F"><code>.left</code></font>'.).  (If `<font color="#82140F"><code>.inc.</code></font>'  has the wrong
+sign, it will be corrected without warning.)
+<p>
+When the optional `<font color="#82140F"><code>box</code></font>' parameters are present, they prescribe the
+bounding box to contain the palette.  The units are centimetres on the
+page.  If these parameters are not present, the box will be drawn above
+the image plot.
+<p>
+<b>Hint</b> It is a good idea to make the palette range `<font color="#82140F"><code>.left.</code></font>' to
+`<font color="#82140F"><code>.right.</code></font>' extend a little beyond the range of full white and full
+black, since otherwise neither pure white nor pure black will appear in
+the colorbar.  For example
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+set image grayscale black 0 white 1 increment 0.1
+draw image palette left -0.1 right 1.1 increment 0.1
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<b>Hint</b> Continuous-tone images with superimposed contours are often
+effective.  To get the contour lines drawn on the image palette, do
+something like this
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw image
+.left.   = 0
+.right.  = 9
+.inc.    = 1
+.space.  = 3
+.height. = 1
+draw image palette left .left. \
+  right .right. \
+  increment .inc. \
+  box \
+    ..xmargin.. \
+    {rpn ..ymargin.. ..ysize.. + .space. + } \
+    {rpn ..xmargin.. ..xsize.. +} \
+    {rpn ..ymargin.. ..ysize.. + .space. + .height. + }
+draw contour .left. .right. .inc. unlabelled
+<p>
+.c. = .left.
+while {rpn .right. .c. &lt;= }
+  .c_cm. = {rpn .c. .left. - \
+   .right. .left. - / \
+    ..xsize.. * ..xmargin.. +}
+  draw line from \
+    .c_cm. \
+    {rpn ..ymargin.. ..ysize.. + .space. + }\
+    to \
+    .c_cm. \
+    {rpn ..ymargin.. ..ysize.. + .space. + .height. +} \
+    cm
+  .c. += 1
+end while
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+<!-- @node   Draw Image, Draw Isopycnal, Draw Image Palette, Draw -->
+<a name="DrawImage" ></a>
+<h4>9.3.9.16: `<font color="#82140F"><code>draw image</code></font>'</h4>
+
+<!-- latex: \index{draw image} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw image'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw black/white image made by `<font color="#82140F"><code>convert grid to image</code></font>' or by
+`<font color="#82140F"><code>read image</code></font>'.
+<p>
+
+<!-- @node   Draw Isopycnal, Draw Isospice, Draw Image, Draw -->
+<a name="DrawIsopycnal" ></a>
+<h4>9.3.9.17: `<font color="#82140F"><code>draw isopycnal</code></font>'</h4>
+
+<!-- latex: \index{draw isopycnal} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw isopycnal \
+   [unlabelled] .density. [.P_sigma. [.P_theta.]]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Draw isopycnal curve for a temperature-salinity diagram.  This curve is
+the locus of temperature and salinity values which yield seawater of the
+indicated density, at the indicated pressure.  The UNESCO equation of
+state is used.
+<p>
+For the results to make sense, the x-axis should be salinity and the
+y-axis should be either in-situ temperature or potential temperature.
+<p>
+The `<font color="#82140F"><code>.density.</code></font>' unit is kg/m^3.  If the supplied value exceeds 100
+then it will be taken to indicate the actual density; otherwise it will
+be taken to indicate density minus 1000 kg/m^3.  (The deciding value of
+100 kg/m^3 was chosen since water never has this density; the more
+intuitive value of 1000 kg/m^3 would be inappropriate since water can
+have that density at some temperatures.)  Thus, 1020 and 20 each
+correspond to an actual density of 1020 kg/m^3.
+<p>
+The reference pressure for density, `<font color="#82140F"><code>.P_sigma.</code></font>', is in decibars
+(roughly corresponding to meters of water depth).  If no value is
+supplied, a pressure of 0 dbar (i.e. atmospheric pressure) is used.
+<p>
+The reference pressure for theta, `<font color="#82140F"><code>.P_theta.</code></font>', is in decibars, and
+defaults to zero (i.e. atmospheric pressure) if not supplied.  This
+option is used if the y-axis is potential temperature referenced to a
+pressure other than the surface.  Normally the potential temperature is,
+however, referenced to the surface, so that specifying a value for
+`<font color="#82140F"><code>.P_theta.</code></font>' is uncommon.
+<p>
+By default, labels will be drawn on the isopycnal curve; this may be
+prevented by supplying the keyword `<font color="#82140F"><code>unlabelled</code></font>'.  If labels are
+drawn, they will be of order 1000, or of order 10 to 30, according to
+the value of `<font color="#82140F"><code>.density.</code></font>' supplied (see above).  The label format
+defaults to "%g" in the C-language format notation, and may be
+controlled by `<font color="#82140F"><code>set contour format</code></font>'.  The label position may be
+controlled by `<font color="#82140F"><code>set contour label position</code></font>' command (bug: only
+non-centered style works).  Setting label position is useful if labels
+collide with data points.  Labels are drawn in the whiteunder mode, so
+they can white-out data below.  For this reason it is common to draw
+data points after drawing isopycnals.
+<p>
+If the y-axis is in-situ temperature, the command should be called
+without specifying `<font color="#82140F"><code>.P_sigma.</code></font>', or, equivalently, with
+`<font color="#82140F"><code>.P_sigma.</code></font>' = 0.  That is, the resultant curve will
+correspond to the (S,T) solution to the equation
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.density. = RHO(S, T, 0)
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+where `<font color="#82140F"><code>RHO=RHO(S,T,p)</code></font>' is the UNESCO equation of state for
+seawater.  This is a curve of constant sigma_T.
+<p>
+If the y-axis is potential temperature referenced to the surface,
+`<font color="#82140F"><code>.P_theta.</code></font>' should not be specified, or should be specified to be
+zero.  The resultant curve corresponds to a constant value of
+potential density referenced to pressure `<font color="#82140F"><code>.P_sigma.</code></font>', i.e. the
+(S,theta) solution to the equation
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.density. = RHO(S, theta, .P_sigma.)
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+For example, with `<font color="#82140F"><code>.P_sigma.=0</code></font>' (the default), the result
+is a curve of constant sigma_theta.
+<p>
+If the y-axis is potential temperature referenced to some pressure other
+than that at the surface, `<font color="#82140F"><code>.P_theta.</code></font>' should be supplied.  The
+resultant curve will be the (S,theta) solution to the equation
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.density. = RHO(S, T', .P_sigma.)
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+where
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+T'=THETA(S, theta, .P_theta., .P_sigma.)
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+where `<font color="#82140F"><code>THETA=THETA(S,T,P,Pref)</code></font>' is the UNESCO formula for potential
+temperature of a water-parcel moved to a reference pressure of
+`<font color="#82140F"><code>Pref</code></font>'.  Note that `<font color="#82140F"><code>theta</code></font>', potential temperature referenced
+to pressure `<font color="#82140F"><code>.P_theta.</code></font>', is the variable assumed to exist on
+the y-axis.
+<p>
+
+
+
+<!-- @node   Draw Isospice, Draw Label Boxed, Draw Isopycnal, Draw -->
+<a name="DrawIsospice" ></a>
+<h4>9.3.9.18: `<font color="#82140F"><code>draw isospice</code></font>'</h4>
+
+<!-- latex: \index{draw isospice} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw isospice .spice. [unlabelled]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw an iso-spice line for a "TS" diagram, using (S, T) data stored in
+files in a subdirectory named `<font color="#82140F"><code>iso-spice0</code></font>' in a directory named by
+the unix environment variable `<font color="#82140F"><code>GRI_EOS_DIR</code></font>'.  You must set this
+environment variable yourself, in the normal unix way.  If
+`<font color="#82140F"><code>GRI_EOS_DIR</code></font>' is not defined, Gri looks in the directory
+`<font color="#82140F"><samp>/data/po/ocean/EOS/iso0</samp></font>'; of course, this will work only
+for people on the same machine as the author.
+<p>
+Only certain iso-spice lines are stored in these files, so only certain
+values of `<font color="#82140F"><code>.spice.</code></font>' are allowed.  They are 21.75, 22.00, 22.25,
+..., 30.75.  You must supply `<font color="#82140F"><code>.density.</code></font>' in exactly this format
+(with 2 decimal places), or else Gri will not find the appropriate TS
+file, and will give a "can't open file" error.  NB: isopycnals ranging
+from about 23.00 to 26.00 cross a TS diagram spanning 34&lt;S&lt;36 and
+0&lt;T&lt;10.
+<p>
+The line is labelled at the right with the density value, unless the
+`<font color="#82140F"><code>unlabelled</code></font>' option is given.
+<p>
+Clipping should be on when drawing iso-spice lines.  A warning will be
+given if the isospice line does not intersect the clipping region.
+<p>
+EXAMPLE
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+set clip on
+draw isospice line 27.00
+draw isospice line 27.50 unlabelled
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+<!-- @node   Draw Label Boxed, Draw Label Whiteunder, Draw Isospice, Draw -->
+<a name="DrawLabelBoxed" ></a>
+<h4>9.3.9.19: `<font color="#82140F"><code>draw label</code></font>'</h4>
+
+<!-- latex: \index{draw label boxed} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw label boxed "string" at .xleft. .ybottom. [cm]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw boxed label for plot, located with lower-left corner at indicated
+(x,y) position (specified in user units or in cm on the page).  The
+current font size and pen color are used.  The geometry derives from the
+current font size, with the label being centered within the box.
+<p>
+
+<!-- @node   Draw Label Whiteunder, Draw Label For Last Curve, Draw Label Boxed, Draw -->
+<a name="DrawLabelWhiteunder" ></a>
+<h4>9.3.9.20: `<font color="#82140F"><code>draw label whiteunder</code></font>'</h4>
+
+<!-- latex: \index{draw label whiteunder} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw label whiteunder "\string" at .xleft. .ybottom. [cm]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw label for plot, located with lower-left corner at indicated (x,y)
+position (specified in user units or in cm on the page).  Whiteout is
+used to clean up the area under the label.  BUGS: Cannot handle angled
+text; doesn't check for super/subscripts.
+<p>
+
+<!-- @node   Draw Label For Last Curve, Draw Label, Draw Label Whiteunder, Draw -->
+<a name="DrawLabelForLastCurve" ></a>
+<h4>9.3.9.21: `<font color="#82140F"><code>draw label for last curve</code></font>'</h4>
+
+<!-- latex: \index{draw label for last curve} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw label for last curve "label"'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw a label for the last curve drawn, using the `<font color="#82140F"><code>..xlast..</code></font>' and
+`<font color="#82140F"><code>..ylast..</code></font>' built-in variables.
+<p>
+
+<!-- @node   Draw Label, Draw Line From, Draw Label For Last Curve, Draw -->
+<a name="DrawLabel" ></a>
+<h4>9.3.9.22: `<font color="#82140F"><code>draw label</code></font>'</h4>
+
+<!-- latex: \index{draw label} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw label "\string" [centered|rightjustified] \
+    at .x. .y. [cm|pt] \
+    [rotated .deg.]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+With no optional parameters, draw string at given location in USER units.
+<p>
+With the `<font color="#82140F"><code>cm</code></font>' or `<font color="#82140F"><code>pt</code></font>' keyword is present, the location is in
+centimetres or points on the page.
+<p>
+With the `<font color="#82140F"><code>rotated</code></font>' keyword present, the angle in degrees from the
+horizontal, measured positive in the counterclockwise direction, is
+given.
+<p>
+With the keyword `<font color="#82140F"><code>centered</code></font>' present, the text is centered at the
+given location; similarly the keyword `<font color="#82140F"><code>rightjustified</code></font>' makes the
+text end at the given location.
+<p>
+
+
+<!-- @node   Draw Line From, Draw Line Legend, Draw Label, Draw -->
+<a name="DrawLineFrom" ></a>
+<h4>9.3.9.23: `<font color="#82140F"><code>draw line from ... to</code></font>'</h4>
+
+<!-- latex: \index{draw line} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw line from .x0. .y0. to .x1. .y1. [cm|pt]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+With no optional parameters, draw a line from (`<font color="#82140F"><code>.x0.</code></font>',
+`<font color="#82140F"><code>.y0.</code></font>')  to (`<font color="#82140F"><code>.x1.</code></font>', `<font color="#82140F"><code>.y1</code></font>'.), where coordinates are in
+user units.  With the `<font color="#82140F"><code>cm</code></font>' or `<font color="#82140F"><code>pt</code></font>' keyword present, the
+coordinates are in centimetres or points on the page.  NOTE: This will
+not cause auto-drawing of axes.
+<p>
+
+
+<!-- @node   Draw Line Legend, Draw Lines, Draw Line From, Draw -->
+<a name="DrawLineLegend" ></a>
+<h4>9.3.9.24: `<font color="#82140F"><code>draw line legend</code></font>'</h4>
+
+<!-- latex: \index{draw line legend} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw line legend "label" at .x. .y. [cm] [length .cm.]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw a legend identifying the current line type with the given label.  A
+short horizontal line is drawn starting at the location (`.x.',
+`<font color="#82140F"><code>.y.</code></font>'), which may be specified in centimetres or, the default, in
+user coordinates.  The line length is normally 1 cm, but this length can
+be set by the last option.  The indicated label string is drawn 0.25 cm
+to the right of the line.
+     
+<b>See also</b> `<font color="#82140F"><code>draw symbol legend ...</code></font>'.
+     
+EXAMPLE (of keeping track of the desired location for the legend)
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.offset. = 1                    # cm to offset legends
+# ... get salinity data
+set line width 0.25
+draw curve
+draw line legend "Salinity" at .x. .y. 
+# ... get temperature data
+set line width 1.0
+set dash 0.45 0.05
+draw curve
+.y. += .offset.
+draw line legend "Temperature" at .x. .y.
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+<!-- @node   Draw Lines, Draw Patches, Draw Line Legend, Draw -->
+<a name="DrawLines" ></a>
+<h4>9.3.9.25: `<font color="#82140F"><code>draw lines</code></font>'</h4>
+
+<!-- latex: \index{draw lines} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw lines {vertically .left. .right. .inc.} | \
+    {horizontally .bottom. .top. .inc.}'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw several lines, either vertically or horizontally.  This can be
+useful in drawing gridlines for axes, etc.  The following example shows
+how to draw thin gray lines extending from the labelled tics on the x
+axis (ie, at 0, 0.1, 0.2, ... 1):
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+set x axis 0 1 0.1 0.05
+set y axis 10 20 10
+draw axes
+set graylevel 0.75
+set line width 0.5
+draw lines vertically 0 1 0.1
+set graylevel 0
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+
+
+<!-- @node   Draw Patches, Draw Polygon, Draw Lines, Draw -->
+<a name="DrawPatches" ></a>
+<h4>9.3.9.26: `<font color="#82140F"><code>draw patches</code></font>'</h4>
+
+<!-- latex: \index{draw patches} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw patches .width. .height. [cm]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+With the optional `<font color="#82140F"><code>cm</code></font>' keyword not present, draw column data z(x,y)
+as gray patches according to the grayscale as set by most recent
+`<font color="#82140F"><code>set image grayscale</code></font>'.  The patches are aligned along the
+horizontal, and have the indicated size in user units.
+<p>
+With the optional keyword `<font color="#82140F"><code>cm</code></font>' is present, the patch size is
+specified in centimetres.
+<p>
+
+
+
+<!-- @node   Draw Polygon, Draw Regression Line, Draw Patches, Draw -->
+<a name="DrawPolygon" ></a>
+<h4>9.3.9.27: `<font color="#82140F"><code>draw polygon</code></font>'</h4>
+
+<!-- latex: \index{draw polygon} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw polygon [filled] .x0. .y0. .x1. .y1. [other pairs] [user|cm|pt]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw a polygon connecting the indicated points, specified in user
+units.  The last point is joined to the first by a line segment.  At
+least two points must be specified.  If the `<font color="#82140F"><code>filled</code></font>' keyword is
+present, the polygon is filled with the current pen color.  If no unit
+is given, user units are used.
+<p>
+
+<!-- @node   Draw Regression Line, Draw Symbol At, Draw Polygon, Draw -->
+<a name="DrawRegressionLine" ></a>
+<h4>9.3.9.28: `<font color="#82140F"><code>draw regression line</code></font>'</h4>
+
+<!-- latex: \index{draw regression line} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw regression line [clipped]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Fit and draw a regression line to column data, of the form
+ `<font color="#82140F"><code>y = ..coeff0.. + ..coeff1.. * x</code></font>', exporting `<font color="#82140F"><code>..coeff0..</code></font>',
+`<font color="#82140F"><code>..coeff0_sig..</code></font>', `<font color="#82140F"><code>..coeff1..</code></font>'  and `<font color="#82140F"><code>..coeff1_sig..</code></font>'  as
+global variables (see <a href="Regress.html#Regress">Regress</a>).
+<p>
+
+Normally, the line is not clipped to the axes frame, but it will be if
+the keyword `<font color="#82140F"><code>clipped</code></font>' is given.
+<p>
+
+HINT: to label the plot you might do the following:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+sprintf \label "y = %f + %f * x. R$^2$=%f" \
+  ..coeff0.. ..coeff1.. ..R2..
+draw title "The linear fit is \label"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+     
+<p>
+
+<!-- @node   Draw Symbol At, Draw Symbol Legend, Draw Regression Line, Draw -->
+<a name="DrawSymbolAt" ></a>
+<h4>9.3.9.29: `<font color="#82140F"><code>draw symbol ... at</code></font>'</h4>
+
+<!-- latex: \index{draw symbol at} -->
+
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw symbol .code.|\name at .x. .y. [cm|pt]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw a symbol at given (single) location.  The location is normally in
+user coordinates; it will be in centimetres on the page if the optional
+`<font color="#82140F"><code>cm</code></font>' or `<font color="#82140F"><code>pt</code></font>' keyword is given.
+<p>
+With the optional numerical/name code specified, then the symbol of
+that number or name is drawn at each (x,y) datum, whether or not a
+z-column exists.  The numerical/name codes are:
+<p>
+<center><IMG SRC="./resources/symbols.gif" ALT="Symbols in gri"></center> 
+<p> 
+
+
+
+<!-- @node   Draw Symbol Legend, Draw Symbol, Draw Symbol At, Draw -->
+<a name="DrawSymbolLegend" ></a>
+<h4>9.3.9.30: `<font color="#82140F"><code>draw symbol legend</code></font>'</h4>
+
+<!-- latex: \index{draw symbol legend} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw symbol legend \symbol_name "label" \
+    at .x. .y. [cm]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw indicated symbol at indicated location, with the indicated label
+beside it.  The label is drawn one M-space to the right of the symbol,
+vertically centered on the indicated `<font color="#82140F"><code>.y.</code></font>' location.
+<p>
+
+
+<!-- @node   Draw Symbol, Draw Time Stamp, Draw Symbol Legend, Draw -->
+<a name="DrawSymbol" ></a>
+<h4>9.3.9.31: `<font color="#82140F"><code>draw symbol</code></font>'</h4>
+
+<!-- latex: \index{draw symbol} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw symbol [[.code.|\name]    \
+    | [graylevel z]             \
+      [color [hue z|.h.]        \
+             [brightness .b.]   \
+             [saturation .s.]]]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+With no optional parameters, draw symbols at the (x,y) data.  If a
+z-column has been read with `<font color="#82140F"><code>read columns</code></font>', then its value codes
+the symbol to draw, according to the table below.  (The value of z is
+first rounded to the nearest integer.)  If no z-column has been read,
+the symbol X is drawn at each datum.
+<p>
+With the optional numerical/name code specified, then the symbol of
+that number or name is drawn at each (x,y) datum, whether or not a
+z-column exists.  The numerical/name codes are:
+<center><IMG SRC="./resources/symbols.gif" ALT="Symbols in Gri"></center> 
+<p> 
+<p>
+
+With the optional `<font color="#82140F"><code>graylevel z</code></font>' fields specified, the graylevel is
+given by the `<font color="#82140F"><code>z</code></font>' column (0=black, 1=white).
+<p>
+With the optional `<font color="#82140F"><code>color</code></font>' field specified, the color is
+specified, either directly in the command (the `<font color="#82140F"><code>hue .h.</code></font>' form) or
+in the z column.  For more information on color, refer to the 
+`<font color="#82140F"><code>set color hsb ...</code></font>' command.
+<p>
+Examples: both `<font color="#82140F"><code>draw symbol bullet color</code></font>' and 
+`<font color="#82140F"><code>draw symbol bullet color hue z</code></font>' draw bullets whose hue is given by
+the value in the z column.  The hue (or the color, in other words)
+blends smoothly across the spectrum as the numerical value ranges from 0
+to 1.  The value 0yields red, 1/3 yields green, 2/3 yields blue, etc.
+If the `<font color="#82140F"><code>brightness</code></font>' and the `<font color="#82140F"><code>saturation</code></font>' are not specified,
+they both default to the value 1, which yields pure, bright colors.
+<p>
+Example: draw all in green dots
+`<font color="#82140F"><code>draw symbol bullet color hue 0.333 brightness 1 saturation 1</code></font>'
+<p>
+
+Example: display spectrum of dots
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+set symbol size 0.3
+open "awk 'END{ \
+    for(c=0;c&lt;1;c+=1/40) \
+        print(c,c,c)}' | "
+read columns x y z
+close
+draw symbol bullet color hue z
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+
+
+<!-- @node   Draw Time Stamp, Draw Title, Draw Symbol, Draw -->
+<a name="DrawTimeStamp" ></a>
+<h4>9.3.9.32: `<font color="#82140F"><code>draw time stamp</code></font>'</h4>
+
+<!-- latex: \index{draw times stamp} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw time stamp \
+    [fontsize .points. \
+        [at .x_cm. .y_cm. cm \
+            [with angle .deg.]]]'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw the command-file name, PostScript file name, and time, at the top
+of graph.  Normally, the timestamp is drawn at the top of the page, in a
+fontsize of 10 points.  But the user can specify the fontsize, and
+additionally the location (in cm) and additionally the angle measured in
+degrees anticlockwise from the horizontal.
+<p>
+NOTE: If you want to have the plot drawn in landscape mode, ensure
+that `<font color="#82140F"><code>set page landscape</code></font>' precedes `<font color="#82140F"><code>draw time stamp.</code></font>'
+<p>
+
+
+<!-- @node   Draw Title, Draw Values, Draw Time Stamp, Draw -->
+<a name="DrawTitle" ></a>
+<h4>9.3.9.33: `<font color="#82140F"><code>draw title</code></font>'</h4>
+
+<!-- latex: \index{draw title} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`draw title "\string"'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw the indicated string above the plot.
+<p>
+
+
+<!-- @node   Draw Values, Draw X Axis, Draw Title, Draw -->
+<a name="DrawValues" ></a>
+<h4>9.3.9.34: `<font color="#82140F"><code>draw values</code></font>'</h4>
+
+<!-- latex: \index{draw values} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw values                 \
+    [.dx. .dy.]             \
+    [\format]               \
+    [separation .xcm. .ycm.]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw values of `<font color="#82140F"><code>z</code></font>' column, at corresponding (`<font color="#82140F"><code>x</code></font>', `<font color="#82140F"><code>y</code></font>')
+locations.  If the `<font color="#82140F"><code>separation</code></font>' keyword is present, the distance
+between successive points is checked, and points are skipped unless the
+x and y separations exceed the indicated distances.
+<p>
+<ul>
+<p>
+<li> `<font color="#82140F"><code>draw values</code></font>'
+Draw the values of `<font color="#82140F"><code>z(x,y)</code></font>', positioned 1/2 M-space to the right of
+`<font color="#82140F"><code>(x,y)</code></font>' and vertically centred on `<font color="#82140F"><code>y</code></font>'.  The values are written
+in a good general format known as `<font color="#82140F"><code>%lg</code></font>', in C terminology.
+<p>
+<li> `<font color="#82140F"><code>draw values %.2f</code></font>'
+Draw values of `<font color="#82140F"><code>z(x,y)</code></font>' positioned as described above, but using
+the indicated format string.  This format string specifies that 2
+numbers be used after the decimal place, and that floating point should
+be used.  See any C manual for format codes.
+<p>
+<li> `<font color="#82140F"><code>draw values .dx. .dy.</code></font>'
+Print values of `<font color="#82140F"><code>z(x,y)</code></font>' at indicated offset vector
+(`<font color="#82140F"><code>.dx.</code></font>',`<font color="#82140F"><code>.dy.</code></font>'), measured in centimeters, from the values of
+`<font color="#82140F"><code>(x,y)</code></font>' at which the data are defined.
+<p>
+<li> `<font color="#82140F"><code>draw values .dx. .dy. %.3f</code></font>'
+Print values of `<font color="#82140F"><code>z(x,y)</code></font>' at indicated distance from `<font color="#82140F"><code>(x,y)</code></font>',
+indicated format.
+</ul>
+<p>
+
+
+<!-- @node   Draw X Axis, Draw X Box Plot, Draw Values, Draw -->
+<a name="DrawXAxis" ></a>
+<h4>9.3.9.35: `<font color="#82140F"><code>draw x axis</code></font>'</h4>
+
+<!-- latex: \index{draw x axis} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw x axis [at bottom|top|{.y. [cm]} [lower|upper]]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw an x axis, optionally at a specified location and of a specified
+style.
+<ul>
+<p>
+<li> `<font color="#82140F"><code>draw x axis</code></font>'
+Draw a lower x axis (ie, one with the numbers below the line) at the
+bottom of the box defined by `<font color="#82140F"><code>set y axis</code></font>'.
+<p>
+<li> `<font color="#82140F"><code>draw x axis at bottom</code></font>'
+Draw a lower x axis (ie, one with the numbers below the line) at the
+bottom of the box defined by `<font color="#82140F"><code>set y axis</code></font>'.
+<p>
+<li> `<font color="#82140F"><code>draw x axis at top</code></font>'
+Draw an upper x axis (ie, one with the numbers above the line) at the
+top of the box defined by `<font color="#82140F"><code>set y axis</code></font>' (or above any existing
+stacked x axes there)
+<p>
+<li> `<font color="#82140F"><code>draw x axis at .y.</code></font>'
+Draw a lower x axis at indicated value of `<font color="#82140F"><code>.y.</code></font>'.
+<p>
+<li> `<font color="#82140F"><code>draw x axis at .y. upper</code></font>'
+Draw an upper x axis at indicated value of .y.
+</ul>
+<p>
+
+
+<!-- @node   Draw X Box Plot, Draw Y Axis, Draw X Axis, Draw -->
+<a name="DrawXBoxPlot" ></a>
+<h4>9.3.9.36: `<font color="#82140F"><code>draw x box plot</code></font>'</h4>
+
+<!-- latex: \index{draw x box plot} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw x box plot at .y. [size .cm.]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw Tukey box plots (which give a summary of histogram properties).
+Box plots were invented by Tukey for eda (exploratory data analysis).
+The centre of the box is the median.  The box edges show the first
+quartile (q1) and the third quartile (q3).  The distance from q3 to q1
+is called the inter-quartile range.  The whiskers (i.e., the lines with
+crosses at the end) extend from q1 and q3 to the furthest data points
+which are still within a distance of 1.5 inter-quartile ranges from q1
+and q3.  Beyond the whiskers, all outliers are shown: open circles are
+used for data within a distance of 3 inter-quartile ranges beyond q1 and
+q3, and in closed circles beyond that.
+<p>
+
+
+
+<ul>
+<p>
+<li> `<font color="#82140F"><code>draw x box plot at .y.</code></font>'
+Draw Tukey's box plot, spreading in the x direction, centered at
+y=`<font color="#82140F"><code>.y.</code></font>' and of default width 0.5 cm.
+<p>
+<li> `<font color="#82140F"><code>draw x box plot at .y. size .cm.</code></font>'
+Draw Tukey's box plot, spreading in the x direction, centered at
+y=`<font color="#82140F"><code>.y.</code></font>' and of width `<font color="#82140F"><code>.cm.</code></font>' centimetres.
+</ul>
+<p>
+
+
+<!-- @node   Draw Y Axis, Draw Y Box Plot, Draw X Box Plot, Draw -->
+<a name="DrawYAxis" ></a>
+<h4>9.3.9.37: `<font color="#82140F"><code>draw y axis</code></font>'</h4>
+
+<!-- latex: \index{draw y axis} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw y axis [at left|right|{.x. cm} [left|right]]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw a y axis, optionally at a specified location and of a specified
+style.
+<p>
+<ul>
+<p>
+<li> `<font color="#82140F"><code>draw y axis</code></font>'
+Draw a left-hand-side y axis (ie, one with the numbers to the left of
+the line) at left of box defined by `set x axis'
+<p>
+<li> `<font color="#82140F"><code>draw y axis at left</code></font>'
+Draw a left-hand-side y axis (ie, one with the numbers to the left of
+the line) at left of box defined by `<font color="#82140F"><code>set x axis</code></font>'.
+<p>
+<li> `<font color="#82140F"><code>draw y axis at right</code></font>'
+Draw a right-hand-side y axis (ie, one with the numbers to the right of
+the line) at right of box defined by `<font color="#82140F"><code>set x axis</code></font>'.
+<p>
+<li> `<font color="#82140F"><code>draw y axis at .x.</code></font>'
+Draw a left-hand-side y axis (ie, one with the numbers to the left of
+the line) at indicated value of `<font color="#82140F"><code>.x.</code></font>'
+<p>
+<li> `<font color="#82140F"><code>draw y axis at .x. right</code></font>'
+Draw a right-hand-side y axis (ie, one with the numbers to the right of
+the line) at indicated value of `<font color="#82140F"><code>.x.</code></font>'
+</ul>
+<p>
+
+
+<!-- @node   Draw Y Box Plot, Draw Zero Line, Draw Y Axis, Draw -->
+<a name="DrawYBoxPlot" ></a>
+<h4>9.3.9.38: `<font color="#82140F"><code>draw y box plot</code></font>'</h4>
+
+<!-- latex: \index{draw y box plot} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw y box plot at .x. [size .cm]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw Tukey box plots (which give summary of histogram properties).
+<ul>
+<p>
+<li> `<font color="#82140F"><code>draw y box plot at .x.</code></font>'
+Draw Tukey's box plot, spreading in the y direction, centered at
+x=`<font color="#82140F"><code>.x.</code></font>' and of default width 0.5 cm.
+<p>
+<li> `<font color="#82140F"><code>draw y box plot at .x. size .cm.</code></font>'
+Draw Tukey's box plot, spreading in the y direction, centered at
+x=`<font color="#82140F"><code>.x.</code></font>' and of width `<font color="#82140F"><code>.cm.</code></font>' centimetres.
+</ul>
+<p>
+
+
+<!-- @node   Draw Zero Line, End Group, Draw Y Box Plot, Draw -->
+<a name="DrawZeroLine" ></a>
+<h4>9.3.9.39: `<font color="#82140F"><code>draw zero line</code></font>'</h4>
+
+<!-- latex: \index{draw zero line} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw zero line [horizontally|vertically]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Draw lines corresponding to x=0 or y=0.
+<ul>
+<p>
+<li> `<font color="#82140F"><code>draw zero line</code></font>'
+Draw line y=0 if it is within axes.
+<p>
+<li> `<font color="#82140F"><code>draw zero line horizontally</code></font>'
+Draw line y=0 if it is within axes.
+<p>
+<li> `<font color="#82140F"><code>draw zero line vertically</code></font>'
+Draw line x=0 if it is within axes.
+</ul>
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

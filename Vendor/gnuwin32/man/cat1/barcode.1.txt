@@ -1,0 +1,486 @@
+BARCODE(1)                        GNU barcode                       BARCODE(1)
+
+
+
+NAME
+       barcode  -  a  stand  alone  program  to run the barcode
+       library
+
+SYNOPSIS
+       barcode [-b - | string] [-e encoding] [-o - | outfile] [
+       other-flags ]
+
+DESCRIPTION
+       The  information  below  is  extracted  from the texinfo
+       file, which is the preferred source of information.
+
+       The barcode program is a front-end to access  some  fea-
+       tures  of the library from the command line.  It is able
+       to read user supplied strings from the command line or a
+       data  file (standard input by default) and encode all of
+       them.
+
+
+
+OPTIONS
+       barcode accepts the following options:
+
+       --help or -h
+              Print a usage summary and exit.
+
+       -i filename
+              Identify a file where strings to be  encoded  are
+              read  from. If missing (and if -b is not used) it
+              defaults to standard input. Each data line of the
+              input  file  will  be  used to create one barcode
+              output.
+
+       -o filename
+              Output file. It defaults to standard output.
+
+       -b string
+              Specify  a  single  ``barcode''  string   to   be
+              encoded.   The  option can be used multiple times
+              in order to encode multiple  strings  (this  will
+              result in multi-page postscript output or a table
+              of barcodes if -t  is  specified).   The  strings
+              must  match  the  encoding  chosen; if it doesn't
+              match the program will print a warning to  stderr
+              and generate ``blank'' output (although not zero-
+              length).  Please note  that  a  string  including
+              spaces  or other special characters must be prop-
+              erly quoted.
+
+       -e encoding
+              encoding is the name of the chosen encoding  for-
+              mat  being  used. It defaults to the value of the
+              environment variable BARCODE_ENCODING or to  auto
+              detection if the environment is also unset.
+
+       -g geometry
+              The geometry argument is of the form ``[<width> x
+              <height>] [+ <xmargin> +  <ymargin>]''  (with  no
+              intervening  spaces).  Unspecified  margin values
+              will  result  in  no  margin;  unspecified   size
+              results  in  default  size.  The specified values
+              represent print points by  default,  and  can  be
+              inches,  millimeters  or other units according to
+              the -u option  or  the  BARCODE_UNIT  environment
+              variable.   The  argument  is  used  to place the
+              printout  code  on  the  page.   Note   that   an
+              additional  white margin of 10 points is added to
+              the printout. If the option is unspecified,  BAR-
+              CODE_GEOMETRY is looked up in the environment, if
+              missing a default size and  no  margin  (but  the
+              default 10 points) are used.
+
+       -t table-geometry
+              Used  to print several barcodes to a single page,
+              this option is meant to be used to  print  stick-
+              ers.  The  argument  is of the form ``<columns> x
+              <lines>  [+  <leftmargin>  +  <bottommargin>   [-
+              <rightmargin> [- <topmargin>]]]'' (with no inter-
+              vening spaces); if missing,  the  top  and  right
+              margin  will default to be the same as the bottom
+              and left margin. The  margins  are  specified  in
+              print  points  or  in  the  chosen  unit  (see -u
+              below).  If the option  is  not  specified,  BAR-
+              CODE_TABLE  is looked up in the environment, oth-
+              erwise no table is printed and each barcode  will
+              get  its  own  page.  The size (but not the posi-
+              tion) of a barcode item within a table  can  also
+              be  selected  using  -g  (see  "geometry" above),
+              without struggling  with  external  and  internal
+              margins.   I still think management of geometries
+              in a table is suboptimal, but  I  can't  make  it
+              better without introducing incompatibilities.
+
+       -m margin(s)
+              Specifies  an internal margin for each sticker in
+              the table. The argument is of the  form  ``<xmar-
+              gin>,<ymargin>''  and  the margin is applied sym-
+              metrically to the sticker.  If  unspecified,  the
+              environment  variable BARCODE_MARGIN is used or a
+              default internal margin of 10 points is used.
+
+       -n     ``Numeric'' output: don't print the ASCII form of
+              the code, only the bars.
+
+       -c     No  checksum  character (for encodings that allow
+              it, like code 39, other codes, like UPC  or  EAN,
+              ignore this option).
+
+       -E     Encapsulated   postscript   (default   is  normal
+              postscript). When the output is generated as  EPS
+              only one barcode is encoded.
+
+       -P     PCL output. Please note that the Y direction goes
+              from top to bottom for PCL, and the origin for an
+              image  is the top-left corner instead of the bot-
+              tom-left
+
+       -p pagesize
+              Specify a non-default page size.  The  page  size
+              can  be specified in millimeters, inches or plain
+              numbers (for  example:  "210x297mm",  "8.5x11in",
+              "595x842").  A page specification as numbers will
+              be interpreted  according  to  the  current  unit
+              specification  (see  -u  below).  If  libpaper is
+              available, you can also  specify  the  page  size
+              with its name, like "A3" or "letter" (libpaper is
+              a standard component of Debian GNU/Linux, but may
+              be  missing  elsewhere). The default page size is
+              your system-wide default if libpaper is there, A4
+              otherwise.
+
+       -u unit
+              Choose  the  unit  used  in  size specifications.
+              Accepted values are ``mm'',  ``cm'',  ``in''  and
+              ``pt''.  By  default, the program will check BAR-
+              CODE_UNIT in the environment, and  assume  points
+              otherwise (this behaviour is compatible with 0.92
+              and previous versions. If -u  appears  more  than
+              once,  each  instance will modified the behaviour
+              for the arguments at its right,  as  the  command
+              line  is  processes  left  to  right. The program
+              internally works with points,  and  any  size  is
+              approximated  to  the  nearest  multiple  of  one
+              point. The -u option  affect  -g  (geometry),  -t
+              (table) and -p (page size).
+
+
+
+ENCODING TYPES
+       The  program  encodes  text strings passed either on the
+       command line (with -b) or retrieved from standard input.
+       The  text representation is interpreted according to the
+       following rules. When auto-detection of the encoding  is
+       enabled  (i.e,  no explicit encoding type is specified),
+       the encoding types are scanned  to  find  one  that  can
+       digest the text string.  The following list of supported
+       types is sorted in the same order the library uses  when
+       auto-detecting a suitable encoding for a string.
+
+       EAN    The  EAN  frontend  is similar to UPC; it accepts
+              strings of  digits,  12  or  7  characters  long.
+              Strings of 13 or 8 characters are accepted if the
+              provided checksum digit  is  correct.   I  expect
+              most  users  to  feed  input  without a checksum,
+              though.  The  add-2  and  add-5   extension   are
+              accepted for both the EAN-13 and the EAN-8 encod-
+              ings.  The following are example of  valid  input
+              strings:        ``123456789012''        (EAN-13),
+              ``1234567890128''    (EAN-13    wih    checksum),
+              ``1234567''  (EAN-8),  ``12345670  12345'' (EAN-8
+              with checksum  and  add-5),  ``123456789012  12''
+              (EAN-13   with   add-2),  ``123456789012  12345''
+              (EAN-13 with add-5).
+
+       UPC    The UPC frontend accepts only strings made up  of
+              digits  (and, if a supplemental encoding is used,
+              a blank to separate it).  It accepts  strings  of
+              11  or  12  digits (UPC-A) and 6 or 7 or 8 digits
+              (UPC-E).
+
+
+       The 12th digit of UPC-A is the checksum and is added  by
+       the  library  if  not  specified  in the input; if it is
+       specified, it must be the right checksum or the code  is
+       rejected  as invalid.  For UPC-E, 6 digit are considered
+       to be the middle part  of  the  code,  a  leading  0  is
+       assumed  and  the checksum is added; 7 digits are either
+       considered the initial  part  (leading  digit  0  or  1,
+       checksum missing) or the final part (checksum specified,
+       leading 0 assumed); 8 digits are considered  to  be  the
+       complete  code,  with  leading 0 or 1 and checksum.  For
+       both UPC-A and UPC-E, a trailing string of 2 digits or 5
+       digits is accepted as well. Therefore, the following are
+       examples of valid strings that can be  encoded  as  UPC:
+       ``01234567890''  (UPC-A)  ``012345678905''  (UPC-A  with
+       checksum), ``012345'' (UPC-E), ``01234567890 12''  (UPC-
+       A,  add-2)  and  ``01234567890  12345''  (UPC-A, add-5),
+       ``0123456 12'' (UPC-E, add-2).  Please  note  that  when
+       setting  BARCODE_ANY  to  auto-detect the encoding to be
+       used, 12-digit strings and 7-digit strings  will  always
+       be identified as EAN. This because I expect most user to
+       provide input without a checksum. If you need to specify
+       UPC-with-checksum  as input you must explicitly set BAR-
+       CODE_UPC as a flag or use -e upc on the command line.
+
+       ISBN   ISBN numbers are encoded as EAN-13 symbols,  with
+              an  optional  add-5 trailer. The ISBN frontend of
+              the library accepts real ISBN numbers  and  deals
+              with  any hyphen and, if present, the ISBN check-
+              sum character before encoding data. Valid  repre-
+              sentations  for  ISBN  strings  are  for example:
+              ``1-56592-292-1'',     ``3-89721-122-X''      and
+              ``3-89721-122-X 06900}''.
+
+       code 128-B
+              This  encoding  can represent all of the printing
+              ASCII characters, from  the  space  (32)  to  DEL
+              (127).  The  checksum  digit is mandatory in this
+              encoding.
+
+       code 128-C
+              The ``C'' variation  of  Code-128  uses  Code-128
+              symbols   to  represent  two  digits  at  a  time
+              (Code-128 is made up of 104 symbols whose  inter-
+              pretation is controlled by the start symbol being
+              used). Code 128-C is thus the most compact way to
+              represent  any even number of digits. The encoder
+              refuses to deal with  an  odd  number  of  digits
+              because  the caller is expected to provide proper
+              padding to  an  even  number  of  digits.  (Since
+              Code-128   includes  control  symbols  to  switch
+              charset, it is theoretically possible  to  repre-
+              sent  the odd digit as a Code 128-A or 128-B sym-
+              bol, but this tool  doesn't  currently  implement
+              this option).
+
+       code 128 raw
+              Code-128  output  represented symbol-by-symbol in
+              the input string.  To override part of the  prob-
+              lems  outlined  below  in specifying code128 sym-
+              bols, this pseudo-encoding  allows  the  used  to
+              specify  a  list  of code128 symbols separated by
+              spaces. Each symbol is represented by a number in
+              the  range  0-105.   The  list should include the
+              leading character.The checksum and the stop char-
+              acter  are  automatically  added  by the library.
+              Most likely this  pseudo-encoding  will  be  used
+              with  BARCODE_NO_ASCII  and some external program
+              to supply the printed text.
+
+       code 39
+              The code-39 standard can  encode  uppercase  let-
+              ters,  digits, the blank space, plus, minus, dot,
+              star, dollar, slash, percent.  Any string that is
+              only  composed  of such characters is accepted by
+              the code-39 encoder. To  avoid  loosing  informa-
+              tion,  the  encoder  refuses to encode mixed-case
+              strings  (a  lowercase  string   is   nonetheless
+              accepted  as a shortcut, but is encoded as upper-
+              case).
+
+       interleaved 2 of 5
+              This encoding can only represent an  even  number
+              of  digits  (odd  digits are represented by bars,
+              and even digits by the interleaving spaces).  The
+              name stresses the fact that two of the five items
+              (bars or spaces) allocated  to  each  symbol  are
+              wide,  while  the  rest  are narrow. The checksum
+              digit is  optional  (can  be  disabled  via  BAR-
+              CODE_NO_CHECKSUM).   Since  the number of digits,
+              including the checksum, must be even,  a  leading
+              zero  is  inserted in the string being encoded if
+              needed (this is specifically stated in the  specs
+              I have access to).
+
+       code 128
+              Automatic  selection  between alphabet A, B and C
+              of  the  Code-128  standard.  This  encoding  can
+              represent  all ASCII symbols, from 0 (NUL) to 127
+              (DEL), as well as four special symbols, named F1,
+              F2,  F3, F4. The set of symbols available in this
+              encoding is not easily represented  as  input  to
+              the  barcode library, so the following convention
+              is used.  In the input string, which is a  C-lan-
+              guage  null-terminated  string,  the  NUL char is
+              represented by the value 128 (0x80, 0200) and the
+              F1-F4  characters  are  represented by the values
+              193-196 (0xc1-0xc4, 0301-0304).  The values  have
+              been  chosen  to  ease  their  representation  as
+              escape sequences.
+
+
+       Since  the  shell  doesn't  seem  to  interpret   escape
+       sequences on the command line, the "-b" option cannot be
+       easily used to designate the strings to be encoded. As a
+       workaround  you  can  resort to the command echo, either
+       within back-ticks or used separately to  create  a  file
+       that  is  then  fed  to the standard-input of barcode --
+       assuming your echo command processes  escape  sequences.
+       The  newline  character  is  especially though to encode
+       (but not impossible unless you use a csh variant.
+
+
+       These problems only apply to the command-line tool;  the
+       use  of  library  functions doesn't give any problem. In
+       needed, you can use the ``code 128 raw'' pseudo-encoding
+       to  represent  code128 symbols by their numerical value.
+       This encoding is used late in the auto-selection  mecha-
+       nism  because  (almost)  any  input string can be repre-
+       sented using code128.
+
+       Codabar
+              Codabar can encode the ten digits and a few  spe-
+              cial  symbols  (minus,  plus, dollar, colon, bar,
+              dot). The  characters  ``A'',  ``B'',  ``C''  and
+              ``D''   are  used  to  represent  four  different
+              start/stop characters. The input  string  to  the
+              barcode  library  can  include the start and stop
+              characters or not include  them  (in  which  case
+              ``A''  is used as start and ``B'' as stop). Start
+              and stop characters in the input  string  can  be
+              either  all  lowercase  or  all uppercase and are
+              always printed as uppercase.
+
+       Plessey
+              Plessey barcodes can encode all  the  hexadecimal
+              digits.  Alphabetic  digits  in  the input string
+              must either be all lowercase  or  all  uppercase.
+              The output text is always uppercase.
+
+       MSI    MSI can only encode the decimal digits. While the
+              standard specifies either one or two  check  dig-
+              its,  the  current implementation in this library
+              only generates one check digit.
+
+       code 93
+              The code-93 standard can natively encode 48  dif-
+              ferent  characters,  including uppercase letters,
+              digits, the blank space, plus, minus, dot,  star,
+              dollar,  slash,  percent, as well as five special
+              characters:   a  start/stop  delimiter  and  four
+              "shift  characters"  used  for extended encoding.
+              Using this "extended encoding" method, any  stan-
+              dard 7-bit ASCII character can be encoded, but it
+              takes up two symbol lengths  in  barcode  if  the
+              character  is  not natively supported (one of the
+              48).  The encoder here fully implements the  code
+              93  encoding  standard.   Any characters natively
+              supported (A-Z, 0-9, ".+-/$ encoded as such - for
+              any other characters (such as lower case letters,
+              brackets, parentheses, etc.),  the  encoder  will
+              revert  to  extended  encoding.   As  a note, the
+              option to exclude the checksum will eliminate the
+              two modulo-47 checksums (called C and K) from the
+              barcode, but this probably will make  it  unread-
+              able  by  9  These  checksums are specified to be
+              used at the firmware  level,  and  their  absence
+              will be interpreted as an invalid barcode.
+
+
+
+PCL OUTPUT
+       While  the  default output is Postscript (possibly EPS),
+       and Postscript can be post-processed to almost anything,
+       it  is  sometimes  desirable  to  create output directly
+       usable by the specific printer at  hand.   PCL  is  cur-
+       rently  supported  as  an output format for this reason.
+       Please note that the Y coordinate for PCL goes from  top
+       to  bottom,  while for Postscript it goes from bottom to
+       top. Consistently, while in Postscript you  specify  the
+       bottom-left  corner  as  origin, for PCL you specify the
+       top-left corner.
+
+
+       Barcode output for PCL Printers (HP LaserJet and compat-
+       ibles),  was developed using PCL5 Reference manuals from
+       HP.  that really refers to these printers:
+
+
+       LaserJet III, III P, III D, III Si,
+
+
+       LaserJet 4 family
+
+
+       LaserJet 5 family
+
+
+       LaserJet 6 family
+
+
+       Color LaserJet
+
+
+       DeskJet 1200 and 1600.
+
+
+       However, barcode printing uses a very  small  subset  of
+       PCL,  probably  also LaserJet II should print it without
+       problem, but the resulting text may be horrible.
+
+
+       The only real difference from  one  printer  to  another
+       really  depends  on  which  font  are  available  in the
+       printer, used in printing the label  associated  to  the
+       bars (if requested).
+
+
+       Earlier  LaserJet  supports only bitmaps fonts, so these
+       are not "scalable". (Ljet II ?), Also these fonts,  when
+       available,  have  a  specified direction, and not all of
+       them are available in both Portrait and Landscape  mode.
+
+
+       From  LaserJet  4  series, (except 4L/5L that are entry-
+       level printers), Arial scalable font  should  be  avail-
+       able, so it's the "default font" used by this program.
+
+
+       LaserJet III series printers (and 4L, 5L), don't feature
+       "Arial" as a resident  font,  so  you  should  use  BAR-
+       CODE_OUT_PCL_III  instead  of BARCODE_OUT_PCL., and font
+       the font used will be "Univers" instead of "Arial".
+
+
+       Results on compatible printers, may  depend  on  consis-
+       tency   of   PCL5  compatibility,  in  doubt,  try  BAR-
+       CODE_OUT_PCL_III
+
+
+       PJL commands are not used here, as it's not very compat-
+       ible.
+
+
+       Tested Printers:
+
+
+       Hp LaserJet 4050
+
+
+       Hp LaserJet 2100
+
+
+       Epson N-1200 emul PCL
+
+
+       Toshiba DP2570 (copier) + PCL option
+
+
+       Epson EPL-7100 emul. HP LaserJet II: bars print fine but
+       text is bad.
+
+
+
+BUGS
+       The  current  management  of borders/margins is far from
+       optimal. The ``default'' margin applied by  the  library
+       interferes  with the external representation, but I feel
+       it is mandatory to avoid creating barcode output with no
+       surrounding white space (the problem is especially rele-
+       vant for EPS output).
+
+
+       EAN-128 is not (yet) supported. I plan to  implement  it
+       pretty soon and then bless the package as version 1.0.
+
+
+
+SEE ALSO
+       barcode(3)
+
+AUTHORS
+       Alessandro Rubini <rubini@gnu.org> (maintainer)
+
+       Leonid  A.  Broukhis  <leob@mailcom.com> (several encod-
+       ings)
+
+       Andrea Scopece <a.scopece@tin.it> (PCL output)
+
+
+
+4th Berkeley Distribution        October 2001                       BARCODE(1)

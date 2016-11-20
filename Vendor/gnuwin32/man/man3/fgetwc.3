@@ -1,0 +1,45 @@
+.\" Copyright (c) Bruno Haible <haible@clisp.cons.org>
+.\"
+.\" This is free documentation; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License as
+.\" published by the Free Software Foundation; either version 2 of
+.\" the License, or (at your option) any later version.
+.\"
+.\" References consulted:
+.\"   GNU glibc-2 source code and manual
+.\"   Dinkumware C library reference http://www.dinkumware.com/
+.\"   OpenGroup's Single Unix specification http://www.UNIX-systems.org/online.html
+.\"   ISO/IEC 9899:1999
+.\"
+.TH FGETWC 3  "July 25, 1999" "GNU" "Linux Programmer's Manual"
+.SH NAME
+fgetwc \- read a wide character from a FILE stream
+.SH SYNOPSIS
+.nf
+.B #include <wchar.h>
+.sp
+.BI "wint_t fgetwc (FILE* " stream ");
+.BI "wint_t getwc (FILE* " stream ");
+.fi
+.SH DESCRIPTION
+The \fBfgetwc\fP function is the wide-character equivalent of the \fBfgetc\fP
+function. It reads a wide character from \fIstream\fP and returns it. If
+the end of stream is reached, or if \fIferror(stream)\fP becomes true,
+it returns WEOF. If a wide character conversion error occurs, it sets
+\fBerrno\fP to \fBEILSEQ\fP and returns WEOF.
+.PP
+The \fBgetwc\fP function or macro performs identically to \fBfgetwc\fP.
+.SH "RETURN VALUE"
+The \fBfgetwc\fP function returns the next wide-character from the stream, or
+WEOF.
+.SH "CONFORMING TO"
+ISO/ANSI C, UNIX98
+.SH "SEE ALSO"
+.BR fputwc "(3), " fgetws "(3), " ungetwc (3)
+.SH NOTES
+The behaviour of \fBfgetwc\fP depends on the LC_CTYPE category of the
+current locale.
+.PP
+In the absence of additional information passed to the fopen call, it is
+reasonable to expect that \fBfgetwc\fP will actually read a multibyte sequence
+from the stream and then convert it to a wide character.

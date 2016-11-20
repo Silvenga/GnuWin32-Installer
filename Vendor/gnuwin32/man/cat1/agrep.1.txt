@@ -1,0 +1,179 @@
+agrep(1)                                               agrep(1)
+
+
+
+NAME
+       agrep - print lines approximately matching a pattern
+
+SYNOPSIS
+       agrep [OPTION]...  PATTERN [FILE]...
+
+DESCRIPTION
+       Searches for approximate matches of PATTERN in each FILE
+       or  standard  input.    Example:  `agrep   -2   optimize
+       foo.txt'  outputs all lines in file `foo.txt' that match
+       "optimize" within two errors.  E.g. lines which  contain
+       "optimise", "optmise", and "opitmize" all match.
+
+OPTIONS
+   Regexp selection and interpretation:
+       -e PATTERN, --regexp=PATTERN
+              Use  PATTERN  as  a regular expression; useful to
+              protect patterns beginning with -.
+
+       -i, --ignore-case
+              Ignore case distinctions (as defined by the  cur-
+              rent locale) in PATTERN and input files.
+
+       -k, --literal
+              Treat  PATTERN  as  a  literal string, that is, a
+              fixed string with no special characters.
+
+       -w, --word-regexp
+              Force PATTERN  to  match  only  whole  words.   A
+              "whole  word"  is a substring which either starts
+              at the beginning or the record or is preceded  by
+              a  non-word  constituent  character.   Similarly,
+              the substring must either end at the end  of  the
+              record  or  be followed by a non-word constituent
+              character.    Word-constituent   characters   are
+              alphanumerics  (as defined by the current locale)
+              and the underscore character.  Note that the non-
+              word  constituent  characters  must  surround the
+              match; they cannot be counted as errors.
+
+   Approximate matching settings:
+       -D NUM, --delete-cost=NUM
+              Set cost of missing characters to NUM.
+
+       -I NUM, --insert-cost=NUM
+              Set cost of extra characters to NUM.
+
+       -S NUM, --substitute-cost=NUM
+              Set cost of incorrect characters  to  NUM.   Note
+              that  a  deletion  (a  missing  character) and an
+              insertion (an extra character)  together  consti-
+              tute  a  substituted character, but the cost will
+              be the that of a deletion and an insertion  added
+              together.   Thus,  if the const of a substitution
+              is set to be larger than the sum of the costs  of
+              deletion and insertion, direct substitutions will
+              never be done.
+
+       -E NUM, --max-errors=NUM
+              Select records that have at most NUM errors.
+
+       -#     Select records that have at most # errors (# is a
+              digit between 0 and 9).
+
+   Miscellaneous:
+       -d PATTERN, --delimiter=PATTERN
+              Set  the  record  delimiter regular expression to
+              PATTERN.  The text between two delimiters, before
+              the first delimiter, and after the last delimiter
+              is considered to be a record.  The default record
+              delimiter  is  the  regexp  "\n", so by default a
+              record is a line.  PATTERN  can  be  any  regular
+              expression  that does not match the empty string.
+              For example, using -d "^From " defines mail  mes-
+              sages as records in a Mailbox format file.
+
+       -v, --invert-match
+              Select  non-matching  records instead of matching
+              records.
+
+       -V, --version
+              Print version information and exit.
+
+       -y, --nothing
+              Does nothing.  This options exists only for  com-
+              patibility with the non-free agrep program.
+
+       --help Display a brief help message and exit.
+
+   Output control:
+       -B, --best-match
+              Only  output  the best matching records, that is,
+              the records with the lowest cost.  This  is  cur-
+              rently  implemented by making two passes over the
+              input files and cannot be used when reading  from
+              standard input.
+
+       --color, --colour
+              Highlight the matching strings in the output with
+              a color marker.  The color string is  taken  from
+              the GREP_COLOR environment variable.  The default
+              color is red.
+
+       -c, --count
+              Only print a count of matching records  per  each
+              input file, suppressing normal output.
+
+       -h, --no-filename
+              Suppress  the  prefixing  filename on output when
+              multiple files are searched.
+
+       -H, --with-filename
+              Prefix each output record with the  name  of  the
+              input file where the record was read from.
+
+       -l, --files-with-matches
+              Only print the name of each input file which con-
+              tains at least one match, suppressing normal out-
+              put.  The scanning for each file will stop on the
+              first match.
+
+       -n, --record-number
+              Prefix each output record with its sequence  num-
+              ber  in  the input file.  The number of the first
+              record is 1.
+
+       -q, --quiet, --silent
+              Do not write anything to standard  output.   Exit
+              immediately  with  zero exit status if a match is
+              found.
+
+       -s, --show-cost
+              Print match cost with output.
+
+       --show-position
+              Prefix each output record with the start and  end
+              offset of the first match within the record.  The
+              offset of the first character of the record is 0.
+              The  end  position  is given as the offset of the
+              first character after the match.
+
+       -M, --delimiter-after
+              By default, the record delimiter is  the  newline
+              character   and  is  output  after  the  matching
+              record.  If -d is used, the record delimiter will
+              be  output  before  the  matching  record.   This
+              option causes the delimiter to  be  output  after
+              the matching record.
+
+       With  no  FILE, or when FILE is -, reads standard input.
+       If less than two FILEs are given -h is  assumed,  other-
+       wise -H is the default.
+
+DIAGNOSTICS
+       Exit  status  is  0 if a match is found, 1 for no match,
+       and 2 if there were errors.  If -E or -# is  not  speci-
+       fied, only exact matches are selected.
+
+       PATTERN  is  a  POSIX  extended regular expression (ERE)
+       with the TRE extensions.
+
+REPORTING BUGS
+       Report  bugs  to  the   TRE   mailing   list   <tre-gen-
+       eral@lists.laurikari.net>.
+
+COPYRIGHT
+       Copyright © 2002-2004 Ville Laurikari.
+       This is free software, and comes with ABSOLUTELY NO WAR-
+       RANTY.  You are welcome to  redistribute  this  software
+       under  certain  conditions;  see the source for the full
+       license text.
+
+
+
+TRE agrep 0.7.5        November 21, 2004               agrep(1)

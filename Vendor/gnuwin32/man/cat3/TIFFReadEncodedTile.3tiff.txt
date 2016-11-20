@@ -1,0 +1,58 @@
+TIFFReadEncodedTile(3TIFF)           TIFFReadEncodedTile(3TIFF)
+
+
+
+
+
+NAME
+       TIFFReadEncodedTile  -  read  and  decode a tile of data
+       from an open TIFF file
+
+SYNOPSIS
+       #include <tiffio.h>
+
+       int TIFFReadEncodedTile(TIFF *tif, u_long  tile,  u_char
+       *buf, u_long size)
+
+DESCRIPTION
+       Read  the  specified  tile  of data and place up to size
+       bytes of decompressed information in the (user supplied)
+       data buffer.
+
+NOTES
+       The  value  of  tile is a ``raw tile number.''  That is,
+       the caller must take into account  whether  or  not  the
+       data  are organized in separate planes (PlanarConfigura-
+       tion=2).  TIFFComputeTile automatically does  this  when
+       converting  an  (x,y,z,sample) coordinate quadruple to a
+       tile number. To read a full tile of data the data buffer
+       should  be  at  least  as large as the value returned by
+       TIFFTileSize.
+
+       The library attempts to hide bit- and byte-ordering dif-
+       ferences  between  the  image  and the native machine by
+       converting data to the native machine order.  Bit rever-
+       sal  is  done  if  the  FillOrder tag is opposite to the
+       native machine bit order. 16-  and  32-bit  samples  are
+       automatically  byte-swapped if the file was written with
+       a byte order opposite to the native machine byte order,
+
+RETURN VALUES
+       The actual number of bytes of data that were  placed  in
+       buf  is  returned;  TIFFReadEncodedTile returns -1 if an
+       error was encountered.
+
+DIAGNOSTICS
+       All error messages are directed to the  TIFFError(3TIFF)
+       routine.
+
+SEE ALSO
+       TIFFOpen(3TIFF),    TIFFReadRawTile(3TIFF),    TIFFRead-
+       Tile(3TIFF), libtiff(3TIFF)
+
+       Libtiff  library   home   page:   http://www.remotesens-
+       ing.org/libtiff/
+
+
+
+libtiff                 October 15, 1TIFFReadEncodedTile(3TIFF)

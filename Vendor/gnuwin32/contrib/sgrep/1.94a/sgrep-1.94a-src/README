@@ -1,0 +1,820 @@
+
+        README file for sgrep version 1.91-alpha - 
+	a tool to search and index text, SGML, XML and HTML files using
+	structured patterns
+
+        Copyright (C) 1998  University of Helsinki, 
+                            Department of Computer Science
+
+        Authors: Jani Jaakkola           Jani.Jaakkola@cs.helsinki.fi
+                 Pekka Kilpelainen       Pekka.Kilpelainen@cs.helsinki.fi
+
+---------------------------------------------------------------------------
+
+This README file is intended for describing the new features of 
+sgrep-1.91a. If you want to know what sgrep is and what the old features 
+are, see:
+http://www.cs.helsinki.fi/~jjaakkol/sgrep.html
+
+See the section "NEW QUERY LANGUAGE FEATURES" for description of the
+new operators available in version 1.91a.
+
+Sgrep-1.91 supports 16-bit wide characters and Unicode in XML-documents. 
+See the section "WIDE CHARACTER SUPPORT" for information on wide 
+characters and UTF-8 and UTF-16 encodings.
+
+This file (and newer versions of this file) is available from
+http://www.cs.helsinki.fi/~jjaakkol/sgrep/README.txt
+
+Sgrep is distributed under GNU General Public License. See file COPYING
+for details. 
+
+This piece of software is still under development. This means that:
+- New features might be included before final sgrep-2.0 release.
+- Existing features might be changed.
+- It is guaranteed to have bugs.
+- All suggestions are welcome.
+- All available documentation of the new features is contained in
+  this file.
+
+---------------------------------------------------------------------------
+NEW FEATURES
+---------------------------------------------------------------------------
+
+Major new features since sgrep-1.0 which are already present:
+- Indexing of both structure and content.
+- SGML/XML/HTML scanner.
+- Official Win32 binary.
+- sgtool has been dumped. It never really worked and even when it
+  did, it wasn't very useful.
+- Should be completely compatible with older versions of sgrep.
+- Sgrep now supports direct containment. In SGML and XML world this 
+  means, that you can query children or parents of given elements.
+- Sgrep uses GNU autoconf 
+- Also the sources are now available
+- Operators for supporting direct containment
+- Nearness operators
+- 16-bit wide characters and Unicode support
+
+Features which will be present in sgrep-2.0:
+- Proper documentation
+- Support for querying notations, element type declarations and
+  attribute list declarations inside SGML/XML document prolog
+- Scanning of all well-formed XML-documents.
+
+Features probably won't be present in sgrep-2.0:
+- Regular expressions, since they are probably better handled by other
+  software, like Perl. However, sgrep still needs some new options for 
+  better perl support.
+
+---------------------------------------------------------------------------
+Win32-BINARY RELEASE
+---------------------------------------------------------------------------
+
+The Win32-binary release contains both sgrep binary and m4 binary.
+Sgrep binary is compiled with MSVC and requires no additional libraries.
+
+Please note that the examples in this README file and in the sgrep
+WWW-pages have been written using sh shell-syntax. When you use sgrep 
+under the windows shell, "COMMAND.COM" you have to either use the -f option 
+or translate query from:
+
+% sgrep 'word("foo") or word("bar")' foobar
+
+to 
+
+C:\> sgrep "word(\"foo\") or word(\"bar\")" foobar
+
+Alternatively, you can install bash from the Cygnus Cygwin project.
+
+The m4 binary comes from the Cygnus Cygwin project. See
+http://sourceware.cygnus.com/cygwin/ for details.
+Included binary release of m4 requires the cygwin.dll DLL-library.
+Both of them are distributed under GNU General Public License (GPL).
+See file COPYING for details. 
+
+---------------------------------------------------------------------------
+SGML-SCANNER
+---------------------------------------------------------------------------
+
+Sgrep has a built-in scanner for XML, SGML and HTML-documents. This means
+that complex macros for querying SGML-files are no longer
+needed. However, sgrep still does not contain a full blown 
+SGML-parser: the thing which it does contain could be described as an 
+SGML-scanner. It does not recognize any syntax errors, it does
+not provide a parse tree and it does not provide any event stream. 
+It just recognizes regions from SGML-files corresponding to different 
+SGML tokens: start tags, end tags, attributes, etc.
+
+Since version 1.90a the SGML-scanner maintains an element stack. This
+is needed for the ability to support direct containment in queries
+to SGML/XML-files. Query language primitive 'elements' returns
+all elements of queried XML/SGML-documents. (see the 'childrening'
+and 'parenting' operators for examples).
+
+Since version 1.91a sgrep has support for 16-bit wide characters in
+query terms and support for UTF-8 and UTF-16 encodings in the 
+SGML-scanner. See the "WIDE CHARACTER SUPPORT" below.
+
+SGML has many features which make it very difficult to parse. The
+SGML-scanner implemented in sgrep does not attempt to be a complete 
+and error free SGML-parser; valid SGML-documents might confuse it.
+However, my goal is that all well formed XML-documents will be
+parsed correctly.
+
+The scanner has two modes:
+- SGML/HTML-mode
+  o Names are case insensitive
+  o PIs end with '>'
+- XML-mode
+  o Names are case sensitive
+  o PIs end with '?>'
+
+Sgrep will recognize empty XML elements (<ELEMENT/>) in both
+modes.
+
+The scanner does not automatically include entity references.
+However, it can automatically add external parsed entities
+defined in the internal document type definition subset to scanned files.
+Eg. if you have a line
+	<!ENTITY chapter1 SYSTEM "chapter1.sgml">
+in your document, the scanner can automatically include file
+"chapter1.sgml" to the list of scanned files, when the scanner sees
+this line in the internal document type definition subset.
+To use this feature you need to use "-g include-entities" option.
+
+---------------------------------------------------------------------------
+WIDE CHARACTER SUPPORT
+---------------------------------------------------------------------------
+
+Sgrep version 1.91a introduces 16-bit wide character support in index terms
+and in the SGML-parser.
+
+Since the sgrep query language is still strictly 8-bit, wide characters
+in queries need to be encoded. I chose to use encoding which looks
+just like character entity references in SGML: "\#<decimal number>;"
+for character number in decimal and "\#x<hex number>;" for character
+number in hexadecimal. Therefore the ISO-8859-1 letter a with two
+dots on top of it, 'ä' assuming you are reading this file with ISO-8859-1
+font '&auml;'-entity in HTML, '&#228;' as a decimal character reference
+and '&#e4;' as a hexadecimal character reference can be encoded in sgrep
+query either as "\#228;" or as "\#xe4;".
+
+So the finnish word "älämölö" ("&auml;l&auml;m&ouml;l&ouml;" in HTML) can
+be queried either with query like 'word("älämölö")', since sgrep query
+language supports 8-bit characters, or with encoded query like
+'word("\#228;l\#228;m\#248;l\#248")' or 'word("\#xe4;l\#xe4;m\#xf8;l\#xf8")'.
+
+The SGML-parser supports UTF-8 and UTF-16 encodings. You can select
+the encoding with the -g option:
+
+- "-g encoding=utf-8" selects UTF-8 encoding. This is the default if you
+  are using the SGML-scanner in XML-mode (with -g xml option).
+- "-g encoding=utf-16" selects UTF-16 encoding. Note that currently (in
+  version 1.91a), this is a synonym for "-g encoding=utf-8"
+  since sgrep switches automatically to UTF-16 mode from UTF-8 mode when 
+  it sees the byte order mark (this also means, that you must have the byte
+  order mark, if you are using UTF-16).
+- "-g encoding=iso-8859-1" selects iso-8859-1 encoding, which is also the
+  default encoding when SGML-scanner is any other mode than XML.
+
+The SGML-scanner recognizes character entity references currently only
+in character data content. Character entity references in attribute values
+or entity literals are not recognized. No other entity references 
+than character entity references are expanded, not even "&amp;", "&gt;" 
+and "&lt;". I plan  to fix this before next release.
+
+The XML-scanner recognizes the encoding parameter in XML-declarations
+and can switch encoding accordingly (if not overridden with -g encoding
+option). Currently "us-ascii", "iso-8859-1", "utf-8" and "utf-16"
+encodings are recognized. Note that in XML-mode the SGML-parser 
+interprets all characters classified as "Letter" in the XML-spesification
+as word characters by default.
+
+Currently only the SGML-scanner is aware of different encodings. The
+output module does not do any conversions: it just dumps the result
+regions from query files exatly as they were encoded there, even when
+different files use different encodings (this probably needs to be
+fixed).
+
+Here is an example using Murata Makotos example XML-documents in Japanese
+(see http://www.oasis-open.org/cover/xmlJapaneseExamples.html ).
+The unicode character 0x771f represents word Murata in japanese.
+
+% sgrep -o"%f:%l\n" -g xml 'word("\#x771f")' pr-xml-little-endian.xml pr-xml-utf-16.xml pr-xml-utf-8.xml weekly-utf-8.xml 
+pr-xml-little-endian.xml:2
+pr-xml-utf-16.xml:2
+pr-xml-utf-8.xml:3
+
+---------------------------------------------------------------------------
+NEW QUERY LANGUAGE FEATURES
+---------------------------------------------------------------------------
+
+The example file "example.sgml" and its DTD "example.dtd" are 
+included in this distribution.
+
+New query language features in version 1.91a and later:
+
+* near(distance)
+
+Finds regions of left hand side and right hand side having at most 
+'distance' bytes bytes between them. 
+'A near(0) B' would return regions of A and B which "touch" each other
+(in other words, there is no bytes between them. I know that using bytes 
+is not the best way to measure distance in a text search engine, but the 
+way Sgrep works makes this kind of query very fast. If you really need 
+nearnes operator with words as a measure of distance, you could use 
+'join(distance,word("*")) containing A containing B'. However this query 
+would take much more time and memory to evaluate.)
+
+In this example, I use Jon Bosaks religious text as example material:
+
+% sgrep -x index -o"%r\n" 'word("jesus") near(20) word("peter")'
+Jesus was come into Peter
+Jesus taketh Peter
+Peter, and said unto Jesus
+Jesus taketh with him Peter
+Peter said unto Jesus
+Jesus unto Peter
+Peter followed Jesus
+Jesus loved saith unto Peter
+Jesus saith to Simon Peter
+Peter, an apostle of Jesus
+% sgrep -x index -o"%r\n" 'word("adam") near(30) word("eve") near(40) word("cain")'
+Adam knew Eve his wife; and she conceived, and bare Cain
+
+* near_before(distance)
+
+Works like just like 'near', except that 'near_after' requires the regions
+in the left hand side to occur before regions in the right hand side.
+
+% sgrep -x index -o"%r\n" 'word("peter") near_before(20) word("jesus")'
+Peter, and said unto Jesus
+Peter said unto Jesus
+Peter followed Jesus
+Peter, an apostle of Jesus
+
+New query language features in version 1.90a and later:
+
+* elements
+
+Returns all SGML-elements. This example counts all elements from input
+documents:
+
+% sgrep -c elements sgreptest.sgml 
+14
+
+* parenting
+
+Works like old "containing" operator, except that parenting returns 
+left hand side regions directly containing right hand side regions 
+instead of all regions containing right hand side regions.
+NOTE: parenting works right only if the left hand side expression
+does not contain overlapping regions (which is guaranteed, if the
+left hand side regions correspond to SGML-elements).
+
+% sgrep 'elements parenting word("Peletier")' sgreptest.sgml 
+<CITEREF RID="rf38">Peletier et al. (1994)</CITEREF>
+
+* childrening
+
+Works like old "in" operator, except that childrening returns left hand
+side regions directly contained in right hand side regions
+instead of all regions contained in right hand side regions.
+This example counts children elements of SGREPTEST-element
+
+% sgrep -c 'elements childrening (
+	stag("SGREPTEST") .. etag("SGREPTEST"))' sgreptest.sgml 
+13
+
+* first(n, expression) and last(n ,expression)
+
+First-operator selects first n regions of the regions returned
+by expression and last-operator selects last n regions of
+the regions returned by expression.
+
+This query selects first child element of last child element of 
+third ACT-element from a file containing word "Hamlet":
+(In other words, TITLE of last SCENE of third ACT of shakespeares
+famous PLAY "The Tragedy of Hamlet, Prince of Denmark")
+
+% cat test/childrening
+first(1,
+  elements childrening
+    last(1,
+      elements childrening
+        last(1,first(3,
+          stag("ACT") .. etag("ACT") in (file("*") containing word("Hamlet"))
+        )
+      )
+    )
+)
+% sgrep -x hamlet-index -f test/childrening
+<TITLE>SCENE IV.  The Queen's closet.</TITLE>
+% 
+
+* first_bytes(n, expression) and last_bytes(n,expression)
+
+Operator first_bytes(n,expression) truncates all regions returned from 
+expression to n-byte length starting from regions start point. 
+Operator last_bytes(n,expression) truncates all regions returned from
+expression to n-byte length starting from regions end point.
+
+This example returns the start tags of SGREPTEST-elements children:
+
+% sgrep 'stag("*") containing first_bytes(1,elements childrening (stag("SGREPTEST") .. etag("SGREPTEST")))' sgreptest.sgml 
+<Partno><Partno><Partno><Partno><partno><partno><partno><partno><partno><partno><partno><CITEREF RID="rf38"><AUTHOR>
+
+This query returns the end tags of SGREPTEST-elements children:
+
+% sgrep 'etag("*") containing last_bytes(1,elements childrening (stag("SGREPTEST") .. etag("SGREPTEST")))' sgreptest.sgml 
+</partno></partno></partno></partno></partno></partno></partno></partno></PARTNO></PARTNO></PARTNO></CITEREF></AUTHOR>
+
+New query features in version 1.70a and later
+
+* file("filename")
+
+Returns the region containing the named file.
+
+* pi("PITarget")
+
+Returns the regions containing the processing instructions beginning with 
+the given PI target.
+
+% sgrep 'pi("example_pi")' example.sgml
+<?example_pi processing instruction>
+
+* attribute("attribute name")
+
+Returns the regions containing the named attribute.
+
+% sgrep 'attribute("ATT1")' example.sgml
+att1="value1"
+
+* attvalue("attribute value")
+
+Returns the regions containing the given attribute value.
+
+% sgrep 'attvalue("value2")' example.sgml 
+"value2"
+% sgrep 'attribute("*") containing attvalue("value2")' example.sgml 
+att2="value2"
+
+* stag("GI")
+
+Returns the regions containing the start tags with the given GI.
+
+% sgrep 'stag("EXAMPLE")' example.sgml 
+<EXAMPLE att1="value1" att2="value2">
+
+* etag("GI")
+
+Returns the regions containing the end tags with the given GI.
+
+% sgrep 'etag("EXAMPLE")' example.sgml 
+</EXAMPLE>
+
+* word("word")
+
+Returns the regions containing the given word.
+N.B: A query word("foo") does not recognize occurrences of word "foo"
+inside comments. (See operators comment and comment_word  below.)
+
+% sgrep 'word("example")' example.sgml 
+example
+% sgrep '"\n"_."\n" containing word("example")' example.sgml 
+This is an example SGML file to demonstrate new features in sgrep-2.0.
+
+* comments
+
+Returns the regions containing all SGML comments.
+
+% sgrep 'comments' example.sgml 
+<!-- comment --><!-- another comment -->
+
+* comment_word("comment word")
+
+Returns the region containing the given word inside comments.
+
+% sgrep 'comment_word("another")' example.sgml 
+another
+% sgrep 'comments containing comment_word("another")' example.sgml 
+<!-- another comment -->
+
+* cdata
+
+Returns regions containing CDATA marked sections. Sgrep recognizes
+words also inside CDATA marked sections.
+
+% sgrep 'cdata' example.sgml 
+<![CDATA[ <CDATA> <marked> &section ]]><![CDATA[ another marked section ]]>
+% sgrep 'cdata containing word("another")' example.sgml 
+<![CDATA[ another marked section ]]>
+
+* entity("entity name")
+
+Returns the regions containing references to the given entity.
+(Entity references are currently recognized only in PCDATA.)
+
+% sgrep 'entity("entity1")' example.sgml 
+&entity1;
+% sgrep 'stag("ELEM1") .. etag("ELEM1") containing entity("entity1")'
+example.sgml 
+<ELEM1>&entity1;</ELEM1>
+
+* doctype("doctype name")
+
+Returns the regions containing given document type name inside the document
+type declaration.
+
+% sgrep 'doctype("*")' example.sgml 
+EXAMPLE
+
+* doctype_pid("publicid")
+
+Returns the regions containing the given document type public id inside 
+document type declarations.
+
+% sgrep 'doctype_pid("*")' example.sgml 
+-//SID//DTD sgrep example//EN
+
+* doctype_sid("systemid")
+
+Returns the regions containing the given document type system id inside
+document type declarations.
+
+% sgrep 'doctype_sid("ex*")' example.sgml 
+example.dtd
+
+* entity_declaration("entity name")
+
+Returns the regions containing the declaration of the given entity name.
+
+% sgrep 'entity_declaration("entity1")' example.sgml 
+<!ENTITY entity1 "literal value">
+
+* entity_literal("entity name")
+
+Returns the regions containing the literal value of the given entity name.
+
+% sgrep 'entity_literal("entity1")' example.sgml 
+literal value
+
+* entity_pid("entity public id")
+
+Returns the regions containing the given public id of an entity within its
+declaration.
+
+% sgrep 'entity_pid("*")' example.sgml 
+-//SID//NONSGML entity example//EN
+
+* entity_sid("entity system id")
+
+Returns the regions containing the given system id inside an entity
+declaration.
+
+% sgrep 'entity_sid("*")' example.sgml 
+figure.file
+
+* entity_ndata("notation name")
+
+Returns the regions containing the given notation name inside entity
+declarations.
+
+% sgrep 'entity_ndata("*")' example.sgml 
+anotation
+% sgrep 'entity_declaration("*") containing entity_ndata("ANOTATION")'
+example.sgml 
+<!ENTITY figure PUBLIC "-//SID//NONSGML entity example//EN"
+                "figure.file" NDATA anotation>
+
+
+* prologs
+
+Returns the regions containing document prologs.
+
+% sgrep 'pi("*") in prologs' example.sgml 
+<?pi inside prolog>
+
+--------------------------------------------------------------------
+ INDEXING
+--------------------------------------------------------------------
+
+Sgrep supports indexing of both structure and content of SGML, HTML
+and XML documents. Indexing is implemented by creating a separate index
+file, which contains a list of terms and of regions corresponding to these
+terms. This means that if you want to output the actual content of
+result regions you have to keep the original files around. 
+
+If the query uses only the new SGML query features, the same query should
+return same results independent of whether an index was used or not.
+
+Indexes are stored in compressed binary files. Depending on the indexed
+material the index file size is 30-60% of the original files. This is
+not so bad, since in theory you can produce the full content of
+the original files from the index file, except for whitespace and 
+punctuation marks.
+
+Maximum size of the indexed data is currently 2 gigabytes. If you
+want to index larger collections, you have to split the index
+to multiple index files. However, for optimal performance the
+index file size should be smaller than your available RAM-memory.
+
+Sgrep is switched to indexing mode by giving "-I" as first option in
+the command line. Command 'sgrep -I -h' will give you the summary of
+available indexing options:
+
+<CLIP>
+Usage: (sgindex | sgrep -I) <options> <files...>
+Use 'sgrep -h' for help on query mode options.
+
+Indexing mode options are:
+  -C              display copyright notice
+  -h              help (means this text)
+  -i              fold all words to lower case when indexing
+  -T              show statistics about created index files
+  -V              display version information
+  -v              verbose mode. Shows what is going on
+  -c <index file> create new index file
+  -F <file>       read list of input files from <file> instead of command line
+  -g <option>     set scanner option:
+      sgml        use SGML scanner
+      html        use HTML scanner (currently same as sgml scanner)
+      xml         use XML scanner
+      sgml-debug  show recognized SGML tokens
+      include-entities  automatically include system entities
+  -l <limit>      make a list of possible stopwords
+  -L <stop file>  write possible stopwords to file
+  -S <stop file>  read stop word list from file
+  -m <megabytes>  main memory available for indexing in megabytes
+  -w <char list>  set the list of characters used to recognize words
+        --              no more options
+
+Copyright (C) 1998 University of Helsinki. Use sgindex -C for details,
+</CLIP>
+
+Options -C, -h, and -V should be self explanatory.
+
+Indexes are created using the -c option and giving a file list to index.
+The file list can be directly in the command line, or with -F option
+(see below).
+
+<CLIP>
+% sgrep -I -c demo.index demo.sgml
+% ls -l demo.*
+-rw-------   1 jjaakkol grpd        53577 Aug 24 12:52 demo.index
+-rw-------   1 jjaakkol grpd        91536 Mar  6 13:40 demo.sgml 
+</CLIP>
+
+First 13 lines of the index file contain statistics about the created
+index.
+
+<CLIP>
+% head -13 demo.index
+sgrep-index v0
+
+2441 terms
+11554 entries
+1024 bytes header (1%)
+9764 bytes term index (18%)
+17222 bytes strings (32%)
+  26366 total strings
+  9144 compressed with lcps (-34%)
+25545 bytes postings (47%)
+22 bytes file list (0%)
+53577 total index size
+--
+</CLIP>
+
+With -F <file> option you can give a list of the files to be indexed 
+in the named file, instead of giving it on the command line.
+The file names given in the file have to separated by a newline. 
+
+The -v option gives verbose progress reports while indexing:
+
+<CLIP>
+% sgrep -I -v -c demo.index demo.sgml
+Indexing 1/1 files 64/89K (71%)
+Writing index file of 52K
+Writing index 2048/2441 entries (83%)
+</CLIP>
+
+The entries added to the index are case sensitive by default. 
+For example, word("Foo") is different from word("foo").  
+With option -i you can instruct sgrep to 
+fold all words (only words in content or comments, not any structural 
+elements like element type names or attribute values) to lowercase. 
+
+With option -T you can get some statistics (some useful for debugging, 
+some less useful, and some mighty cryptic) about the created index.
+
+With option -L <term file> you can create a file containing list of
+all terms added to index. Each line in created file will contain the
+amount of bytes required by the term and the term itself.
+
+This example is using the XML WWW-page from http://www.sil.org/sgml/xml.html
+<CLIP>
+% sgrep -I -i -L terms -c xml.index xml.html
+% cat terms | sort -n | tail
+2043 eLI
+2094 wa
+2263 wto
+2543 wof
+2713 wand
+3414 eA
+3433 wxml
+4410 wthe
+5076 aHREF
+5390 sA                                                     
+</CLIP>
+
+With option -S <stop word list file> you can give indexer a stop word
+list to reduce the size of index. Stop word list consists of one
+stop word per line, with possibly including the amount of bytes
+in the term (so you can actually use a part of file originally created with
+the -L option to indexer).
+
+Here is an example using a simple English stop word list (containing words like
+"to", "and", "the" and so on) to reduce the size of the index:
+
+<CLIP>
+% sgrep -I -i -L terms -c xml.index xml.html
+% ls -l xml.index
+-rw-------   1 jjaakkol grpd       291599 Aug 24 14:13 xml.index
+% sgrep -I -i -S stoplist -c xml.index xml.html
+% ls -l xml.index
+-rw-------   1 jjaakkol grpd       259058 Aug 24 14:14 xml.index             
+</CLIP>
+
+With using "-l <number>" option you can obtain information about the impact
+of stop word list on index size when all terms taking more space
+than a fraction of 1/number of the index would be considered as stop words.
+
+<CLIP>
+% sgrep -I -l 200 -i -c xml.index xml.html
+Possible stop words:
+    4K (1.74%) 'aHREF'
+    3K (1.17%) 'eA'
+    1K (0.70%) 'eLI'
+    5K (1.85%) 'sA'
+    1K (0.70%) 'sLI'
+    2K (0.72%) 'wa'
+    2K (0.93%) 'wand'
+    1K (0.62%) 'wfor'
+    1K (0.67%) 'win'
+    2K (0.87%) 'wof'
+    4K (1.51%) 'wthe'
+    2K (0.78%) 'wto'
+    3K (1.18%) 'wxml'
+-------------
+   38K (13.43%) total
+</CLIP>
+
+Using the "-g sgml" option you can select SGML mode scanner.
+
+Using the "-g xml" option you can select XML mode scanner.
+
+Using the "-g include-entities" option you can automatically include
+defined system entities to indexed files (see SGML scanner above).
+
+Using the "-g sgml-debug" option you can check the tokens which sgrep 
+recognized from its input files:
+
+<CLIP>
+% sgrep -I -c demo.index -g sgml-debug sgreptest.sgml
+doctype("SGREPTEST"):dnSGREPTEST:(10,18)
+doctype_pid("-//SID//DTD Just something to test sgrep//EN"):dp-//SID//DTD Just
+something to test sgrep//EN:(29,72)
+doctype_sid("empty"):dsempty:(77,81)
+comment_word("Comment"):cComment:(93,99)
+comment(""):-:(88,110)
+pi("PI"):?PI:(111,115)
+....
+word("third"):wthird:(1391,1395)
+etag("PARTNO"):ePARTNO:(1396,1404)
+etag("SGREPTEST"):eSGREPTEST:(1406,1417)
+</CLIP>
+
+With the "-m <megabytes>'" option you can adjust the amount of main memory
+indexer will use for postings spool before writing a temporary
+file. Default value for -m option is 20 megabytes. Creating the index
+completely in main is faster than using temporary files. However, if you 
+give a value larger than available main memory, sgrep will probably start
+trashing and indexing will be slow.
+
+With "-w <char list>" option you can select which characters make up
+words. The default is "-w a-zA-Z". Here in Finland I would use
+"-w A-Za-ZÅÄÖåäö" (assuming you have iso-8859-1 font). If you want to index
+also numbers you could use "-w A-Za-z0-9"
+
+---------------------------------------------------------------------------
+QUERIES
+---------------------------------------------------------------------------
+
+Sgrep has some new options when used in the query mode.
+
+Options "-F <file>", "-w <word characters>" and "-g <scanner option>"
+have the same functions as in the indexing mode.
+
+Option "-x <index file>" is used to specify an index while when one
+is used. If -x option is used and no file list is specified either
+in the command line or with -F option, sgrep obtains the list of
+queried files straight from the index.
+
+---------------------------------------------------------------------------
+EXAMPLE
+---------------------------------------------------------------------------
+
+Here the input file xml.html is taken from Robin Covers excellent
+WWW-page at http://www.sil.org/sgml/xml.html
+
+Example: Find all P elements containing word "newsfax":
+<CLIP>
+% time sgrep -x xml.index 'stag("P") .. etag("P") containing word("newsfax")'
+<p>[August 19, 1998]  <a href="http://www.zenweb.com/robert/tools/">Tools and
+Utilities</a> from Robert Hanson: XML::Parser, LOTE NewsFax to XML Parsers,
+LOTE XML to Kingdom Summaries, XML Script Server Parser.</p>
+0.03user 0.03system 0:00.25elapsed 24%CPU (0avgtext+0avgdata 0maxresident)k
+</CLIP>
+
+The same example without using index:
+
+<CLIP>
+% time sgrep -i 'stag("P") .. etag("P") containing word("newsfax")' xml.html
+<p>[August 19, 1998]  <a href="http://www.zenweb.com/robert/tools/">Tools and
+Utilities</a> from Robert Hanson: XML::Parser, LOTE NewsFax to XML Parsers,
+LOTE XML to Kingdom Summaries, XML Script Server Parser.</p>
+0.82user 0.05system 0:01.18elapsed 73%CPU (0avgtext+0avgdata 0maxresident)k
+</CLIP>
+
+---------------------------------------------------------------------------
+ANOTHER EXAMPLE
+---------------------------------------------------------------------------
+
+This example uses Jon Bosak's XML-example material: religious texts
+and Shakespeare's works. Since this query is slightly more complex,
+it has been put together from smaller parts by using m4. File "filelist"
+contains the list of all XML-example files from Bosaks collection.
+
+Here is the file "query"
+<CLIP>
+# Finds elements having given name
+define(ELEMENT, (stag($1) .. etag($1)))
+
+# Finds LINE elements
+define(E_LINE, (ELEMENT("LINE")))
+
+# Finds SPEECH elements
+define(E_SPEECH, (ELEMENT("SPEECH")))
+
+# Finds SPEECH elements where HAMLET is speaking
+define(HAMLET_SPEAKING, (E_SPEECH containing (
+                ELEMENT("SPEAKER") containing word("HAMLET"))))
+
+# Finds LINE elements containing words to, be, not and question
+define(TOBENOTQUESTION, (E_LINE containing word("to") containing word("be")
+   containing word("not") containing word("question")))   
+
+# Finds the LINE where HAMLET says the famous words
+define(HAMLET_SAYS, (TOBENOTQUESTION in HAMLET_SPEAKING))
+</CLIP>
+
+Evaluate the query using plain search:
+
+<CLIP>
+% time sgrep -o "%f:\n %r\n" -f query -e HAMLET_SAYS -F filelist
+/xml/shakespeare.1.10.xml/hamlet.xml:
+ <LINE>To be, or not to be: that is the question:</LINE>
+16.60user 0.78system 0:18.29elapsed 94%CPU (0avgtext+0avgdata 0maxresident)k
+0inputs+0outputs (327major+455minor)pagefaults 0swaps
+</CLIP>
+
+Create an index of the input texts:
+
+<CLIP>
+% time sgrep -I -c index -v -F filelist
+Indexing 43/43 files 14957/14958K (99%)
+Writing index file of 5472K
+Writing index 35840/36691 entries (97%)
+23.65user 4.56system 0:32.77elapsed 86%CPU (0avgtext+0avgdata 0maxresident)k
+0inputs+0outputs (94major+5928minor)pagefaults 0swaps
+</CLIP>
+
+Evaluate the query using index:
+
+<CLIP>
+% time sgrep -x index -o "%f:\n %r\n" -f query -e HAMLET_SAYS -F filelist
+/xml/shakespeare.1.10.xml/hamlet.xml:
+ <LINE>To be, or not to be: that is the question:</LINE>
+1.24user 0.13system 0:01.43elapsed 95%CPU (0avgtext+0avgdata 0maxresident)k
+0inputs+0outputs (536major+728minor)pagefaults 0swaps
+</CLIP>
+
+---------------------------------------------------------------------------
+THAT'S IT! Enjoy!
+---------------------------------------------------------------------------
+
+Please send comments about sgrep-2.0 to
+Jani Jaakkola (jjaakkol@cs.helsinki.fi).
+
+

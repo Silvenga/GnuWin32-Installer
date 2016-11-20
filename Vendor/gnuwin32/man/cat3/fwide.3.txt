@@ -1,0 +1,61 @@
+FWIDE(3)           Linux Programmer's Manual           FWIDE(3)
+
+
+
+
+
+NAME
+       fwide  -  set  and  determine  the orientation of a FILE
+       stream
+
+SYNOPSIS
+       #include <wchar.h>
+
+       int fwide (FILE* stream, int mode);
+
+DESCRIPTION
+       When mode is zero, the  fwide  function  determines  the
+       current orientation of stream. It returns a value > 0 if
+       stream is wide-character oriented, i.e. if wide  charac-
+       ter  I/O  is  permitted  but  char I/O is disallowed. It
+       returns a value < 0 if stream is byte oriented, i.e.  if
+       char  I/O  is permitted but wide character I/O is disal-
+       lowed. It returns zero if stream has no orientation yet;
+       in  this  case  the  next I/O operation might change the
+       orientation (to byte oriented if it is a char I/O opera-
+       tion,  or  to  wide-character  oriented  if it is a wide
+       character I/O operation).
+
+       Once a stream has an orientation, it cannot  be  changed
+       and persists until the stream is closed.
+
+       When mode is non-zero, the fwide function first attempts
+       to set stream's orientation (to wide-character  oriented
+       if  mode  > 0, or to byte oriented if mode < 0). It then
+       returns a value denoting  the  current  orientation,  as
+       above.
+
+RETURN VALUE
+       The  fwide  function  returns  the stream's orientation,
+       after possibly changing it. A return  value  >  0  means
+       wide-character  oriented.  A return value < 0 means byte
+       oriented. A return value zero means undecided.
+
+CONFORMING TO
+       ISO/ANSI C, UNIX98
+
+SEE ALSO
+       fprintf(3), fwprintf(3)
+
+NOTES
+       Wide-character output to a byte oriented stream  can  be
+       performed  through the fprintf function with the %lc and
+       %ls directives.
+
+       Char oriented output to a wide-character oriented stream
+       can  be performed through the fwprintf function with the
+       %c and %s directives.
+
+
+
+GNU                    November 17, 1999               FWIDE(3)

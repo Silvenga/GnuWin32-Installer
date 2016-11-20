@@ -1,0 +1,197 @@
+FAX2TIFF(1)                                         FAX2TIFF(1)
+
+
+
+
+
+NAME
+       fax2tiff  -  create a TIFF Class F fax file from raw fax
+       data
+
+SYNOPSIS
+       fax2tiff [ options ] [ -o output.tif ] input.raw
+
+DESCRIPTION
+       Fax2tiff creates a TIFF file containing CCITT Group 3 or
+       Group  4  encoded data from one or more files containing
+       ``raw'' Group 3  or  Group  4  encoded  data  (typically
+       obtained  directly  from a fax modem).  By default, each
+       row of data in the resultant TIFF file  is  1-dimension-
+       ally  encoded and padded or truncated to 1728 pixels, as
+       needed.  The resultant image is a set of low  resolution
+       (98  lines/inch)  or  medium resolution (196 lines/inch)
+       pages, each of which is a single  strip  of  data.   The
+       generated file conforms to the TIFF Class F (FAX) speci-
+       fication for storing facsimile  data.   This  means,  in
+       particular,  that each page of the data does not include
+       the trailing return to control (RTC) code;  as  required
+       for  transmission  by  the CCITT Group 3 specifications.
+       The old, ``classic'', format is created if the -c option
+       is used.  (The Class F format can also be requested with
+       the -f option.)
+
+       The default name of the output image  is  fax.tif;  this
+       can  be  changed with the -o option.  Each input file is
+       assumed to be a separate page of facsimile data from the
+       same document.  The order in which input files are spec-
+       ified on the command line is  the  order  in  which  the
+       resultant pages appear in the output file.
+
+OPTIONS
+       Options  that  affect  the  interpretation of input data
+       are:
+
+       -3     Assume  input  data  is  CCITT  Group  3  encoded
+              (default).
+
+       -4     Assume input data is CCITT Group 4 encoded.
+
+       -U     Assume  input  data  is  uncompressed (Group 3 or
+              Group 4).
+
+       -1     Assume input data is encoded  with  the  1-dimen-
+              sional  version  of  the  CCITT  Group  3 Huffman
+              encoding algorithm (default).
+
+       -2     Assume input data is 2-dimensional version of the
+              CCITT Group 3 Huffman encoding algorithm.
+
+       -P     Assume  input  data is not EOL-aligned (default).
+              This option has effect with Group 3 encoded input
+              only.
+
+       -A     Assume input data is EOL-aligned. This option has
+              effect with Group 3 encoded input only.
+
+       -M     Treat input data as having bits filled from  most
+              significant bit (MSB) to most least bit (LSB).
+
+       -L     Treat input data as having bits filled from least
+              significant bit (LSB)  to  most  significant  bit
+              (MSB) (default).
+
+       -B     Assume input data was encoded with black as 0 and
+              white as 1.
+
+       -W     Assume input data was encoded with black as 1 and
+              white as 0 (default).
+
+       -R     Specify  the  vertical resolution, in lines/inch,
+              of  the  input  images.   By  default  input  are
+              assumed  to  have  a  vertical  resolution of 196
+              lines/inch.  If images are low resolution facsim-
+              ile,  a  value  of 98 lines/inch should be speci-
+              fied.
+
+       -X     Specify  the  width,  in  pixels,  of  the  input
+              images.   By  default input are assumed to have a
+              width of 1728 pixels.
+
+       Options that affect the output file format are:
+
+       -o     Specify the name of the output file.
+
+       -7     Force output to  be  compressed  with  the  CCITT
+              Group 3 Huffman encoding algorithm (default).
+
+       -8     Force  output  to  be  compressed  with the CCITT
+              Group 4 Huffman encoding.
+
+       -u     Force output to be uncompressed (Group 3 or Group
+              4).
+
+       -5     Force output to be encoded with the 1-dimensional
+              version of the CCITT  Group  3  Huffman  encoding
+              algorithm.
+
+       -6     Force output to be encoded with the 2-dimensional
+              version of the CCITT  Group  3  Huffman  encoding
+              algorithm (default).
+
+       -a     Force the last bit of each End Of Line (EOL) code
+              to land on a byte boundary (default). This ``zero
+              padding''  will  be  reflected in the contents of
+              the Group3Options tag of the resultant TIFF file.
+              This  option has effect with Group 3 encoded out-
+              put only.
+
+       -p     Do not EOL-align output. This option  has  effect
+              with Group 3 encoded output only.
+
+       -c     Generate "classic" Group 3 TIFF format.
+
+       -f     Generate  TIFF Class F (TIFF/F) format (default).
+
+       -m     Force output data to have bits filled  from  most
+              significant bit (MSB) to most least bit (LSB).
+
+       -l     Force  output data to have bits filled from least
+              significant bit (LSB)  to  most  significant  bit
+              (MSB) (default).
+
+       -r     Specify  the  number  of rows (scanlines) in each
+              strip of data written to  the  output  file.   By
+              default  (or  when  value 0 is specified), tiffcp
+              attempts to set the rows/strip that no more  than
+              8  kilobytes  of  data  appear  in  a strip (with
+              except of  G3/G4  compression  schemes).  If  you
+              specify special value -1 it will results in infi-
+              nite number of the rows  per  strip.  The  entire
+              image will be the one strip in that case. This is
+              default  in  case  of  G3/G4  output  compression
+              schemes.
+
+       -s     Stretch  the  input  image  vertically by writing
+              each input row of data twice to the output  file.
+
+       -v     Force  fax2tiff  to  print  the number of rows of
+              data it retrieved from the input file.
+
+       -z     Force output to be compressed with the LZW encod-
+              ing.
+
+DIAGNOSTICS
+       The following warnings and errors come from the decoding
+       routines in the library.
+
+       Warning, %s: Premature EOL at  scanline  %d  (x  %d).\n.
+       The  input  data  had  a  row  that was shorter than the
+       expected width.  The row is padded with white.
+
+       %s: Premature EOF at scanline %d (x %d).\n.  The decoder
+       ran out of data in the middle of a scanline.  The resul-
+       tant row is padded with white.
+
+       %s: Bad code word at row %d, x %d\n.  An invalid Group 3
+       code was encountered while decoding the input file.  The
+       row  number  and  horizontal  position  is  given.   The
+       remainder  of the input row is discarded, while the cor-
+       responding output row is padded with white.
+
+       %s: Bad 2D code word  at  scanline  %d.\n.   An  invalid
+       Group  4 or 2D Group 3 code was encountered while decod-
+       ing the input file.  The row number and horizontal posi-
+       tion  is  given.  The remainder of the input row is dis-
+       carded, while the corresponding  output  row  is  padded
+       with white.
+
+BUGS
+       Input data are assumed to have a a ``top left'' orienta-
+       tion; it should be possible to override this  assumption
+       from the command line.
+
+SEE ALSO
+       CCITT  Recommendation  T.4  (Standardization  of Group 3
+       Facsimile Apparatus for Document Transmission).
+
+       The Spirit of TIFF Class F, an appendix to the TIFF  5.0
+       specification prepared by Cygnet Technologies.
+
+       tiffinfo(1), tiffdither(1), tiffgt(1), libtiff(3)
+
+       Libtiff   library   home   page:  http://www.remotesens-
+       ing.org/libtiff/
+
+
+
+libtiff                 November 2, 2005            FAX2TIFF(1)

@@ -1,0 +1,83 @@
+# Example 9 -- Plot dTdrho-rho section
+
+`Initialize Parameters'
+{
+    \FILE_DATA = "example9a.dat" # T vs rho
+    \FILE_LOCN = "example9b.dat" # section distances
+    #
+    # Following values from ~/eubex/processing/to_rho_bins/do_rho_inter
+    \RHO_MIN = "28.1"
+    \RHO_MAX = "27.5"
+    \RHO_INC = "-0.002"
+    \NY = "301"
+    set missing value -99.0
+    \xmin = "350"
+    \xmax = "0"
+    \xinc = "-100"
+    \ymin = "28.1"
+    \ymax = "27.8"
+    \yinc = "-0.1"
+    \zmin = "-10"		# black
+    \zmax = "0"			# white
+}
+`Initialize Axes'
+Set up axes.
+{
+    set x name "km"
+    set x size 10
+    set x axis \xmin \xmax \xinc
+    set y size 5
+    set y name "$\sigma_T$"
+    set y axis name horizontal
+    set y axis \ymin \ymax \yinc
+    set y format %.1lf
+    draw axes none
+}
+`Initialize Files'
+{
+    query \data "Data file?   " ("\FILE_DATA")
+    query \locn "Station locn?" ("\FILE_LOCN")
+}
+`Read Data'
+{
+    # Read x-locations
+    system awk '{print $2}' < \locn > TMP
+    system wc TMP | awk '{print $1}' > NUM
+    open NUM
+    read .gridx_number.
+    close
+    system rm NUM 
+    open TMP
+    read grid x .gridx_number.
+    close
+    system rm TMP
+    # Create y-locations
+    set y grid \RHO_MIN \RHO_MAX \RHO_INC
+    #
+    # Read data
+    open \data
+    read grid data \NY .gridx_number.
+    close
+}
+Initialize Parameters
+Initialize Axes
+Initialize Files
+Read Data
+set image range \zmin \zmax
+set image colorscale hsb 0 1 1 \zmin   hsb .6 1 1 \zmax
+convert grid to image box \xmin  \ymin \xmax \ymax
+#
+# Draw the image, then draw the axes.  Note that the image has
+# extends beyond the axes frame, so we will turn clipping
+# on before drawing it, to make a clean picture.
+set clip postscript on
+draw image
+set clip postscript off
+draw axes
+
+#
+# All done.
+draw title "Example 9"
+if {"\dohisto" == "yes"}
+    draw title "Histogram enhanced grayscales"
+end if

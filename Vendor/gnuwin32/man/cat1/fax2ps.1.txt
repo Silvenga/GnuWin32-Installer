@@ -1,0 +1,103 @@
+FAX2PS(1)                                             FAX2PS(1)
+
+
+
+
+
+NAME
+       fax2ps - convert a TIFF facsimile to compressed
+
+SYNOPSIS
+       fax2ps [ options ] [ file...  ]
+
+DESCRIPTION
+       fax2ps  reads one or more TIFF facsimile image files and
+       prints a compressed form of
+        on the standard output that is suitable for printing.
+
+       By default, each page is scaled  to  reflect  the  image
+       dimensions  and  resolutions stored in the file.  The -x
+       and -y options can be used to specify the horizontal and
+       vertical  image  resolutions (lines/inch), respectively.
+       If the -S option is specified, each page  is  scaled  to
+       fill  an output page.  The default output page is 8.5 by
+       11 inches.  Alternate page dimensions can  be  specified
+       in inches with the -W and -H options.
+
+       By  default fax2ps generates  for all pages in the file.
+       The -p option can be used to select one  or  more  pages
+       from a multi-page document.
+
+       fax2ps generates a compressed form of  that is optimized
+       for sending pages of text to a  printer  attached  to  a
+       host  through  a low-speed link (such as a serial line).
+       Each output page is filled with white and then only  the
+       black  areas are drawn.  The  specification of the black
+       drawing operations is optimized by using a special  font
+       that  encodes  the move-draw operations required to fill
+       the black regions on the page.  This compression  scheme
+       typically  results  in a substantially reduced  descrip-
+       tion, relative to the  straightforward  imaging  of  the
+       page  with  a  image operator.  This algorithm can, how-
+       ever, be ineffective for continuous-tone  and  white-on-
+       black  images.   For  these images, it sometimes is more
+       efficient to send the raster bitmap image directly;  see
+       tiff2ps(1).
+
+OPTIONS
+       -p number Print only the indicated page.  Multiple pages
+                 may be printed by specifying this option  more
+                 than once.
+
+       -x resolution
+                 Use  resolution  as the horizontal resolution,
+                 in dots/inch, of the image data.   By  default
+                 this value is taken from the file.
+
+       -y resolution
+                 Use  resolution as the vertical resolution, in
+                 lines/inch, of the  image  data.   By  default
+                 this value is taken from the file.
+
+       -S        Scale each page of image data to fill the out-
+                 put page dimensions.  By  default  images  are
+                 presented  according to the dimension informa-
+                 tion recorded in the TIFF file.
+
+       -W width  Use width as the width, in inches, of the out-
+                 put page.
+
+       -H height Use  height  as  the height, in inches, of the
+                 output page.
+
+DIAGNOSTICS
+       Some messages about malformed TIFF images come from  the
+       TIFF library.
+
+       Various  messages about badly formatted facsimile images
+       may be generated due to transmission errors in  received
+       facsimile.   fax2ps  attempts  to recover from such data
+       errors by resynchronizing decoding at  the  end  of  the
+       current  scanline.   This  can result in long horizontal
+       black lines in the resultant
+        image.
+
+NOTES
+       If the destination printer supports  Level II then it is
+       always  faster to just send the encoded bitmap generated
+       by the tiff2ps(1) program.
+
+BUGS
+       fax2ps should probably figure out when  it  is  doing  a
+       poor job of compressing the output and just generate
+        to image the bitmap raster instead.
+
+SEE ALSO
+       tiff2ps(1), libtiff(3)
+
+       Libtiff   library   home   page:  http://www.remotesens-
+       ing.org/libtiff/
+
+
+
+libtiff                 November 2, 2005              FAX2PS(1)

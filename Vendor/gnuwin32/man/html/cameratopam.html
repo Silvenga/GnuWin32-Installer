@@ -1,0 +1,191 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Cameratopam User Manual</TITLE></HEAD>
+<BODY>
+<H1>pamflip</H1>
+Updated: 12 April 2005
+<BR>
+<A HREF="cameratopam.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+cameratopam - convert raw camera image to PAM
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<b>cameratopam</b>
+
+[<i>input_file_name</i>]
+
+[<b>-identify_only</b>]
+[<b>-quick_interpolate</b>]
+[<b>-half_size</b>]
+[<b>-four_color_rgb</b>]
+[<b>-document_mode</b>]
+[<b>-balance_auto</b>]
+[<b>-balance_camera</b>]
+[<b>-red_scale=</b><i>float</i>]
+[<b>-blue_scale=</b><i>float</i>]
+[<b>-brightness=</b><i>fraction</i>]
+[<b>-no_clip_color</b>]
+[<b>-rgb</b>]
+[<b>-secondary</b>]
+[<b>-linear</b>]
+[<b>-verbose</b>]
+
+
+<P>All options can be abbreviated to their shortest unique prefix.  You
+may use two hyphens instead of one to designate an option.  You may
+use either white space or an equals sign between an option name and
+its value.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>cameratopam</b> converts from any of dozens of raw camera image
+formats to PAM.  
+
+<p>Digital still cameras often can produce images in a special raw
+format in addition to something more standard such as TIFF or JFIF
+(JPEG).  Software supplied with the camera allows you to manipulate
+the image using information which is lost when the camera converts to
+the common format.  A particular camera model often has a unique raw
+format.
+
+
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<dl>
+<dt><b>-identify_only</b>
+
+<dd>Report to Standard Error the format of the input image but don't
+generate an output image.  Program fails if it cannot recognize the
+format.
+
+<dt><b>-verbose</b>
+
+<dd>Report to Standard Error details of the processing.
+
+<dt><b>-quick_interpolate</b>
+
+<dd>Use simple bilinear interpolation for quick results.  The default
+is to use a slow, high-quality adaptive algorithm.
+
+<dt><b>-half_size</b>
+
+<dd>Half-size the output image.  Instead of interpolating, reduce
+each 2x2 block of sensors to one pixel.  Much faster than
+<b>-quick_interpolate</b>.
+
+<dt><b>-four_color_rgb</b>
+
+<dd>Interpolate RGB as four colors.  This causes a slight loss of
+detail, so use this only if you see false 2x2 mesh patterns in blue
+sky.
+
+<dt><b>-document_mode</b>
+
+<dd>Show the raw data as a grayscale image with no interpolation.
+This is good for photographing black and white documents.
+
+<dt><b>-balance_auto</b>
+
+<dd>Automatic color balance.  The default is to use a fixed
+color balance based on a white card photographed in sunlight.
+
+<dt><b>-balance_camera</b>
+
+<dd>Use the color balance specified by the camera.  If
+<B>cameratopam</B> can't find this, it prints a warning and reverts to
+the default.
+
+<dt><b>-red_scale=</b><i>float</i>
+<dt><b>-blue_scale</b><i>float</i>
+
+<dd>Further adjust the color balance by multiplying the red and blue
+channels by these values.  Both default to 1.0.
+
+<dt><b>-brightness=</b><i>float</i>
+
+<dd>Change the output brightness.  Default is 1.0.
+
+<dt><b>-no_clip_color</b>
+
+<dd>By default, <b>cameratoapm</b> clips all colors to prevent pink
+hues in the highlights.  Combine this option with
+<b>-brightness=0.25</b> to leave the image data completely unclipped.
+
+<dt><b>-rgb</b>
+
+<dd>Write raw camera colors to the output file.  By default,
+<b>cameratoapm</b> converts to sRGB colorspace.
+
+<dt><b>-secondary</b>
+
+<dd>For cameras based on the Fuji Super CCD SR, this option causes
+<b>cameratopam</b> to use the secondary sensors, in effect
+underexposing the image by four stops to reveal detail in the
+highlights.  <b>cameratopam</b> silently ignores this option for all
+other cameras.
+
+<dt><b>-linear</b>
+
+<dd>This option causes <b>cameratopam</b> to generate a variation on
+PAM that has &quot;linear&quot; color samples.  In true PAM, each
+sample in the image raster is gamma-corrected; i.e. it is essentially
+proportional to brightness.  With the <b>linear</b> option,
+<b>cameratopam</b> generates an image in which the samples are instead
+proportional to light intensity.
+
+<p>Without <b>-linear</b>, the image maxval is 255, so the image
+contains one byte per sample.  With <b>-linear</b>, the maxval is
+65535, so the image contains two bytes per sample.
+
+<p>Without <b>-linear</b>, <b>cameratopam</b> uses a 99th percentile
+white point.  With <b>-linear</b>, it doesn't.  I don't know what that
+means.
+
+</dl>
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<A HREF="411toppm.html">411toppm</A>, 
+<A HREF="http://netpbm.sourceforge.net/doc/pamflipo.html">pamflip</A>, 
+<A HREF="pam.html">pam</A>,
+
+<A NAME="lbAG">&nbsp;</A>
+
+<A NAME="history"></A>
+<H2>HISTORY</H2>
+
+<P><b>cameratopam</b> was new in Netpbm 10.28 (June 2005).
+
+<p>It was derived from the program <b>dcraw</b> by Dave Coffin,
+available at , by Bryan Henderson in April 2005.  Bryan replaced the
+part that generates the Netpbm output image and removed the Adobe
+Photoshop output function.  Bryan changed the command syntax and and
+made other small changes to make the program consistent with Netpbm.
+He also split the source code into manageable pieces (<b>dcraw</b> has
+a single 5000 line source file).
+
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<li><A HREF="cameratopam.html#lbAB">NAME</A>
+<li><A HREF="cameratopam.html#lbAC">SYNOPSIS</A>
+<li><A HREF="cameratopam.html#lbAD">DESCRIPTION</A>
+<li><A HREF="cameratopam.html#lbAE">OPTIONS</A>
+<li><A HREF="cameratopam.html#lbAF">SEE ALSO</A>
+<li><A HREF="cameratopam.html#history">HISTORY</A>
+</UL>
+</BODY>
+</HTML>

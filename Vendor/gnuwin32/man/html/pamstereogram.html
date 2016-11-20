@@ -1,0 +1,274 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+<title>Pamstereogram User Manual</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+
+<body>
+<h1>pamstereogram</h1>
+
+Updated: 18 April 2004
+<br>
+<a href="pamstereogram.html#contents">Table Of Contents</a> 
+
+<h2 id="name">NAME</h2>
+
+pamstereogram - create a PAM single-image stereogram from a PAM
+height map
+
+<h2 id="synopsis">SYNOPSIS</h2>
+
+<b>pamstereogram</b>
+[<b>-help</b>]
+[<b>-verbose</b>]
+[<b>-pbm</b> | <b>-pgm</b> | <b>-ppm</b>]
+[<b>-maxval</b> <i>value</i>]
+[<b>-patfile</b> <i>pnmfile</i>]
+[<b>-pam</b>]
+[<b>-xshift</b> <i>pixels</i>]
+[<b>-yshift</b> <i>pixels</i>]
+[<b>-magnifypat</b> <i>scale</i>]
+[<b>-guidesize</b> <i>pixels</i>]
+[<b>-dpi</b> <i>resolution</i>]
+[<b>-crosseyed</b>]
+[<b>-makemask</b>]
+[<b>-eyesep</b> <i>inches</i>]
+[<b>-depth</b> <i>fraction</i>]
+[<i>infile</i>]
+
+<?makeman .SH OPTION USAGE ?>
+
+<p>Minimum unique abbreviation of option is acceptable.  You may use
+double hyphens instead of single hyphen to denote options.  You may use
+white space in place of the equals sign to separate an option name
+from its value.
+
+
+<h2 id="description">DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pamstereogram</b> inputs a height map (a map of the distances
+from your eye of the points in a scene) and outputs a single-image
+stereogram (SIS).  A SIS is a 2-D image specially designed to appear
+three dimensional when viewed with relaxed, slightly unfocused eyes.
+What's exciting about single-image stereograms is that they don't
+require special glasses to view, although it does require a bit of
+practice to train your eyes to unfocus properly.  <b>pamstereogram</b>
+program provides a wealth of control over how the stereogram is
+generated, including the following:</p>
+
+<ul>
+<li>black and white, grayscale, or color output</li>
+
+<li>single-image random-dot stereograms (SIRDS) or single-image
+stereograms (SIS) using a tiled image</li>
+
+<li>images targeting a given device resolution and eye separation</li>
+
+<li>optional guide boxes to assist in focusing</li>
+
+<li>the ability to trade off depth levels for easier viewing</li>
+
+<li>choice of ordinary or cross-eyed stereograms</li>
+</ul>
+
+<p>The output is a PAM image on Standard Output.  Options control the
+exact format of the PAM.  If you want a PNM (PBM, PGM, or PPM) image,
+use <b>pamtopnm</b> on the output.
+
+<p>To make a red/green type of stereogram (that you view with 3-D
+glasses) instead, see <b>ppm3d</b>x
+
+<h2 id="options">OPTIONS</h2>
+
+<dl compact> <dt><b>-verbose</b></dt> <dd>Display messages about image
+sizes and formats and properties of the stereogram being
+generated.</dd>
+
+<dt><b>-blackandwhite</b></dt>
+
+<dd>Produce a single-image random-dot black and white stereogram.
+This is the default.</dd>
+
+<dt><b>-grayscale</b></dt>
+
+<dd>Produce a single-image random-dot grayscale stereogram.
+
+<dt><b>-color</b></dt>
+<dd>Produce a single-image random-dot color stereogram.
+
+<dt><b>-maxval=</b><i>value</i></dt>
+
+<dd>Designate the maximum value of each gray/color component, i.e.
+the color resolution.  Smaller values make the output image have
+smaller numbers of unique grays/colors.  If you don't specify
+<b>-maxval</b>, <b>pamstereogram</b> uses the maxval of the input
+image.  This option has no effect with <b>-blackandwhite</b>.
+
+<dt><b>-patfile=</b><i>pnmfile</i></dt>
+
+<dd>Specify an image to use as a repeated background pattern for the
+stereogram instead of a random-dot pattern.  Intricate images
+generally produce a crisper 3-D effect that simpler images.  The
+output file will have the same maxval and format (black and white,
+grayscale or color) as the pattern file.  You cannot specify the
+<b>-patfile</b> option along with <b>-blackandwhite</b>,
+<b>-grayscale</b>, <b>-color</b>, or <b>-maxval</b>.
+
+<dt><b>-xshift=</b><i>pixels</i></dt>
+<dd>Shift the pattern image (designated by <b>-patfile</b>) to the
+right by <i>pixels</i> pixels (default: 0).  <b>-xshift</b> is helpful
+when creating "true-color" stereograms.  This option is valid only
+along with <b>-patfile</b>.
+
+<dt><b>-yshift</b> <i>pixels</i></dt>
+<dd>Shift the pattern image (designated by <b>-patfile</b>) downwards
+by <i>pixels</i> pixels (default: 0).    This option is valid only
+along with <b>-patfile</b>.
+
+<dt><b>-magnifypat=</b><i>scale</i></dt>
+
+<dd>Magnify each pixel in the pattern file or each random dot by
+integral scaling factor <i>scale</i>.  Note that <b>pamstereogram</b>
+applies the pattern magnification <em>after</em> pattern shifting
+(<b>-xshift</b> and <b>-yshift</b>).</dd>
+
+<dt><b>-guidesize=</b><i>pixels</i></dt>
+
+<dd>Draw a pair of <i>pixels</i> by <i>pixels</i> black squares on
+a white background underneath the stereogram proper.  These squares
+help you guide your eyes into proper focus to view the 3-D image.
+The trick is to focus your eyes some distance behind the image,
+causing you to see four black squares, then continue altering your
+focus distance until the middle two black squares fuse into a
+single black square.  At that point, a crisp, 3-D image will appear.
+
+<p>If <i>pixels</i> is negative, <b>pamstereogram</b> will draw the
+guide squares above the stereogram instead of below it.  If
+<i>pixels</i> is zero (the default), <b>pamstereogram</b> will draw 
+no guide squares.
+
+<dt><b>-dpi=</b><i>resolution</i></dt>
+<dd>Specify the resolution of the output device in dots per inch.
+The default is 96 DPI, which represents a fairly crisp screen
+resolution.</dd>
+
+<dt><b>-crosseyed</b></dt>
+<dd>Invert the gray levels in the height map (input image) so that
+the 3-D image pops out of the page where it would otherwise sink
+into the page and vice versa.  Some people are unable to diverge
+their eyes and can only cross them. The <b>-crosseyed</b> option
+enables such people to see the 3-D image as intended.</dd>
+
+<dt><b>-makemask</b></dt>
+
+<dd>Instead of a stereogram, output a PAM mask image showing coloring
+constraints.  New pixels will be taken from the pattern file where the
+mask is black.  Copies of existing pixels will be taken from the
+pattern file where the mask is white.  The <b>-makemask</b> option can
+be used to help create more sophisticated pattern files (to use with
+<b>-patfile</b>) Note that <b>-makemask</b> ignores
+<b>-magnifypat</b>; it always produces masks that assume a pattern
+magnification of 1.
+
+<dt><b>-eyesep=</b><i>inches</i></dt>
+
+<dd>Specify the separation in inches between your eyes. The default,
+2.5 inches (6.4 cm), should be sufficient for most people and probably
+doesn't need to be changed.</dd>
+
+<dt><b>-depth=</b><i>fraction</i></dt>
+
+<dd>Specify the output image's depth of field. That is,
+<i>fraction</i> represents the fractional distance of the near plane
+from the far plane.  Smaller numbers make the 3-D image easier to
+perceive but flatter.  Larger numbers make the 3-D image more
+difficult to perceive but deeper.  The default, 0.3333, generally
+works fairly well.</dd>
+
+</dl>
+
+<h2 id="parameters">PARAMETERS</h2>
+
+<p>The only parameter, <i>infile</i>, is the name of an input file
+that is a height map image.  If you don't specify <i>infile</i>,
+the input is from Standard Input.
+
+<p>The input is a PAM image of depth 1.  Each sample represents the
+distance from the eye that the 3-D image at that location should be.
+Higher numbers mean further from the eye.
+
+<p><b>pamstereogram</b> pays no attention the the image's tuple type
+and ignores all planes other than Plane 0.
+
+<p>Like any Netpbm program, <b>pamstereogram</b> will accept PNM input
+as if it were the PAM equivalent.
+
+<p>A good initial test is to input an image consisting of a solid image
+of distance 0 within a large field of maximum distance.
+
+
+<h2 id="examples">EXAMPLES</h2>
+
+<p>Generate a SIRDS out of small, brightly colored squares and prepare
+it for display on an 87 DPI monitor:</p>
+
+<pre>
+   pamstereogram heightmap.pam \
+                 -dpi 87 -verbose -color -maxval 1 -magnifypat 3 \
+                 &gt;3d.pam
+</pre>
+
+<p>Generate a SIS by tiling a PPM file (a prior run with
+<b>-verbose</b> indicates how wide the pattern file should be for
+seamless tiling, although any width is acceptable for producing
+SISes):</p>
+
+<pre>
+   pamstereogram myheights.pam -patfile mypattern.ppm &gt;mysis.pam
+</pre>
+
+
+<h2 id="seealso">SEE ALSO</h2>
+
+<ul>
+<li><a href="pam.html">pam</a></li>
+<li><a href="ppm3d.html">ppm3d</a></li>
+
+<li>Harold W. Thimbleby, Stuart Inglis, and Ian H. Witten.
+<em>Displaying 3D Images: Algorithms for Single Image Random Dot
+Stereograms</em>. In IEEE Computer, <strong>27</strong>(10):38-48,
+October 1994.</li>
+</ul>
+
+
+<h2><a name="history">HISTORY</a></h2>
+
+<p><b>pamstereogram</b> was new in Netpbm 10.22 (April 2004).</p>
+
+
+<h2><a name="author">AUTHOR</a></h2>
+
+<p>Copyright (C) 2004 Scott Pakin, 
+<a href="mailto:scott+pbm@pakin.org">scott+pbm@pakin.org</a>.</p>
+
+
+<h2><a name="contents">Table Of Contents</a></h2>
+
+<ul>
+<li><a href="pamstereogram.html#name">NAME</a></li>
+<li><a href="pamstereogram.html#synopsis">SYNOPSIS</a></li>
+<li><a href="pamstereogram.html#description">DESCRIPTION</a></li>
+<li><a href="pamstereogram.html#options">OPTIONS</a></li>
+<li><a href="pamstereogram.html#parameters">PARAMETERS</a></li>
+<li><a href="pamstereogram.html#examples">EXAMPLES</a></li>
+<li><a href="pamstereogram.html#seealso">SEE ALSO</a></li>
+<li><a href="pamstereogram.html#history">HISTORY</a></li>
+<li><a href="pamstereogram.html#author">AUTHOR</a></li>
+</ul>
+
+</body>
+</html>
+

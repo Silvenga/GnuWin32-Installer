@@ -1,0 +1,227 @@
+<?xml version="1.1" encoding="iso-8859-1" ?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+
+<head>
+<title>Infotopam User Manual</title>
+</head>
+
+<body>
+
+<h1>infotopam</h1>
+
+<p>Updated: 07 April 2004</p>
+
+<p><a href="infotopam.html#index">Table Of Contents</a></p>
+
+<h2 id="name">NAME</h2>
+
+<p>infotopam - convert Amiga .info icons to PAM</p>
+
+<h2 id="synopsis">SYNOPSIS</h2>
+
+<p>
+<b>infotopam</b>
+[<b>-forcecolor</b>]
+[<b>-numcolors</b> <i>numcolors</i>]
+[<b>-selected</b>]
+[<i>index color</i> ...]
+[<i>filename</i>]
+</p>
+
+<p>Minimum unique abbreviation of option is acceptable.  You may use double
+hyphens instead of single hyphen to denote options.  You may use white space in
+place of the equals sign to separate an option name from its value.</p>
+
+<h2 id="examples">EXAMPLES</h2>
+
+<p>By default, <b>infotopam</b> converts the first icon in a .info file:</p>
+
+  <pre>
+    infotopam amiga.info &gt; amiga.first.pam
+  </pre>
+
+<p>Use the <i>-selected</i> option to convert the second icon in a .info
+file.  Here <b>infotopam</b> reads from Standard Input:</p>
+
+  <pre>
+    infotopam -selected &lt; amiga.info &gt; amiga.second.pam
+  </pre>
+
+<p>Use the <i>-forcecolor</i> option to force color conversion for a 1
+bit-plane .info file:</p>
+
+  <pre>
+    infotopam -forcecolor bw.info &gt; bw.pam
+  </pre>
+
+<p>Use <i>-numcolors</i> to override colors for indexes 0 and 3.  Notice the
+two ways to specify the color:</p>
+
+  <pre>
+    infotopam -numcolors 2 0 green 3 #FF0000 icon.info &gt; icon.pam
+  </pre>
+
+<p>Since Amiga monitors do not use square pixels, some icons may appear
+squished.  Filtering the output through <b>pamscale</b> can fix this:</p>
+
+  <pre>
+     infotopam squish.info | pamtopnm | pamscale -yscale 1.7 &gt; normal.pnm
+  </pre>
+
+<h2 id="description">DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>infotopam</b> converts an Amiga .info (icon) file to a PAM image.
+<b>infotopam</b> reads a .info file from <i>filename</i>, or from Standard
+Input if you do not specify a file name, and writes the converted PAM image to
+Standard Output.</p>
+
+<p><b>infotopam</b> currently handles 1 and 2 bit-plane icons.  If the .info
+icon only has 1 bit-plane, <b>infotopam</b> generates a bitmap
+(black&amp;white) PAM image; otherwise it generates a color PAM image.  You
+can force <b>infotopam</b> to convert 1 bit-plane images to color PAM images by
+using the <i>-forcecolor</i> option.</p>
+
+<h2 id="options">OPTIONS</h2>
+
+<dl>
+  <dt><b>-forcecolor</b></dt>
+
+  <dd><p>Forces <b>infotopam</b> to convert 1 bit-plane icons to color PAM
+  images instead of bitmap PAM images.  <b>infotopam</b> uses the index 2
+  color for black and the index 1 color for white (more on this
+  below).</p></dd>
+
+  <dt><b>-numcolors</b> <i>numcolors</i></dt>
+
+  <dd><p>Tells <b>infotopam</b> how many colors to override.  Pixels in the
+  Amiga .info files are assigned an index value rather than a specific color.
+  The standard colors for a 2 bit-plane icon are:</p>
+
+  <pre>
+    Index 0:  Blue   (00, 55, AA)
+    Index 1:  White  (FF, FF, FF)
+    Index 2:  Black  (00, 00, 20)
+    Index 3:  Orange (FF, 8A, 00)
+  </pre>
+
+  <p>To override the colors, first specify how many colors to override using
+  <i>-numcolors</i>, then specify an (<i>index color</i>) pair for each color
+  you want to override, where <i>index</i> is a value from 0 to 3 and
+  <i>color</i> the the new color for that index.  Specify <i>color</i> as
+  described for the <a href= "libppm.html#colorname"><b>ppm_parsecolor()</b>
+  argument</a>.</p></dd>
+
+  <dt><b>-selected</b></dt>
+
+  <dd>Tells <b>infotopam</b> to convert the selected (second) icon instead of
+  the normal (first) icon.  Each Amiga .info icon file contains two icon
+  images.  The first image is the normal, unselected icon, and the second
+  image is the selected icon.  By default <b>infotopam</b> converts the first
+  icon.  You can tell <b>infotopam</b> to convert the second icon by using the
+  <i>-selected</i> option.</dd>
+
+</dl>
+
+<p>All options can be abbreviated to their shortest unique prefix.</p>
+
+<h2 id="seealso">SEE ALSO</h2>
+
+<p>
+  <a href="pam.html">pam</a>
+  <a href="pamtopnm.html">pamtopnm</a>
+  <a href="pamscale.html">pamscale</a>
+</p>
+
+<h2 id="notes">NOTES</h2>
+
+<p>Thanks to the following people on comp.sys.amiga.programmer for tips
+and pointers on decoding the info file format:</p>
+
+<ul>
+  <li>Ben Hutchings</li>
+  <li>Thomas Richter</li>
+  <li>Kjetil Svalastog Matheussen</li>
+  <li>Anders Melchiorsen</li>
+  <li>Dirk Stoecker</li>
+  <li>Ronald V.D.</li>
+</ul>
+
+<p>The format of the Amiga .info file is as follows:</p>
+
+  <pre>
+    DiskObject header            78 bytes
+    Optional DrawerData header   56 bytes
+    First icon header            20 bytes
+    First icon data              Varies
+    Second icon header           20 bytes
+    Second icon data             Varies  
+  </pre>
+
+<p>The DiskObject header contains, among other things, the magic number
+(0xE310), the object width and height (inside the embedded Gadget header),
+and the version.</p>
+
+<p>Each icon header contains the icon width and height, which can be smaller
+than the object width and height, and the number of bit-planes.</p>
+
+<p>The icon data has the following format:</p>
+
+  <blockquote>
+    <p><i>BIT-PLANE</i> planes, each with <i>HEIGHT</i> rows of (<i>WIDTH</i>
+    +15) / 16 * 2 bytes length.</p>
+  </blockquote>
+
+<p>So if you have a 9x3x2 icon, the icon data will look like this:</p>
+
+  <pre>
+    aaaa aaaa a000 0000
+    aaaa aaaa a000 0000
+    aaaa aaaa a000 0000
+    bbbb bbbb b000 0000
+    bbbb bbbb b000 0000
+    bbbb bbbb b000 0000
+  </pre>
+
+<p>where <i>a</i> is a bit for the first bit-plane, <i>b</i> is a bit for the
+second bit-plane, and <i>0</i> is padding.  Thanks again to Ben Hutchings for
+his very helpful post!</p>
+
+<h2 id="history">HISTORY</h2>
+
+<p><b>infotopam</b> was new in Netpbm 10.22 (April 2004).
+
+<h2 id="limitations">LIMITATIONS</h2>
+
+
+<p><b>infotopam</b> currently only handles 1 and 2 bit-plane icons.</p>
+
+<p>There is no <b>pamtoinfo</b> command, since the .info files contain a lot
+more than just icon data, and mapping the colors would be difficult.</p>
+
+<h2 id="author">AUTHOR</h2>
+
+<p>Copyright (C) 2000, 2004 by Richard Griswold.</p>
+
+<hr />
+
+<a id="index">&nbsp;</a>
+<h2>Table Of Contents</h2>
+
+<ul>
+  <li><a href="infotopam.html#name">NAME</a></li>
+  <li><a href="infotopam.html#synopsis">SYNOPSIS</a></li>
+  <li><a href="infotopam.html#examples">EXAMPLES</a></li>
+  <li><a href="infotopam.html#description">DESCRIPTION</a></li>
+  <li><a href="infotopam.html#options">OPTIONS</a></li>
+  <li><a href="infotopam.html#seealso">SEE ALSO</a></li>
+  <li><a href="infotopam.html#notes">NOTES</a></li>
+  <li><a href="infotopam.html#history">HISTORY</a></li>
+  <li><a href="infotopam.html#limitations">LIMITATIONS</a></li>
+  <li><a href="infotopam.html#author">AUTHOR</a></li>
+</ul>
+
+</body>
+</html>

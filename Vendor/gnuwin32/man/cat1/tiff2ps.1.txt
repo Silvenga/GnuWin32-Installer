@@ -1,0 +1,167 @@
+TIFF2PS(1)                                           TIFF2PS(1)
+
+
+
+
+
+NAME
+       tiff2ps - convert a TIFF image to
+
+SYNOPSIS
+       tiff2ps [ options ] input.tif ...
+
+DESCRIPTION
+       tiff2ps  reads  TIFF  images and writes  or Encapsulated
+       (EPS) on  the  standard  output.   By  default,  tiff2ps
+       writes  Encapsulated   for the first image in the speci-
+       fied TIFF image file.
+
+       By default, tiff2ps will generate  that fills a  printed
+       area  specified  by the TIFF tags in the input file.  If
+       the file does not  contain  XResolution  or  YResolution
+       tags,  then  the  printed  area  is set according to the
+       image dimensions.  The -w and -h options (see below) can
+       be  used  to  set  the dimensions of the printed area in
+       inches; overriding any relevant TIFF tags.
+
+       The  generated for RGB, palette, and  CMYK  images  uses
+       the  colorimage  operator.  The  generated for greyscale
+       and bilevel images uses the image  operator.   When  the
+       colorimage operator is used,  code to emulate this oper-
+       ator on older  printers is also  generated.   Note  that
+       this emulation code can be very slow.
+
+       Color  images  with associated alpha data are composited
+       over a white background.
+
+OPTIONS
+       -1     Generate  Level 1 (the default).
+
+       -2     Generate  Level 2.
+
+       -3     Generate  Level 3. It basically allows one to use
+              the  /flateDecode  filter for ZIP compressed TIFF
+              images.
+
+       -a     Generate output for all IFDs (pages) in the input
+              file.
+
+       -b     Specify  the  bottom  margin  for  the output (in
+              inches). This does not affect the height  of  the
+              printed image.
+
+       -c     Center  the image in the output. This option only
+              shows an effect if both the -w and the -h  option
+              are given.
+
+       -d     Set  the  initial TIFF directory to the specified
+              directory number.  (NB: directories are  numbered
+              starting  at  zero.)   This  option is useful for
+              selecting individual pages in a multi-page  (e.g.
+              facsimile) file.
+
+       -e     Force  the  generation  of Encapsulated  (implies
+              -z).
+
+       -h     Specify the vertical size of the printed area (in
+              inches).
+
+       -H     Specify  the maximum height of image (in inches).
+              Images with larger sizes will be split in several
+              pages.  Option -L may be used for specifying size
+              of split images overlapping.
+
+       -i     Enable/disable pixel interpolation.  This  option
+              requires  a single numeric value: zero to disable
+              pixel interpolation and non-zero to enable.   The
+              default is enabled.
+
+       -L     Specify  the size of overlapping for split images
+              (in inches). Used in conjunction with -H  option.
+
+       -l     Specify  the  left  margin  for  the  output  (in
+              inches). This does not affect the  width  of  the
+              printed image.
+
+       -m     Where possible render using the imagemask
+               operator  instead  of  the image operator.  When
+              this option is specified tiff2ps will use  image-
+              mask  for  rendering  1 bit deep images.  If this
+              option is not specified or if the image depth  is
+              greater than 1 then the image operator is used.
+
+       -o     Set  the initial TIFF directory to the IFD at the
+              specified file offset.  This option is useful for
+              selecting thumbnail images and the like which are
+              hidden using the SubIFD tag.
+
+       -p     Force the generation of (non-Encapsulated) .
+
+       -r     Rotate image by 180 degrees.
+
+       -s     Generate output for a single IFD  (page)  in  the
+              input file.
+
+       -w     Specify  the  horizontal size of the printed area
+              (in inches).
+
+       -x     Override resolution units specified in  the  TIFF
+              as centimeters.
+
+       -y     Override  resolution  units specified in the TIFF
+              as inches.
+
+       -z     When generating  Level 2, data is scaled so  that
+              it  does  not  image  into the deadzone on a page
+              (the outer margin that  the  printing  device  is
+              unable  to  mark).   This  option suppresses this
+              behavior.  When  Level 1 is  generated,  data  is
+              imaged to the entire printed page and this option
+              has no affect.
+
+EXAMPLES
+       The following generates  Level 2 for all pages of a fac-
+       simile:
+              tiff2ps -a2 fax.tif | lpr
+       Note  also  that  if  you have version 2.6.1 or newer of
+       Ghostscript then you can efficiently  preview  facsimile
+       generated with the above command.
+
+       To generate Encapsulated  for a the image at directory 2
+       of an image use:
+              tiff2ps -d 1 foo.tif
+       (notice that directories are numbered starting at zero.)
+
+       If  you  have  a  long image, it may be split in several
+       pages:
+              tiff2ps -h11 -w8.5 -H14 -L.5 foo.tif > foo.ps
+       The page size is set to 8.5x11 by -w and -h options.  We
+       will  accept  a small amount of vertical compression, so
+       -H set to 14. Any pages between 11 and 14 inches will be
+       fit  onto one page.  Pages longer than 14 inches are cut
+       off at 11 and continued  on  the  next  page.  The  -L.5
+       option  says  to repeat a half inch on the next page (to
+       improve readability).
+
+BUGS
+       Because  does not support  the  notion  of  a  colormap,
+       8-bit  palette images produce 24-bit  images.  This con-
+       version results in output that is six times bigger  than
+       the  original  image and which takes a long time to send
+       to a printer over a serial line.  Matters are even worse
+       for 4-, 2-, and 1-bit palette images.
+
+BUGS
+       Does  not handle tiled images when generating PS Level I
+       output.
+
+SEE ALSO
+       pal2rgb(1), tiffinfo(1), tiffcp(1),  tiffgt(1),  tiffme-
+       dian(1), tiff2bw(1), tiffsv(1), libtiff(3)
+
+       Libtiff   library   home   page:  http://www.remotesens-
+       ing.org/libtiff/
+
+
+
+libtiff                 November 2, 2005             TIFF2PS(1)

@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pnmremap User Manual</TITLE></HEAD>
+<BODY>
+<H1>pnmremap</H1>
+Updated: 01 January 2002
+<BR>
+<A HREF="pnmremap.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pnmremap - replace colors in a PNM image with colors from another set
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pnmremap</B>
+
+[<B>-floyd</B>|<B>-fs</B>|<B>-nfloyd</B>|<B>-nofs</B>]
+
+[<B>-firstisdefault</B>]
+
+[<B>-verbose</B>]
+
+[<B>-mapfile=</B><I>palettefile</I>]
+
+[<B>-missingcolor=</B><I>color</I>]
+
+[<I>pnmfile</I>]
+
+<P>All options can be abbreviated to their shortest unique prefix.
+You may use two hyphens instead of one to designate an option.  You
+may use either white space or an equals sign between an option name
+and its value.
+
+<A NAME="description">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<P><B>pnmremap</B> replaces the colors in an input image with those
+from a palette you specify.  Where colors in the input are present in
+the palette, they just stay the same in the output.  But where the
+input contains a color that is not in the palette, <b>pnmremap</b>
+gives you three choices: 1) choose the closest color from the palette;
+2) choose the first color from the palette; 3) use a color specified
+by a command option.
+
+<p>You can also dither, which means rather than mapping pixel by
+pixel, <b>pnmremap</b> uses colors from the palette to try to make
+multi-pixel regions of the output have the same average color as the
+input.
+
+<P>Two reasons to do this are: 1) you want to reduce the number of
+colors in the input image; and 2) you need to feed the image to
+something that can handle only certain colors.
+
+<P>To reduce colors, you can generate the palette with
+<B>pnmcolormap</B>.
+
+<p>By default, <b>pnmremap</b> maps an input color that is not in the
+palette to the closest color that <em>is</em> in the palette.  Closest
+means with the smallest cartesian distance in the red, green, blue
+brightness space (smallest sum of the squares of the differences in
+red, gree, and blue ITU Rec 709 gamma-adjusted intensities).
+
+<p>You can instead specify a single default color for <b>pnmremap</b>
+to use for any color in the input image that is not in the palette.
+Use the <b>-missing</b> option for this.
+
+<p>You can also specify that the first color in the palette image
+is the default.  Use the <b>-firstisdefault</b> option for this.
+
+<p>The palette is simply a PNM image.  The colors of the pixels in the
+image are the colors in the palette.  Where the pixels appear in the
+image, and the dimensions of the image, are irrelevant.  Multiple
+pixels of the same color are fine.  However, a palette image is
+typically a single row with one pixel per color.
+
+<p>If you specify <b>-missing</b>, the color you so specify is in
+the palette in addition to whatever is in the palette image.
+
+<p>For historical reasons, Netpbm sometimes calls the palette a
+&quot;colormap.&quot; But it doesn't really map anything.
+<b>pnmremap</b> creates its own map, based on the palette, to map
+colors from the input image to output colors.
+
+<h3 id="mismatch">Palette/Image Type Mismatch</h3>
+
+<p>In the simple case, the palette image is of the same depth (number
+of planes, i.e. number of components in each tuple (pixel)) as the
+input image and <b>pnmremap</b> just does a straightforward search of
+the palette for each input tuple (pixel).  In fact, <b>pnmremap</b>
+doesn't even care if the image is a visual image.
+
+<p>But what about when the depths differ?  In that case,
+<b>pnmremap</b> converts the input image (in its own memory) to match
+the palette and then proceeds as above.
+
+<p>There are only two such cases in which <b>pnmremap</b> knows how to
+do the conversion when one of them is tuple type RGB, depth 3, and the
+other is tuple type GRAYSCALE or BLACKANDWHITE, depth 1; and vice
+versa.
+
+<p>In any other case, <b>pnmremap</b> fails.
+
+<p>Note that as long as your input and palette images are PNM, they'll
+always fall into one of the cases <b>pnmremap</b> can handle.  There's an
+issue only if you're using some exotic PAM image.
+
+<p>Before Netpbm 10.27 (March 2005), <b>pnmremap</b> could not handle
+the case of a palette of greater depth than the input image.
+
+<p>In any case, the output image has the same tuple type and depth as
+the palette image.
+
+<h3 id="example">Examples</h3>
+
+<pre>
+pnmcolormap testimg.ppm 256 &gt;palette.ppm
+
+pnmremap -map=palette.ppm testimg.ppm &gt;reduced_testimg.ppm
+</pre>
+
+<P>To limit colors to a certain set, a typical example is to create an
+image for posting on the World Wide Web, where different browsers know
+different colors.  But all browsers are supposed to know the 216
+&quot;web safe&quot; colors which are essentially all the colors you
+can represent in a PPM image with a maxval of 5.  So you can do this:
+
+<PRE>
+pamseq 3 5 &gt;websafe.pam
+
+pnmremap -map=websafe.pam testimg.ppm &gt;websafe_testimg.ppm
+</PRE>
+
+<p>Another useful palette is one for the 8 color IBM TTL color set, which
+you can create with
+<pre>
+pamseq 3 1 &gt;ibmttl.pam
+</pre>
+
+<p>If you want to quantize one image to use the colors in another one,
+just use the second one as the palette.  You don't have to reduce it
+down to only one pixel of each color, just use it as is.
+
+<P>The output image has the same type and maxval as the palette image.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>PARAMETERS</H2>
+
+<P>There is one parameter, which is required: The file specification of
+the input PNM file.
+
+
+<A NAME="options"></a>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+
+<DT><B>-mapfile=</B><i>palettefilename</i>
+<DD>
+This names the file that contains the palette image.
+
+<P>This option is mandatory.
+
+<DT><B>-floyd</B>
+<DT><B>-fs</B>
+<DT><B>-nofloyd</B>
+<DT><B>-nofs</B>
+<DD>
+These options determine whether Floyd-Steinberg dithering is done.
+Without Floyd-Steinberg, the selection of output color of a pixel is based
+on the color of only the corresponding input pixel.  With Floyd-Steinberg,
+multiple input pixels are considered so that the average color of an area
+tends to stay more the same than without Floyd-Steinberg.  For example, 
+if you map an image with a black, gray, gray, and white pixel
+adjacent, to a palette that contains only black and white, it might 
+result in an output of black, black, white, white.  Pixel-by-pixel
+mapping would instead map both the gray pixels to the same color.
+
+
+<p>Floyd-Steinberg gives vastly better results on images where
+unmodified quantization has banding or other artifacts, especially
+when going to a small number of colors such as the above IBM set.
+However, it does take substantially more CPU time.
+     
+<P><B>-fs</B> is a synomym for <B>-floyd</B>.  <B>-nofs</B> is a
+synonym for <B>-nofloyd</B>.
+
+<P>The default is <B>-nofloyd</B>.
+
+<DT><B>-firstisdefault</B>
+
+<DD>This tells <b>pnmremap</b> to map any input color that is not in
+the palette to the first color in the palette (the color of the pixel
+in the top left corner of the palette image)
+
+<p>See <a href="pnmremap.html#description">DESCRIPTION</a>.
+
+<P>If you specify <B>-firstisdefault</B>, the maxval of your input
+must match the maxval of your palette image.
+
+<DT><B>-missingcolor=</B><I>color</I>
+
+<DD>This specifies the default color for <b>pnmremap</b> to map to a
+color in the input image that isn't in the palette.  <I>color</I> may
+or may not be in the palette image; it is part of the palette
+regardless.
+
+<P>If you specify <B>-missingcolor</B>, the maxval of your input must
+match the maxval of your palette image.
+
+<DT><B>-verbose</B>
+
+<DD>Display helpful messages about the mapping process.
+
+</DL>
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pnmcolormap.html">pnmcolormap</A></B>,
+<B><A HREF="pamseq.html">pamseq</A></B>,
+<B><A HREF="pnmquant.html">pnmquant</A></B>,
+<B><A HREF="ppmquantall.html">ppmquantall</A></B>,
+<B><A HREF="pnmdepth.html">pnmdepth</A></B>,
+<B><A HREF="ppmdither.html">ppmdither</A></B>,
+<B><A HREF="ppmquant.html">ppmquant</A></B>,
+<B><A HREF="ppm.html">ppm</A></B>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1989, 1991 by Jef Poskanzer.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pnmremap.html#lbAB">NAME</A>
+<LI><A HREF="pnmremap.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pnmremap.html#description">DESCRIPTION</A>
+<ul>
+  <LI><A HREF="pnmremap.html#example">Examples</A>
+  <LI><A HREF="pnmremap.html#mismatch">Palette/Image Type Mismatch</A>
+  </ul>
+<LI><A HREF="pnmremap.html#lbAE">PARAMETERS</A>
+<LI><A HREF="pnmremap.html#options">OPTIONS</A>
+<LI><A HREF="pnmremap.html#lbAF">SEE ALSO</A>
+<LI><A HREF="pnmremap.html#lbAG">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

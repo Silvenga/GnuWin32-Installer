@@ -1,0 +1,149 @@
+ICON2GIF(1)                                                        ICON2GIF(1)
+
+
+
+NAME
+       icon2gif - Create multi-image GIF.
+
+SYNOPSIS
+       icon2gif [-q] [-a] [-d] [t TranslationTable] [-h] gif-
+       file...
+
+DESCRIPTION
+       A program to convert a series of editable text GIF icon
+       specifications and named GIF files into a multi-image
+       GIF, usable as a graphic resource file.  It can also
+       dump existing GIFs in this format.
+
+       If no gif-file is given, icon2gif will try to read a
+       text input from stdin.
+
+       Specification Syntax
+
+       Here is a syntax summary in informal BNF.  The token
+       `NL' represents a required newline.
+
+           <gif-spec> ::= <header-block> <image-block>...
+
+           <header-block> ::= <header-declaration>...
+
+           <header-declaration ::=
+                   | screen width <digits> NL
+                   | screen height <digits> NL
+                   | screen colors <digits> NL
+                   | screen background <digits> NL
+                   | screen map <color-table> NL
+
+           <color-table> ::= <color-declaration>... end NL
+
+           <color-declaration> ::= rgb <digits> <digits> <digits> is <key> NL
+
+           <image-block> ::= include <file-name> NL
+                   | image NL
+                       <image-declaration>...
+                       <raster-picture>
+                       [ <extension> ]
+
+           <image-declarations> ::= image top <digits> NL
+                       | image left <digits> NL
+                       | image interlaced NL
+                       | image map <color-table> NL
+                       | image bits <digits> by <digits> NL <raster-block>
+
+           <extension> := <comment> NL <extension-block> NL end NL
+                   | <plaintext> NL <extension-block> NL end NL
+                   | extension <hex-digits> NL <extension-block> NL end NL
+
+       If the semantics of the `screen height', `screen width',
+       `screen background', `image top', `image left' declara-
+       tions aren't obvious to you, what are you doing with
+       this software?
+
+       A color table declares color indices (in ascending order
+       from 0) and assiciates them with key characters.  These
+       characters can later be used in raster blocks.  As these
+       must be printable and non-whitespace, you can only spec-
+       ify 94 colors per icon.  Life is like that sometimes.
+
+       A raster block is just a block of key characters.  It
+       should be sized correctly for the `image bits' declara-
+       tion that leads it.
+
+       The `comment' or `plaintext' keywords lead defined GIF89
+       extension record data (the other two GIF89 types, graph-
+       ics control and application block, are not yet sup-
+       ported).  You can also say `extension' followed by a
+       hexadecimal record type.  All of these extension decla-
+       rations must be followed by an extension block, which is
+       terminated by the keyword `end' on its own line.
+
+       An extension block is a series of text lines, each
+       interpreted as a string of bytes to fill an argument
+       block (the terminating newline is stripped).  Text may
+       include standard C-style octal and hex escapes preceded
+       by a backslash.
+
+       All <digits> tokens are interpreted as decimal numerals;
+       <hex-digits> tokens are interpreted as two hex digits (a
+       byte). All coordinates are zero-origin with the top left
+       corner (0,0).  Range checking is weak and signedness
+       checking nonexistent; caveat hacker!
+
+       In general, the amount of whitespace and order of decla-
+       rations within a header or image block is not signifi-
+       cant, except that a raster picture must immediately fol-
+       low its `image bits' bits declaration.
+
+       The `include' declaration includes a named GIF as the
+       next image.  The global color maps of included GIFs are
+       merged with the base table defined by any `screen color'
+       declaration.  All images of an included multi-image GIF
+       will be included in order.
+
+       Comments may be preceded with `#' and will be ignored.
+
+OPTIONS
+       -q  Quiet mode.  Defaults off on MSDOS, on under UNIX.
+           Controls printout of running scan lines. Use -q- to
+           invert.
+
+       -d  Dump the input GIF file(s) into the text form
+           described above.
+
+       -t  Specify name characters to use when dumping raster
+           blocks.  Only valid with -d option.
+
+       -h  Print one line of command line help, similar to
+           Usage above.
+
+EXAMPLES
+       A sample icon file called `sample.ico' is included in
+       the pic directory.
+
+BUGS
+       Because there are only 94 characters unambiguously
+       usable for raster blocks, an attempt to dump a GIF with
+       a larger color map will fail.
+
+       Error checking is rudimentary.
+
+SEE ALSO
+       gif2bgi(1), gif2epsn(1), gif2herc(1), gif2iris(1),
+       gif2ps(1), gif2rgb(1), gif2rle(1), gif2x11(1),
+       gifasm(1), gifbg(1), gifburst(1), gifclip(1), gif-
+       clrmp(1), gifcolor(1), gifcomb(1), gifcompose(1), gif-
+       filtr(1), giffix(1), gifflip(1), gifhisto(1), gifin-
+       ter(1), gifinto(1), gifovly(1), gifpos(1), gifrotat(1),
+       gifrsize(1), gifspnge(1), giftext(1), gifwedge(1),
+       raw2gif(1), rgb2gif(1), rle2gif(1), text2gif(1)
+
+COPYRIGHT
+       The GIFLIB distribution is Copyright (c) 1997  Eric S.
+       Raymond
+
+AUTHOR
+       Eric S. Raymond <esr@snark.thyrsus.com>
+
+
+
+3rd Berkeley Distribution                                          ICON2GIF(1)

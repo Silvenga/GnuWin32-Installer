@@ -1,0 +1,48 @@
+RLE_PUTROW(3)                                     RLE_PUTROW(3)
+
+
+
+
+
+NAME
+       rle_putrow  -  Write  a row (scanline) of data to an RLE
+       file.
+
+SYNOPSIS
+       #include <rle.h>
+
+       void rle_putrow( rows, length, the_hdr );
+       rle_pixel ** rows;
+       int length;
+       rle_hdr * the_hdr;
+
+DESCRIPTION
+       Rle_putrow is called for each output scanline when  cre-
+       ating  an RLE(5) image.  Rows is an array of pointers to
+       the pixel data for the color components of the scanline.
+       Rows should have the_hdr->ncolors elements.  If an alpha
+       channel is being saved, rows[-1]  should  point  to  the
+       alpha  channel  data.  Length is the number of pixels in
+       the scanline.  Rows[i] should point to the the_hdr->xmin
+       element of the scanline.
+
+       The  function  rle_row_alloc(3)  will  properly allocate
+       memory for use by rle_putrow.
+
+SEE ALSO
+       rle_hdr(3), rle_skiprow(3), rle_putraw(3),
+       rle_puteof(3), rle_row_alloc(3), rle_row_free(3),
+       librle(3), RLE(5).
+
+AUTHOR
+       Spencer W. Thomas, Todd Fuqua
+
+BUGS
+       Having the scanline indexed from xmin is  an  incredible
+       botch.   Its origin lies in the deep dark history of the
+       raster toolkit, and it seems it's too late to change  it
+       now.
+
+
+
+3                            2/2/87               RLE_PUTROW(3)

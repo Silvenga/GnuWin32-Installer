@@ -1,0 +1,199 @@
+TEXI2DVI(1)                      User Commands                     TEXI2DVI(1)
+
+
+
+NAME
+       texi2dvi - convert Texinfo documents to PDF
+
+SYNOPSIS
+       texi2dvi [OPTION]... FILE...
+
+DESCRIPTION
+       Run  each  Texinfo  or  (La)TeX FILE through TeX in turn
+       until all cross-references are  resolved,  building  all
+       indices.  The directory containing each FILE is searched
+       for included files.  The  suffix  of  FILE  is  used  to
+       determine its language ((La)TeX or Texinfo).  To process
+       (e)plain  TeX  files,  set  the   environment   variable
+       LATEX=tex.
+
+       In  order  to  make  texi2dvi  a  drop-in replacement of
+       TeX/LaTeX in AUC-TeX, the FILE may also be  composed  of
+       the following simple TeX commands.
+
+       `\input{FILE}'
+              the actual file to compile
+
+       `\nonstopmode'
+              same as --batch
+
+       Makeinfo  is  used  to  perform  Texinfo macro expansion
+       before running TeX when needed.
+
+   General options:
+       -b, --batch
+              no interaction
+
+       -D, --debug
+              turn on shell debugging (set -x)
+
+       -h, --help
+              display this help and exit successfully
+
+       -o, --output=OFILE
+              leave output in OFILE (implies --clean); only one
+              input FILE may be specified in this case
+
+       -q, --quiet
+              no output unless errors (implies --batch)
+
+       -s, --silent
+              same as --quiet
+
+       -v, --version
+              display version information and exit successfully
+
+       -V, --verbose
+              report on what is done
+
+   TeX tuning:
+       -@     use @input instead of \input for  preloaded  Tex-
+              info
+
+       --dvi  output a DVI file [default]
+
+       --dvipdf
+              output a PDF file via DVI (using dvipdf)
+
+       -e, -E, --expand
+              force macro expansion using makeinfo
+
+       -I DIR search DIR for Texinfo files
+
+       -l, --language=LANG
+              specify LANG for FILE, either latex or texinfo
+
+       --no-line-error
+              do not pass --file-line-error to TeX
+
+       -p, --pdf
+              use pdftex or pdflatex for processing
+
+       -r, --recode
+              call recode before TeX to translate input
+
+       --recode-from=ENC
+              recode from ENC to the @documentencoding
+
+       --src-specials
+              pass --src-specials to TeX
+
+       -t, --command=CMD
+              insert CMD in copy of input file
+
+       or --texinfo=CMD
+              multiple values accumulate
+
+       --translate-file=FILE
+              use given charset translation file for TeX
+
+   Build modes:
+       --build=MODE
+              specify the treatment of auxiliary files [local]
+
+       --tidy same as --build=tidy
+
+       -c, --clean
+              same as --build=clean
+
+       --build-dir=DIR
+              specify  where the tidy compilation is performed;
+              implies --tidy; defaults to TEXI2DVI_BUILD_DIREC-
+              TORY [.]
+
+       --mostly-clean
+              remove  the  auxiliary  files and directories but
+              not the output
+
+       The MODE  specifies  where  the  TeX  compilation  takes
+       place,  and,  as  a consequence, how auxiliary files are
+       treated.  The build mode can also be set using the envi-
+       ronment variable TEXI2DVI_BUILD_MODE.
+
+   Valid MODEs are:
+       `local'
+              compile in the current directory, leaving all the
+              auxiliary files around.  This is the  traditional
+              TeX use.
+
+       `tidy' compile  in  a  local  *.t2d directory, where the
+              auxiliary  files  are  left.   Output  files  are
+              copied back to the original file.
+
+       `clean'
+              same  as  `tidy', but remove the auxiliary direc-
+              tory  afterwards.   Every  compilation  therefore
+              requires the full cycle.
+
+   Using the `tidy' mode brings several advantages:
+       -      the  current  directory  is  not  cluttered  with
+              plethora of temporary files.
+
+       -      clutter    can    be    even    reduced     using
+              --build-dir=dir:  all  the  *.t2d directories are
+              stored there.
+
+       -      clutter can  be  reduced  to  zero  using,  e.g.,
+              --build-dir=/tmp/$USER.t2d                     or
+              --build-dir=$HOME/.t2d.
+
+       -      the output file is updated after every  succesful
+              TeX  run, for sake of concurrent visualization of
+              the output.  In a `local' build the viewer  stops
+              during the whole TeX run.
+
+       -      if  the  compilation fails, the previous state of
+              the output file is preserved.
+
+       -      PDF and DVI compilation are kept in separate sub-
+              directories  preventing any possibility of auxil-
+              iary file incompatibility.
+
+       On the other  hand,  because  `tidy'  compilation  takes
+       place  in  another  directory, occasionally TeX won't be
+       able to find some  files  (e.g.,  when  using  \graphic-
+       spath):  in  that  case use -I to specify the additional
+       directories to consider.
+
+       The values of the BIBTEX, LATEX (or  PDFLATEX),  MAKEIN-
+       DEX,  MAKEINFO,  TEX (or PDFTEX), TEXINDEX, and THUMBPDF
+       environment variables are used to run those commands, if
+       they are set.  Any CMD strings are added after @setfile-
+       name for Texinfo input, in  the  first  line  for  LaTeX
+       input.
+
+REPORTING BUGS
+       Email  bug  reports  to  <bug-texinfo@gnu.org>,  general
+       questions  and  discussion  to   <help-texinfo@gnu.org>.
+       Texinfo home page: http://www.gnu.org/software/texinfo/
+
+COPYRIGHT
+       Copyright © 2008 Free Software Foundation, Inc.  License
+       GPLv3+:    GNU    GPL     version     3     or     later
+       <http://gnu.org/licenses/gpl.html>
+       This is free software: you are free to change and redis-
+       tribute it.  There is NO WARRANTY, to the extent permit-
+       ted by law.
+
+SEE ALSO
+       The  full  documentation for texi2dvi is maintained as a
+       Texinfo manual.  If the info and texi2dvi  programs  are
+       properly installed at your site, the command
+
+              info texi2dvi
+
+       should give you access to the complete manual.
+
+
+
+texi2dvi 1.135                  September 2008                     TEXI2DVI(1)

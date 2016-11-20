@@ -1,0 +1,110 @@
+# Style sheet for CORBA IDL
+# Copyright (c) 1999 Bob Phillips, Akim Demaille, Miguel Santana
+#
+
+#
+# This file is part of a2ps.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+## IDL 0.1 Bob Phillips
+# Derived an OMG CORBA IDL style sheet from Akim Demaille's C style sheet
+# Disclaimer: I don't know what I'm doing -- I seem to be passably faking
+# it for my own IDL code and for OMG standards 98-03-01.idl (CORBA base IDL)
+# and 98-10-01.idl (COSS).  I'm reasonably happy with most things, but I'm
+# open to suggestions.  I definitely want to hear about things that
+# don't work, since my IDL usage is sporadic (intense for brief periods,
+# then almost non-existent).  Thanks for your help, bobp@fpk.hp.com .
+
+style "CORBA IDL" is
+requires a2ps 4.12e
+
+written by "Bob Phillips <bobp@fpk.hp.com>"
+version is 0.1
+documentation is
+   "A first attempt at a style sheet for OMG CORBA IDL."
+   "I believe I captured all the keywords for CORBA 2.2 IDL."
+   "I also stole code from gnuc.ssh to print the method names"
+   "in bold face.  I'm not sure I quite like my own choices"
+   "for Keyword_strong and Keyword, so I'm looking for feedback."
+   "Note that, as with gnuc.ssh, for a method name to be noted as such,"
+   "the left parenthesis associated with the argument list for the method"
+   "must appear on the same line as the method name. "
+end documentation
+
+alphabets are
+   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_#$%"
+
+case sensitive
+
+# the IDL I've seen is a bit loose about starting the line off with a hash
+# character.  So... I've tweaked the regex slightly.  The benefit/drawback
+# is that it will make the matched expressions Keyword_strong in comments,
+# or any other statements in which they occur.  I think it is less annoying
+# than missing the expressions because the hash character doesn't start the
+# line.
+keywords in Keyword_strong are
+   defined,
+   /#[ 	]*(define|e(l(if|se)|ndif|rror|x)|i(f(|def|ndef)|mport|nclude)|line|pragma|undef)/
+end keywords
+
+keywords in Keyword are
+   short, long, long, unsigned, float, double, char, wchar, string, void,
+   wstring, boolean, octet, any, enum, Object, struct, sequence,
+   union, switch, context
+end keywords
+
+keywords in Keyword_strong are
+   module,
+   interface,
+   readonly,
+   attribute,
+   exception,
+   oneway,
+   "in",
+   out,
+   inout,
+   const,
+   typedef,
+   TRUE, FALSE,
+   raises,
+   native,
+   pseudo
+end keywords
+
+operators in Plain are
+# Original from gnuc.ssh
+#  (/^([a-zA-Z_][a-zA-Z_0-9]*)([ \t]*)(/
+#	\1 Label_strong, \2 Plain, "(" Plain)
+# Early trial -- didn't like Label_strong
+#(/([a-zA-Z_0-9]*)([ \t]*)\\(/\1 Label_strong, \2 Plain, "(" Plain)
+
+# Handles the discriminated union properly
+(/(switch)([ \t]*)\\(/\1 Keyword , \2 Plain, "(" Plain) ,
+
+# Function declaration
+# This uses GNU C convention of TYPE\nFnName(args)
+(/([a-zA-Z_0-9]*)([ \t]*)\\(/\1 Label , \2 Plain, "(" Plain)
+end operators
+
+sequences are
+    "/*" Comment "*/",
+    "//" Comment,
+    C-char
+end sequences
+
+end style

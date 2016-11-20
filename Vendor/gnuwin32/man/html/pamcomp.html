@@ -1,0 +1,318 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD><TITLE>Pamcomp User Manual</TITLE></HEAD>
+<BODY>
+<H1>pamcomp</H1>
+Updated: 17 July 2004
+<BR>
+<A HREF="pamcomp.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+pamcomp - composite (overlay) two Netpbm images together
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pamcomp</B>
+
+[<B>-align=</B>{<B>left</B>|<B>center</B>|<B>right</B>|
+<B>beyondleft</b>|<b>beyondright</b>}]
+<BR>
+[<B>-valign=</B>{<B>top</B>|<B>middle</B>|<B>bottom</B>|
+<b>above</b>|<b>below</b>}]
+<BR>
+[<B>-xoff=</B><I>X</I>]
+[<B>-yoff=</B><I>Y</I>]
+<BR>
+[<B>-alpha=</B><I>alpha-pgmfile</I>]
+[<B>-invert</B>]
+[<B>-opacity=<i>opacity</i></B>]
+[<b>-linear</b>]
+<BR>
+<I>overlay_file</I>
+[<I>underlying_file</I> [<I>output_file</I>]]
+
+<p>Minimum unique abbreviation of option is acceptable.  You may use double
+hyphens instead of single hyphen to denote options.  You may use white
+space in place of the equals sign to separate an option name from its value.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<B>pamcomp</B> reads two images and produces a composite image with
+one of the images overlayed on top of the other, possible
+translucently.  The images need not be the same size.  The input and
+outputs are Netpbm format image files.
+
+<P>In its simplest use, <B>pamcomp</B> simply places the image in the
+file <I>overlay_file</I> on top of the image in the file
+<I>underlying_file</I>, blocking out the part of <I>underlying_file</I>
+beneath it.
+
+<P>If you add the <B>-alpha</B> option, then <B>pamcomp</B> uses the
+image in file <I>alpha-pgmfile</I> as an alpha mask, which means it
+determines the level of transparency of each point in the overlay
+image.  The alpha mask must have the same dimensions as the overlay
+image.  In places where the alpha mask defines the overlay image to be
+opaque, the composite output contains only the contents of the overlay
+image; the underlying image is totally blocked out.  In places where
+the alpha mask defines the overlay image to be transparent, the
+composite output contains none of the overlay image; the underlying
+image shows through completely.  In places where the alpha mask shows
+a value in between opaque and transparent (translucence), the
+composite image contains a mixture of the overlay image and the
+underlying image and the level of translucence determines how much of
+each.
+
+<P>The alpha mask is a PGM file in which a white pixel represents
+opaqueness and a black pixel transparency.  Anything in between is
+translucent.  (Like any Netpbm program, <B>pamcomp</B> will see a PBM
+file as if it is PGM).
+
+<p>If the overlay image is a PAM image of tuple type RGB_ALPHA or
+GRAYSCALE_ALPHA, then the overlay image contains transparency
+information itself and <b>pamcomp</b> uses it the same way as the
+alpha mask described above.  If you supply both an overlay image that
+has transparency information and an alpha mask, <b>pamcomp</b>
+multiplies the two opacities to get the opacity of the overlay pixel.
+
+<p>Before Netpbm 10.25 (October 2004), <b>pamcomp</b> did not
+recognize the transparency information in a PAM image -- it just
+ignored it.  So people had to make appropriate alpha masks in order to
+have a non-opaque overlay.  Some Netpbm programs that convert from
+image formats such as PNG that contain transparency information are
+not able to create RGB_ALPHA or GRAYSCALE_ALPHA PAM output, so you
+have to use the old method -- extract the transparency information from
+the original into a separate alpha mask and use that as input to
+<b>pamcomp</b>.
+
+<P>The output image is always of the same dimensions as the underlying
+image.  <B>pamcomp</B> uses only parts of the overlay image that fit
+within the underlying image.
+
+<P>To specify where on the underlying image to place the overlay
+image, use the <B>-align</B>, <B>-valign</B>, <B>-xoff</B>, and
+<B>-yoff</B> options.  Without these options, the default horizontal
+position is flush left and the default vertical position is flush top.
+
+<p>The overlay image, in the position you specify, need not fit entirely
+within the underlying image.  <b>pamcomp</b> uses only the parts of the
+overlay image that appear above the underlying image.  It is possible to
+specify positioning such that <em>none</em> of the overlay image is 
+over the underlying image -- i.e. the overlay is out of frame.  If you
+do that, <b>pamcomp</b> issues a warning.
+
+<P> The overlay and underlying images may be of different formats
+(e.g.  overlaying a PBM text image over a full color PPM image) and
+have different maxvals.  The output image has the more general of the
+two input formats and a maxval that is the least common multiple the
+two maxvals (or the maximum maxval allowable by the format, if the LCM
+is more than that).
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-align=</b><i>alignment</i>
+<DD>
+This option selects the basic horizontal position of the overlay image
+with respect to the underlying image, in syntax reminiscent of HTML.
+<b>left</b> means flush left, <b>center</b> means centered, and <b>right</b>
+means flush right.
+
+<p>The <b>-xoff</b> option modifies this position.
+
+<b>beyondleft</b> means just out of frame to the left -- the right edge of
+the overlay is flush with the left edge of the underlying image.  
+<b>beyondright</b> means just out of frame to the right.  These alignments
+are useful only if you add a <b>-xoff</b> option.    These two values were
+added in Netpbm 10.10 (October 2002).
+
+<p>The default is <b>left</b>.
+
+<DT><B>-valign=</b><i>alignment</i>
+<DD>
+
+This option selects the basic vertical position of the overlay image
+with respect to the underlying image, in syntax reminiscent of HTML.
+<b>top</b> means flush top, <b>middle</b> means centered, and <b>bottom</b>
+means flush bottom.
+
+<p>The <b>-yoff</b> option modifies this position.
+
+<b>above</b> means just out of frame to the top -- the bottom edge of
+the overlay is flush with the top edge of the underlying image.  
+<b>below</b> means just out of frame to the bottom.  These alignments
+are useful only if you add a <b>-yoff</b> option.  These two values were
+added in Netpbm 10.10 (October 2002).
+
+<p>The default is <b>top</b>.
+
+<DT><B>-xoff=</B><I>x</I>
+
+<DD>This option modifies the horizontal positioning of the overlay
+image with respect to the underlying image as selected by the
+<b>-align</b> option.  <b>pamcomp</b> shifts the overlay image from
+that basic position <i>x</i> pixels to the right.  <i>x</i> can be
+negative to indicate shifting to the left.
+
+<p>The overlay need not fit entirely (or at all) on the underlying image.
+<B>pamcomp</B> uses only the parts that lie over the underlying image.
+
+<P>Before Netpbm 10.10 (October 2002), <b>-xoff</b> was mutually 
+exclusive with <b>-align</b> and always measured from the left edge.
+
+<DT><B>-yoff=</B><I>y</I>
+
+<DD>This option modifies the vertical positioning of the overlay
+image with respect to the underlying image as selected by the
+<b>-valign</b> option.  <b>pamcomp</b> shifts the overlay image from
+that basic position <i>y</i> pixels downward.  <i>y</i> can be
+negative to indicate shifting upward.
+
+<p>The overlay need not fit entirely (or at all) on the underlying image.
+<B>pamcomp</B> uses only the parts that lie over the underlying image.
+
+<P>Before Netpbm 10.10 (October 2002), <b>-xoff</b> was mutually 
+exclusive with <b>-valign</b> and always measured from the top edge.
+
+<DT><B>-alpha=</B><i>alpha-pgmfile</i>
+<DD>
+This option names a file that contains the alpha mask.  If you don't
+specify this option, there is no alpha mask, which is equivalent to 
+having an alpha mask specify total opaqueness everywhere.
+<p>
+You can specify <b>-</b> as the value of this option and the alpha
+mask will come from Standard Input.  If you do this, don't specify
+Standard Input as the source of any other input image.
+
+<DT><B>-invert</B>
+<DD>
+This option inverts the sense of the values in the alpha mask, which 
+effectively switches the roles of the overlay image and the underlying
+image in places where the two intersect.
+
+<DT><B>-opacity=</B><i>opacity</i>
+<DD>
+This option tells how opaque the overlay image is to be, i.e. how much
+of the composite image should be from the overlay image, as opposed to
+the underlying image.  <i>opacity</i> is a floating point number, with
+1.0 meaning the overlay image is totally opaque and 0.0 meaning it is
+totally transparent.  The default is 1.0.
+
+<p>If you specify an alpha mask (the <b>-alpha</b> option),
+<b>pamcomp</b> uses the product of the opacity indicated by the alpha
+mask (as modified by the <b>-invert</b> option, as a fraction, and
+this opacity value.  The <b>-invert</b> option does not apply to this
+opacity value.
+
+<p>As a simple opacity value, the value makes sense only if it is
+between 0 and 1, inclusive.  However, <b>pamcomp</b> accepts all
+values and performs the same arithmetic computation using whatever
+value you provide.  An opacity value less than zero means the underlay
+image is intensified and then the overlay image is "subtracted" from
+it.  An opacity value greater than unity means the overlay image is
+intensified and the underlaying image subtracted from it.  In either
+case, <b>pamcomp</b> clips the resulting color component intensities
+so they are nonnegative and don't exceed the output image's maxval.
+
+<p>This may seem like a strange thing to do, but it has uses.  You
+can use it to brighten or darken or saturate or desaturate areas of the
+underlaying image.  See <a href="extendedopacity.html">
+this description</a> of the technique.
+     
+<p>This option was added in Netpbm 10.6 (July 2002).  Before Netpbm 10.15
+(April 2003), values less than zero or greater than unity were not allowed.
+
+<dt><b>-linear</b>
+
+<dd>This option indicates that the inputs are not true Netpbm images
+but rather a non-gamma-adjusted variation.  This is relevant only when
+you mix pixels, using the <b>-opacity</b> option or an alpha mask
+(the <b>-alpha</b> option).
+
+<p>The alpha mask and <b>-opacity</b> values indicate a fraction of
+the light intensity of a pixel.  But the PNM and PNM-equivalent PAM
+image formats represent intensities with gamma-adjusted numbers that
+are not linearly proportional to intensity.  So <b>pamcomp</b>, by
+default, performs a calculation on each sample read from its input and
+each sample written to its output to convert between these
+gamma-adjusted numbers and internal intensity-proportional numbers.
+
+<p>Sometimes you are not working with true PNM or PAM images, but
+rather a variation in which the sample values are in fact directly
+proportional to intensity.  If so, use the <b>-linear</b> option to
+tell <b>pamcomp</b> this.  <b>pamcomp</B> then will skip the
+conversions.
+
+<p>The conversion takes time.  And the difference between
+intensity-proportional values and gamma-adjusted values may be small
+enough that you would barely see a difference in the result if you
+just pretended that the gamma-adjusted values were in fact
+intensity-proportional.  So just to save time, at the expense of some
+image quality, you can specify <b>-linear</b> even when you have true
+PPM input and expect true PPM output.
+
+<p>For the first 13 years of Netpbm's life, until Netpbm 10.20
+(January 2004), <b>pamcomp</b>'s predecessor <b>pnmcomp</b> always
+treated the PPM samples as intensity-proportional even though they
+were not, and drew few complaints.  So using <b>-linear</b> as a lie
+is a reasonable thing to do if speed is important to you.
+
+<p>Another technique to consider is to convert your PNM image to the
+linear variation with <b>pnmgamma</b>, run <b>pamcomp</b> on it and
+other transformations that like linear PNM, and then convert it back
+to true PNM with <b>pnmgamma -ungamma</b>.  <b>pnmgamma</b> is often
+faster than <b>pamcomp</b> in doing the conversion.
+
+</DL>
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<p><B><A HREF="ppmmix.html">ppmmix</A></B> and <B><A
+HREF="pnmpaste.html">pnmpaste</A></B> are simpler, less general
+versions of the same tool.
+
+<p><B><A HREF="ppmcolormask.html">ppmcolormask</A></B> and <B><A
+HREF="pbmmask.html">pbmmask</A></B> can help with generating an alpha
+mask.
+
+<p><B><A HREF="pnmcomp.html">pnmcomp</A></B> is an older program that
+runs faster, but has less function.
+
+<P><B><A HREF="pnm.html">pnm</A></B>
+
+
+<a name="history"></a>
+<H2>HISTORY</H2>
+
+<p><b>pamcomp</b> was new in Netpbm 10.21 (March 2004).  Its predecessor,
+<b>pnmcomp</b>, was one of the first programs added to Netpbm when the
+project went global in 1993.
+
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1992 by David Koblas (<A
+HREF="mailto:koblas@mips.com">koblas@mips.com</A>).
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pamcomp.html#lbAB">NAME</A>
+<LI><A HREF="pamcomp.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pamcomp.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pamcomp.html#lbAE">OPTIONS</A>
+<LI><A HREF="pamcomp.html#lbAF">SEE ALSO</A>
+<LI><A HREF="pamcomp.html#history">HISTORY</A>
+<LI><A HREF="pamcomp.html#lbAG">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

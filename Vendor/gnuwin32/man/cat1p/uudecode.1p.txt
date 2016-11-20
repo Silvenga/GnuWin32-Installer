@@ -1,0 +1,195 @@
+uudecode(P)                                         uudecode(P)
+
+
+
+
+
+NAME
+       uudecode - decode a binary file
+
+SYNOPSIS
+       uudecode [-o outfile][file]
+
+DESCRIPTION
+       The  uudecode  utility  shall  read  a file, or standard
+       input if no file is specified, that includes  data  cre-
+       ated by the uuencode utility. The uudecode utility shall
+       scan the input file, searching for data compatible  with
+       one of the formats specified in uuencode, and attempt to
+       create or overwrite the file described by the  data  (or
+       overridden by the -o option). The pathname shall be con-
+       tained in the data or specified by the  -o  option.  The
+       file access permission bits and contents for the file to
+       be produced shall be contained in that  data.  The  mode
+       bits  of  the  created file (other than standard output)
+       shall be set from the file access permission  bits  con-
+       tained  in  the  data;  that is, other attributes of the
+       mode, including the file mode creation mask (see umask()
+       ), shall not affect the file being produced.
+
+       If  the  pathname of the file to be produced exists, and
+       the user does not have write permission  on  that  file,
+       uudecode  shall terminate with an error. If the pathname
+       of the file to be produced  exists,  and  the  user  has
+       write  permission  on that file, the existing file shall
+       be overwritten.
+
+       If the input data was produced by uuencode on  a  system
+       with  a  different  number  of bits per byte than on the
+       target system, the results of uudecode are  unspecified.
+
+OPTIONS
+       The  uudecode  utility shall conform to the Base Defini-
+       tions  volume  of  IEEE Std 1003.1-2001,  Section  12.2,
+       Utility Syntax Guidelines.
+
+       The following option shall be supported by the implemen-
+       tation:
+
+       -o  outfile
+              A pathname of a file that shall be  used  instead
+              of  any  pathname  contained  in  the input data.
+              Specifying   an   outfile   option-argument    of
+              /dev/stdout shall indicate standard output.
+
+
+OPERANDS
+       The following operand shall be supported:
+
+       file   The  pathname  of a file containing the output of
+              uuencode.
+
+
+STDIN
+       See the INPUT FILES section.
+
+INPUT FILES
+       The input files shall be files containing the output  of
+       uuencode.
+
+ENVIRONMENT VARIABLES
+       The  following  environment  variables  shall affect the
+       execution of uudecode:
+
+       LANG   Provide a default value for the internationaliza-
+              tion  variables  that are unset or null. (See the
+              Base Definitions volume of  IEEE Std 1003.1-2001,
+              Section  8.2,  Internationalization Variables for
+              the precedence of internationalization  variables
+              used  to  determine  the  values  of locale cate-
+              gories.)
+
+       LC_ALL If set to a non-empty string value, override  the
+              values  of  all  the  other  internationalization
+              variables.
+
+       LC_CTYPE
+              Determine the locale for  the  interpretation  of
+              sequences  of  bytes  of  text data as characters
+              (for example, single-byte as  opposed  to  multi-
+              byte characters in arguments and input files).
+
+       LC_MESSAGES
+              Determine  the  locale  that  should  be  used to
+              affect the format and contents of diagnostic mes-
+              sages written to standard error.
+
+       NLSPATH
+              Determine  the  location  of message catalogs for
+              the processing of LC_MESSAGES .
+
+
+ASYNCHRONOUS EVENTS
+       Default.
+
+STDOUT
+       If the file data header encoded  by  uuencode  is  -  or
+       /dev/stdout,  or the -o /dev/stdout option overrides the
+       file data, the standard output shall be in the same for-
+       mat  as  the file originally encoded by uuencode. Other-
+       wise, the standard output shall not be used.
+
+STDERR
+       The standard error shall be  used  only  for  diagnostic
+       messages.
+
+OUTPUT FILES
+       The  output file shall be in the same format as the file
+       originally encoded by uuencode.
+
+EXTENDED DESCRIPTION
+       None.
+
+EXIT STATUS
+       The following exit values shall be returned:
+
+        0     Successful completion.
+
+       >0     An error occurred.
+
+
+CONSEQUENCES OF ERRORS
+       Default.
+
+       The following sections are informative.
+
+APPLICATION USAGE
+       The user who is invoking uudecode must have  write  per-
+       mission on any file being created.
+
+       The  output  of  uuencode  is essentially an encoded bit
+       stream that is not cognizant of byte boundaries.  It  is
+       possible  that  a  9-bit byte target machine can process
+       input from an 8-bit  source,  if  it  is  aware  of  the
+       requirement,  but the reverse is unlikely to be satisfy-
+       ing.  Of course, the only data that  is  meaningful  for
+       such a transfer between architectures is generally char-
+       acter data.
+
+EXAMPLES
+       None.
+
+RATIONALE
+       Input files are not necessarily text files, as stated by
+       an  early  proposal.  Although  the uuencode output is a
+       text file, that output could have  been  wrapped  within
+       another file or mail message that is not a text file.
+
+       The  -o option is not historical practice, but was added
+       at the request of WG15 so that the user  could  override
+       the  target  pathname  without  having to edit the input
+       data itself.
+
+       In early  drafts,  the  [  -o  outfile]  option-argument
+       allowed the use of - to mean standard output. The symbol
+       - has only been used previously in  IEEE Std 1003.1-2001
+       as  a  standard  input  indicator. The developers of the
+       standard did not wish to overload the meaning  of  -  in
+       this  manner.   The  /dev/stdout  concept exists on most
+       modern systems. The /dev/stdout syntax does not refer to
+       a new special file. It is just a magic cookie to specify
+       standard output.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       umask() , uuencode
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                  uudecode(P)

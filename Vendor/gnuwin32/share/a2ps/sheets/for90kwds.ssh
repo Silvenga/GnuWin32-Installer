@@ -1,0 +1,204 @@
+# Style sheet for Fortran 90 keywords
+# last modified 1999 08
+
+#
+# This file is part of a2ps.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+style "Fortran 90 Keywords" is
+
+written by "Denis Girou <Denis.Girou@idris.fr>, Alexander Mai <st002279@hrzpub.tu-darmstadt.de>"
+version is 0.52
+requires a2ps version 4.12a
+
+documentation is
+  "This sheet implements the superset which Fortran 90 and Fortran 95 provide"
+  "over Fortran 77."
+  ""
+  "See the documentation of the style sheet code(fortran)code for more details."
+end documentation
+
+# get the Fortran 77 stuff
+ancestors are
+  for77kwds
+end ancestors
+
+keywords in Keyword_strong are
+  allocatable, allocate, 
+  "case", contains, continue, cycle,
+  deallocate,
+  elemental, /end *block *data/, /end *do/, /end *file/, /end *if/,
+     /end *select/, /end *type/, /end *where/, exit,
+  forall, 
+  include, intent,
+  kind,
+  namelist, nullify,
+  only, "optional",
+  pointer,  pure,
+  recursive, result,
+  /select *case/,
+  target, type,
+  where, while
+end keywords
+
+
+# Intrinsics and others
+keywords in Keyword_strong are           # Shall we use 'Keyword' instead !?
+  adjustl, adjustr, advance, all, allocated, any, associated,
+  bit_size, blank, btest, ceiling, char, cshift,
+  date_and_time, dot_product, dprod,
+  eoshift, epsilon, exponent,
+  floor, fraction,
+  huge,
+  iachar, iand, ichar, ieor, ifix, index, ior,
+     ishft, ishftc,
+  lbound, len_trim,
+  matmul, maxexponent, maxloc, maxval,
+     merge, minexponent, minloc, minval, modulo, mvbits,
+  nearest, nint, not,
+  pack, precision, present, product,
+  random_number, random_seed, range, repeat, reshape, rrspacing,
+  scale, scan, selected_int_kind, selected_real_kind,
+     set_exponent, shape, size, spacing, spread, sum,
+     system_clock,
+  tiny, transfer, transpose, trim,
+  ubound, unpack,
+  verify
+end keywords
+
+# Other keywords which are not so important
+
+keywords in Keyword are
+  private, public
+end keywords
+
+operators are
+  # Intent Attributes
+  ( # 1. opening bracket
+   /(\\( *)/
+    # 2. keyword
+   /(in|inout|out)/
+    # 3. closing bracket
+   /( *\\))/
+    \1 Plain , \2 Keyword, \3 Plain),
+
+  # Named parameters for built-in commands
+  ( #1. keyword
+   /(access|action|blank|delim|err|file|form|iostat|name|named|nextrec/
+   /|pad|position|recl|sequential|size|status)/
+    # 2. space and '='
+   /([[:space:]]+=)/
+   \1 Keyword, \2)
+end operators
+
+
+# Nice additions to F77
+optional operators are
+    ">=" \geq,
+    "<=" \leq,
+    "/=" \neq,
+    "=>" \Rightarrow
+end operators
+
+
+operators are
+
+  # end of named entities (including keyword)
+  (# 1. keyword
+   /(end)/
+   # 2. Spaces
+  /([[:space:]]+)/
+   # 3. keyword
+   /(program|subroutine|function|module|interface)/
+   \1 Keyword_strong, \2, \3 Keyword_strong),
+
+  # end of named entities (including keyword & name)
+  (# 1. keyword
+   /(end)/
+   # 2. Spaces
+   /([[:space:]]+)/
+   # 3. keyword
+   /(program|subroutine|function|module|interface)/
+   # 4. Spaces
+   /([[:space:]]+)/
+   # 5. The label
+   /([^[:space:];!]+)/
+   \1 Keyword_strong, \2, \3 Keyword_strong, \4, \5 Label_strong),
+
+  # Module
+  (# 1. The keyword
+   /(module)/
+   # 2. Spaces
+   /([[:space:]]+)/
+   # 3. The label
+   /([^[:space:]]+)/
+   # 4. empty rest of line
+   /([[:space:]]+$)/
+   \1 Keyword_strong, \2, \3 Label_strong, \4),
+
+  # Module procedure
+  (# 1, 2, 3. The keywords
+   /(module)([[:space:]]+)(procedure)/
+   # 4. Spaces
+   /([[:space:]]+)/
+   # 5. The label
+   /([^[:space:]]+)/
+   \1 Keyword_strong, \2, \3 Keyword_strong, \4, \5 Label_strong),
+
+  # Interface block without name
+  (# 1,  The keyword
+   /(interface)/
+   # 2 spaces
+   /([[:space:]]*)/
+   \1 Keyword_strong, \2),
+
+  # Interfaces with generic name 
+  (# 1. The keyword
+   /(interface)/
+   # 2. Spaces
+   /([[:space:]]+)/
+   # 3. The label
+   /([^[:space:](]+)/
+   \1 Keyword_strong, \2, \3 Label_strong),
+   
+  # Assignment/Operator Interfaces
+  (# 1, 2, 3. The keywords
+   /(interface)([[:space:]]+)(assignment|operator)/
+   # 4. Spaces and opening `('
+   /([[:space:]]*\\()/
+   # 5. The operator
+   /([^[:space:])]+)/
+   # 6. The closing ')'
+   /(\\)[[:space:]]*)/
+   \1 Keyword_strong, \2, \3 Keyword_strong, \4, \5 Label, \6),
+   
+  # Use; here is room for improvements since it
+  # may take more arguments than only a single label ...
+  (# 1. The keyword
+   /(use)/
+   # 2. Spaces
+   /([[:space:]]+)/
+   # 3. The label
+   /([^[:space:](]+)/
+   \1 Keyword_strong, \2, \3 Label)
+
+end operators
+
+end style
+
+

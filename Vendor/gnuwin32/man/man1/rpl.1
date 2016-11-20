@@ -1,0 +1,199 @@
+.\"
+.\" Man page for rpl by Joe Laffey
+.\"
+.\" See http://www.laffeycomputer.com/ for updates
+.\"
+.\" rpl is subject to license
+.\" 
+.\" rpl -L to read the license
+.\"
+.\"
+.TH rpl 1 "July 22, 2002" "LAFFEY Computer Imaging"
+.SH NAME
+rpl (RePLace) \- replace strings in multiple files
+.SH VERSION
+1.4.0
+.SH SYNOPSIS
+rpl [-iwRspfdtx [-q|-v]] <old_str> <new_str> <target_file(s)>
+.SH DESCRIPTION
+.I
+rpl
+replaces old_str with new_str in all target files. It returns the number of strings replaced
+or a system error code (non-zero) if there is an error.
+.P
+Note that you should put strings in single quotes if they contain spaces. You must also escape all shell meta-characters. It's a good idea to put ALL strings in single quotes.
+.P
+.I
+rpl
+will attempt to maintain the owner, group and permissions of your original files. For safety,
+.I
+rpl
+creates a temporary file and makes changes to that file. It then moves the temporary file over the original file.
+.I
+rpl
+sets the owner, group, and permissions of the new file to match those of the original file.
+In some circumstances
+.I
+rpl
+will not be able to do this (such as when a file is owned by the superuser but you have group write permission).
+In these cases
+.I
+rpl
+will warn you that the owner/group or permissions cannot be set and that file will be skipped, unless you use the force (-f) option. Note that the use of temp files in predictable, world-writeable locations could lead to symlink attacks. Ideally you should set the $TMPDIR environment variable to a private directory readable and writeable only by you. This is especially important if running
+.I
+rpl
+as root. You have been warned!
+.P
+Normally,
+.I
+rpl
+will change the modification time of all files it processes like any other program. However, you may instruct
+.I
+rpl
+to keep the original modification times using the -d (Don't alter mod-times) option.
+.P
+You can specify file suffixes to be searched using the -x option. Any files that do not match the specified suffixes will not be searched or modified. The -x option may be used more than once to tell 
+.I
+rpl
+to search files with varying suffixes. For instance, say you wanted to search all of your ".html", ".htm", and ".php" files you would add 
+.P
+" -x'.html' -x'.htm' -x'.php' "
+.P
+to your command line. 
+.I
+rpl
+would then skip any files that did not end with these suffixes. This is mainly useful when doing recursive searching (-R option).
+.SH OPTIONS
+.TP
+.BI \-i
+Ignore case of old_str
+.RS
+.I
+rpl
+will match the old_str in the searched file regardless of the case. The case of new_str will not be altered.
+.RE
+.TP
+.BI \-w
+Whole words (old_str bounded by white space in file)
+.RS
+.I
+rpl
+will only match old_str if it is bounded by the start of a line, a space, a tab, or the end of a line.
+.RE
+.TP
+.BI \-q
+Quiet mode (no output at all)
+.RS
+Good for shell scripts, etc.
+.RE
+.TP
+.BI \-v
+Verbose mode (lots of output)
+.RS
+.I
+rpl
+will list the name of each file and directory, and the line numbers that contain matches.
+.RE
+.TP
+.BI \-R
+Search directories recursively
+.RS
+.I
+rpl
+will scan every file and every directory recursively. Without this option directories will be skipped.
+.RE
+.TP
+.BI \-x
+Specify file suffixes to search. (e.g. ".html", ".c", etc.) May be used multiple times. See above for details.
+.RS
+.RE
+.TP
+.BI \-p
+Prompt for each file
+.RS
+.I
+rpl
+will prompt you before scanning each file. If you respond 'N' or 'n'
+.I
+rpl
+will skip that file and move on to the next file. The default action if you press enter is to process the file.
+.RE
+.TP
+.BI \-s
+Simulation mode
+.RS
+.I
+rpl
+will scan all of the files and list the names of files that it would modify if a replace operation was executed. If you turn on the verbose (-v) option as well
+.I
+rpl
+will list the line numbers where the string is matched.
+.RE
+.TP
+.BI \-e
+Honor Escapes
+.RS
+.I
+rpl
+will honor escape sequences in old_string and new_string.  Standard escapes such as "\t" (tab), "\n" (newline), "\r" (carriage return) are processed, as well as any octal or hexidecimal ASCII codes. Octal ASCII codes start with a '\' and are comprised of three digits [0-7] (e.g. '\015'). Hexidecimal ASCII codes start with '\0x' followed by two characters [0-f] (e.g. '\0x0d'). The 'x' and the [a-f] may be upper or lowercase. When you use this switch you must escape all backslash ('\') characters with another backslash (e.g. '\\').
+.RE
+.TP
+.BI \-f
+Force mode
+.RS
+.I
+rpl
+will overwrite files even if the owner, group, or permissions of the new file will not match the original. Obviously,
+.I
+rpl
+cannot overwrite files if the user does not have write permission.
+.RE
+.TP
+.BI \-d
+Don't change modification times
+.RS
+.I
+rpl
+will process files, but keep their original modification times.
+.RE
+.TP
+.BI \-t
+Use $TMPDIR for temporary files
+.RS
+Causes
+.I
+rpl
+to write temporary files to the directory specified by the environment variable $TMPDIR instead of writing the temp files to the original file dir. (See note above about symlink attacks and temp files.)
+.RE
+.TP
+.BI \-L
+Display the software license
+.RS
+This displays the software license that you agree to by using
+.I
+rpl.
+.RE
+.TP
+.BI \-h
+Display a brief summary of options
+.SH BUGS
+Report bugs to software@laffeycomputer.com
+.SH TODO
+Grep pattern matching.
+.P
+An option to backup the original file.
+.P
+If you would like to see this or other enhancements send e-mail to software@laffeycomputer.com
+.SH CONTRIBUTORS
+Original code:
+.RS
+Joe Laffey <software@laffeycomputer.com>
+.RE
+.P
+Other contributors include:
+.RS
+Devrim Erdem <devrim@infotron-tr.com> 
+.RE
+.RS
+Many thanks to the beta testers who sent in valuable feedback!
+.RE

@@ -1,0 +1,381 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: making a newcommand change its arguments</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile ChangeableCommandArguments.html "Gri: making a newcommand change its arguments" "Programming Gri" --> 
+
+<!-- @node   Changeable Command Arguments, The Ampersand Syntax, Complicated New Command, Adding New Commands -->
+<a name="ChangeableCommandArguments" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="NewCommands.html#AddingNewCommands" shape="rect" coords="516,2,532,24" href="NewCommands.html#AddingNewCommands">
+<area alt="Gri: creating a complicated new command" shape="rect" coords="557,2,573,24" href="ComplicatedNewCommand.html">
+<area alt="Gri: Hints for Gri programming" shape="rect" coords="581,2,599,24" href="Hints.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: Hints for Gri programming" shape="rect" coords="581,2,599,24" href="Hints.html">
+</map>
+<h3>10.11.5: Altering command arguments -- the `<font color="#82140F"><code>&amp;</code></font>' syntax</h3>
+
+
+The Gri language permits a newcommand to change variables and synonyms
+passed as arguments, using a syntax that is quite similar to that
+employed by the C++ language.
+<p>
+<UL>
+<LI><a href="ChangeableCommandArguments.html#TheAmpersandSyntax">The Ampersand Syntax</a>: Denoting changeable arguments
+<LI><a href="ChangeableCommandArguments.html#DoublingAVariable">Doubling A Variable</a>: Variables (e.g. `<font color="82140F"><code>&.variable.</code></font>')
+<LI><a href="ChangeableCommandArguments.html#ManipulatingASynonym">Manipulating A Synonym</a>: Synonyms (e.g. `<font color="82140F"><code>&\synonym</code></font>')
+<LI><a href="ChangeableCommandArguments.html#Nesting">Nesting</a>: Newcommands called by newcommands
+<LI><a href="ChangeableCommandArguments.html#UsingNewAndDelete">Using New And Delete</a>: Isolating local variables and synonyms
+<LI><a href="ChangeableCommandArguments.html#DeterminingCallingInformation">Determining Calling Information</a>: The `<font color="82140F"><code>\&.word?.</code></font>' and `<font color="#82140F"><code>\&&.word?.</code></font>' syntax
+<LI><a href="ChangeableCommandArguments.html#ImplementationofAmpersandSyntax">Implementation of Ampersand Syntax</a>: Algorithm Gri uses
+</UL>
+
+
+<!-- @node   The Ampersand Syntax, Doubling A Variable, Changeable Command Arguments, Changeable Command Arguments -->
+<a name="TheAmpersandSyntax" ></a>
+<h4>10.11.5.1: Overview of the `<font color="#82140F"><code>&amp;</code></font>' syntax</h4>
+
+
+Normally the arguments to a newcommand are parsed into either numerical
+values or strings, before execution is passed into the newcommand.  This
+is a akin to the scheme called "call by value" in some programming
+languages.  Gri also provides a syntax, borrowed from C++, that permits
+a newcommand to alter the contents of variable or synonym arguments.
+<p>
+The technique is simple.  To permit a newcommand to modify an argument
+that is a variable or a synonym, just put a `<font color="#82140F"><code>&amp;</code></font>' to the left of the
+item on the calling line.  Then, within the newcommand, the
+corresponding local synonym (i.e. `<font color="#82140F"><code>\.word1.</code></font>', etc.) will behave as
+though it were the instance of the original variable or synonym.
+<p>
+The `<font color="#82140F"><code>&amp;</code></font>' is placed to the left of the variable-name or synonym-name
+without intervening space.  For example `<font color="#82140F"><code>foo &amp;.var. &amp;\syn</code></font>' tells
+the parser that the newcommand named `<font color="#82140F"><code>foo</code></font>' may possibly alter the
+values of the variable `<font color="#82140F"><code>.var.</code></font>' and the synonym `<font color="#82140F"><code>\syn</code></font>', as they
+exist in the calling context.
+<p>
+It is important to note that Gri pays very little attention to the
+`<font color="#82140F"><code>&amp;</code></font>' in a syntax-declaration line.  All it does is to note that the
+item to the right of the `<font color="#82140F"><code>&amp;</code></font>' is not a fixed word in the newcommand
+being defined; this follows the usual rules for parsing newcommand syntax
+(see <a href="ParsingSynonyms.html#Parsing">Parsing</a>).
+<p>
+
+<!-- @node   Doubling A Variable, Manipulating A Synonym, The Ampersand Syntax, Changeable Command Arguments -->
+<a name="DoublingAVariable" ></a>
+<h4>10.11.5.2: Example: doubling a variable</h4>
+
+
+Consider the task of adding a fixed amount to a variable.  If the
+variable we wish to double is `<font color="#82140F"><code>.x.</code></font>', we might write
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`double_a_particular_variable'
+{ 
+    .x. = {rpn .x. 2 *}
+}
+.x. = 10
+double_a_particular_variable
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Code such as that presented above occurs in many applications.  (Turn
+the multiplication into an addition, and change `<font color="#82140F"><code>.x.</code></font>' to
+`<font color="#82140F"><code>..ymargin..</code></font>', and you'll start to see the core of an application
+that draws multiple graph panels, one above another.)  However, the code
+is too specific to be of much general use!
+<p>
+What if we want to double some other variable instead?  The code below
+shows how to do that.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`double &amp;.value.'
+{
+    \.word1. = {rpn \.word1. 2 *}      # line 3
+}
+.x. = 10                               # line 5
+double &amp;.x.
+.y. = 3.14
+double &amp;.y.
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+At line 3 Gri interprets the `<font color="#82140F"><code>\.word1.</code></font>' to the <b>left</b> of the
+equals sign as a reference to the variable that is set to the value 10
+in line 5.  Similarly, the `<font color="#82140F"><code>\.word1.</code></font>' to the <b>right</b> of the
+equals sign evaluates to 10, the value in the calling program.
+<p>
+Gri automatically determines whether an item is a variable or a synonym,
+and does the correct thing.  Thus, for example, if line 3 above were written as
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\.word1. = "hello"                 # ERROR
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+an error would be reported, since `<font color="#82140F"><code>double</code></font>' was called with a
+variable as an argument, and variables cannot hold strings.
+<p>
+<!-- @node   Manipulating A Synonym, Nesting, Doubling A Variable, Changeable Command Arguments -->
+<a name="ManipulatingASynonym" ></a>
+<h4>10.11.5.3: Example: manipulating a synonym</h4>
+
+
+Synonyms are treated in the same way, as is illustrated in the following
+example.
+<p>
+
+Q: what does the following print?
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`add_a_dat &amp;\filename'
+{
+    \.word1. = {rpn "\.word1." ".dat" strcat}
+}
+\filename = "test"
+add_a_dat &amp;\filename
+show "\filename"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+A: it prints `<font color="#82140F"><code>test.dat</code></font>'.
+<p>
+
+<!-- @node   Nesting, Using New And Delete, Manipulating A Synonym, Changeable Command Arguments -->
+<a name="Nesting" ></a>
+<h4>10.11.5.4: Nesting</h4>
+
+
+One newcommand may call another, letting a deeply-nested newcommand
+alter values of synonyms and variables that may otherwise be hidden
+behind `<font color="#82140F"><code>new</code></font>' items of the same name.  This is done by using the
+`<font color="#82140F"><code>&amp;</code></font>' notation at each step.  The following provides an example of
+passing a variable through two levels of newcommands.
+<p>
+
+Q: what does the following print?
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`food critic &amp;food'                 
+{                                  
+    \.word2. = "\.word2.s"          
+    yummy &amp;\.word2.                 
+}                                  
+`yummy &amp;foods'                      
+{                                  
+    \.word1. = "\.word1. are tasty" 
+}                                   
+\a = "apple"                         
+food critic &amp;\a                      
+show "\a"                            
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+A: it prints `<font color="#82140F"><code>apples are tasty</code></font>'.
+<p>
+
+
+<!-- @node   Using New And Delete, Determining Calling Information, Nesting, Changeable Command Arguments -->
+<a name="UsingNewAndDelete" ></a>
+<h4>10.11.5.5: About `<font color="#82140F"><code>new</code></font>' and `<font color="#82140F"><code>delete</code></font>'</h4>
+
+
+
+If `<font color="#82140F"><code>new</code></font>' and `<font color="#82140F"><code>delete</code></font>' are executed on local synonyms inside
+newcommands (e.g.  `<font color="#82140F"><code>new \.word1.</code></font>')  they create and destroy
+variables and synonyms in the context of the <b>calling program</b>.
+<p>
+For example, consider the following.
+<p>
+
+Q: what does the following print?
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`poetry &amp;\s'
+{
+    new \s                             # line 3
+    \s = "rose"
+    \.word1. = "\.word1. is a \s"      # line 5
+    delete \s                          # line 6
+}
+\s = "A rose "                         # line 8
+poetry &amp;\s
+show "\s"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+A: it prints `<font color="#82140F"><code>A rose is a rose</code></font>'.
+<p>
+The key point here is that the instance of the synonym named `<font color="#82140F"><code>\s</code></font>'
+in the calling program, set in line 8, is modified by the `<font color="#82140F"><code>poetry</code></font>'
+newcommand, in line 6.  This modification involves the use of a synonym,
+<b>also named</b> `<font color="#82140F"><code>\s</code></font>', that "lives" wholly within the newcommand,
+being created in line 3 and destroyed in line 6.  
+<p>
+
+<!-- @node   Determining Calling Information, Implementation of Ampersand Syntax, Using New And Delete, Changeable Command Arguments -->
+<a name="DeterminingCallingInformation" ></a>
+<h4>10.11.5.6: Determining calling information</h4>
+
+
+
+Newcommands may determine the name and the nesting level of changeable
+calling arguments.  To get the name, put a single ampersand after the
+backslash of the local synonym of interest.  To get the nesting level (0
+for main program, etc.) put two ampersands after the backslash.
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`NC &amp;.var.'
+{
+    show "\&amp;.word1. (expect '.a.')"
+    show "\&amp;&amp;.word1. (expect 0)"
+}
+.a. = 1
+NC &amp;.a.
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<b>Note</b>: neither of these items may be used an lvalue.  That is,
+they may not be used to the left of an equals sign.  But you can always
+get around that by clever use of alias synonyms (see <a href="Synonyms.html#AliasSynonyms">Alias Synonyms</a>).
+<p>
+
+
+<!-- @node   Implementation of Ampersand Syntax, Hints, Determining Calling Information, Changeable Command Arguments -->
+<a name="ImplementationofAmpersandSyntax" ></a>
+<h4>10.11.5.7: How Gri implements the `<font color="#82140F"><code>&amp;</code></font>' syntax</h4>
+
+
+
+When the parser encounters an unquoted `<font color="#82140F"><code>&amp;</code></font>' followed immediately by
+the name of a variable or a synonym, it converts the whole token
+(`<font color="#82140F"><code>&amp;</code></font>' plus name) into a specially-encoded string that can be
+recognized inside newcommands.  (This is <b>only</b> done if the
+`<font color="#82140F"><code>&amp;</code></font>' and the variable name are <b>not</b> enclosed in double
+quotes.)
+<p>
+This specially-encoded string contains not just the name of the variable
+or synonym, but also the current level of nesting of newcommands.  In
+this way a newcommand can have its own private versions of variables,
+created by `<font color="#82140F"><code>new</code></font>', that won't be misinterpreted for the
+identically-named variables in the calling program.
+<p>
+The format of these specially-encoded strings is
+`<font color="#82140F"><code>#\bn\ba\bm\be\b:\bN \b_ \bl\be\bv\be\bl\b:\bL#\b</code></font>',
+where `<font color="#82140F"><code>N</code></font>' stands for
+the name of the variable/synonym, `<font color="#82140F"><code>L</code></font>' stands for the current level,
+and `<font color="#82140F"><code>\b</code></font>' is the backspace character (hexadecimal 08 in the ascii
+table).  This string is designed to be strange enough that users are
+unlikely to use it themselves.  The coding scheme is not entirely
+arbitrary, however; note that if the backspace characters are ignored
+the result has the form `<font color="#82140F"><code>name:N_level:L</code></font>'.  It's also worth noting
+that if this string were printed on a terminal that erased characters
+when typing backspaces the result would be of the form `<font color="#82140F"><code>N_L</code></font>'.
+<p>
+Examples: `<font color="#82140F"><code>@.a.</code></font>' in the main program
+(i.e. at level 0) encodes to
+`<font color="#82140F"><code>#\bn\ba\bm\be\b:\b.a. \b_ \bl\be\bv\be\bl\b:\b0#\b</code></font>'
+and `<font color="#82140F"><code>&amp;\my_syn</code></font>' inside a newcommand called by the main program
+(i.e. at level 1) encodes to
+`<font color="#82140F"><code>#\bn\ba\bm\be\b:\b\my_syn \b_ \bl\be\bv\be\bl\b:\b1#\b</code></font>'.
+<p>
+Inside a newcommand, Gri checks to see if builtin synonyms
+(e.g. `<font color="#82140F"><code>\.word1.</code></font>') hold such specially-encoded strings.  If so, then
+the appropriate versions of the variables are used in preference to any
+variables that may have been newly created by `<font color="#82140F"><code>new</code></font>' inside the
+newcommand.
+<p>
+
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

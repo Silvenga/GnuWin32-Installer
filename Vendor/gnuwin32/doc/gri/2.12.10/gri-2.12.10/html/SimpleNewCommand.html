@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: creating a simple new command</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile SimpleNewCommand.html "Gri: creating a simple new command" "Programming Gri" --> 
+
+<!-- @node   Simple New Command, Complicated New Command, Parsing, Adding New Commands -->
+<a name="SimpleNewCommand" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="NewCommands.html#AddingNewCommands" shape="rect" coords="516,2,532,24" href="NewCommands.html#AddingNewCommands">
+<area alt="Gri: How synonyms are parsed" shape="rect" coords="557,2,573,24" href="ParsingSynonyms.html">
+<area alt="Gri: creating a complicated new command" shape="rect" coords="581,2,599,24" href="ComplicatedNewCommand.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: creating a complicated new command" shape="rect" coords="581,2,599,24" href="ComplicatedNewCommand.html">
+</map>
+<h3>10.11.3: Simple example of a new command</h3>
+
+To make a new command called `<font color="#82140F"><code>Show The Time</code></font>' insert the following
+into your `<font color="#82140F"><samp>~/.grirc</samp></font>' resource file or into your command-file
+somewhere near the top, or at least before you use the command.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`Show The Time'
+New command to show the time of day.
+{
+  show "\.time."
+}
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+EXPLANATION:
+<ul>
+<p>
+<li> 
+The name of the new command is enclosed in angled single-quote marks.
+The words of the new command should begin with upper-case letters to
+prevent a name clash with a present or future built-in Gri command.
+<b>Formatting convention:</b> Make sure that the entire definition
+string, from the opening angled quote to the ending angled quote,
+appears on one line.  Otherwise Gri will give an error like
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+ERROR: Can't extract syntax for new command
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+Following the name line, you may optionally insert any number of lines
+which will become the `<font color="#82140F"><code>help</code></font>' information for the new command.  See
+the file `<font color="#82140F"><samp>gri.cmd</samp></font>' for the recommended stylistic conventions in
+writing help information (see <a href="InvokingGri.html#InvokingGri">Invoking Gri</a>). If your `<font color="82140F"><code>help</code></font>' text
+includes an example that uses an opening brace (`<font color="#82140F"><code>{</code></font>') you must
+escape the brace with a backslash, e.g. (`<font color="#82140F"><code>\{</code></font>').
+<li>
+Following the help lines, if they exist, the body of the new command is
+given, sandwiched between a starting line containing an opening brace
+(`<font color="#82140F"><code>{</code></font>') as the <b>only</b> nonwhite character, and an ending line
+containing a closing brace (`<font color="#82140F"><code>}</code></font>') as the only nonwhite character.
+Any valid Gri commands may be used in the body of the new command.  It
+is acceptable to use other new commands in the body. Recursion is also
+allowed -- a new command is allowed to call itself (although there is a
+limit on nesting, of perhaps a thousand or so; this varies with the
+version of Gri).  <b>Formatting convention:</b> It is usual, but not
+necessary, to use an indentation level of 2 spaces in the body of the
+new command.
+</ul>
+<p>
+The new command is invoked by `<font color="#82140F"><code>Show The Time</code></font>'.  Help for the
+command is found by `<font color="#82140F"><code>help Show The Time</code></font>' or `<font color="#82140F"><code>help Show</code></font>'.
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

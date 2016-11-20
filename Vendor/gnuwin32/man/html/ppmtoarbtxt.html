@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Ppmtoarbtxt User Manual</TITLE></HEAD>
+<BODY>
+<H1>ppmtoarbtxt</H1>
+<BR>
+Updated: 27 April 2003
+<BR>
+<A HREF="ppmtoarbtxt.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+ppmtoarbtxt - generate image in arbitrary text format from PPM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>ppmtoarbtxt</B>
+<I>bodyskl</I>
+[<B>-hd</B> <I>headskl</I>]
+[<B>-tl</B> <I>tailskl</I>]
+[<I>ppmfile</I>]
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<b>ppmtoarbtxt</b> generates simple text-based graphics formats based on
+format descriptions given as input.  A text-based graphics format is one in
+which an image is represented by text (like PNM plain format, but unlike
+PNM raw format).
+
+<b>ppmtoarbtxt</b>reads a PPM image as input.  For each pixel in the
+image, <b>ppmtoarbtxt</b> writes the contents of the skeleton file
+<I>bodyskl</I>, with certain substitutions based on the value of the
+pixel, to stdout.  The substitutions are as follows:
+
+<DL COMPACT>
+<DT><B>#(ired</B><I> format blackref whiteref</I><B>)</B>
+
+<DD>generates an integer in the range <I>blackref</I> to
+<I>whiteref</I> using <I>format</I> representing the red intensity of
+the pixel.  A red intensity of 0 becomes <I>blackref</I>; a red
+intensity of maxval becomes <I>whiteref</I>.
+
+<p><B>#(ired)</B> is equivalent to <B>#(ired %d 0 255)</B>.
+
+<DT><B>#(igreen</B><I> format blackref whiteref</I><B>)</B>
+
+<DD>Same as <B>#(ired...</B>, but for green.
+
+<DT><B>#(iblue</B><I> format blackref whiteref</I><B>)</B>
+
+<DD>Same as <B>#(ired...</B>, but for blue.
+
+<DT><B>#(ilum</B><I> format blackref whiteref</I><B>)</B>
+
+<DD>Same as <B>#(ired...</B>, but representing the luminance value
+(0.299*red + 0.587*green + 0.114*blue) of the pixel.
+
+<DT><B>#(fred</B><I> format blackref whiteref</I><B>)</B>
+
+<DD>Same as <B>#(ired...</B>, but generates a floating point number instead
+of an integer.
+
+<p>
+<B>#(fred)</B> is equivalent to <B>#(fred %f 0.0 1.0)</B>.
+
+<DT><B>#(fgreen</B><I> format blackref whiteref</I><B>)</B>
+
+<DD>Same as <B>#(fred...</B>, but for green.
+
+<DT><B>#(fblue</B><I> format blackref whiteref</I><B>)</B>
+
+<DD>Same as <B>#(fred...</B>, but for blue.
+
+<DT><B>#(flum</B><I> format blackref whiteref</I><B>)</B>
+
+<DD>Same as <B>#(fred...</B>, but representing the luminance value
+(0.299*red + 0.587*green + 0.114*blue) of the pixel.
+
+
+<DT><B>#(width)</B>
+
+<DD>Generates the width in pixels of the image.
+
+<DT><B>#(height)</B>
+
+<DD>Generates the height in pixels of the image.
+
+
+<DT><B>#(posx)</B> 
+
+<DD>Generates the horizontal position of the pixel, in pixels from the left
+edge of the image.
+
+<DT><B>#(posy)</B> 
+
+<DD>Generates the vertical position of the pixel, in pixels from the top
+edge of the image.
+
+</DL>
+
+
+<P>If the skeleton file ends with a LF-character, <b>ppmtoarbtxt</b>
+ignores it -- it does not include it in the output.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-hd</B> <I>headskl</I>
+
+<DD>This option causes <b>ppmtoarbtxt</b> to place the contents of
+the file named <I>headskl</I> at the beginning of the output, before
+the first pixel.  It does the same substitutions as for
+<I>bodyskl</I>, except substitutions based on a pixel value are
+undefined.
+
+<DT><B>-tl</B> <I>tailskl</I>
+
+<DD>This option causes <b>ppmtoarbtxt</b> to place the contents of
+the file named <i>tailskl</i> at the end of the output, after the
+last pixel.  It is analogous to <b>-hd</b>.
+</DL>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>EXAMPLES</H2>
+
+<h3>gray inversion</H3>
+
+<P>Here we generate a PGM plain-format image with gray inversion
+(like <b>ppmtopgm | pnminvert</b>).
+
+<p>Contents of our head skeleton file:
+
+<pre>
+P2
+#(width) #(height)
+255
+</pre>
+
+<P>Contents of our body skeleton file:
+
+<pre>
+#(ilum %d 255 0)
+</pre>
+
+<h3>povray file</h3>
+
+<P>Here we generate a povray file where each pixel is represented by a
+sphere at location (x,y,z) = (posx,height-posy,luminance).  The color
+of the sphere is the color of the pixel.
+
+<p>Contents of our head skeleton:
+
+<pre>
+#include &quot;colors.inc&quot;
+#include &quot;textures.inc&quot;
+camera {
+   location  &lt;#(width) * 0.6, #(height) * 0.7, 80&gt;
+   look_at   &lt;#(width) * 0.5, #(height) * 0.5, 0&gt;
+}
+
+light_source { &lt;#(width) * 0.5, #(height) * 0.5, 25&gt; color White
+}
+</pre>
+
+<p>Contents of our body skeleton:
+
+<pre>
+sphere { &lt;#(posx),#(height)-#(posy),#(ilum %d 0 10)&gt;, 0.5
+  texture {
+    pigment {
+      color rgb &lt;#(fred),#(fgreen),#(fblue)&gt;
+    }
+    finish {
+      phong 1
+    }
+  }
+}
+</pre>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<A href="pnmtoplainpnm.html">pnmtoplainpnm</A>
+<A href="ppm.html">ppm</A>
+
+<H2>HISTORY</H2>
+<A NAME="history">&nbsp;</A>
+
+<P><B>ppmtoarbtxt</b> was added to Netpbm in Release 10.14 (March 2003).
+It existed under the name <b>ppmtotxt</b> since 1995.
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1995 by Peter Kirchgessner
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="ppmtoarbtxt.html#lbAB">NAME</A>
+<LI><A HREF="ppmtoarbtxt.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="ppmtoarbtxt.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="ppmtoarbtxt.html#lbAE">OPTIONS</A>
+<LI><A HREF="ppmtoarbtxt.html#lbAF">EXAMPLES</A>
+<LI><A HREF="ppmtoarbtxt.html#lbAG">SEE ALSO</A>
+<LI><A HREF="ppmtoarbtxt.html#history">HISTORY</A>
+<LI><A HREF="ppmtoarbtxt.html#lbAH">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

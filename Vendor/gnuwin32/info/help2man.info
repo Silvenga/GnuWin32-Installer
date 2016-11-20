@@ -1,0 +1,390 @@
+This is help2man.info, produced by makeinfo version 4.7 from
+help2man.texi.
+
+INFO-DIR-SECTION GNU programming support
+START-INFO-DIR-ENTRY
+* help2man: (help2man).      Automatic manual page generation.
+END-INFO-DIR-ENTRY
+
+   This file documents the GNU `help2man' command which produces simple
+manual pages from the `--help' and `--version' output of other commands.
+
+   Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 Free Software
+Foundation, Inc.
+
+   Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+   Permission is granted to copy and distribute modified versions of
+this manual under the conditions for verbatim copying, provided that
+the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+   Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation approved by the Foundation.
+
+
+File: help2man.info,  Node: Top,  Next: Overview,  Up: (dir)
+
+`help2man'
+**********
+
+`help2man' produces simple manual pages from the `--help' and
+`--version' output of other commands.
+
+* Menu:
+
+* Overview::                    Overview of `help2man'.
+* Invoking help2man::           How to run `help2man'.
+* Including text::              Including additional text in the output.
+* --help recommendations::      Recommended formatting for --help output.
+* Makefile usage::              Using `help2man' with `make'.
+* Localised man pages::         Producing native langauge manual pages.
+* Reports::                     Reporting bugs or suggestions.
+* Availability::                Obtaining `help2man'.
+
+
+File: help2man.info,  Node: Overview,  Next: Invoking help2man,  Prev: Top,  Up: Top
+
+1 Overview of `help2man'
+************************
+
+`help2man' is a tool for automatically generating simple manual pages
+from program output.
+
+   Although manual pages are optional for GNU programs other projects,
+such as Debian require them (*note Man Pages: (standards)Man Pages.)
+
+   This program is intended to provide an easy way for software authors
+to include a manual page in their distribution without having to
+maintain that document.
+
+   Given a program which produces reasonably standard `--help' and
+`--version' outputs, `help2man' can re-arrange that output into
+something which resembles a manual page.
+
+
+File: help2man.info,  Node: Invoking help2man,  Next: Including text,  Prev: Overview,  Up: Top
+
+2 How to Run `help2man'
+***********************
+
+The format for running the `help2man' program is:
+
+     `help2man' [OPTION]... EXECUTABLE
+
+   `help2man' supports the following options:
+
+`-n STRING'
+`--name=STRING'
+     Use STRING as the description for the `NAME' paragraph of the
+     manual page.
+
+     By default (for want of anything better) this paragraph contains
+     `manual page for PROGRAM VERSION'.
+
+     This option overrides an include file `[name]' section (*note
+     Including text::).
+
+`-s SECTION'
+`--section SECTION'
+     Use SECTION as the section for the man page.  The default section
+     is 1.
+
+`-m MANUAL'
+`--manual=MANUAL'
+     Set the name of the manual section to SECTION, used as a centred
+     heading for the manual page.  By default `User Commands' is used
+     for pages in section 1, `Games' for section 6 and `System
+     Administration Utilities' for sections 8 and 1M.
+
+`-S SOURCE'
+`--source=SOURCE'
+     The program source is used as a page footer, and often contains
+     the name of the organisation or a suite of which the program is
+     part.  By default the value is the package name and version.
+
+`-L LOCALE'
+`--locale=LOCALE'
+     Select output locale (default `C').  Both the program and
+     `help2man' must support the given LOCALE (*note Localised man
+     pages::).
+
+`-i FILE'
+`--include=FILE'
+     Include material from FILE (*note Including text::).
+
+`-I FILE'
+`--opt-include=FILE'
+     A variant of `--include' for use in Makefile pattern rules which
+     does not require FILE to exist.
+
+`-o FILE'
+`--output=FILE'
+     Send output to FILE rather than `stdout'.
+
+`-N'
+`--no-info'
+     Suppress inclusion of a `SEE ALSO' paragraph directing the reader
+     to the Texinfo documentation.
+
+`--help'
+`--version'
+     Show help or version information.
+
+   By default `help2man' passes the standard `--help' and `--version'
+options to the executable although alternatives may be specified using:
+
+`-h OPTION'
+`--help-option=OPTION'
+     help option string
+
+`-v OPTION'
+`--version-option=OPTION'
+     version option string
+
+
+File: help2man.info,  Node: --help recommendations,  Next: Makefile usage,  Prev: Including text,  Up: Top
+
+3 `--help' Recommendations
+**************************
+
+Here are some recommendations for what to include in your `--help'
+output.  Including these gives `help2man' the best chance at generating
+a respectable man page, as well as benefitting users directly.
+
+   *Note Command-Line Interfaces: (GNU Coding Standards)Command-Line
+Interfaces, and *Note Man Pages: (GNU Coding Standards)Man Pages, for
+the official GNU standards relating to `--help' and man pages.
+
+   * A synopsis of how to invoke the program.  If different usages of
+     the program have different invocations, then list them all.  For
+     example (edited for brevity):
+
+          Usage: cp [OPTION]... SOURCE DEST
+            or:  cp [OPTION]... SOURCE... DIRECTORY
+          ...
+
+     Use `argv[0]' for the program name in these synopses, just as it
+     is, with no directory stripping.  This is in contrast to the
+     canonical (constant) name of the program which is used in
+     `--version'.
+
+   * A very brief explanation of what the program does, including
+     default and/or typical behavior.  For example, here is `cp''s:
+
+          Copy SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY.
+
+   * A list of options, indented to column 2.  If the program supports
+     one-character options, put those first, then the equivalent long
+     option (if any).  If the option takes an argument, include that
+     too, giving it a meaningful name.  Align the descriptions in a
+     convenient column, if desired.  Note that to be correctly
+     recognised by `help2man' the description must be separated from
+     the options by at least two spaces and descriptions continued on
+     subsequent lines must start at the same column.
+
+     Here again is an (edited) excerpt from `cp', showing a short
+     option with an equivalent long option, a long option only, and a
+     short option only:
+
+            -a, --archive                same as -dpR
+                --backup[=CONTROL]       make a backup of each ...
+            -b                           like --backup but ...
+
+     For programs that take many options, it may be desirable to split
+     the option list into sections such as `Global', `Output control',
+     or whatever makes sense in the particular case.  It is usually
+     best to alphabetize (by short option name first, then long) within
+     each section, or the entire list if there are no sections.
+
+   * Any useful additional information about program behavior, such as
+     influential environment variables, further explanation of options,
+     etc.  For example, `cp' discusses `VERSION_CONTROL' and sparse
+     files.
+
+   * A few examples of typical usage, at your discretion.  One good
+     example is usually worth a thousand words of description, so this
+     is highly recommended.
+
+   * In closing, a line stating how to email bug reports.  Typically,
+     MAILING-ADDRESS will be `bug-PROGRAM@gnu.org'; please use this
+     form for GNU programs whenever possible.  It's also good to
+     mention the home page of the program, other mailing lists, etc.
+
+
+   The `argp' and `popt' programming interfaces let you specify option
+descriptions for `--help' in the same structure as the rest of the
+option definition; you may wish to consider using these routines for
+option parsing instead of `getopt'.
+
+
+File: help2man.info,  Node: Including text,  Next: --help recommendations,  Prev: Invoking help2man,  Up: Top
+
+4 Including Additional Text in the Output
+*****************************************
+
+Additional static text may be included in the generated manual page by
+using the `--include' and `--opt-include' options (*note Invoking
+help2man::).
+
+   The format for files included with these option is simple:
+
+     [section]
+     text
+
+     /pattern/
+     text
+
+   Blocks of verbatim *roff text are inserted into the output either at
+the start of the given `[section]' (case insensitive), or after a
+paragraph matching `/pattern/'.
+
+   Patterns use the Perl regular expression syntax and may be followed
+by the `i', `s' or `m' modifiers (*note perlre(1): (*manpages*)perlre.)
+
+   Lines before the first section or pattern which begin with `-' are
+processed as options.  Anything else is silently ignored and may be
+used for comments, RCS keywords and the like.
+
+   The section output order is:
+
+     NAME
+     SYNOPSIS
+     DESCRIPTION
+     OPTIONS
+     EXAMPLES
+     _other_
+     AUTHOR
+     REPORTING BUGS
+     COPYRIGHT
+     SEE ALSO
+
+   Any `[name]' or `[synopsis]' sections appearing in the include file
+will replace what would have automatically been produced (although you
+can still override the former with `--name' if required).
+
+   Other sections are prepended to the automatically produced output for
+the standard sections given above, or included at _other_ (above) in
+the order they were encountered in the include file.
+
+
+File: help2man.info,  Node: Makefile usage,  Next: Localised man pages,  Prev: --help recommendations,  Up: Top
+
+5 Using `help2man' With `make'
+******************************
+
+A suggested use of `help2man' in Makefiles is to have the manual page
+depend not on the binary, but on the source file(s) in which the
+`--help' and `--version' output are defined.
+
+   This usage allows a manual page to be generated by the maintainer and
+included in the distribution without requiring the end-user to have
+`help2man' installed.
+
+   An example rule for the program `prog' could be:
+
+     prog.1: $(srcdir)/main.c
+             -$(HELP2MAN) --output=$@ --name='an example program' ./prog
+
+   The value of `HELP2MAN' may be set in `configure.in' using either of:
+
+     AM_MISSING_PROG(HELP2MAN, help2man, $missing_dir)
+
+   for `automake', or something like:
+
+     AC_PATH_PROG(HELP2MAN, help2man, false // No help2man //)
+
+   for `autoconf' alone.
+
+
+File: help2man.info,  Node: Localised man pages,  Next: Reports,  Prev: Makefile usage,  Up: Top
+
+6 Producing Native Langauge Manual Pages.
+*****************************************
+
+Manual pages may be produced for any locale supported by both the
+program and `help2man'(1) with the `--locale' (`-L') option.
+
+     help2man -L fr_FR@euro -o cp.fr.1 cp
+
+6.1 Changing the Location of Message Catalogs
+=============================================
+
+When creating localised manual pages from a program's build directory it
+is probable that the translations installed in the standard location
+will not be (if installed at all) correct for the version of the
+program being built.
+
+   A preloadable library is provided with `help2man' which will
+intercept `open(2)' calls for message catalogs for the domain given by
+`$TEXTDOMAIN' and re-map the requests to the appropriate file under
+`./po' (or `$LOCALEDIR' if given).
+
+   So for example:
+
+     LD_PRELOAD="hacklocaledir.so preloadable_libintl.so" TEXTDOMAIN=PROG \
+       help2man -L fr_FR@euro -i PROG.fr.h2m -o PROG.fr.1 PROG
+
+   will translate requests by PROG for
+`/usr/share/locale/fr/LC_MESSGAES/PROG.mo' to `po/fr.gmo'.
+
+   Notes:
+   * The generalisation of `fr_FR@euro' to `fr' in the example above is
+     done by `gettext', if a more specific match were available it
+     would also have been re-mapped.
+
+   * The inclusion of `preloadable_libintl.so' in `$LD_PRELOAD' is
+     required only for cases (such as `glibc') where `gettext' is built
+     into libc (where `__open' would otherwise be satisfied internally).
+
+   * This preload hack has only been tested against `glibc' 2.3.1 and
+     `gettext' 2.3.1 on a GNU/Linux system; let me know if it does (or
+     doesn't) work for you (*note Reports::).
+
+   ---------- Footnotes ----------
+
+   (1) `help2man' currently supports `fr_FR' and `pl_PL' (*note
+Reports:: for how to submit other translations).
+
+
+File: help2man.info,  Node: Reports,  Next: Availability,  Prev: Localised man pages,  Up: Top
+
+7 Reporting Bugs or Suggestions
+*******************************
+
+If you find problems or have suggestions about this program or manual,
+please report them to <bug-help2man@gnu.org>.
+
+   Note to translators:  when submitting new translations for
+`po/help2man.pot' please additionally translate `help2man.h2m' (used to
+augment the manual pages for `help2man').
+
+
+File: help2man.info,  Node: Availability,  Prev: Reports,  Up: Top
+
+8 Obtaining `help2man'
+**********************
+
+The latest version of this distribution is available on-line from:
+
+     `ftp://ftp.gnu.org/gnu/help2man/'
+
+
+
+Tag Table:
+Node: Top1112
+Node: Overview1819
+Node: Invoking help2man2526
+Node: --help recommendations4697
+Node: Including text8113
+Node: Makefile usage9650
+Node: Localised man pages10589
+Ref: Localised man pages-Footnote-112389
+Node: Reports12503
+Node: Availability12961
+
+End Tag Table

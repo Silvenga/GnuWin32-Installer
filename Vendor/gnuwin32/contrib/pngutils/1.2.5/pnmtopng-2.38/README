@@ -1,0 +1,85 @@
+** PNMTOPNG / PNGTOPNM
+** version 2.38 - 16 June 2002
+
+This is another in a set of semi-official bug-fix/enhancement releases.
+I sort of took over maintenance of this package while Willem was on an
+extended bike trip several years ago, and for now I'm continuing with
+periodic, small updates.  (The code really should be rewritten to avoid
+directly messing with libpng's internal structures, but I haven't yet
+found time to do that.)
+
+Brief changelog:
+
+  2.37   - (March 1998) never publicly released, partly because Willem had
+           hoped to quiet gcc's "<var> might be clobbered by `longjmp'"
+
+  2.37.2 - fixed gcc "clobber" warnings; under Solaris, they resulted in
+           stack corruption even when there was no error in the image files
+           or libraries
+
+  2.37.3 - fixed a minor bug with respect to error exits; generally cleaner
+           error exits (close files, etc.)
+
+  2.37.4 - fixed a bug that caused 16-shade grayscale images to be written
+           as 8-bit grayscale instead of (smaller) 4-bit colormapped images
+           (bug report, analysis and fix by Rafal Rzeczkowski); added support
+           for the new/upcoming pbmplus release (based on 1999-11-28 beta).
+
+  2.37.5 - fixed a bug in -transparent handling (pnmtopng no longer chooses
+           an approximate color if the specified one isn't present); quieted
+           a gcc warning in the non-16-bit version; added optional support
+           for warning-level return codes (define PNMTOPNG_WARNING_LEVEL 2
+           to enable) to pnmtopng
+
+  2.37.6 - fixed a bug in -background handling for low-bit-depth grayscale
+           images; renamed version.h to pnmtopng_version.h
+
+  2.38   - forced explicit binary mode on stdin/stdout for DOS-like OSes;
+           added same (optional) support for warning-level return codes to
+           pngtopnm (see 2.37.5 above); plugged some memory leaks; documented
+           palette-remapping code better; added support for custom (ordered)
+           palette (new -palette option); added some checks for malloc()
+           failure; extended syntax of text-comment files by allowing blank
+           lines and keywords on separate lines from main text (tenthumbs at
+           cybernex.net); abandoned silly "ultra-minor" version number
+
+                   -- [end of Greg Roelofs commentary] --
+
+
+The utilities pnmtopng and pngtopnm are based on other pbm tools and require
+the libraries included in the pbmplus/netpbm package. Also required are the
+png library and the zlib compression library.
+
+These can be found at:
+	ftp://swrinde.nde.swri.edu/pub/png/src/libpng-*
+	ftp://swrinde.nde.swri.edu/pub/png/src/zlib-*
+	ftp://ftp.x.org/contrib/utilities/netpbm-1mar1994*
+or see
+	http://www.libpng.org/pub/png/apps/pnmtopng.html
+	http://www.libpng.org/pub/png/libpng.html
+	http://www.zlib.org/
+	http://netpbm.sourceforge.net/
+	http://www.acme.com/software/pbmplus/	[update coming someday?]
+
+To compile and install, a makefile is provided. Do check the directories
+where you have put the required libraries. Then either accommodate the 
+makefile or make links from generic names (e.g., zlib) to version-specific
+directories (e.g., zlib-1.1.4), which is the recommended way.
+
+For testing purposes, have a look at the test-set PngSuite.tar.gz, which
+contains a small test-image for every PNG color type and for most PNG chunk
+types. It can be found at:
+	http://www.schaik.com/pngsuite/pngsuite.html
+	ftp://swrinde.nde.swri.edu/pub/png/images/suite/
+
+Other web pages with PNG images are at:
+	http://www.libpng.org/pub/png/png-textures.html
+	http://www.libpng.org/pub/png/pngs-img.html
+	http://www.libpng.org/pub/png/pngpic2.html
+	http://www.libpng.org/pub/png/colorcube/
+	http://www.libpng.org/pub/png/pngmisc.html#images
+
+------
+Alexander Lehmann <lehmann@usa.net>
+Willem van Schaik <willem@schaik.com>
+Greg Roelofs <newt@pobox.com>

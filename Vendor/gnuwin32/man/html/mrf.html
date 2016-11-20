@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>MRF image format specification</TITLE></HEAD>
+<BODY>
+<A HREF="mrf.html#index">Table Of Contents</A>
+
+<H1>MRF format</H1>
+Updated: 1991
+<BR>
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+MRF - monochrome recursive format (compressed bitmaps)
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p>MRF is a compressed format for bilevel (1-bit mono) images.  It
+achieves better compression for some such images than either GIF or
+PNG. (It's also very easy to implement (about the same difficulty as
+RLE, I'd say) and an MRF reader needs no tables/buffers, which may
+make it useful for tiny machines).
+
+<P>In case the above hasn't made it sufficiently clear, I'll make this
+next point explicitly: <em>MRF cannot represent color at all.</em> Nor
+can it represent grayscale.  It's a specifically mono format.  (If you
+want to compress a color or grayscale image, my advice is to use
+JPEG2000).
+
+<P>First, here's what goes where in an MRF file. I'll explain how the
+compression works afterward.
+
+<DL COMPACT>
+<DT>Offset<DD>
+Description
+<DT>0
+<DD>
+magic number - &quot;MRF1&quot; (in ASCII)
+
+<DT>4
+<DD>
+width (32-bit, MSB first (i.e. big-endian))
+
+<DT>8
+<DD>
+height (same)
+
+<DT>12
+<DD>
+reserved (single byte, must be zero)
+
+<DT>13
+<DD>
+compressed data
+
+</DL>
+
+<P>Note that there is no end-of-file marker in the file itself - the
+compressed data carries on right up to EOF.
+
+<P>The way the picture is compressed is essentially very simple, but
+as they say, the devil is in the detail.  So don't be put off if it
+sounds confusing.
+
+<P>The image is treated as a number of 64x64 squares, forming a grid
+large enough to encompass it. (If an image is (say) 129x65, it'll be
+treated in the same way as a 192x128 one. On decompression, the extra
+area which was encoded (the contents of this area is undefined) should
+be ignored.) Each of these squares in turn (in left-to-right,
+top-to-bottom order) is recursively subdivided until the smallest
+completely black or white squares are found. Some pseudocode (eek!)
+for the recursive subdivision routine should make things clearer:
+
+<PRE>
+    if square size &gt; 1x1 and square is all one color, output 1 bit
+    if whole square is black, output a 0 bit and return
+    if whole square is white, output a 1 bit and return
+    output a 0 bit
+    divide the square into four quarters, calling routine for
+    each in this order: top-left, top-right, bottom-left, bottom-right
+</PRE>
+
+<P>(Note that the &quot;output a 0 bit&quot; stage is not reached for squares
+of size 1x1, which is what stops it recursing infinitely.  I mention
+this as it may not be immediately obvious.)
+
+<P>The whole of the compressed data is made up of the bits output by
+the above routine. The bits are packed into bytes MSB first, so for
+example outputting the bits 1,0,0,0,0,0,0,0 would result in a 80h byte
+being output. Any `unused' bits in the last byte output are undefined;
+these are effectively after EOF and their value is unimportant.
+
+<P>If writing that sounds too much like hard work :-), you could
+always adapt <b>pbmtomrf</b> and/or <b>mrftopbm</b>.  That's the main
+reason their source code is public domain, after all.
+
+<P>Above, I said the contents of any extra area encoded (when a bitmap
+smaller than the grid of squares is compressed) is undefined.  This is
+deliberate so that the MRF compressor can make these unseen areas
+anything it wants so as to maximize compression, rather than simply
+leaving it blank. <b>pbmtomrf</b> does a little in this respect but
+could definitely be improved upon.
+
+<P><b>mrftopbm</b>'s <b>-1</b> option causes it to include the edges, if
+any, in the output PBM.  This may help when debugging a compressor's
+edge optimization.
+
+<p>Note that the "F" in the name "MRF" comes from "format," which is redundant
+because it is the name of a format.  That sort of makes "MRF format" sound
+as stupid as "PIN number," but it's not really that bad.
+
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="mrftopbm.html">mrftopbm</A></B>,
+<B><A HREF="pbmtomrf.html">pbmtomrf</A></B>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Russell Marks.
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<UL>
+<LI><A HREF="mrf.html#lbAB">NAME</A>
+<LI><A HREF="mrf.html#lbAC">DESCRIPTION</A>
+<LI><A HREF="mrf.html#lbAE">SEE ALSO</A>
+<LI><A HREF="mrf.html#lbAF">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

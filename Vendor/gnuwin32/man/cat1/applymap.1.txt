@@ -1,0 +1,57 @@
+APPLYMAP(1)                                         APPLYMAP(1)
+
+
+
+
+
+NAME
+       applymap  -  Apply  the  color map in an RLE file to the
+       pixel data
+
+SYNOPSIS
+       applymap [ -l ] [ -o outfile ] [ infile ]
+
+DESCRIPTION
+       This program takes the color map in an RLE(5)  file  and
+       modifies  the  pixel values by applying the color map to
+       them.  If there is more than one color  channel  in  the
+       input  file, the color map in the input file should have
+       the same number of channels.  If the input  file  has  a
+       single color channel, the output file will have the same
+       number of color channels as the color map.
+
+       Each pixel in the input file is mapped as follows:   For
+       a  multi-channel  input  file,  a  pixel in channel i is
+       mapped as map[i][pixel] >> 8, producing a pixel in  out-
+       put  channel  i.  The right shift takes the 16 bit color
+       map value to an 8 bit pixel value.  For a single channel
+       input  file,  to  produce a pixel in output channel i is
+       produced from the corresponding  input  pixel  value  as
+       map[i][pixel] >> 8.
+
+OPTIONS
+       -l     This  option will cause a linear (identity) color
+              map to be loaded into the  output  file.   Other-
+              wise, the output file will have no color map.
+
+       infile The input will be read from this file, otherwise,
+              input will be taken from stdin.
+
+       -o outfile
+              If specified, output  will  be  written  to  this
+              file, otherwise it will go to stdout.
+
+SEE ALSO
+       rleldmap(1), urt(1), RLE(5).
+
+AUTHOR
+       Spencer W. Thomas, University of Utah
+
+BUGS
+       If  the  image  data and color map channels in the input
+       file do not conform  to  the  restriction  stated  above
+       (N->N or 1->N) the program will most likely core dump.
+
+
+
+1                         Nov 12, 1986              APPLYMAP(1)

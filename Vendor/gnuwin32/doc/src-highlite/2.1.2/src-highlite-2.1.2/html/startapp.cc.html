@@ -1,0 +1,576 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type"
+content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="GNU source-highlight 2.1
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite">
+<title>source file</title>
+</head>
+<body>
+<pre><tt><i><font color="#9A1900">/*</font></i>
+<i><font color="#9A1900"> * Copyright (C) 1999-2005  Lorenzo Bettini, www.lorenzobettini.it</font></i>
+<i><font color="#9A1900"> *</font></i>
+<i><font color="#9A1900"> * This program is free software; you can redistribute it and/or modify</font></i>
+<i><font color="#9A1900"> * it under the terms of the GNU General Public License as published by</font></i>
+<i><font color="#9A1900"> * the Free Software Foundation; either version 2 of the License, or</font></i>
+<i><font color="#9A1900"> * (at your option) any later version.</font></i>
+<i><font color="#9A1900"> *</font></i>
+<i><font color="#9A1900"> * This program is distributed in the hope that it will be useful,</font></i>
+<i><font color="#9A1900"> * but WITHOUT ANY WARRANTY; without even the implied warranty of</font></i>
+<i><font color="#9A1900"> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</font></i>
+<i><font color="#9A1900"> * GNU General Public License for more details.</font></i>
+<i><font color="#9A1900"> *</font></i>
+<i><font color="#9A1900"> * You should have received a copy of the GNU General Public License</font></i>
+<i><font color="#9A1900"> * along with this program; if not, write to the Free Software</font></i>
+<i><font color="#9A1900"> * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.</font></i>
+<i><font color="#9A1900"> *</font></i>
+<i><font color="#9A1900"> </font></i><i><font color="#9A1900">*/</font></i>
+
+<b><font color="#000080">#ifdef</font></b> HAVE_CONFIG_H
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"config.h"</font>
+<b><font color="#000080">#endif</font></b>
+
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"startapp.h"</font>
+
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdlib.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;iostream&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;fstream&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;assert.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;string.h&gt;</font>
+
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"colors.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"cmdline.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"fileutil.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"messages.h"</font>
+
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"copyright.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"reportbugs.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"parsetags.h"</font>
+
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"generatorfactory.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"srcuntabifier.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"chartranslator.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"langdefloader.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"lineoutputgenerator.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"langmap.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"regexpengine.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"regexpenginedebug.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"docgenerator.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"textstyles.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"outlangdefparserfun.h"</font>
+
+<i><font color="#9A1900">//</font></i><i><font color="#9A1900"> for globals</font></i>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"linenumdigit.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"globalostream.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"cmdlineargs.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"mainoutputbuffer.h"</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"mainoutputgenerator.h"</font>
+
+<b><font color="#0000FF">using</font></b> <b><font color="#0000FF">namespace</font></b> std<font color="#990000">;</font>
+
+<i><font color="#9A1900">//</font></i><i><font color="#9A1900"> global output stream</font></i>
+ostream<font color="#990000">*</font> sout<font color="#990000">;</font>
+
+<b><font color="#000080">#ifdef</font></b> BUILD_AS_CGI
+<b><font color="#000080">#include</font></b> <font color="#FF0000">"envmapper.h"</font>
+<b><font color="#000080">#endif</font></b> <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> BUILD_AS_CGI</font></i>
+
+
+<font color="#009900">unsigned</font> <font color="#009900">int</font> line_num_digit <font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">;</font> <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> num of digits to represent line number</font></i>
+
+gengetopt_args_info args_info <font color="#990000">;</font>     <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> command line structure</font></i>
+
+<b><font color="#0000FF">static</font></b> <font color="#009900">void</font> <b><font color="#000000">print_cgi_header</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+
+StartApp<font color="#990000">:</font><font color="#990000">:</font><b><font color="#000000">StartApp</font></b><font color="#990000">(</font><font color="#990000">)</font> <font color="#990000">:</font>
+    <b><font color="#000000">docgenerator</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font><font color="#990000">,</font> <b><font color="#000000">formatter</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font><font color="#990000">,</font> <b><font color="#000000">langmap</font></b><font color="#990000">(</font><b><font color="#0000FF">new</font></b> LangMap<font color="#990000">)</font><font color="#990000">,</font> <b><font color="#000000">outlangmap</font></b><font color="#990000">(</font><b><font color="#0000FF">new</font></b> LangMap<font color="#990000">)</font><font color="#990000">,</font> <b><font color="#000000">generator_factory</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font><font color="#990000">,</font>
+  <b><font color="#000000">entire_doc </font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font><font color="#990000">,</font> <b><font color="#000000">verbose </font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font><font color="#990000">,</font> <b><font color="#000000">cssUrl </font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font><font color="#990000">,</font>
+  <b><font color="#000000">use_css </font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font><font color="#990000">,</font> <b><font color="#000000">is_cgi </font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">)</font><font color="#990000">,</font> <b><font color="#000000">gen_version</font></b><font color="#990000">(</font><b><font color="#0000FF">true</font></b><font color="#990000">)</font><font color="#990000">,</font>
+  <b><font color="#000000">generate_line_num</font></b><font color="#990000">(</font><b><font color="#0000FF">false</font></b><font color="#990000">)</font><font color="#990000">,</font> <b><font color="#000000">generate_ref</font></b><font color="#990000">(</font><b><font color="#0000FF">false</font></b><font color="#990000">)</font>
+<font color="#FF0000">{</font>
+<font color="#FF0000">}</font>
+
+StartApp<font color="#990000">:</font><font color="#990000">:</font><font color="#990000">~</font><b><font color="#000000">StartApp</font></b><font color="#990000">(</font><font color="#990000">)</font>
+<font color="#FF0000">{</font>
+  <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> cout &lt;&lt; "destroying StartApp..." &lt;&lt; endl;</font></i>
+  <b><font color="#000000">cmdline_parser_free</font></b><font color="#990000">(</font><font color="#990000">&amp;</font>args_info<font color="#990000">)</font><font color="#990000">;</font>
+
+  <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> TODO: fix all the pointer dependences</font></i>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>formatter<font color="#990000">)</font>
+    <b><font color="#0000FF">delete</font></b> formatter<font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>docgenerator<font color="#990000">)</font>
+    <b><font color="#0000FF">delete</font></b> docgenerator<font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>generator_factory<font color="#990000">)</font>
+    <b><font color="#0000FF">delete</font></b> generator_factory<font color="#990000">;</font>
+<font color="#FF0000">}</font>
+
+<font color="#009900">int</font>
+StartApp<font color="#990000">:</font><font color="#990000">:</font><b><font color="#000000">start</font></b><font color="#990000">(</font><font color="#009900">int</font> argc<font color="#990000">,</font> <font color="#009900">char</font> <font color="#990000">*</font> argv<font color="#990000">[</font><font color="#990000">]</font><font color="#990000">)</font>
+<font color="#FF0000">{</font>
+  <font color="#009900">char</font> <font color="#990000">*</font>docTitle<font color="#990000">;</font>
+  <font color="#009900">char</font> <font color="#990000">*</font>docHeader<font color="#990000">;</font> <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> the buffer with the header</font></i>
+  <font color="#009900">char</font> <font color="#990000">*</font>docFooter<font color="#990000">;</font> <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> the buffer with the footer</font></i>
+  <b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>header_fileName <font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">;</font>
+  <b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>footer_fileName <font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">;</font>
+  <font color="#009900">unsigned</font> i<font color="#990000">;</font>
+  <font color="#009900">int</font> v<font color="#990000">;</font>
+  <font color="#009900">int</font> tabSpaces <font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">;</font>
+
+<b><font color="#000080">#ifdef</font></b> BUILD_AS_CGI
+  <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> map environment to parameters if used as CGI</font></i>
+  <font color="#009900">char</font> <font color="#990000">*</font><font color="#990000">*</font>temp_argv<font color="#990000">;</font>
+  temp_argv <font color="#990000">=</font> <b><font color="#000000">map_environment</font></b><font color="#990000">(</font><font color="#990000">&amp;</font>argc<font color="#990000">,</font> argv<font color="#990000">)</font><font color="#990000">;</font>
+  is_cgi <font color="#990000">=</font> temp_argv <font color="#990000">!</font><font color="#990000">=</font> argv<font color="#990000">;</font>
+  argv <font color="#990000">=</font> temp_argv<font color="#990000">;</font>
+<b><font color="#000080">#endif</font></b> <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> BUILD_AS_CGI</font></i>
+
+  <b><font color="#0000FF">if</font></b><font color="#990000">(</font><font color="#990000">(</font>v <font color="#990000">=</font> <b><font color="#000000">cmdline_parser</font></b><font color="#990000">(</font>argc<font color="#990000">,</font> argv<font color="#990000">,</font> <font color="#990000">&amp;</font>args_info<font color="#990000">)</font><font color="#990000">)</font> <font color="#990000">!</font><font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">)</font>
+    <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> calls cmdline parser. The user gived bag args if it doesn't return -1</font></i>
+    <b><font color="#0000FF">return</font></b> EXIT_FAILURE<font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>version_given<font color="#990000">)</font>
+    <font color="#FF0000">{</font>
+      <b><font color="#000000">print_version </font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+      <b><font color="#000000">print_copyright </font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+      <b><font color="#0000FF">return</font></b> EXIT_SUCCESS<font color="#990000">;</font>
+    <font color="#FF0000">}</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>help_given<font color="#990000">)</font>
+    <font color="#FF0000">{</font>
+      cout <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"GNU "</font><font color="#990000">;</font>
+      <b><font color="#000000">cmdline_parser_print_help </font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+      <b><font color="#000000">print_reportbugs </font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+      <b><font color="#0000FF">return</font></b> EXIT_SUCCESS<font color="#990000">;</font>
+    <font color="#FF0000">}</font>
+
+  gen_version <font color="#990000">=</font> <font color="#990000">(</font>args_info<font color="#990000">.</font>gen_version_flag <font color="#990000">!</font><font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">)</font><font color="#990000">;</font>
+
+  <i><font color="#9A1900">/*</font></i><i><font color="#9A1900"> initialization of global symbols </font></i><i><font color="#9A1900">*/</font></i>
+  inputFileName <font color="#990000">=</font> outputFileName <font color="#990000">=</font> <font color="#993399">0</font> <font color="#990000">;</font>
+  sout <font color="#990000">=</font> <font color="#993399">0</font> <font color="#990000">;</font>
+  docTitle <font color="#990000">=</font> <font color="#993399">0</font> <font color="#990000">;</font>
+  docHeader <font color="#990000">=</font> <font color="#993399">0</font> <font color="#990000">;</font>
+  docFooter <font color="#990000">=</font> <font color="#993399">0</font> <font color="#990000">;</font>
+
+  docTitle <font color="#990000">=</font> args_info<font color="#990000">.</font>title_arg <font color="#990000">;</font>
+  header_fileName <font color="#990000">=</font> args_info<font color="#990000">.</font>header_arg <font color="#990000">;</font>
+  footer_fileName <font color="#990000">=</font> args_info<font color="#990000">.</font>footer_arg <font color="#990000">;</font>
+  verbose <font color="#990000">=</font> args_info<font color="#990000">.</font>verbose_given <font color="#990000">;</font>
+  <b><font color="#0000FF">const</font></b> string style_file <font color="#990000">=</font> args_info<font color="#990000">.</font>style_file_arg<font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font> args_info<font color="#990000">.</font>tab_given <font color="#990000">&gt;</font> <font color="#993399">0</font> <font color="#990000">)</font>
+    tabSpaces <font color="#990000">=</font> args_info<font color="#990000">.</font>tab_arg <font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>header_fileName<font color="#990000">)</font>
+    docHeader <font color="#990000">=</font> <b><font color="#000000">read_file </font></b><font color="#990000">(</font>header_fileName<font color="#990000">)</font><font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>footer_fileName<font color="#990000">)</font>
+    docFooter <font color="#990000">=</font> <b><font color="#000000">read_file </font></b><font color="#990000">(</font>footer_fileName<font color="#990000">)</font><font color="#990000">;</font>
+
+  cssUrl <font color="#990000">=</font> args_info<font color="#990000">.</font>css_arg <font color="#990000">;</font>
+  use_css <font color="#990000">=</font> <font color="#990000">(</font> cssUrl <font color="#990000">!</font><font color="#990000">=</font> <font color="#993399">0</font> <font color="#990000">)</font> <font color="#990000">;</font>
+
+  entire_doc <font color="#990000">=</font>
+    <font color="#990000">(</font><font color="#990000">!</font> args_info<font color="#990000">.</font>no_doc_given<font color="#990000">)</font> <font color="#990000">&amp;</font><font color="#990000">&amp;</font>
+    <font color="#990000">(</font> args_info<font color="#990000">.</font>doc_given <font color="#990000">|</font><font color="#990000">|</font> <font color="#990000">(</font>docTitle <font color="#990000">!</font><font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">)</font> <font color="#990000">|</font><font color="#990000">|</font> use_css <font color="#990000">)</font> <font color="#990000">;</font>
+
+  string inputFileName<font color="#990000">;</font>
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>input_given<font color="#990000">)</font>
+    inputFileName <font color="#990000">=</font> args_info<font color="#990000">.</font>input_arg <font color="#990000">;</font>
+
+  string outputFileName<font color="#990000">;</font>
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font> inputFileName<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font> <font color="#990000">&amp;</font><font color="#990000">&amp;</font> <font color="#990000">!</font> is_cgi <font color="#990000">&amp;</font><font color="#990000">&amp;</font> args_info<font color="#990000">.</font>output_given<font color="#990000">)</font>
+    outputFileName <font color="#990000">=</font> args_info<font color="#990000">.</font>output_arg <font color="#990000">;</font>
+
+  <font color="#009900">bool</font> generate_to_stdout <font color="#990000">=</font>
+    <font color="#990000">(</font>args_info<font color="#990000">.</font>output_arg <font color="#990000">&amp;</font><font color="#990000">&amp;</font>
+     <b><font color="#000000">strcmp </font></b><font color="#990000">(</font>args_info<font color="#990000">.</font>output_arg<font color="#990000">,</font> <font color="#FF0000">"STDOUT"</font><font color="#990000">)</font> <font color="#990000">=</font><font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">)</font><font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font> verbose <font color="#990000">)</font>
+    <b><font color="#000000">setMessager</font></b><font color="#990000">(</font> <b><font color="#0000FF">new</font></b> DefaultMessages <font color="#990000">)</font> <font color="#990000">;</font>
+
+  <b><font color="#000000">printMessage</font></b><font color="#990000">(</font> PACKAGE <font color="#990000">)</font> <font color="#990000">;</font>
+  <b><font color="#000000">printMessage</font></b><font color="#990000">(</font> VERSION <font color="#990000">)</font> <font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>data_dir_given<font color="#990000">)</font>
+    data_dir <font color="#990000">=</font> args_info<font color="#990000">.</font>data_dir_arg<font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>check_lang_given<font color="#990000">)</font> <font color="#FF0000">{</font>
+    cout <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"checking "</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> args_info<font color="#990000">.</font>check_lang_arg <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"... "</font><font color="#990000">;</font>
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>LangDefLoader<font color="#990000">:</font><font color="#990000">:</font><b><font color="#000000">check_lang_def</font></b><font color="#990000">(</font>data_dir<font color="#990000">,</font> args_info<font color="#990000">.</font>check_lang_arg<font color="#990000">)</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+      cout <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"OK"</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl<font color="#990000">;</font>
+      <b><font color="#0000FF">return</font></b><font color="#990000">(</font>EXIT_SUCCESS<font color="#990000">)</font><font color="#990000">;</font>
+    <font color="#FF0000">}</font>
+
+    <b><font color="#0000FF">return</font></b> <font color="#990000">(</font>EXIT_FAILURE<font color="#990000">)</font><font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>check_outlang_given<font color="#990000">)</font> <font color="#FF0000">{</font>
+    cout <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"checking "</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> args_info<font color="#990000">.</font>check_outlang_arg <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"... "</font><font color="#990000">;</font>
+    textstyles <font color="#990000">=</font> <b><font color="#000000">parse_outlang_def</font></b><font color="#990000">(</font>data_dir<font color="#990000">.</font><b><font color="#000000">c_str</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">,</font> args_info<font color="#990000">.</font>check_outlang_arg<font color="#990000">)</font><font color="#990000">;</font>
+    cout <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"OK"</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl<font color="#990000">;</font>
+    <b><font color="#0000FF">return</font></b> <font color="#990000">(</font>EXIT_SUCCESS<font color="#990000">)</font><font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+
+  string lang_map <font color="#990000">=</font> args_info<font color="#990000">.</font>lang_map_arg<font color="#990000">;</font>
+  <b><font color="#000000">assert</font></b><font color="#990000">(</font>lang_map<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font><font color="#990000">;</font>
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font> args_info<font color="#990000">.</font>lang_def_given<font color="#990000">)</font>
+    langmap <font color="#990000">=</font> <b><font color="#000000">LangMapPtr</font></b><font color="#990000">(</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">LangMap</font></b><font color="#990000">(</font>data_dir<font color="#990000">,</font> lang_map<font color="#990000">)</font><font color="#990000">)</font><font color="#990000">;</font>
+
+  string outlang_map <font color="#990000">=</font> args_info<font color="#990000">.</font>outlang_map_arg<font color="#990000">;</font>
+  <b><font color="#000000">assert</font></b><font color="#990000">(</font>outlang_map<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font><font color="#990000">;</font>
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font> args_info<font color="#990000">.</font>outlang_def_given<font color="#990000">)</font>
+    outlangmap <font color="#990000">=</font> <b><font color="#000000">LangMapPtr</font></b><font color="#990000">(</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">LangMap</font></b><font color="#990000">(</font>data_dir<font color="#990000">,</font> outlang_map<font color="#990000">)</font><font color="#990000">)</font><font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>lang_list_given<font color="#990000">)</font> <font color="#FF0000">{</font>
+    cout <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"Supported languages (file extensions)\nand associated language definition files\n\n"</font><font color="#990000">;</font>
+    langmap<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">print</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+    <b><font color="#0000FF">return</font></b> <font color="#990000">(</font>EXIT_SUCCESS<font color="#990000">)</font><font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>outlang_list_given<font color="#990000">)</font> <font color="#FF0000">{</font>
+    cout <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"Supported output languages\nand associated language definition files\n\n"</font><font color="#990000">;</font>
+    outlangmap<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">print</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+    <b><font color="#0000FF">return</font></b> <font color="#990000">(</font>EXIT_SUCCESS<font color="#990000">)</font><font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+
+  Tags <font color="#990000">*</font>tags <font color="#990000">=</font> <b><font color="#000000">parseTags</font></b><font color="#990000">(</font>data_dir<font color="#990000">,</font> style_file<font color="#990000">)</font><font color="#990000">;</font>
+
+  outputbuffer <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> OutputBuffer<font color="#990000">;</font>
+
+  string title<font color="#990000">;</font>
+  string doc_header<font color="#990000">;</font>
+  string doc_footer<font color="#990000">;</font>
+  string css_url<font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>docTitle<font color="#990000">)</font>
+    title <font color="#990000">=</font> docTitle<font color="#990000">;</font>
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">(</font><font color="#990000">!</font> docTitle<font color="#990000">)</font> <font color="#990000">&amp;</font><font color="#990000">&amp;</font> inputFileName<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font>
+    title <font color="#990000">=</font> inputFileName<font color="#990000">;</font>
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>docHeader<font color="#990000">)</font>
+    doc_header <font color="#990000">=</font> docHeader<font color="#990000">;</font>
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>docFooter<font color="#990000">)</font>
+    doc_footer <font color="#990000">=</font> docFooter<font color="#990000">;</font>
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>cssUrl<font color="#990000">)</font>
+    css_url <font color="#990000">=</font> cssUrl<font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>line_number_ref_given<font color="#990000">)</font>
+    args_info<font color="#990000">.</font>line_number_given <font color="#990000">=</font> args_info<font color="#990000">.</font>line_number_ref_given<font color="#990000">;</font>
+
+  string outlangfile<font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font> args_info<font color="#990000">.</font>outlang_def_given<font color="#990000">)</font> <font color="#FF0000">{</font>
+    string out_format <font color="#990000">=</font> args_info<font color="#990000">.</font>out_format_arg<font color="#990000">;</font>
+
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>use_css<font color="#990000">)</font>
+      out_format <font color="#990000">+</font><font color="#990000">=</font> <font color="#FF0000">"-css"</font><font color="#990000">;</font>
+
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>entire_doc<font color="#990000">)</font>
+      out_format <font color="#990000">+</font><font color="#990000">=</font> <font color="#FF0000">"-doc"</font><font color="#990000">;</font>
+
+    outlangfile <font color="#990000">=</font> outlangmap<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">get_file</font></b><font color="#990000">(</font>out_format<font color="#990000">)</font><font color="#990000">;</font>
+
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font> outlangfile<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+      cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> PACKAGE <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">": "</font><font color="#990000">;</font>
+      cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"output language "</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> out_format
+          <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">" not handled"</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl<font color="#990000">;</font>
+      <b><font color="#0000FF">return</font></b> EXIT_FAILURE <font color="#990000">;</font>
+    <font color="#FF0000">}</font>
+  <font color="#FF0000">}</font> <b><font color="#0000FF">else</font></b> <font color="#FF0000">{</font>
+    outlangfile <font color="#990000">=</font> args_info<font color="#990000">.</font>outlang_def_arg<font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+
+  textstyles <font color="#990000">=</font> <b><font color="#000000">parse_outlang_def</font></b><font color="#990000">(</font>data_dir<font color="#990000">.</font><b><font color="#000000">c_str</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">,</font> outlangfile<font color="#990000">.</font><b><font color="#000000">c_str</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font><font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font> textstyles<font color="#990000">-</font><font color="#990000">&gt;</font>file_extension<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font> <font color="#990000">&amp;</font><font color="#990000">&amp;</font> <font color="#990000">!</font> outputFileName<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+    cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> PACKAGE <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">": "</font><font color="#990000">;</font>
+    cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"empty file extension in output language file "</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font>
+         outlangfile <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl<font color="#990000">;</font>
+    <b><font color="#0000FF">return</font></b> EXIT_FAILURE <font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+
+  <b><font color="#0000FF">const</font></b> string ext <font color="#990000">=</font> <font color="#FF0000">"."</font> <font color="#990000">+</font> textstyles<font color="#990000">-</font><font color="#990000">&gt;</font>file_extension<font color="#990000">;</font>
+
+  generator_factory <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">GeneratorFactory</font></b><font color="#990000">(</font>textstyles<font color="#990000">,</font> tags<font color="#990000">)</font><font color="#990000">;</font>
+
+  generator_factory<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">createGenerators </font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+  docgenerator <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">DocGenerator</font></b><font color="#990000">(</font>title<font color="#990000">,</font> inputFileName<font color="#990000">,</font>
+                                  doc_header<font color="#990000">,</font> doc_footer<font color="#990000">,</font>
+                                  css_url<font color="#990000">,</font> entire_doc<font color="#990000">,</font>
+                                  textstyles<font color="#990000">-</font><font color="#990000">&gt;</font>docTemplate<font color="#990000">.</font><b><font color="#000000">toStringBegin</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">,</font>
+                                  textstyles<font color="#990000">-</font><font color="#990000">&gt;</font>docTemplate<font color="#990000">.</font><b><font color="#000000">toStringEnd</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font><font color="#990000">;</font><font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font> is_cgi <font color="#990000">)</font>
+    <b><font color="#000000">print_cgi_header</font></b><font color="#990000">(</font><font color="#990000">)</font> <font color="#990000">;</font>
+
+  <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> let's start the translation :-)</font></i>
+
+  generate_line_num <font color="#990000">=</font>
+    <font color="#990000">(</font>args_info<font color="#990000">.</font>line_number_given <font color="#990000">|</font><font color="#990000">|</font> args_info<font color="#990000">.</font>line_number_ref_given<font color="#990000">)</font><font color="#990000">;</font>
+  generate_ref <font color="#990000">=</font> args_info<font color="#990000">.</font>line_number_ref_given<font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>tabSpaces<font color="#990000">)</font>
+    formatter <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">Untabifier </font></b><font color="#990000">(</font>tabSpaces<font color="#990000">)</font><font color="#990000">;</font>
+  <b><font color="#0000FF">else</font></b> <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>line_number_given<font color="#990000">)</font>
+    formatter <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">Untabifier</font></b><font color="#990000">(</font><font color="#993399">8</font><font color="#990000">)</font><font color="#990000">;</font>
+  <b><font color="#0000FF">else</font></b>
+    formatter <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">TextFormatter</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+
+  TextFormatterPtr <b><font color="#000000">chartranslator</font></b><font color="#990000">(</font>textstyles<font color="#990000">-</font><font color="#990000">&gt;</font>charTranslator<font color="#990000">)</font><font color="#990000">;</font>
+  formatter<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">setFormatter</font></b><font color="#990000">(</font>chartranslator<font color="#990000">)</font><font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>lang_def_arg<font color="#990000">)</font>
+    lang_file <font color="#990000">=</font> args_info<font color="#990000">.</font>lang_def_arg<font color="#990000">;</font>
+
+  <font color="#009900">int</font> result <font color="#990000">=</font> EXIT_SUCCESS<font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>src_lang_given<font color="#990000">)</font>
+    source_language <font color="#990000">=</font> args_info<font color="#990000">.</font>src_lang_arg<font color="#990000">;</font>
+
+  <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> first the --input file</font></i>
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font> <font color="#990000">!</font> args_info<font color="#990000">.</font>inputs_num <font color="#990000">)</font> <font color="#FF0000">{</font>
+    result <font color="#990000">=</font> <b><font color="#000000">processFile</font></b><font color="#990000">(</font>inputFileName<font color="#990000">,</font> <font color="#990000">(</font>generate_to_stdout <font color="#990000">?</font> <font color="#FF0000">""</font> <font color="#990000">:</font> outputFileName<font color="#990000">)</font><font color="#990000">)</font> <font color="#990000">;</font>
+    outputbuffer<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">reset</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+
+  <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> let's process other files, if there are any</font></i>
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font> args_info<font color="#990000">.</font>inputs_num <font color="#990000">&amp;</font><font color="#990000">&amp;</font> <font color="#990000">!</font>is_cgi <font color="#990000">)</font> <font color="#FF0000">{</font>
+    <b><font color="#0000FF">for</font></b> <font color="#990000">(</font> i <font color="#990000">=</font> <font color="#993399">0</font> <font color="#990000">;</font> i <font color="#990000">&lt;</font> <font color="#990000">(</font>args_info<font color="#990000">.</font>inputs_num<font color="#990000">)</font> <font color="#990000">;</font> <font color="#990000">+</font><font color="#990000">+</font>i <font color="#990000">)</font> <font color="#FF0000">{</font>
+      result <font color="#990000">=</font> processFile
+        <font color="#990000">(</font> args_info<font color="#990000">.</font>inputs<font color="#990000">[</font>i<font color="#990000">]</font><font color="#990000">,</font>
+          <font color="#990000">(</font>generate_to_stdout <font color="#990000">?</font> <font color="#FF0000">""</font> <font color="#990000">:</font> <b><font color="#000000">createOutputFileName </font></b><font color="#990000">(</font>args_info<font color="#990000">.</font>inputs<font color="#990000">[</font>i<font color="#990000">]</font><font color="#990000">,</font>
+                                                    args_info<font color="#990000">.</font>output_dir_arg<font color="#990000">,</font> ext<font color="#990000">)</font><font color="#990000">)</font><font color="#990000">)</font> <font color="#990000">;</font>
+      <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>result <font color="#990000">=</font><font color="#990000">=</font> EXIT_FAILURE<font color="#990000">)</font>
+        <b><font color="#0000FF">break</font></b><font color="#990000">;</font>
+      cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"Processed "</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> args_info<font color="#990000">.</font>inputs<font color="#990000">[</font>i<font color="#990000">]</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl <font color="#990000">;</font>
+      outputbuffer<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">reset</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+    <font color="#FF0000">}</font>
+  <font color="#FF0000">}</font>
+
+  <b><font color="#0000FF">delete</font></b> outputbuffer<font color="#990000">;</font>
+  outputbuffer <font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>tags<font color="#990000">)</font>
+    <b><font color="#0000FF">delete</font></b> tags<font color="#990000">;</font>
+
+  <b><font color="#0000FF">return</font></b> <font color="#990000">(</font>result<font color="#990000">)</font><font color="#990000">;</font>
+<font color="#FF0000">}</font>
+
+<font color="#009900">void</font>
+StartApp<font color="#990000">:</font><font color="#990000">:</font><b><font color="#000000">print_copyright</font></b><font color="#990000">(</font><font color="#990000">)</font>
+<font color="#FF0000">{</font>
+  <font color="#009900">int</font> i<font color="#990000">;</font>
+
+  <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>i <font color="#990000">=</font> <font color="#993399">1</font><font color="#990000">;</font> i <font color="#990000">&lt;</font><font color="#990000">=</font> copyright_text_length<font color="#990000">;</font> <font color="#990000">+</font><font color="#990000">+</font>i<font color="#990000">)</font>
+    cout <font color="#990000">&lt;</font><font color="#990000">&lt;</font> copyright_text<font color="#990000">[</font>i<font color="#990000">]</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl<font color="#990000">;</font><font color="#990000">;</font>
+<font color="#FF0000">}</font>
+
+<font color="#009900">void</font>
+StartApp<font color="#990000">:</font><font color="#990000">:</font><b><font color="#000000">print_reportbugs</font></b><font color="#990000">(</font><font color="#990000">)</font>
+<font color="#FF0000">{</font>
+  <font color="#009900">int</font> i<font color="#990000">;</font>
+
+  <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>i <font color="#990000">=</font> <font color="#993399">1</font><font color="#990000">;</font> i <font color="#990000">&lt;</font><font color="#990000">=</font> reportbugs_text_length<font color="#990000">;</font> <font color="#990000">+</font><font color="#990000">+</font>i<font color="#990000">)</font>
+    cout <font color="#990000">&lt;</font><font color="#990000">&lt;</font> reportbugs_text<font color="#990000">[</font>i<font color="#990000">]</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl<font color="#990000">;</font>
+<font color="#FF0000">}</font>
+
+<font color="#009900">void</font>
+StartApp<font color="#990000">:</font><font color="#990000">:</font><b><font color="#000000">print_version</font></b><font color="#990000">(</font><font color="#990000">)</font>
+<font color="#FF0000">{</font>
+  cout <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"GNU "</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> PACKAGE <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">" "</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> VERSION <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl<font color="#990000">;</font>
+<font color="#FF0000">}</font>
+
+<font color="#009900">int</font> <b><font color="#000000">process_file</font></b><font color="#990000">(</font><b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>file<font color="#990000">,</font> TextFormatter <font color="#990000">*</font>pre<font color="#990000">,</font> <b><font color="#0000FF">const</font></b> string <font color="#990000">&amp;</font>path<font color="#990000">,</font> <b><font color="#0000FF">const</font></b> string <font color="#990000">&amp;</font>lang_file<font color="#990000">)</font>
+<font color="#FF0000">{</font>
+  RegExpStatePtr initial_state <font color="#990000">=</font> LangDefLoader<font color="#990000">:</font><font color="#990000">:</font><b><font color="#000000">get_lang_def</font></b><font color="#990000">(</font>path<font color="#990000">,</font> lang_file<font color="#990000">)</font><font color="#990000">;</font>
+
+  <b><font color="#0000FF">try</font></b><font color="#FF0000">{</font>
+    <b><font color="#000000">printMessage</font></b><font color="#990000">(</font><font color="#FF0000">"Processing "</font> <font color="#990000">+</font> <b><font color="#000000">string</font></b><font color="#990000">(</font><font color="#990000">(</font>file <font color="#990000">?</font> file <font color="#990000">:</font> <font color="#FF0000">"standard input"</font><font color="#990000">)</font><font color="#990000">)</font> <font color="#990000">+</font> <font color="#FF0000">" with regex"</font><font color="#990000">)</font><font color="#990000">;</font>
+    <b><font color="#000000">printMessage</font></b><font color="#990000">(</font><font color="#FF0000">"Using language definition "</font> <font color="#990000">+</font> lang_file<font color="#990000">)</font><font color="#990000">;</font>
+    RegExpEnginePtr engine<font color="#990000">;</font>
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>args_info<font color="#990000">.</font>debug_langdef_given<font color="#990000">)</font>
+      engine <font color="#990000">=</font> <b><font color="#000000">RegExpEnginePtr</font></b><font color="#990000">(</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">RegExpEngineDebug</font></b><font color="#990000">(</font>initial_state<font color="#990000">,</font> pre<font color="#990000">)</font><font color="#990000">)</font><font color="#990000">;</font>
+    <b><font color="#0000FF">else</font></b>
+      engine <font color="#990000">=</font> <b><font color="#000000">RegExpEnginePtr</font></b><font color="#990000">(</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">RegExpEngine</font></b><font color="#990000">(</font>initial_state<font color="#990000">,</font> pre<font color="#990000">)</font><font color="#990000">)</font><font color="#990000">;</font>
+    engine<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">process_file</font></b><font color="#990000">(</font>file<font color="#990000">)</font><font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+  <b><font color="#0000FF">catch</font></b><font color="#990000">(</font><font color="#990000">.</font><font color="#990000">.</font><font color="#990000">.</font><font color="#990000">)</font>
+  <font color="#FF0000">{</font>
+    <b><font color="#000000">exitError</font></b><font color="#990000">(</font><font color="#FF0000">"error during regex processing"</font><font color="#990000">)</font><font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+  <b><font color="#0000FF">return</font></b> <font color="#993399">0</font><font color="#990000">;</font>
+<font color="#FF0000">}</font>
+
+<font color="#009900">int</font>
+StartApp<font color="#990000">:</font><font color="#990000">:</font><b><font color="#000000">processFile</font></b><font color="#990000">(</font><b><font color="#0000FF">const</font></b> string <font color="#990000">&amp;</font>inputFileName<font color="#990000">,</font> <b><font color="#0000FF">const</font></b> string <font color="#990000">&amp;</font>outputFileName<font color="#990000">)</font>
+<font color="#FF0000">{</font>
+  FILE <font color="#990000">*</font>in <font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">;</font>
+  <font color="#009900">bool</font> deleteOStream <font color="#990000">=</font> <b><font color="#0000FF">false</font></b> <font color="#990000">;</font>
+  <font color="#009900">bool</font> langSpecFound <font color="#990000">=</font> <b><font color="#0000FF">false</font></b><font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font> outputFileName<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font> <font color="#990000">)</font> <font color="#FF0000">{</font>
+    sout <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">ofstream</font></b><font color="#990000">(</font>outputFileName<font color="#990000">.</font><b><font color="#000000">c_str</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font> <font color="#990000">;</font>
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font> <font color="#990000">!</font> <font color="#990000">(</font><font color="#990000">*</font>sout<font color="#990000">)</font> <font color="#990000">)</font> <font color="#FF0000">{</font>
+      cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"Error in creating "</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> outputFileName <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">" for output"</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl <font color="#990000">;</font>
+      <b><font color="#0000FF">return</font></b> EXIT_FAILURE <font color="#990000">;</font>
+    <font color="#FF0000">}</font>
+    deleteOStream <font color="#990000">=</font> <b><font color="#0000FF">true</font></b><font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>inputFileName<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font>
+    <font color="#FF0000">{</font>
+      <font color="#009900">unsigned</font> <font color="#009900">int</font> lines <font color="#990000">=</font> <b><font color="#000000">get_line_count </font></b><font color="#990000">(</font>inputFileName<font color="#990000">)</font><font color="#990000">;</font>
+
+      line_num_digit <font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">;</font>
+      <b><font color="#0000FF">while</font></b> <font color="#990000">(</font>lines<font color="#990000">)</font>
+        <font color="#FF0000">{</font>
+          <font color="#990000">+</font><font color="#990000">+</font>line_num_digit<font color="#990000">;</font>
+          lines <font color="#990000">/</font><font color="#990000">=</font> <font color="#993399">10</font><font color="#990000">;</font>
+        <font color="#FF0000">}</font>
+    <font color="#FF0000">}</font>
+  <b><font color="#0000FF">else</font></b>
+    line_num_digit <font color="#990000">=</font> <font color="#993399">5</font><font color="#990000">;</font>
+  <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> if we read from stdin, we can't read the file in advance and</font></i>
+  <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> check how many lines of code it contains.  In this case set</font></i>
+  <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> the number of digit for the line number to 5.</font></i>
+
+  <i><font color="#9A1900">/*</font></i>
+<i><font color="#9A1900">   * Use default values for any options not provided</font></i>
+<i><font color="#9A1900">   </font></i><i><font color="#9A1900">*/</font></i>
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>sout <font color="#990000">=</font><font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+    sout <font color="#990000">=</font> <font color="#990000">&amp;</font>cout<font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>in <font color="#990000">=</font><font color="#990000">=</font> <font color="#993399">0</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+    <font color="#990000">;</font> <i><font color="#9A1900">/*</font></i><i><font color="#9A1900"> Well stdin already points to stdin so, .... </font></i><i><font color="#9A1900">*/</font></i>
+  <font color="#FF0000">}</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>generate_line_num<font color="#990000">)</font>
+    outputgenerator <font color="#990000">=</font>
+      <b><font color="#0000FF">new</font></b> <b><font color="#000000">LineOutputGenerator</font></b><font color="#990000">(</font><font color="#990000">*</font>outputbuffer<font color="#990000">,</font> <font color="#990000">*</font>sout<font color="#990000">,</font>
+        <font color="#990000">&amp;</font><font color="#990000">(</font>textstyles<font color="#990000">-</font><font color="#990000">&gt;</font>anchor<font color="#990000">)</font><font color="#990000">,</font> generate_ref<font color="#990000">,</font>
+        <font color="#990000">(</font>args_info<font color="#990000">.</font>line_number_ref_given <font color="#990000">?</font> args_info<font color="#990000">.</font>line_number_ref_arg <font color="#990000">:</font> <font color="#FF0000">""</font><font color="#990000">)</font><font color="#990000">)</font><font color="#990000">;</font>
+  <b><font color="#0000FF">else</font></b>
+    outputgenerator <font color="#990000">=</font> <b><font color="#0000FF">new</font></b> <b><font color="#000000">OutputGenerator</font></b><font color="#990000">(</font><font color="#990000">*</font>outputbuffer<font color="#990000">,</font> <font color="#990000">*</font>sout<font color="#990000">)</font><font color="#990000">;</font>
+
+  docgenerator<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">set_gen_version </font></b><font color="#990000">(</font>gen_version<font color="#990000">)</font><font color="#990000">;</font>
+
+  <b><font color="#000000">printMessage</font></b><font color="#990000">(</font> <font color="#FF0000">"translating source code... "</font><font color="#990000">,</font> cerr <font color="#990000">)</font> <font color="#990000">;</font>
+
+  string langfile <font color="#990000">=</font> lang_file<font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font>langfile<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+    <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> find the language definition file associated to a language</font></i>
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>source_language<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font> <font color="#FF0000">{</font>
+      langfile <font color="#990000">=</font> langmap<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">get_file</font></b><font color="#990000">(</font>source_language<font color="#990000">)</font><font color="#990000">;</font>
+      <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font> langfile<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font>
+        <font color="#FF0000">{</font>
+          <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font> args_info<font color="#990000">.</font>failsafe_given<font color="#990000">)</font>
+          <font color="#FF0000">{</font>
+            cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> PACKAGE <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">": "</font><font color="#990000">;</font>
+            cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"source language "</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> source_language
+                <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">" not handled"</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl<font color="#990000">;</font>
+            <b><font color="#0000FF">return</font></b> EXIT_FAILURE <font color="#990000">;</font>
+          <font color="#FF0000">}</font>
+        <font color="#FF0000">}</font>
+      <b><font color="#0000FF">else</font></b>
+        langSpecFound <font color="#990000">=</font> <b><font color="#0000FF">true</font></b><font color="#990000">;</font>
+    <font color="#FF0000">}</font> <b><font color="#0000FF">else</font></b> <font color="#FF0000">{</font>
+      <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font> inputFileName<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font>
+        <font color="#FF0000">{</font>
+          <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font> args_info<font color="#990000">.</font>failsafe_given<font color="#990000">)</font>
+          <font color="#FF0000">{</font>
+            cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> PACKAGE <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">": "</font><font color="#990000">;</font>
+            cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"when using stdin, please specify a source language"</font>
+                  <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl<font color="#990000">;</font>
+            <b><font color="#0000FF">return</font></b> EXIT_FAILURE <font color="#990000">;</font>
+          <font color="#FF0000">}</font>
+        <font color="#FF0000">}</font>
+
+      string file_ext <font color="#990000">=</font> <b><font color="#000000">get_file_extension </font></b><font color="#990000">(</font>inputFileName<font color="#990000">)</font><font color="#990000">;</font>
+
+      <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>file_ext <font color="#990000">=</font><font color="#990000">=</font> <font color="#FF0000">""</font><font color="#990000">)</font>
+        <font color="#FF0000">{</font>
+          <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font> args_info<font color="#990000">.</font>failsafe_given<font color="#990000">)</font>
+          <font color="#FF0000">{</font>
+            cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> PACKAGE <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">": "</font><font color="#990000">;</font>
+            cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"no file extension; please specify a source language"</font>
+                  <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl<font color="#990000">;</font>
+            <b><font color="#0000FF">return</font></b> EXIT_FAILURE <font color="#990000">;</font>
+          <font color="#FF0000">}</font>
+        <font color="#FF0000">}</font>
+
+      langfile <font color="#990000">=</font> langmap<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">get_file</font></b><font color="#990000">(</font>file_ext<font color="#990000">)</font><font color="#990000">;</font>
+      <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font> langfile<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font>
+        <font color="#FF0000">{</font>
+          <b><font color="#0000FF">if</font></b> <font color="#990000">(</font><font color="#990000">!</font> args_info<font color="#990000">.</font>failsafe_given<font color="#990000">)</font>
+          <font color="#FF0000">{</font>
+            cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> PACKAGE <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">": "</font><font color="#990000">;</font>
+            cerr <font color="#990000">&lt;</font><font color="#990000">&lt;</font> <font color="#FF0000">"unknown file extension "</font> <font color="#990000">&lt;</font><font color="#990000">&lt;</font> file_ext <font color="#990000">&lt;</font><font color="#990000">&lt;</font> endl<font color="#990000">;</font>
+            <b><font color="#0000FF">return</font></b> EXIT_FAILURE <font color="#990000">;</font>
+          <font color="#FF0000">}</font>
+        <font color="#FF0000">}</font>
+      <b><font color="#0000FF">else</font></b>
+        langSpecFound <font color="#990000">=</font> <b><font color="#0000FF">true</font></b><font color="#990000">;</font>
+    <font color="#FF0000">}</font>
+  <font color="#FF0000">}</font>
+  <b><font color="#0000FF">else</font></b>
+    langSpecFound <font color="#990000">=</font> <b><font color="#0000FF">true</font></b><font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>langSpecFound<font color="#990000">)</font>
+  <font color="#FF0000">{</font>
+    docgenerator<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">generate_start_doc </font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+
+    <b><font color="#0000FF">const</font></b> string <font color="#990000">&amp;</font>i_file_name <font color="#990000">=</font> <b><font color="#000000">get_input_file_name</font></b><font color="#990000">(</font>inputFileName<font color="#990000">)</font><font color="#990000">;</font>
+    <b><font color="#0000FF">const</font></b> <font color="#009900">char</font> <font color="#990000">*</font>input_file_name <font color="#990000">=</font> <font color="#990000">(</font>i_file_name<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font> <font color="#990000">?</font> i_file_name<font color="#990000">.</font><b><font color="#000000">c_str</font></b><font color="#990000">(</font><font color="#990000">)</font> <font color="#990000">:</font> <font color="#993399">0</font><font color="#990000">)</font><font color="#990000">;</font>
+
+    <b><font color="#000000">process_file</font></b><font color="#990000">(</font>input_file_name<font color="#990000">,</font> formatter<font color="#990000">,</font> data_dir<font color="#990000">,</font> langfile<font color="#990000">)</font><font color="#990000">;</font>
+
+    outputgenerator<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">generate</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+
+    docgenerator<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">generate_end_doc </font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+
+    <b><font color="#000000">printMessage</font></b><font color="#990000">(</font> <font color="#FF0000">"done !"</font><font color="#990000">,</font> cerr <font color="#990000">)</font> <font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+  <b><font color="#0000FF">else</font></b> <i><font color="#9A1900">//</font></i><i><font color="#9A1900"> we're in failsafe mode so we simply copy the file to the output</font></i>
+  <font color="#FF0000">{</font>
+    istream <font color="#990000">*</font>input<font color="#990000">;</font>
+    <b><font color="#0000FF">if</font></b><font color="#990000">(</font><font color="#990000">!</font> inputFileName<font color="#990000">.</font><b><font color="#000000">size</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">)</font>
+      input <font color="#990000">=</font> <font color="#990000">&amp;</font>cin<font color="#990000">;</font>
+    <b><font color="#0000FF">else</font></b>
+      input <font color="#990000">=</font> <b><font color="#000000">open_file_istream_or_error</font></b><font color="#990000">(</font>inputFileName<font color="#990000">)</font><font color="#990000">;</font>
+
+    <font color="#990000">*</font>sout <font color="#990000">&lt;</font><font color="#990000">&lt;</font> input<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">rdbuf</font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+
+    <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>input <font color="#990000">!</font><font color="#990000">=</font> <font color="#990000">&amp;</font>cin<font color="#990000">)</font>
+      <b><font color="#0000FF">delete</font></b> input<font color="#990000">;</font>
+  <font color="#FF0000">}</font>
+
+  sout<font color="#990000">-</font><font color="#990000">&gt;</font><b><font color="#000000">flush </font></b><font color="#990000">(</font><font color="#990000">)</font><font color="#990000">;</font>
+
+  <b><font color="#0000FF">if</font></b> <font color="#990000">(</font> deleteOStream <font color="#990000">)</font>
+    <b><font color="#0000FF">delete</font></b> sout <font color="#990000">;</font>
+
+  <b><font color="#0000FF">delete</font></b> outputgenerator<font color="#990000">;</font>
+
+  <b><font color="#0000FF">return</font></b> EXIT_SUCCESS<font color="#990000">;</font>
+<font color="#FF0000">}</font>
+
+
+<font color="#009900">void</font>
+<b><font color="#000000">print_cgi_header</font></b><font color="#990000">(</font><font color="#990000">)</font>
+<font color="#FF0000">{</font>
+  <b><font color="#000000">printf</font></b><font color="#990000">(</font> <font color="#FF0000">"Content-type: text/html\n"</font> <font color="#990000">)</font> <font color="#990000">;</font>
+  <b><font color="#000000">printf</font></b><font color="#990000">(</font> <font color="#FF0000">"\n"</font> <font color="#990000">)</font> <font color="#990000">;</font>
+<font color="#FF0000">}</font>
+
+</tt></pre>
+</body>
+</html>

@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Ppmchange User Manual</TITLE></HEAD>
+<BODY>
+<H1>ppmchange</H1>
+Updated: 21 April 2004
+<BR>
+<A HREF="ppmchange.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+ppmchange - change all pixels of one color to another in a PPM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>ppmchange</B>
+
+[<B>-closeness=</B><I>closeness_percent</I>]
+[<B>-remainder=</B><I>remainder_color</I>]
+[<B>-closeok</b>]
+[<I>oldcolor newcolor</I>] ...
+[<I>ppmfile</I>]
+
+<A NAME="example"></a>
+<H2>EXAMPLES</H2>
+
+<PRE>
+<b>ppmchange red blue redimage.ppm &gt;blueimage.ppm</b>
+
+<b>ppmchange red red -remainder=black myimage.ppm &gt;redblack.ppm</b>
+
+<b>ppmchange -closeness=90 white white black black</b>
+
+</PRE>
+
+<A NAME="description">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>ppmchange</b> reads a PPM image as input and changes all pixels of
+colr <I>oldcolor</I> to color <I>newcolor</I>.
+
+You may specify up to 256 oldcolor/newcolor pairs on the command line.
+<B>ppmchange</B> leaves all colors not mentioned unchanged, unless you
+specify the <B>-remainder</B> option, in which case they are all
+changed to the single specified color.
+
+<P>You can specify that colors similar, but not identical, to the ones
+you specify get replaced by specifying a &quot;closeness&quot; factor.
+
+<P>Specify the colors as described for the <a
+href="libppm.html#colorname">argument of the <b>ppm_parsecolor()</b>
+library routine</a>.
+
+<P>If a pixel matches two different <I>oldcolor</I>s, <B>ppmchange</B>
+replaces it with the <I>newcolor</I> of the leftmost specified one.
+
+<p>The maxval of the output image is the same as that of the input
+image.  If a <i>newcolor</i> you specify cannot be exactly represented
+in that maxval, <b>ppmchange</b> fails unless you specify the <b>-closeok</b>
+option, in which case <b>ppmchange</b> assumes a color that is as close
+as possible to what you specified but can be represented with your maxval.
+
+<p>A common way that you can have this maxval problem, where the color
+you specify cannot be represented with your maxval, is that your input
+is a PBM (black and white) image that you are colorizing.  The maxval
+in this case is 1, which severely limits the colors to which you can
+change.  To avoid this problem, use <b>pnmdepth</b> to make the maxval
+of your input something consistent with your colors.  255 is usually a
+good choice.
+
+<p>Before Netpbm 10.22 (April 2004), <b>ppmchange</b> always behaved as
+if the user specified <b>-closeok</b> and there was no <b>-closeok</b>
+option.
+
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-closeness </B><I>closeness_percent</I>
+
+<DD><I>closeness</I> is an integer per centage indicating how close
+to the color you specified a pixel must be to get replaced.  By
+default, it is 0, which means the pixel must be the exact color you
+specified.
+
+<P>A pixel gets replaced if the distance in color between it and the
+color you specified is less than or equal to <I>closeness</I> per cent
+of the maxval.
+
+<P>The &quot;distance&quot; in color is defined as the cartesian sum of the
+individual differences in red, green, and blue intensities between the
+two pixels, normalized so that the difference between black and white
+is 100%.
+
+<P>This is probably simpler than what you want most the time.  You
+probably would like to change colors that have similar chrominance,
+regardless of their intensity.  So if there's a red barn that is
+variously shadowed, you want the entire barn changed.  But because the
+shadowing significantly changes the color according to
+<B>ppmchange</B>'s distance formula, parts of the barn are probably
+about as distant in color from other parts of the barn as they are
+from green grass next to the barn.
+
+<P>Maybe <B>ppmchange</B> will be enhanced some day to do chrominance
+analysis.
+
+<dt><b>-closeok</b>
+
+<dd>This option affects how <b>ppmchange</b> interprets a color you
+specify in the arguments.  When you specify this option, <b>ppmchange</b>
+may use a color close to, but not the same as what you specify.  See
+<a href="ppmchange.html#description">the description section</a> for details.
+
+<p>This option was new in Netpbm 10.22 (April 2004).  Before that,
+<b>ppmchange</b> always behaved as if you specified this option.
+     
+<DT><B>-remainder </B><I>color</I>
+
+<DD><B>ppmchange</B> changes all pixels which are not of a color for
+which you specify an explicit replacement color on the command line to
+color <I>color</I>.
+
+<P>An example application of this is
+
+<pre>
+<B>ppmchange -remainder=black red red</B>
+</pre>
+
+to lift only the red portions from an image, or
+<pre>
+<B>ppmchange -remainder=black red white | ppmtopgm</B>
+</pre>
+
+to create a mask file for the red portions of the image.
+
+</DL>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pgmtoppm.html">pgmtoppm</A></B>,
+
+<B><A HREF="ppmcolormask.html">ppmcolormask</A></B>,
+
+<B><A HREF="ppm.html">ppm</A></B>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Wilson H. Bent. Jr. (<A HREF="mailto:whb@usc.edu">whb@usc.edu</A>)
+with modifications by Alberto Accomazzi (<A
+HREF="mailto:alberto@cfa.harvard.edu">alberto@cfa.harvard.edu</A>)
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="ppmchange.html#lbAB">NAME</A>
+<LI><A HREF="ppmchange.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="ppmchange.html#examples">EXAMPLES</A>
+<LI><A HREF="ppmchange.html#description">DESCRIPTION</A>
+<LI><A HREF="ppmchange.html#lbAE">OPTIONS</A>
+<LI><A HREF="ppmchange.html#lbAF">SEE ALSO</A>
+<LI><A HREF="ppmchange.html#lbAG">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

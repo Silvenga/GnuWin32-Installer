@@ -1,0 +1,770 @@
+<html lang="en">
+<head>
+<title>The GNU `libxmi' 2-D Rasterization Library</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="The GNU `libxmi' 2-D Rasterization Library">
+<meta name="generator" content="makeinfo 4.6">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+--></style>
+</head>
+<body>
+<h1 class="settitle">The GNU `libxmi' 2-D Rasterization Library</h1>
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Top">Top</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#libxmi%20Overview">libxmi Overview</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#dir">(dir)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+<br>
+</div>
+
+<h2 class="chapter">1 The <code>libxmi</code> 2-D Rasterization Library</h2>
+
+<p>This is the documentation for version 2.0 of the GNU <code>libxmi</code> 2-D
+rasterization library, which is used by C&nbsp;and C++ programmers. 
+It&nbsp;converts 2-D geometrical objects, such as polylines, polygons,
+and arcs, to raster patterns.  There is support for setting drawing
+attributes, including line width, join style, cap style, and a
+multicolored dash pattern.  The objects may be unfilled or filled. 
+If&nbsp;the&nbsp;latter, the filling may be a solid color, a&nbsp;stipple
+pattern, or a texture.  There is support for sophisticated color-merging
+between separately drawn objects.
+
+<ul class="menu">
+<li><a accesskey="1" href="#libxmi%20Overview">libxmi Overview</a>:      GNU libxmi and its features
+<li><a accesskey="2" href="#libxmi%20Example">libxmi Example</a>:       A sample program that may be linked with libxmi
+<li><a accesskey="3" href="#libxmi%20API">libxmi API</a>:           The libxmi API
+<li><a accesskey="4" href="#Acknowledgements">Acknowledgements</a>:     The contributors
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="libxmi%20Overview">libxmi Overview</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#libxmi%20Example">libxmi Example</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">1.1 An overview of <code>libxmi</code></h3>
+
+<p>With the aid of the GNU <code>libxmi</code> library, a C or C++ programmer may
+rasterize two-dimensional geometric objects; that&nbsp;is, draw them on a
+two-dimensional array of pixels.  The supported objects are points,
+polylines, filled polylines (i.e., polygons), rectangles, filled
+rectangles, and `arcs': segments of ellipses whose principal axes are
+aligned with the coordinate axes.  Like polylines and rectangles, arcs
+may be unfilled or filled.
+
+   <p>The corresponding rendering functions in the <code>libxmi</code> API
+(application programming interface) are <code>miDrawPoints</code>,
+<code>miDrawLines</code>, <code>miFillPolygon</code>, <code>miDrawRectangles</code>,
+<code>miFillRectangles</code>, <code>miDrawArcs</code>, and <code>miFillArcs</code>.  Each
+of these takes an array, rather than a single object, as an argument. 
+For example, one of the arguments of <code>miDrawLines</code> is an array of
+points, interpreted as the vertices of a polyline.  The polygon filled
+by <code>miFillPolygon</code> is specified similarly.  And the final four
+functions render lists of objects, rather than single objects.
+
+   <p>Actually, <code>libxmi</code> provides a two-stage graphics pipeline.  In the
+first stage, an opaque object called a <code>miPaintedSet</code> is drawn
+onto.  Each of the eight drawing functions takes a pointer to a
+<code>miPaintedSet</code> as its first argument.  Conceptually, a
+<code>miPaintedSet</code> is an unordered set of points with integer
+coordinates, partitioned by pixel value.  The datatype representing a
+pixel value is <code>miPixel</code>, which is normally typedef'd as
+<code>unsigned int</code>.  Each of the drawing functions takes a pointer to a
+<code>miGC</code>, or graphics context, as its second argument.  The
+<code>miGC</code> specifies such drawing attributes as line width, join style,
+cap style, and dashing style, and also the pixel value(s) to be used in
+the painting operation.
+
+   <p>In the first stage of the pipeline the Painter's Algorithm is used, so
+that a repeatedly-painted point in a <code>miPaintedSet</code> acquires the
+pixel value applied to&nbsp;it in the final drawing operation.  In the
+second stage, more sophisticated pixel-merging algorithms may be
+applied.  In&nbsp;this stage, a <code>miPaintedSet</code> is copied (`merged')
+onto a <code>miCanvas</code>, by invoking <code>miCopyPaintedSetToCanvas</code>. 
+A&nbsp;<code>miCanvas</code> is a structure that includes a <code>miPixmap</code>: a
+two-dimensional array of <code>miPixel</code>s that may be initialized by the
+user, and read, pixel by pixel, after the merging is performed.  By
+default, <code>miCopyPaintedSetToCanvas</code> uses the Painter's Algorithm
+too, so that the source pixel in the <code>miPaintedSet</code> replaces the
+destination pixel in the <code>miCanvas</code>.  But the merging process may
+be controlled in much finer detail.  A&nbsp;stipple bitmap and a texture
+pixmap, and binary and ternary pixel-merging functions, may be
+specified.
+
+   <p>The <em>interpretation</em> of pixel values is left up&nbsp;to the user. 
+A&nbsp;<code>miPixel</code> could be an index into a color table.  It&nbsp;could
+also be an encoding of a color according to the RGB scheme, the RGBA
+scheme, or some other scheme.  Even though a <code>miPixel</code> is normally
+an <code>unsigned int</code>, this may be altered, if desired, at the time
+<code>libxmi</code> is installed.  Any scalar type or nonscalar type,
+including a structure or a union, could be substituted.
+
+   <p><code>libxmi</code> is intended for use both as a standalone library and as a
+rendering module that may be incorporated in other packages.  To
+facilitate its use in other packages, it may be extensively customized
+at installation time.  Besides customizing the definition of
+<code>miPixel</code>, it is possible to customize the definition of the
+<code>miPixmap</code> datatype, which by default is an array of pointers to
+rows of <code>miPixel</code>s.  The default merging algorithm used by
+<code>miCopyPaintedSetToCanvas</code> may also be altered: it&nbsp;need not be
+the Painter's Algorithm.  For instructions on customization, see the
+comments in the <code>libxmi</code> header file <code>xmi.h</code>.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="libxmi%20Example">libxmi Example</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#libxmi%20API">libxmi API</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#libxmi%20Overview">libxmi Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">1.2 A sample <code>libxmi</code> program</h3>
+
+<p>The following C program uses <code>libxmi</code> to create a
+<code>miPaintedSet</code>, draws a dashed polyline and a dashed elliptic arc
+on the <code>miPaintedSet</code>, and transfers the painted pixels to a
+<code>miCanvas</code> that includes a pixmap of specified size.  Finally, it
+writes the pixmap to standard output.
+
+<pre class="example">     #include &lt;stdio.h&gt;
+     #include &lt;stdlib.h&gt;
+     #include &lt;xmi.h&gt;            /* public libxmi header file */
+     
+     int main ()
+     {
+       miPoint points[4];        /* 3 line segments in the polyline */
+       miArc arc;                /* 1 arc to be drawn */
+       miPixel pixels[4];        /* pixel values for drawing and dashing */
+       unsigned int dashes[2];   /* length of `on' and `off' dashes */
+       miGC *pGC;                /* graphics context */
+       miPaintedSet *paintedSet; /* opaque object to be painted */
+       miCanvas *canvas;         /* drawing canvas (including pixmap) */
+       miPoint offset;           /* for miPaintedSet -&gt; miCanvas transfer */
+       int i, j;
+     
+       /* define polyline: vertices are (25,5) (5,5), (5,25), (35,22) */
+       points[0].x = 25;  points[0].y = 5;
+       points[1].x = 5;   points[1].y = 5;
+       points[2].x = 5;   points[2].y = 25;
+       points[3].x = 35;  points[3].y = 22;
+     
+       /* define elliptic arc */
+       arc.x = 20; arc.y = 15;   /* upper left corner of bounding box */
+       arc.width = 30;           /* x range of box: 20..50 */
+       arc.height = 16;          /* y range of box: 15..31 */
+       arc.angle1 = 0 * 64;      /* starting angle (1/64'ths of a degree) */
+       arc.angle2 = 270 * 64;    /* angle range (1/64'ths of a degree) */
+     
+       /* create and modify graphics context */
+       pixels[0] = 1;            /* pixel value for `off' dashes, if drawn */
+       pixels[1] = 2;            /* default pixel for drawing */
+       pixels[2] = 3;            /* another pixel, for multicolored dashes */
+       pixels[3] = 4;            /* another pixel, for multicolored dashes */
+       dashes[0] = 4;            /* length of `on' dashes */
+       dashes[1] = 2;            /* length of `off' dashes */
+       pGC = miNewGC (4, pixels);
+       miSetGCAttrib (pGC, MI_GC_LINE_STYLE, MI_LINE_ON_OFF_DASH);
+       miSetGCDashes (pGC, 2, dashes, 0);
+       miSetGCAttrib (pGC, MI_GC_LINE_WIDTH, 0); /* Bresenham algorithm */
+     
+       /* create empty painted set */
+       paintedSet = miNewPaintedSet ();
+     
+       /* paint dashed polyline and dashed arc onto painted set */
+       miDrawLines (paintedSet, pGC, MI_COORD_MODE_ORIGIN, 4, points);
+       miDrawArcs (paintedSet, pGC, 1, &amp;arc);
+     
+       /* create 60x35 canvas (initPixel=0); merge painted set onto it */
+       canvas = miNewCanvas (60, 35, 0);
+       offset.x = 0; offset.y = 0;
+       miCopyPaintedSetToCanvas (paintedSet, canvas, offset);
+     
+       /* write canvas's pixmap (a 60x35 array of miPixels) to stdout */
+       for (j = 0; j &lt; canvas-&gt;drawable-&gt;height; j++)
+         {
+           for (i = 0; i &lt; canvas-&gt;drawable-&gt;width; i++)
+             /* note: column index precedes row index */
+             printf ("%d", canvas-&gt;drawable-&gt;pixmap[j][i]);
+           printf ("\n");
+         }
+     
+       /* clean up */
+       miDeleteCanvas (canvas);
+       miDeleteGC (pGC);
+       miClearPaintedSet (paintedSet); /* not necessary */
+       miDeletePaintedSet (paintedSet);
+     
+       return 0;
+     }
+     </pre>
+
+   <p>This program illustrates how <code>miPaintedSet</code>, <code>miGC</code>, and
+<code>miCanvas</code> objects are created and destroyed, as&nbsp;well as
+manipulated.  Each of these types has a constructor and a destructor,
+named <code>miNew</code><small class="dots">...</small> and <code>miDelete</code><small class="dots">...</small>, respectively.
+
+   <p>When creating a <code>miGC</code> with <code>miNewGC</code>, an array of
+<code>miPixel</code>s of length at least&nbsp;2 must be passed as the second
+argument.  The first argument, <code>npixels</code>, is the length of the
+array.  The default color for drawing operations will be pixel number&nbsp;1 in the array.  The other pixel colors in the array will only be used
+when dashing.  In&nbsp;normal (on/off) dashing, the colors of the `on'
+dashes will cycle through the colors numbered 1,2,<small class="dots">...</small>,npixels-1 in
+the array.  In so-called double dashing, the `off' dashes will be drawn
+too, in color number&nbsp;0.
+
+   <p>In the program, the first call to <code>miGCSetAttrib</code> sets the line
+mode to <code>MI_LINE_ON_OFF_DASH</code> rather than <code>MI_DOUBLE_DASH</code>. 
+This replaces the default, which is <code>MI_LINE_SOLID</code>, meaning no
+dashing (only color number&nbsp;1 in the pixel array is used).  An&nbsp;array of dash lengths is then specified by calling
+<code>miSetGCDashes</code>.  (The default dash length array, which is
+replaced, is <code>{4,4}</code>).  When dashing, the specified dash length
+array will be cyclically used.  The first dash will be `on', the second
+`off', and so&nbsp;forth.  The third argument to <code>miSetGCDashes</code>
+specifies an initial offset into this cyclic pattern.  Currently, the
+offset must be nonnegative.
+
+   <p>The second call to <code>miGCSetAttrib</code> sets the line width in the
+graphics context.  If&nbsp;the specified line width is positive, lines
+and arcs will be drawn with a circular brush whose diameter is equal to
+the line width.  All pixels within the brushed region will be painted. 
+If&nbsp;the line width is zero, as it is here, a so-called Bresenham
+algorithm will be used.  Bresenham lines and arcs are drawn with fewer
+pixels than is the case for lines and arcs with width&nbsp;1, and many
+people prefer them.
+
+   <p><code>miDrawLines</code> and <code>miDrawArc</code> do the actual drawing.  They are
+passed a polyline (i.e., an array of <code>miPoint</code>s) and a
+<code>miArc</code>, respectively.  The definitions of the <code>miPoint</code> and
+<code>miArc</code> structures appear in the header file <code>xmi.h</code>, which is
+worth examining.  The third argument of <code>miDrawLines</code>,
+<code>MI_COORD_MODE_ORIGIN</code>, specifies that the points of the polyline,
+after the first, are expressed in absolute rather than relative
+coordinates.
+
+   <p>Finally, the program transfers the painted pixels to a <code>miCanvas</code>,
+and copies the pixels from it to standard output.  A&nbsp;<code>miCanvas</code>, unlike a <code>miPaintedSet</code> and a <code>miGC</code>, is not
+an opaque object, so its elements may be read (and written).  In&nbsp;fact, a <code>miCanvas</code> may be constructed by hand and passed to the
+<code>miCopyPaintedSetToCanvas</code> function.  However, it is usually
+easiest to use the constructor <code>miNewCanvas</code> and the destructor
+<code>miDeleteCanvas</code>.  Any <code>miCanvas</code> created with
+<code>miNewCanvas</code> is allocated on the heap, with <code>malloc</code>.  It&nbsp;includes a pixmap (an&nbsp;array of <code>miPixel</code>s, of specified size)
+that is itself allocated on the heap.
+
+   <p>It is only when the painted pixels are transferred from
+<code>miPaintedSet</code> to <code>miCanvas</code> that clipping to a pixmap takes
+place.  Drawing to a <code>miPaintedSet</code> is entirely unclipped: at&nbsp;least in principle, the <code>miPaintedSet</code> is of potentially infinite
+extent.  However, the pixmap in the <code>miCanvas</code> created by
+<code>miNewCanvas (60, 35, 0)</code> has upper left corner <code>(0,0)</code> and
+lower right corner <code>(59,34)</code>.  Out-of-bound painted pixels, if&nbsp;any, will not be transferred.
+
+   <p>The third argument of <code>miNewCanvas</code> is its <code>initPixel</code>
+argument: the pixel value to&nbsp;which each <code>miPixel</code> in the pixmap
+is initialized.  Since this value is&nbsp;`0', the pixmap that is sent to
+standard output will display the dashed polyline and arc in the `2',
+`3', and&nbsp;`4' colors, on a background of zeroes.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="libxmi%20API">libxmi API</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Acknowledgements">Acknowledgements</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#libxmi%20Example">libxmi Example</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h3 class="section">1.3 The <code>libxmi</code> API</h3>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Opaque%20Data%20Structures">Opaque Data Structures</a>:     The miPaintedSet and miGC structures
+<li><a accesskey="2" href="#First%20Stage">First Stage</a>:                Painting pixels in a miPaintedSet
+<li><a accesskey="3" href="#Second%20Stage">Second Stage</a>:               Merging a miPaintedSet onto a miCanvas
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Opaque%20Data%20Structures">Opaque Data Structures</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#First%20Stage">First Stage</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#libxmi%20API">libxmi API</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#libxmi%20API">libxmi API</a>
+<br>
+</div>
+
+<h3 class="subsection">1.3.1 Opaque data structures</h4>
+
+<p>The drawing functions used in the first stage of the <code>libxmi</code>
+graphics pipeline paint pixels on a <code>miPaintedSet</code>. 
+A <code>miPaintedSet</code> should be thought of as an unordered set of points
+with integer coordinates, partitioned according to pixel value.  Any
+pixel value is a <code>miPixel</code>, which in most <code>libxmi</code>
+installations is typedef'd as an <code>unsigned int</code>.
+
+   <p>A <code>miPaintedSet</code> is an opaque object that must be accessed through
+a pointer.  The functions
+
+<pre class="example">     miPaintedSet * miNewPaintedSet (void);
+     void miDeletePaintedSet (miPaintedSet *paintedSet);
+     </pre>
+
+<p>are the constructor and destructor for the <code>miPaintedSet</code> type. 
+The function
+
+<pre class="example">     void miClearPaintedSet (miPaintedSet *paintedSet);
+     </pre>
+
+<p>clears all pixels from a <code>miPaintedSet</code>, i.e., makes it the empty
+set.
+
+   <p>All drawing functions that paint pixels on a <code>miPaintedSet</code> take a
+pointer to a graphics context as an argument.  A&nbsp;graphics context is
+an opaque object, called a <code>miGC</code>, that contains drawing
+parameters.  The functions
+
+<pre class="example">     miGC * miNewGC (int npixels, const miPixel *pixels);
+     void miDeleteGC (miGC *pGC);
+     miGC * miCopyGC (const miGC *pGC);
+     </pre>
+
+<p>are the constructor, destructor, and copy constructor for the
+<code>miGC</code> type.  The arguments of <code>miNewGC</code> specify an array of
+<code>miPixel</code>s, which must have length at least&nbsp;2.  The default
+color for drawing operations will be pixel number&nbsp;1 in the array. 
+The other pixel colors in the array will only be used when dashing. 
+In&nbsp;normal (on/off) dashing, the colors of the `on' dashes will cycle
+through the colors numbered 1,2,<small class="dots">...</small>,npixels-1.  In so-called double
+dashing, the `off' dashes will be drawn too, in color number&nbsp;0.
+
+   <p>The array of pixel colors may be modified at any later time, by invoking
+the function <code>miSetGCPixels</code>.
+
+<pre class="example">     void miSetGCPixels (miGC *pGC, int npixels, const miPixel *pixels);
+     </pre>
+
+<p>is the declaration of this function.
+
+   <p>The lengths of dashes, when dashing, may be set by invoking
+<code>miSetGCDashes</code>.  It has declaration
+
+<pre class="example">     void miSetGCDashes (miGC *pGC, int ndashes, const unsigned int *dashes,
+                         int offset);
+     </pre>
+
+<p>Here <code>dashes</code> is an array of length <code>ndashes</code>.  The array is
+cyclically used.  The first dash in a polyline or arc will be an `on'
+dash of length <code>dashes[0]</code>; the next dash will be an `off' dash of
+length <code>dashes[1]</code>; and so forth.  The default dash length array in
+any <code>miGC</code> is <code>{4,4}</code>.  The dash length array need not have
+the same length as the pixel color array, and it need not have even
+length.  <code>offset</code>, if nonzero, is an initial offset into the dash
+pattern.  For example, if it equals <code>dashes[0]</code> then the first dash
+will be an `off' dash of length <code>dashes[1]</code>.  Currently,
+<code>offset</code> must be nonnegative.
+
+   <p>Besides the array of pixel colors and the array of dash lengths, any
+<code>miGC</code> contains several attributes whose values are <code>enum</code>s,
+and an integer-valued line width attribute.  Any one of these may be set
+by invoking <code>miSetGCAttrib</code>, and any list of them by invoking
+<code>miSetGCAttribs</code>.  The declarations of these functions are:
+
+<pre class="example">     typedef enum { MI_GC_FILL_RULE, MI_GC_JOIN_STYLE, MI_GC_CAP_STYLE,
+                     MI_GC_LINE_STYLE, MI_GC_ARC_MODE, MI_GC_LINE_WIDTH
+                  } miGCAttribute;
+     void miSetGCAttrib (miGC *pGC, miGCAttribute attribute, int value);
+     void miSetGCAttribs (miGC *pGC, int nattributes,
+                          const miGCAttribute *attributes,
+                          const int *values);
+     </pre>
+
+<p>These attributes are similar to the drawing attributes used in the X&nbsp;Window System.  The allowed values for the attribute
+<code>MI_GC_FILL_RULE</code>, which specifies the rule used when filling
+polygons and arcs, are:
+
+<pre class="example">     enum { MI_EVEN_ODD_RULE, MI_WINDING_RULE };
+     </pre>
+
+<p>The default is <code>MI_EVEN_ODD_RULE</code>.  The allowed values for the
+attribute <code>MI_GC_JOIN_STYLE</code>, which specifies the rule used when
+joining polylines and polyarcs, are:
+
+<pre class="example">     enum { MI_JOIN_MITER, MI_JOIN_ROUND, MI_JOIN_BEVEL,
+             MI_JOIN_TRIANGULAR };
+     </pre>
+
+<p>The default is <code>MI_JOIN_MITER</code>.  The allowed values for the
+attribute <code>MI_GC_CAP_STYLE</code>, which specifies the rule used when
+capping the ends of polylines and arcs, are:
+
+<pre class="example">     enum { MI_CAP_NOT_LAST, MI_CAP_BUTT, MI_CAP_ROUND, MI_CAP_PROJECTING,
+             MI_CAP_TRIANGULAR };
+     </pre>
+
+<p>The default is <code>MI_CAP_BUTT</code>.  The allowed values for the
+attribute <code>MI_GC_LINE_STYLE</code>, which specifies whether or not
+dashing should take place when drawing polylines and arcs, are:
+
+<pre class="example">     enum { MI_LINE_SOLID, MI_LINE_ON_OFF_DASH, MI_LINE_DOUBLE_DASH };
+     </pre>
+
+<p>The default is <code>MI_LINE_SOLID</code>.  The allowed values for the
+attribute <code>MI_GC_ARC_MODE</code>, which specifies how arcs should be
+filled, are:
+
+<pre class="example">     enum { MI_ARC_CHORD, MI_ARC_PIE_SLICE };
+     </pre>
+
+<p>The default is <code>MI_ARC_PIE_SLICE</code>.
+
+   <p>Finally, the value for the line width, i.e., for the
+<code>MI_GC_LINE_WIDTH</code> attribute, may be any nonnegative integer.  The
+default is&nbsp;0, which has a special meaning.  Zero-width lines and
+arcs are not invisible.  Instead, they are drawn with a Bresenham
+algorithm, which paints fewer pixels than is the case for lines with
+width&nbsp;1.
+
+   <p>Any <code>miGC</code> also contains a miter-limit attribute, which, if the
+join mode attribute has value <code>MI_JOIN_MITER</code> and the line width is
+at least&nbsp;1, will affect the drawing of the joins in polylines and
+polyarcs.  At&nbsp;any join point, the `miter length' is the distance
+between the inner corner and the outer corner.  The miter limit is the
+maximum value that can be tolerated for the miter length divided by the
+line width.  If&nbsp;this value is exceeded, the miter will be `cut&nbsp;off': the <code>MI_JOIN_BEVEL</code> join mode will be used instead.
+
+   <p>The function
+
+<pre class="example">     void miSetGCMiterLimit (miGC *pGC, double miter_limit);
+     </pre>
+
+<p>sets the value of this attribute.  The specified value must be greater
+than or equal to&nbsp;1.0.  That is because the miter limit is the
+cosecant of one-half of the minimum join angle for mitering, so values
+less than&nbsp;1.0 are meaningless.  The default value for the miter
+limit is 10.43, as in the X&nbsp;Window System.  10.43&nbsp;is the
+cosecant of 5.5 degrees, so by default, miters will be cut&nbsp;off if
+the join angle is less than 11&nbsp;degrees.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="First%20Stage">First Stage</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Second%20Stage">Second Stage</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Opaque%20Data%20Structures">Opaque Data Structures</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#libxmi%20API">libxmi API</a>
+<br>
+</div>
+
+<h3 class="subsection">1.3.2 The first stage of the graphics pipeline</h4>
+
+<p>In the first stage of the <code>libxmi</code> graphics pipeline, one or more
+of the core drawing functions is invoked.  Each drawing function takes
+pointers to a <code>miPaintedSet</code> and a <code>miGC</code> (a&nbsp;graphics
+context) as its first and second arguments.  It&nbsp;will paint pixels in
+the <code>miPaintedSet</code>, according to the drawing parameters in the
+graphics context.
+
+   <p>The drawing functions fall into three groups: (1) functions that draw
+points, polylines, and polygons, (2)&nbsp;functions that draw rectangles,
+and (3)&nbsp;functions that draw `arcs' (segments of ellipses whose
+principal axes are aligned with the coordinate axes).  We&nbsp;discuss
+these three groups in&nbsp;turn.
+
+   <p>The point/polyline/polygon group includes:
+
+<pre class="example">     void miDrawPoints (miPaintedSet *paintedSet, const miGC *pGC,
+                        miCoordMode mode, int npts, const miPoint *pPts);
+     void miDrawLines (miPaintedSet *paintedSet, const miGC *pGC,
+                       miCoordMode mode, int npts, const miPoint *pPts);
+     void miFillPolygon (miPaintedSet *paintedSet, const miGC *pGC,
+                         miPolygonShape shape,
+                         miCoordMode mode, int npts, const miPoint *pPts);
+     </pre>
+
+<p>The final three arguments of each are a coordinate mode, a specified
+number of points, and an array that contains that number of points. 
+<code>miDrawPoints</code> draws the array as a cloud of points,
+<code>miDrawLines</code> draws a polyline defined by the array, and
+<code>miFillPolygon</code> fills a polygon defined by the array.  The
+<code>mode</code> argument specifies whether the points in the array, after
+the first, are in absolute or relative coordinates.  Its possible values
+are:
+
+<pre class="example">     typedef enum { MI_COORD_MODE_ORIGIN,
+                     MI_COORD_MODE_PREVIOUS } miCoordMode;
+     </pre>
+
+<p>The <code>miPoint</code> structure is defined by
+
+<pre class="example">     typedef struct
+     {
+       int x, y;	/* integer coordinates, y goes downward */
+     } miPoint;
+     </pre>
+
+<p>The additional <code>shape</code> argument of <code>miFillPolygon</code> is
+advisory.  Its possible values are:
+
+<pre class="example">     typedef enum { MI_SHAPE_GENERAL, MI_SHAPE_CONVEX } miPolygonShape;
+     </pre>
+
+<p>They indicate whether the polygon is (1) unconstrained (i.e., not
+necessarily convex, with self-intersections allowed), or (2)&nbsp;convex
+and not self-intersecting.  The latter case can be drawn more rapidly.
+
+   <p>The rectangle group includes
+
+<pre class="example">     void miDrawRectangles (miPaintedSet *paintedSet, const miGC *pGC,
+                            int nrects, const miRectangle *pRects);
+     void miFillRectangles (miPaintedSet *paintedSet, const miGC *pGC,
+                            int nrects, const miRectangle *pRects);
+     </pre>
+
+<p>The final two arguments of each are a specified number of rectangles and
+an array that contains that number of rectangles. 
+<code>miDrawRectangles</code> draws the outline of each rectangle, and
+<code>miFillRectangle</code> fills each rectangle.  The <code>miRectangle</code>
+structure is defined by
+
+<pre class="example">     typedef struct
+     {
+       int x, y;                   /* upper left corner of rectangle */
+       unsigned int width, height; /* dimensions: width&gt;=1, height&gt;=1 */
+     } miRectangle;
+     </pre>
+
+<p>The rectangle group is redundant, since a rectangle is a special sort of
+polyline, defined by a five-point point array in which the last point is
+the same as the first.
+
+   <p>The arc group includes
+
+<pre class="example">     void miDrawArcs (miPaintedSet *paintedSet, const miGC *pGC,
+                      int narcs, const miArc *parcs);
+     void miFillArcs (miPaintedSet *paintedSet, const miGC *pGC,
+                      int narcs, const miArc *parcs);
+     </pre>
+
+<p>The final two arguments of each are a specified number of arcs and an
+array that contains that number of arcs.  <code>miDrawArcs</code> draws each
+arc.  It&nbsp;will join successive arcs, if they are contiguous,
+according to the `join mode' in the graphics context.  Similarly,
+<code>miFillArcs</code> will fill each arc according to the `arc mode' in the
+graphics context.  Either a pie slice or a chord will be filled.
+
+   <p>The <code>miArc</code> structure is defined by
+
+<pre class="example">     typedef struct
+     {
+       int x, y;           /* upper left corner of ellipse's bounding box */
+       unsigned int width, height; /* dimensions: width&gt;=1, height&gt;=1 */
+       int angle1, angle2; /* initial angle, angle range (in 1/64 degrees) */
+     } miArc;
+     </pre>
+
+<p><code>x</code>, <code>y</code>, <code>width</code>, <code>height</code> specify a rectangle
+aligned with the coordinate axes, and <code>angle1</code>, <code>angle2</code>
+specify an angular range (a `pie slice') of an ellipse inscribed in the
+rectangle.  By convention, they are the starting polar angle and angle
+range of the circular arc that would be produced from the elliptic arc
+by squeezing the rectangle into a square.
+
+   <p><code>miDrawArcs</code> maintains a cache of rasterized ellipses.  This cache
+is persistent, and internal to <code>libxmi</code>; accordingly,
+<code>miDrawArcs</code> is not reentrant.  For applications in which
+reentrancy is important, a reentrant counterpart is provided.  It&nbsp;is
+
+<pre class="example">     void miDrawArcs_r (miPaintedSet *paintedSet, const miGC *pGC,
+                        int narcs, const miArc *parcs,
+                        miEllipseCache *ellipseCache);
+     </pre>
+
+<p>The caller of <code>miDrawArcs_r</code> must supply a pointer to a
+<code>miEllipseCache</code> object as the final argument.  A&nbsp;pointer to
+such an object, which is opaque, is returned by
+<code>miNewEllipseCache</code>.  After zero or more calls to
+<code>miDrawArcs_r</code>, the object would be deleted by a call to
+<code>miDeleteEllipseCache</code>.  The declarations
+
+<pre class="example">     miEllipseCache * miNewEllipseCache (void);
+     void miDeleteEllipseCache (miEllipseCache *ellipseCache);
+     </pre>
+
+<p>are supplied in the header file <code>xmi.h</code>.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Second%20Stage">Second Stage</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#First%20Stage">First Stage</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#libxmi%20API">libxmi API</a>
+<br>
+</div>
+
+<h3 class="subsection">1.3.3 The second stage of the graphics pipeline</h4>
+
+<p>In the second state of the graphics pipeline, the pixels in a
+<code>miPaintedSet</code> are transferred (`merged') to a <code>miCanvas</code>, by
+invoking <code>miCopyPaintedSetToCanvas</code>.  It&nbsp;is only when the
+painted pixels are transferred to a <code>miCanvas</code> that clipping to a
+pixmap takes place.
+
+   <p>A&nbsp;<code>miCanvas</code> is a structure that includes a pixmap and several
+parameters that control the transfer of pixels.  Since it is not opaque,
+it may be constructed and modified by&nbsp;hand, if necessary.  The
+<code>miCanvas</code> type has definition
+
+<pre class="example">     typedef struct
+     {
+       miCanvasPixmap *drawable;   /* the pixmap */
+     
+       miBitmap *stipple;          /* a mask, if non-NULL */
+       miPoint stippleOrigin;      /* placement of upper left corner */
+     
+       miPixmap *texture;          /* a texture, if non-NULL */
+       miPoint textureOrigin;      /* placement of upper left corner */
+     
+       miPixelMerge2 pixelMerge2;  /* binary merging function, if non-NULL */
+       miPixelMerge3 pixelMerge3;  /* ternary counterpart, if non-NULL */
+     } miCanvas;
+     </pre>
+
+<p>Here, the <code>miBitmap</code> and <code>miPixmap</code> types are defined by
+
+<pre class="example">     typedef struct
+     {
+       int **bitmap;               /* each element is 0 or 1 */
+       unsigned int width;
+       unsigned int height;
+     }
+     miBitmap;
+     </pre>
+
+<pre class="example">     typedef struct
+     {
+       miPixel **pixmap;           /* each element is a miPixel */
+       unsigned int width;
+       unsigned int height;
+     }
+     miPixmap;
+     </pre>
+
+<p>That is, each of them contains an array of pointers to rows (of&nbsp;integers or pixel values, as the case may&nbsp;be).  In&nbsp;most
+installations of <code>libxmi</code>, <code>miCanvasPixmap</code> is typedef'd as
+<code>miPixmap</code>.  The typedefs
+
+<pre class="example">     typedef miPixel (*miPixelMerge2) (miPixel source, miPixel destination);
+     typedef miPixel (*miPixelMerge3) (miPixel texture, miPixel source,
+                                       miPixel destination);
+     </pre>
+
+<p>define the datatypes of the binary and ternary pixel-merging function
+members.
+
+   <p>The functions
+
+<pre class="example">     miCanvas * miNewCanvas (unsigned int width, unsigned int height,
+                             miPixel initPixel);
+     void miDeleteCanvas (miCanvas *pCanvas);
+     miCanvas * miCopyCanvas (const miCanvas *pCanvas);
+     </pre>
+
+<p>are the constructor, destructor, and copy constructor for the
+<code>miCanvas</code> type.  Rather than a <code>miCanvas</code> being created by&nbsp;hand, <code>miNewCanvas</code> is usually used instead.  The <code>initPixel</code>
+argument is a <code>miPixel</code> value with which the newly allocated pixmap
+should be filled.  The <code>stipple</code> and <code>texture</code> pointers in a
+newly created <code>miCanvas</code> are <code>NULL</code>, as are the pixel-merging
+function members.  The four convenience functions
+
+<pre class="example">     void miSetCanvasStipple (miCanvas *pCanvas, const miBitmap *pStipple,
+                              miPoint stippleOrigin);
+     void miSetCanvasTexture (miCanvas *pCanvas, const miPixmap *pTexture,
+                              miPoint textureOrigin);
+     void miSetPixelMerge2 (miCanvas *pCanvas, miPixelMerge2 pixelMerge2);
+     void miSetPixelMerge3 (miCanvas *pCanvas, miPixelMerge3 pixelMerge3);
+     </pre>
+
+<p>may be used to set these members.
+
+   <p>The <code>miCopyPaintedSetToCanvas</code> function, which implements the
+second stage of the graphics pipeline, can now be discussed.  It&nbsp;has
+declaration
+
+<pre class="example">     void miCopyPaintedSetToCanvas (const miPaintedSet *paintedSet,
+                                    miCanvas *canvas, miPoint origin);
+     </pre>
+
+<p>where <code>origin</code> is the point on the <code>miCanvas</code> to which the
+point <code>(0,0)</code> in the <code>miPaintedSet</code> is mapped.  (It&nbsp;could
+equally well be called <code>offset</code>.)
+
+   <p>The semantics of <code>miCopyPaintedSet</code> boil down to a single issue:
+how a `source' pixel in a <code>miPaintedSet</code> is merged onto the
+corresponding `destination' pixel in a <code>miCanvas</code> to form a new
+pixel.  The simplest case is when no texture is specified (the
+corresponding pointer in the <code>miCanvas</code> is <code>NULL</code>).  In&nbsp;that case, if the binary pixel-merging function member of the
+<code>miCanvas</code> is <code>NULL</code>, a default merging algorithm will be
+used.  In&nbsp;most <code>libxmi</code> installations this is the Painter's
+Algorithm: the new pixel in the <code>miCanvas</code> will simply be the
+source pixel.  If,&nbsp;on the other hand, the binary pixel-merging
+function in the <code>miCanvas</code> is non-<code>NULL</code>, it&nbsp;will be used
+to compute the new pixel.
+
+   <p>A texture pixmap may be specified.  If so, it will be extended
+periodically so as to cover the <code>miCanvas</code>, and its value at the
+location of the destination pixel will affect the merging process. 
+If&nbsp;the ternary pixel-merging function member of the <code>miCanvas</code>
+is <code>NULL</code>, a default merging algorithm, appropriate to the case
+when a texture is present, will be used.  In&nbsp;most <code>libxmi</code>
+installations this is a variant of the Painter's Algorithm: the new
+pixel in the <code>miCanvas</code> will be the texture pixel, rather than the
+source pixel.  If,&nbsp;on the other hand, the ternary pixel-merging
+function in the <code>miCanvas</code> is non-<code>NULL</code>, it&nbsp;will be used
+to compute the new pixel.
+
+   <p>Any <code>miCanvas</code> may also include a pointer to a stipple bitmap. 
+If&nbsp;so, it will be extended periodically so as to cover the
+<code>miCanvas</code>, and its value at the location of the destination pixel
+will determine whether or not its replacement by a new pixel, according
+to one of the preceding rules, will take place.  If&nbsp;the stipple
+value is zero, it&nbsp;will not; otherwise it will.  Stipple bitmaps are
+useful for creating so-called screen door patterns, and more generally
+for protecting, or masking&nbsp;off, part of a <code>miCanvas</code>.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Acknowledgements">Acknowledgements</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#libxmi%20API">libxmi API</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="unnumbered">Acknowledgements</h2>
+
+<p><code>libxmi</code> is based on the machine-independent 2-D graphics routines
+in the X11 sample server code.  Those routines fill polygons and draw
+wide polygonal lines and arcs.  They were written by Brian Kelleher,
+Joel McCormack, Todd Newman, Keith Packard, Robert Scheifler and Ken
+Whaley, who worked for Digital Equipment Corp., MIT, and/or the X&nbsp;Consortium, and are copyright &copy; 1985-89 by the X&nbsp;Consortium.
+
+   <p>In 1998-99, <a href="mailto:rsm@math.arizona.edu">Robert Maier</a> extracted the
+graphics routines from the sample server code in the X11R6 distribution,
+converted them to ANSI&nbsp;C, and added extensive comments.  He&nbsp;also
+introduced data structures appropriate for a two-stage graphics
+pipeline, and converted the graphics routines to use them.  He&nbsp;added
+some new rendering features, such as support for multicolored dashing.
+
+   <p>The modified code was first released by being incorporated in version
+2.2 of the GNU <code>plotutils</code> package, as a rendering module for
+export of PNM and pseudo-GIF files.  See the
+<a href="http://www.gnu.org/software/plotutils/plotutils.html"><code>plotutils</code> home page</a>.  After further modifications, the code was
+released as the standalone <code>libxmi</code> library.
+
+   </body></html>
+

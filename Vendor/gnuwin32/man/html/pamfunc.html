@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD><TITLE>Pamfunc User Manual</TITLE></HEAD>
+
+<BODY>
+<H1>pamfunc</H1>
+Updated: June 2002
+<BR>
+<A HREF="pamfunc.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+pamfunc - Apply simple arithmetic functions to a Netpbm image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pamfunc</B>
+{
+<b>-multiplier=</b><i>realnum</i> |
+<b>-divisor=</b><i>realnum</i> |
+<b>-adder=</b><i>integer</i> |
+<b>-subtractor=</b><i>integer</i> |
+<b>-min=</b><i>wholenum</i> |
+<b>-max=</b><i>wholenum</i>
+}
+[<I>filespec</I>]
+
+<P>All options can be abbreviated to their shortest unique prefix.
+You may use two hyphens instead of one.  You may separate an option
+name and its value with white space instead of an equals sign.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<P><b>pamfunc</b> reads a Netpbm image as input and produces a Netpbm
+image as output, with the same format, maxval, and dimensions as the
+input.  <b>pamfunc</b> applies a simple transfer function to each
+sample in the input to generate the corresponding sample in the
+output.  The options determine what function.
+
+<P><b>pamarith</b> is the same thing, except only for PNM images, for
+binary functions -- it takes two PNM images as input and applies a
+specified simple arithmetic function (e.g. addition) on pairs of
+samples from the two to produce the single output image.
+
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-multiplier=<i>realnum</i></B>
+
+<DD>
+     <P>This option makes the transfer function that of multiplying by
+     <i>realnum</i>.  <i>realnum</i> must be nonnegative.  If the result
+     is greater than the image maxval, it is clipped to the maxval.
+
+     <P>Where the input is a PGM or PPM image, this has the effect of
+     dimming or brightening it.  For a different kind of brightening,
+     see <a href="ppmbrighten.html"><b>ppmbrighten</b></a> and
+     <a href="ppmflash.html"><b>ppmflash</b></a>
+
+     <P>Also, see <a href="ppmdim.html"><b>ppmdim</b></a>, which does the
+     same thing as <b>pamfunc -multiplier</b> on a PPM image with a
+     multiplier between 0 and 1,
+     except it uses integer arithmetic, so it may be faster.
+
+     <P>And <a href="ppmfade.html"><b>ppmfade</b></a> can generate a whole
+     sequence of images of brightness declining to black or increasing to
+     white, if that's what you want.
+     
+<DT><B>-divisor=<i>realnum</i></B>
+
+<DD>
+     <P>This option makes the transfer function that of dividing by
+     <i>realnum</i>.  <i>realnum</i> must be nonnegative.  If the result
+     is greater than the image maxval, it is clipped to the maxval.
+
+     <P>This is the same function as you would get with <b>-multiplier</b>,
+     specifying the multiplicative inverse of <i>realnum</i>.
+     
+<DT><B>-adder=<i>integer</i></B>
+
+<DD>
+     <P>This option makes the transfer function that of adding
+     <i>wholenum</i>.  If the result is greater than the image maxval,
+     it is clipped to the maxval.  If it is less than zero, it is
+     clipped to zero.
+
+     <p>Note that in mathematics, this entity is called an &quot;addend,&quot;
+     and an &quot;adder&quot; is a snake.  We use &quot;adder&quot; because
+     it makes more sense.
+     
+<DT><B>-subtractor=<i>integer</i></B>
+
+<DD>
+     <P>This option makes the transfer function that of subtracting
+     <i>wholenum</i>.  If the result is greater than the image maxval,
+     it is clipped to the maxval.  If it is less than zero, it is
+     clipped to zero.
+
+     <p>Note that in mathematics, this entity is called a
+     &quot;subtrahend&quot; rather than a &quot;subtractor.&quot;  We
+     use &quot;subtractor&quot; because it makes more sense.
+
+     <P>This is the same function as you would get with <b>-multiplier</b>,
+     specifying the negative of <i>integer</i>.
+     
+<DT><B>-min=<i>wholenum</i></B>
+
+<DD>
+     <P>This option makes the transfer function that of taking the
+     maximum of the argument and <i>wholenum</i>.  I.e the minimum
+     value in the output will be <i>wholenum</i>.
+
+     If <i>wholenum</i> is greater than the maxval, though, every sample
+     in the output will be maxval.
+
+<DT><B>-max=<i>wholenum</i></B>
+
+<DD>
+     <P>This option makes the transfer function that of taking the
+     minimum of the argument and <i>wholenum</i>.  I.e the maximum
+     value in the output will be <i>wholenum</i>.
+
+     If <i>wholenum</i> is greater than the maxval, the function is
+     idempotent -- the output is identical to the input.
+     
+</DL>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="ppmdim.html">ppmdim</A></B>,
+<B><A HREF="ppmbrighten.html">ppmbrighten</A></B>,
+<B><A HREF="pnmdepth.html">pnmdepth</A></B>,
+<B><A HREF="pamarith.html">pamarith</A></B>,
+<B><A HREF="ppmfade.html">ppmfade</A></B>,
+
+<B><A HREF="pam.html">pbm</A></B>,
+
+<B><A HREF="pnm.html">pbm</A></B>,
+
+<A NAME="history">&nbsp;</A>
+<H2>HISTORY</H2>
+
+<p>This program was added to Netpbm in Release 10.3 (June 2002).
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pamfunc.html#lbAB">NAME</A>
+<LI><A HREF="pamfunc.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pamfunc.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pamfunc.html#lbAE">OPTIONS</A>
+<LI><A HREF="pamfunc.html#lbAF">SEE ALSO</A>
+<LI><A HREF="pamfunc.html#history">HISTORY</A>
+</UL>
+</BODY>
+</HTML>

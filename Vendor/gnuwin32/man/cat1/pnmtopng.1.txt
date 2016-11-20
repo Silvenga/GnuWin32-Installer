@@ -1,0 +1,336 @@
+Pnmtopng User Manual(0)                 Pnmtopng User Manual(0)
+
+
+
+Table Of Contents
+
+NAME
+       pnmtopng - convert a PNM image to PNG
+
+
+SYNOPSIS
+       pnmtopng  [-verbose]  [-downscale]  [-interlace] [-alpha
+       file]  [-transparent   [=]color]   [-background   color]
+       [-palette  palettefile]  [-gamma value] [-hist] [-chroma
+       wx wy rx ry gx gy bx by] [-phys x y unit]  [-text  file]
+       [-ztxt  file]  [-time [yy]yy-mm-dd hh:mm:ss] [-nofilter]
+       [-sub]  [-up]  [-avg]  [-paeth]   [-compression   level]
+       [-force] [-version] [pnmfile]
+
+
+OPTION USAGE
+       Obsolete options:
+
+       [-filter type]
+
+       You  may  abbreviate  any  option to its shortest unique
+       prefix.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       pnmtopng reads a PNM image as input and produces  a  PNG
+       image as output.
+
+       Color  values  in  PNG files are either eight or sixteen
+       bits wide, so pnmtopng will automatically  scale  colors
+       to  have a maxval of 255 or 65535.  Grayscale files will
+       be produced with bit depths 1, 2, 4, 8 or 16.  An  extra
+       pnmdepth step is not necessary.
+
+
+OPTIONS
+       -verbose
+                   Display the format of the output file.
+
+       -downscale
+                   Enables  scaling  of  maxvalues of more then
+              65535 to 16 bit. Since
+                   this means loss of image data, the  step  is
+              not performed by default.
+
+       -interlace
+                   Creates an interlaced PNG file (Adam7).
+
+       -alpha  file
+               This  specifies the transparency (alpha channel)
+              of the image.  You supply the alpha channel as  a
+              standard PGM alpha mask (see the PGM(1)specifica-
+              tion.pnmtopngdoesnot necessarily  represents  the
+              transparency  information  as an alpha channel in
+              the PNG format.  If it can represent  the  trans-
+              parency information through a palette, it will do
+              so in order to make a smaller PNG file.  pnmtopng
+              even  sorts the palette so it can omit the opaque
+              colors from the transparency part of the  palette
+              and save space for the palette.
+
+
+       -transparent color
+              pnmtopng marks the specified color as transparent
+              in the PNG image.
+
+              Specify the color (color) as  described  for  the
+              argument  of the ppm_parsecolor() library routine
+              .  E.g. red or rgb:ff/00/0d.  If  the  color  you
+              specify  is  not  present  in the image, pnmtopng
+              selects instead the color in the  image  that  is
+              closest  to  the  one  you specify.  Closeness is
+              measured as a cartesian distance  between  colors
+              in  RGB  space.   If multiple colors are equidis-
+              tant, pnmtopng chooses one of them arbitrarily.
+
+              However, if you prefix your  color  specification
+              with '=', e.g.
+
+                                  -transparent =red
+
+
+               only  the exact color you specify will be trans-
+              parent.  If that color does  not  appear  in  the
+              image,  there  will be no transparency.  pnmtopng
+              issues an information message when  this  is  the
+              case.
+
+
+       -background color
+              Causes  pnmtopng  to  create  a  background color
+              chunk in the PNG output which  can  be  used  for
+              subsequent  alpha  channel  or  transparent color
+              conversions.   Specify  color  the  same  as  for
+              -transparent.
+
+
+       -palette palettefile
+              This  option  specifies  a  palette to use in the
+              PNG.  It forces pnmtopng to create  the  paletted
+              (colormapped)  variety  of  PNG  -- if that isn't
+              possible, pnmtopng fails.   If  the  palette  you
+              specify doesn't contain exactly the colors in the
+              image, pnmtopng fails.  Since pnmtopng will auto-
+              matically generate a paletted PNG, with a correct
+              palette, when appropriate, the  only  reason  you
+              would  specify the -palette option is if you care
+              in what order the colors appear in  the  palette.
+              The  PNG  palette has colors in the same order as
+              the palette you specify.
+
+              You specify the palette by naming a PPM file that
+              has one pixel for each color in the palette.
+
+              Alternatively,  consider  the  case  that  have a
+              palette and you want to make sure your  PNG  con-
+              tains only colors from the palette, approximating
+              if necessary.  You don't care  what  indexes  the
+              PNG  uses  internally  for  the  colors (i.e. the
+              order of the PNG palette).   In  this  case,  you
+              don't need -palette.  Pass the Netpbm input image
+              and your palette PPM  through  pnmremap.   Though
+              you  might think it would, using -palette in this
+              case wouldn't even save pnmtopng any work.
+
+
+       -gamma value
+              Causes pnmtopng to create an  gAMA  chunk.   This
+              information  helps  describe how the color values
+              in the PNG must be interpreted.  Without the gAMA
+              chunk,  whatever interprets the PNG must get this
+              information separately (or just assume  something
+              standard).   If  your  input is a true PPM or PGM
+              image, you should specify -gamma .45.  But  some-
+              times people generate images which are ostensibly
+              PPM except  the  image  uses  a  different  gamma
+              transfer function than the one specified for PPM.
+              A common case of this is when the image  is  cre-
+              ated by simple hardware that doesn't have digital
+              computational ability.  Also,  some  simple  pro-
+              grams  that  generate  images  from scratch do it
+              with a gamma transfer in which the gamma value is
+              1.0.
+
+
+       -hist  Use  this parameter to create a chunk that speci-
+              fies the frequency (or histogram) of  the  colors
+              in the image.
+
+
+       -chroma white point X and Y, red X and Y, green X and Y,
+                                 and  blue  X and Y This option
+              specifies the white point and rgb values  follow-
+              ing the CIE-1931 spec.
+
+
+       -phys x y unit
+              This  option  determines  the aspect ratio of the
+              individual pixels of your image as  well  as  the
+              physical resolution of it.
+
+              unit  is either 0 or 1.  When it is 1, the option
+              specifies the physical resolution of the image in
+              pixels per meter.  For example, -phys 10000 15000
+              1 means that when someone displays the image,  he
+              should make it so that 10,000 pixels horizontally
+              occupy  1  meter  and  15,000  pixels  vertically
+              occupy  one  meter.   And even if he doesn't take
+              this advice on the overall size of the  displayed
+              image,  he  should  at least make it so that each
+              pixel displays as 1.5 times as high as wide.
+
+              When unit is 0, that means there is no advice  on
+              the  absolute  physical  resolution;  just on the
+              ratio of horizontal to vertical physical  resolu-
+              tion.
+
+              This  information goes into the PNG's pHYS chunk.
+
+              When you don't specify  -phys,  pnmtopng  creates
+              the  image with no pHYS chunk, which means square
+              pixels of no absolute resolution.
+
+
+       -text file
+              This option lets you include comments in the text
+              chunk  of  the PNG output.  file is the name of a
+              file that contains your text comments.
+
+              Here is an example of a comment file:
+                         Title           PNG file
+
+                         Author          Bryan Henderson
+
+                         Description     how to include a text chunk
+                                         PNG file
+                         "Creation date" 3-feb-1987
+
+                         Software        pnmtopng
+
+              The format of the file is as follows:   The  file
+              is divided into lines, delimited by newline char-
+              acters.  The  last  line  need  not  end  with  a
+              newline  character.  A group of consecutive lines
+              represents a comment.
+
+              A "delimiter character" is a blank or tab or null
+              character.  The first line representing a comment
+              must not start with a delimiter character.  Every
+              other  line in the group is a "continuation line"
+              and must start with a delimiter character.
+
+              The first line representing a comment consists of
+              a  keyword  and  the  first line of comment text.
+              The keyword begins in Column 1 of the  file  line
+              and continues up to, but not including, the first
+              delimiter character, or  the  end  of  the  line,
+              whichever  is  first.  Exception: you can enclose
+              the keyword in double quotes and spaces and  tabs
+              within the double quotes are part of the keyword.
+              The quotes are not part of the  keyword.   A  NUL
+              character is not allowed in a keyword.
+
+              The  first  line  of  the comment text is all the
+              text in the file line beginning after the keyword
+              and  any  delimiter characters after it.  immedi-
+              ately after the delimiter  character  that  marks
+              the end of the keyword.
+
+              A  continuation line defines a subsequent line of
+              the comment.  The comment line is all the text on
+              the  continuation  line  starting  with the first
+              non-delimiter character.
+
+              There is one newline character between every  two
+              comment  lines.   There  is  no newline character
+              after the last line of comment text.
+
+              There is no limit on the length of a file line or
+              keyword  or  comment  text  line or comment text.
+              There is no limit on the number  of  comments  or
+              size of or number of lines in the file.
+
+
+       -ztxt file
+              The  same as -text, except pnmtopng considers the
+              text compressed.
+
+
+       -time  yy-mm-dd hh:mm:ss
+              or -time yyyy-mm-dd hh:mm:ss This  option  allows
+              you  to specify the modification time value to be
+              placed in the PNG output.  You  can  specify  the
+              year  parameter  either  as  a  two digit or four
+              digit value.
+
+
+       -filter type
+              This option is  obsolete.   Before  Netpbm  10.22
+              (April  2004), this was the only way to specify a
+              row filter.  It specifies a single  type  of  row
+              filter, by number, that pnmtopng must use on each
+              row.
+
+              Use -nofilter, -sub, -up,  -avg,  and  -paeth  in
+              current Netpbm.
+
+
+       -nofilter
+
+       -sub
+
+       -up
+
+       -avg
+
+       -paeth Each of these options permits pnmtopng to use one
+              type of row filter.  pnmtopng  chooses  whichever
+              of  the permitted filters it finds to be optimal.
+              If you specify none of these options, it  is  the
+              same  as  specifying all of them -- pnmtopng uses
+              any row filter type it finds optimal.
+
+              These options were new with Netpbm  10.22  (April
+              2004).   Before  that,  you could use the -filter
+              option to specify one permitted row filter  type.
+              The  default, when you specify no filter options,
+              was the same.
+
+
+       -compression level
+               To explicitly set the compression level of  zlib
+              use this parameter.  Select a level between 0 for
+              no compression (maximum speed) and 9 for  maximum
+              compression (minimum speed).
+
+
+       -force When  you specify this, pnmtopng limits its opti-
+              mizations.  The resulting PNG output is as  simi-
+              lar  to  the Netpbm input as possible.  For exam-
+              ple, the PNG output will not be paletted and  the
+              alpha channel will be represented as a full alpha
+              channel even if the information could  be  repre-
+              sented more succinctly with a transparency chunk.
+
+
+
+       -libversion
+              This option causes pnmtopng  to  do  nothing  but
+              display  version  information about the libraries
+              it uses.
+
+
+
+
+SEE ALSO
+       pngtopnm(1), pnmremap(1), pnmgamma(1), pnm(1)
+
+       For    information    on    the    PNG    format,    see
+       http://schaik.com/png .
+
+
+AUTHORS
+       Copyright  (C) 1995-1997 by Alexander Lehmann and Willem
+       van Schaik.
+
+
+
+netpbm documentation       June 2002    Pnmtopng User Manual(0)

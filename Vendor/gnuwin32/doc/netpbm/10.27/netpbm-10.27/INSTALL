@@ -1,0 +1,276 @@
+HOW TO INSTALL NETPBM
+---------------------
+
+For most typical platforms, you can just do
+
+    configure
+
+followed by
+
+    make
+
+To build all the programs.  Then
+
+    make package
+
+to gather all the installable parts into a specified directory, and 
+finally
+
+    installnetpbm
+
+to install it into your system.  
+
+If you're building Latest Netpbm (as opposed to Stable Netpbm), there
+are probably known bugs.  Some may even prevent Netpbm from building.
+These are listed in the release notes for the release on Sourceforge.
+Check it out.
+
+The 'configure' program is not GNU Autoconf -- it is a simple program
+specific to Netpbm that prompts you for information about your system.
+If your system is not typical enough, you'll have to do a little more
+work, as described below under "custom installation."
+
+You need to use GNU Make even if nothing else on your system is GNU,
+because the Netpbm make files exploit many advanced features of GNU
+Make.  Often, systems have both GNU Make and a native Make.  In this
+case, GNU Make is named 'gmake'.  If you don't have it yet, see
+www.gnu.org/software.  GNU Make is free, easy to install, and works
+just about anywhere.
+
+The only tricky part about installing is setting up the shared
+libraries that are part of Netpbm.  Simply putting the library files
+in place may not be enough.  If you get mysterious "file not found"
+kinds of errors and are not an expert with shared libraries, see the
+section "SHARED LIBRARIES" below.
+
+The --keep-going option to Make is handy, because it causes Make to
+make anything it can, as opposed to quitting as soon as something goes
+wrong.  With so many parts having so many requirements, it's not
+unusual for a few things to fail to build, but that doesn't affect
+everything else.  You can work on the failed parts and repeat the make
+and it will attempt to build whatever it hasn't successfully built
+yet.
+
+
+AUTOMATING THE BUILD
+--------------------
+
+The build is already as automatic as Netpbm developers know how to make
+it without sacrificing your ability to build it a wide variety of ways.
+But if you're building for a specific range of applications, e.g. a
+particular standard system configuration, then you may want to write 
+programs to automate the build further.
+
+PLEASE don't do this by writing a program that invokes Netpbm's Configure
+program and tries to maintain a dialogue with Configure.  This is more work
+than you need to do and you will be disappointed with Configure's 
+unpredictability, especially from one release to the next.  Configure is
+specifically intended to talk to an intelligent human being.
+
+Rather, just write a program to generate the file Makefile.config.  That's
+all Configure does in the end anyway.  Like Configure, your program can
+simply copy Makefile.config.in and add overrides to the bottom.  Or you
+can just package up a complete Makefile.config and not run any program at
+all at build time.  Comments in Makefile.config.in explain the entire
+contents.  You can also run Configure interactively and use its output
+as an example.
+
+
+
+INSTALLATION - CYGWIN
+---------------------
+
+(See also the general installation instructions above).
+
+Cygwin is a software package that sets up a Unix-like platform on a
+Windows (win32) system.  Here are some specific things you need in
+that environment to build and use Netpbm.  All these programs and
+libraries are parts of cygwin package.
+
+   Programs: 
+    1) gcc suite 
+    2) binutils
+    3) bash
+    4) dlltool
+    5) flex & byacc
+    6) patch
+    7) install
+    8) rm, ln, cp and other file utilities
+   Libraries:
+    1) libtiff (cygtiff3.dll)
+    2) libpng  (cygpng2.dll)
+    3) libjpeg6b (cygjpeg6b.dll)
+    4) libz (cygz.dll)
+
+Find Cygwin at http://sources.redhat.com/cygwin/ .
+
+One problem special to Windows is the common existence of directories
+with space in their names (e.g. Windows 2000's "Documents and
+Settings" directory.  (Such filenames are possible on non-Windows
+systems, but are highly unconventional).  Don't try to build Netpbm in
+such a directory or with files in such a directory.  It ought to work,
+but it just doesn't.  And the error messages are far from helpful,
+since those spaces completely change the nature of the commands that
+include them.
+
+One way to deal with this is to use the Cygwin "mount" facility to map
+the Windows path "c:/Documents and Settings/aaa/bbb/cccc/Distributions" to
+something short and friendly, such as /Distributions.
+
+
+
+INSTALLATION - MAKING ONLY THE PARTS YOU NEED
+---------------------------------------------
+
+If you don't need the whole package, but just want one tool in it that you
+heard about, you can make just that one.  For example, to make Pnmtojpeg,
+just do
+
+  configure
+  cd converter/other
+  make pnmtojpeg
+
+It will build Pnmtojpeg and any of its dependencies, but nothing else.
+You have to install it manually.  
+
+When you build just one program, you should request static libraries
+in the configure step, because for just one program, the shared
+libraries would be pure masochism.
+
+
+CUSTOM BUILDING
+---------------
+
+This section explains how to customize the installation in the case
+that your platform is, or your requirements are, not among the simple
+cases that 'configure' understands.  'configure' is really just a
+convenient way to build the Makefile.config file, and in the most
+general case, you build that file manually.
+
+Makefile.config contains settings for various things that vary from
+one system to the next, like file paths.  Start with the distributed
+file Makefile.config.in.  Copy it as Makefile.config, then edit it.
+Search for your platform name (Solaris, SunOS, NetBSD, Cygwin, BeOS,
+and Tru64 are among those mentioned) to see recommended settings for
+your platform.
+
+If your system is even too exotic to accomodate with settings in
+Makefile.config, you may need to modify things in the main make files
+or pm_config.h.
+
+If you figure out how to install on other platforms, contact the
+Netpbm maintainer to have the 'configure' program or these
+instructions improved for the next person.
+
+
+CUSTOM INSTALLATION
+-------------------
+
+If the Installnetpbm program doesn't install the way you want, it is
+easy to install it manually using the package that 'make package'
+generates.  That package is just a directory full of files, and you
+should be able to tell by inspection what to do with those files (copy
+to /bin, etc).  If not, there will be a README file in the package to
+explain everything.
+
+
+INSTALLATION - SHARED LIBRARIES
+-------------------------------
+
+There are over 240 programs in the Netpbm package and they do a lot of
+common things.  In order to avoid the expense of copying the code for
+those common things into every program, Netpbm places them in a shared
+library: libnetpbm.  When you invoke a Netpbm program, your system
+notices that it needs this library and accesses it too.
+
+The tricky part of installing the shared (runtime) library is telling
+your system where to find it in the event that you invoke a Netpbm
+program.  And that varies from one system to the next.
+
+On a GNU libc system (essentially, any Linux system), if you put the
+Netpbm shared library in a conventional spot (say, /lib) and reboot
+your system, chances are you will have no trouble running Netpbm
+programs.  But if you want to fine tune things, read up on ld-linux.so
+(GNU libc's dynamic linker) and Ldconfig and consider the
+/etc/ld.so.conf file and LD_LIBRARY_PATH environment variables.  Use
+'ldd' to see if you have a shared library issue.  If it shows any
+shared library as "not found", you've got library trouble.
+
+On a Solaris system, use 'crle' to set the default search path for
+shared libraries (which is kept in /var/ld/ld.config).  Make sure that
+path includes the directory in which you installed the Netpbm shared
+library.  You can also use the LD_LIBRARY_PATH environment variable.
+
+Besides the Netpbm shared library, libnetpbm, several of the converter
+programs, e.g. Jpegtopnm, use separately distributed libraries that
+understand the graphics format involved.  You need to make sure your
+system knows how to find those libraries at run time too (or cause the
+Netpbm build to statically bind the libraries into the Netpbm programs).
+
+Another thing you can do is forget about library search paths and just
+build into each Netpbm executable the location of the Netpbm shared
+library.  (I'm talking about the classic -R linker option) You set
+this up with variables in Makefile.config.  If you use Configure to
+build Makefile.config, then for some platforms where this method is
+common, the Configure dialog asks you what directory, if any, you want
+built into Netpbm executables.
+
+One final note: New Netpbm executables often can run OK with an old
+Netpbm shared library.  This means if you don't correctly install
+the new library, you may run what you think is a new Netpbm program,
+but in actuality be accessing the old Netpbm library, and you may not
+even notice a problem right away.  But eventually, you may find some
+things not working the way they should.  Again, 'ldd' will give you 
+peace of mind.
+
+
+INSTALLATION WITHOUT SHARED LIBRARIES
+-------------------------------------
+
+Since shared libraries can be such a pain, and in fact some systems
+don't even have them, you can build Netpbm with a static library
+instead.  Just answer "static" to the static/shared question when you
+run 'configure' (if you don't use 'configure', set NETPBMLIBTYPE as
+directed in Makefile.config.in).
+
+If you do this, you probably want to do a merge build instead of the
+normal build (there's a question for that in the Configure program).
+See below.
+
+
+MERGE BUILD
+-----------
+
+There are two ways to build Netpbm: the standard or nonmerge build,
+and the merge build.  There are different make file targets for them
+and which one is default is controlled by the DEFAULT_TARGET make
+variable in Makefile.config, and its value is one of the choices you
+make via the Configure dialog.
+
+The standard build is the conventional one.  The merge build is a way
+to reduce disk space and other resource usage in some configurations.
+
+In the standard build, hundreds of separate programs get built: ppmtogif,
+pamcomp, etc.
+
+But the merge build creates a single large program called 'netpbm'
+instead.  That single 'netpbm' program contains the functions of all
+the individual programs that the standard build builds, and selects
+one of them to execute based on what command name you use to invoke
+'netpbm'.
+
+For example, if you install 'netpbm' with a symbolic link to it named
+'ppmtogif' and you invoke the program by typing 'ppmtogif' at a shell
+prompt, 'netpbm' executes Ppmtogif.
+
+Hence, 'make package' creates a package containing the one 'netpbm'
+program and lots of symbolic links to it.  With all these links
+properly installed, a typical user cannot tell the merge build from the
+standard build.
+
+
+DOCUMENTATION
+-------------
+
+Documentation is not packaged with the program source code.  See the
+file doc/USERDOC for information on installing documentation.

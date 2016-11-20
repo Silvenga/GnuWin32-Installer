@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: Finite Element Model mesh</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile FEM.html "Gri: Finite Element Model mesh" "Examples" --> 
+
+
+<!-- @node   Finite Element Model Mesh, Handling Data, Running Means, Examples -->
+<a name="FiniteElementModelMesh" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Examples.html#Examples" shape="rect" coords="516,2,532,24" href="Examples.html#Examples">
+<area alt="Gri: running means" shape="rect" coords="557,2,573,24" href="RunningMeans.html">
+<area alt="Gri: handling data" shape="rect" coords="581,2,599,24" href="HandlingData.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: handling data" shape="rect" coords="581,2,599,24" href="HandlingData.html">
+</map>
+<h2>8.11: Finite Element Model mesh</h2>
+
+
+Finite Element Models (used in fluid mechanics) employ non-rectangular
+meshes, and plotting these meshes requires a few intermediate steps.
+Consider the common case of triangular elements.  Suppose two data files
+exist describing the mesh, the first, `<font color="#82140F"><samp>model.nodes</samp></font>' say, consists
+of a description of the x-y coordinates of the nodes (vertices) of the
+triangles.  The second, `<font color="#82140F"><samp>model.elements</samp></font>' say, consists of a
+description of which triplet of nodes defines each triangle in the mesh.
+Here, from a sample application, is a node file called
+`<font color="#82140F"><samp>model.nodes</samp></font>':
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+1	1	1
+2	2	1
+3	1	2
+4	3	1.5
+5	2	2
+6	1.5	3
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Here is the corresponding file of the elements, called `<font color="#82140F"><samp>model.elements</samp></font>'
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+1	1	2	3
+2	2	5	3
+3	2	4	5
+4	3	5	6
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+In each of these files, the first column is a reference number.  Thus,
+`<font color="#82140F"><samp>model.elements</samp></font>' indicates that the first triangle is defined by
+the nodes numbered `<font color="#82140F"><code>1</code></font>', `<font color="#82140F"><code>2</code></font>' and `<font color="#82140F"><code>3</code></font>' as defined in
+`<font color="#82140F"><samp>model.nodes</samp></font>'.  More specifically, the triangle is defined by
+vertices at (x,y) locations (1,1), (2,1), and (1,2).
+<p>
+A Gri program, named `<font color="#82140F"><samp>FEM.gri</samp></font>', to draw the nodes is the following.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+set missing value -99.99
+# Create data using perl-script ...
+system FEM.pl model.nodes model.elements &gt; tmp
+# ... then plot it ...
+open tmp
+read columns x y
+close
+draw curve
+# ... and, finally, clean up the temporary file
+system rm tmp
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+The work of interpreting the data files is done by the perlscript that
+follows, named `<font color="#82140F"><samp>FEM.pl</samp></font>'
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+#!/usr/bin/perl -w
+$missing = -99.99;              # missing value
+$node_file = $ARGV[0];
+$element_file = $ARGV[1];
+open (NODE, $node_file)
+    or die "Cannot open '$node_file' file";
+open (ELEM, $element_file)
+    or die "Cannot open '$element_file' file";
+<p>
+# Read in node information, creating arrays 
+# named $node_x[] and $node_y[]. Check that 
+# the first column (the index) makes sense.
+$max_node = 1;
+while(&lt;NODE&gt;) {
+    ($index, $node_x[$max_node], $node_y[$max_node])
+        = split;
+    die "Node mismatch at index=$index" 
+        if ($index != $max_node);
+    $max_node++;
+}
+<p>
+# Read in triangle elements, into arrays
+# $a[], $b[], and $c[].  Check that the 
+# first column (the index) makes sense.
+$max_elem = 1;
+while(&lt;ELEM&gt;) {
+    ($index, $a[$max_elem], $b[$max_elem], $c[$max_elem]) 
+        = split;
+    die "Element mismatch at index=$index" 
+        if ($index != $max_elem);
+    $max_elem++;
+}
+<p>
+# Print out triangles suitable for plotting in gri.
+for ($i = 1; $i &lt; $max_elem; $i++) {
+    print $node_x[$a[$i]], " ", $node_y[$a[$i]], "\n";
+    print $node_x[$b[$i]], " ", $node_y[$b[$i]], "\n";
+    print $node_x[$c[$i]], " ", $node_y[$c[$i]], "\n";
+    # Repeat first, to close the triangle.
+    print $node_x[$a[$i]], " ", $node_y[$a[$i]], "\n";
+    print $missing, " ", $missing, "\n";
+}
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+The resultant image is below. 
+<IMG ALT="FEM image" SRC="FEM.png"> 
+
+
+
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

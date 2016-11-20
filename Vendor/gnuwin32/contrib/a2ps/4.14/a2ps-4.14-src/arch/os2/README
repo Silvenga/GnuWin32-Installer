@@ -1,0 +1,137 @@
+         =================================================
+         =     README for OS/2 version of A2PS 4.xx      =
+         =================================================
+
+                         (20000202)
+
+
+            CONTENTS OF THIS DOCUMENT:
+
+            1) What is A2PS ?
+            2) What about the OS/2 version ?
+            3) Contents of this archive:
+            4) Installation
+            5) Building a2ps for OS/2
+            6) Additional information
+
+
+
+1) What is A2PS ?
+   ************
+
+   A very powerful tool to print various file types on your
+   Postscript printer. Since it can delegate converting jobs a2ps
+   can handle almost every file format, provided you have it configured
+   accordingly, of course ;-)
+
+   For more and detailled information check out the supplied documentation
+   or visit it's homepage at
+      http://www.inf.enst.fr/~demaille/a2ps/
+
+
+2) What about the OS/2 version ?
+   ***************************
+
+   To get this utility built under OS/2 I had to work around the
+   configure stuff which didn't work even using the latest Autoconf
+   port.
+
+   The National Language Support (NLS) for the executable's language
+   dependent resources is not include here and I don't offer a
+   shared library (dll) since I can see no further use for this library yet.
+   NLS is nevertheless on my todo list.
+
+
+3) Contents of the binary distribution archive:
+   ********************************************
+
+   - the binary for OS/2 (a2ps.exe)
+   - the supplied shell scripts with a REXX wrapper. You need
+     an installed un*x shell (named sh.exe) in your path to run them.
+     NOTE: not all those utils may be included here actually!
+   - all data files for encoding, pretty printing, font selection, ...
+   - documentation in GNU info format and man pages as well as
+     documents regarding general issues (copyright, license,
+     changelog, ...)
+
+
+4) Installation:
+   ************
+
+   This assumes you have my OS/2 package of a2ps. Installation from sources
+   is more or less the same, once you have built the whole stuff ;-)
+
+   - Put a2ps.exe in the path and the manpage in the manpath.
+   - Adjust the configuration files (a2ps.cfg and a2ps-site.cfg)
+     to your local setup. (*)
+
+   - Store both files and the and the subdirectories
+     (afm, encoding, fonts, ppd, ps, sheets) anywhere on your disk.
+   - Set the environment variable A2PS_CONFIG to point to the
+     your a2ps.cfg file
+   - You're done ! :-)
+
+
+  (*) Additional remarks to the setup:
+     If you have my OS/2 binary package the .cfg files might already
+     have some (more or less) reasonable default values for some settings.
+     Two items are especially important:
+
+      1) 'LibraryPath':
+          it has to include all those directories mentioned above;
+          don't forget to use ';' as the path separator and '/' as the
+          directory separator!)
+      2)  the command to print out.
+          In the given example I use the lpr and lpd to access one of my
+          Postscript printer queues from the commandline. "lp" is a kind of
+          an alias for "lpr.exe -b -p HP5MPPSQ -s localhost" where HP5MPPSQ
+          is one my Postscript printer queues. Both tools are shipped with
+          Warp 4.
+          If you can't work out something similar try out starting ghostview
+          (or ghostscript) or print to a file first. You may want to use
+          "lportd" or tools like printmon.zip (from LEO or hobbes)
+
+
+5) Building ap2s for OS/2
+   **********************
+
+   If you want to compile it yourself you will likely run into trouble
+   using configure as even the latest Autoconf port may fail on this stuff.
+   Either you manage to fix the configure script yourself or
+   you have to create suitable versions of
+     config.h
+   and
+     Makefile.
+   Or you can just copy arch/os2/Makefile.os2 to the toplevel directory
+   and type "make -f Makefile.os2" :-)
+
+
+6) Additional information
+   **********************
+
+   Some OS/2 specific topics:
+
+   - Check whether the default encoding is set properly.
+     German OS/2 users may need to switch to ibm-cp850
+     (see a2ps-site.cfg)
+   - You can't use the OS/2 NULL device "nul" currently.
+     For this purpose use "/dev/null" (supplied by emx.dll)
+
+
+7) Availability
+   ************
+
+   The latest compiled version can be found on my webpages listed below.
+   There you can also find the utility 'file' which a2ps likes to call
+   to guess the the file type.
+
+
+---
+Alexander Mai
+st002279@hrzpub.tu-darmstadt.de
+mai@migdal.ikp.physik.tu-darmstadt.de
+http://www.tu-darmstadt.de/~st002279/os2
+
+
+This file has
+  $Id: README,v 1.1.1.1 2002/03/04 18:46:23 akim Exp $

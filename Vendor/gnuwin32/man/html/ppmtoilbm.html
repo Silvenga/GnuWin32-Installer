@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Ppmtoilbm User Manual</TITLE></HEAD>
+<BODY>
+<H1>ppmtoilbm</H1>
+Updated: 31 October 1993
+<BR>
+<A HREF="ppmtoilbm.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+ppmtoilbm - convert a PPM image into an ILBM file
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>ppmtoilbm</B>
+
+[<B>-maxplanes</B>|<B>-mp</B> <I>N</I>]
+
+[<B>-fixplanes</B>|<B>-fp</B> <I>N</I>]
+
+[<B>-ham6</B>|<B>-ham8</B>]
+
+[<B>-dcbits</B>|<B>-dcplanes</B>r<B>g</B>b<B>]</B>
+
+[
+<B>-normal</B>|<B>-hamif</B>|<B>-hamforce</B>|<B>-24if</B>|<B>-24force</B>|
+<b>-dcif</b>|<b>-dcforce</B>|<b>-cmaponly</B>
+]
+
+[<B>-ecs</B>|<B>-aga</B>]
+
+[<B>-compress</B>|<B>-nocompress</B>]
+
+[<B>-cmethod</B> <I>type</I>]
+
+[<B>-map</B> <i>ppmfile</i>]
+
+[<B>-savemem</B>]
+
+[<B>ppmfile</B>]
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>ppmtoilbm</b> reads a PPM image as input.  Produces an ILBM file
+as output.  <b>ppmtoilbm</b> understands the following ILBM types:
+
+<UL COMPACT>
+
+<LI>Normal ILBMs with 1-16 planes
+
+<LI>Amiga HAM with 3-16 planes
+
+<LI>24 bit
+
+<LI>Color map (BMHD + CMAP chunk only, nPlanes = 0)
+
+<LI>Unofficial direct color.  1-16 planes for each color component.
+
+</ul>
+
+<p>Chunks written: BMHD, CMAP, CAMG (only for HAM), BODY (not for
+colormap files) unofficial DCOL chunk for direct color ILBM.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<p>Options marked with (*) can be prefixed with a &quot;no&quot;,
+e.g. &quot;-nohamif&quot;.  All options can be abbreviated to their
+shortest unique prefix.
+
+<DL COMPACT>
+<DT><B>-maxplanes</b> | <b>-mp</b> <i>n</i>
+
+<DD>(default 5, minimum 1, maximum 16) Maximum planes to write in a
+normal ILBM.  If the pixmap does not fit into &lt;n&gt; planes,
+ppmtoilbm writes a HAM file (if -hamif is used), a 24bit file (if
+-24if is used) or a direct color file (if -dcif is used) or aborts
+with an error.
+
+<DT><B>-fixplanes</b> | <b>-fp</b> <i>b</i>
+
+<DD>(min 1, max 16) If a normal ILBM is written, it will have exactly
+&lt;n&gt; planes.
+
+<DT><B>-hambits</b> | <b>-hamplanes</b> <i>n</i>
+
+<DD>(default 6, min 3, max 16) Select number of planes for HAM
+picture.  The current Amiga hardware supports 6 and 8 planes, so for
+now you should only use this values.
+
+<DT><B>-normal</B>
+
+<DD>Turns off -hamif/-24if/-dcif, -hamforce/-24force/-dcforce and
+-cmaponly.  Also sets compression type to byterun1.
+
+<p>This is the default.
+
+<DT><B>-hamif</B> (*)
+<DT><B>-24if</B> (*)
+<DT><B>-dcif</B> (*)
+
+<DD>Write a HAM/24bit/direct color file if the image does not fit into
+&lt;maxplanes&gt; planes.
+
+<DT><B>-hamforce</B> (*)
+<DT><B>-24force</B> (*)
+<DT><B>-dcforce</B> (*)
+
+<DD>Write a HAM/24bit/direct color file.
+
+<DT><B>-dcbits</b> | <b>-dcplanes</b> <i>r</i> <i>g</i> <i>b</i>
+
+<DD>(default 5, min 1, max 16).  Select number of bits for red, green
+&amp; blue in a direct color ILBM.
+
+<DT><B>-ecs</B>
+
+<DD>Shortcut for: -hamplanes 6 -maxplanes 5
+
+<p>This is the default.
+
+<DT><B>-aga</B>
+
+<DD>Shortcut for: <b>-hamplanes 8 -maxplanes 8</B>
+
+<DT><B>-ham6</B>
+
+<DD>Shortcut for: <b>-hamplanes 6 -hamforce</B>
+
+<DT><B>-ham8</B>
+
+<DD>Shortcut for: <b>-hamplanes 8 -hamforce</b>
+
+<DT><B>-compress</B> (*)
+
+<DD>This is the default.
+
+<DD>Compress the BODY chunk.  The default compression method is
+byterun1.  Compression requires building the ILBM image in memory;
+turning compression off allows stream-writing of the image, but the
+resulting file will usually be 30% to 50% larger.  Another alternative
+is the -savemem option, this will keep memory requirements for
+compression at a minimum, but is very slow.
+
+<DT><B>-cmethod</b> <b>none</b>|<b>byterun1</B>
+
+<DD>This option does the same thing as <b>-compress</b>.
+
+<DT><B>-map</b> <i>ppmfile</i>
+
+<DD>Write a normal ILBM using the colors in &lt;ppmfile&gt; as the
+colormap.  The colormap file also determines the number of planes, a
+<b>-maxplanes</b> or <b>-fixplanes</b> option is ignored.
+
+<DT><B>-cmaponly</B>
+
+<DD>Write a colormap file: only BMHD and CMAP chunks, no BODY chunk,
+nPlanes = 0.
+
+<DT><B>-savemem</B>
+
+<DD>See the <b>-compress</b> option.
+
+</DL>
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>LIMITATIONS</H2>
+
+<p>HAM pictures will always get a grayscale colormap; a real color
+selection algorithm might give better results.  On the other hand,
+this allows row-by-row operation on HAM images, and all HAM images of
+the same depth (no. of planes) share a common colormap, which is
+useful for building HAM animations.
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>REFERENCES</H2>
+
+Amiga ROM Kernel Reference Manual - Devices (3rd Ed.)
+<BR>
+Addison Wesley, ISBN 0-201-56775-X
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<A HREF="ppm.html">ppm</A>, 
+<A HREF="ilbmtoppm.html">ilbmtoppm</A>
+
+<A NAME="lbAI">&nbsp;</A>
+<H2>AUTHORS</H2>
+
+<p>Copyright (C) 1989 by Jef Poskanzer.
+
+<p>Modified October 1993 by Ingo Wilken (<A
+HREF="mailto:Ingo.Wilken@informatik.uni-oldenburg.de">Ingo.Wilken@informatik.uni-oldenburg.de</A>)
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="ppmtoilbm.html#lbAB">NAME</A>
+<LI><A HREF="ppmtoilbm.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="ppmtoilbm.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="ppmtoilbm.html#lbAE">OPTIONS</A>
+<LI><A HREF="ppmtoilbm.html#lbAF">LIMITATIONS</A>
+<LI><A HREF="ppmtoilbm.html#lbAG">REFERENCES</A>
+<LI><A HREF="ppmtoilbm.html#lbAH">SEE ALSO</A>
+<LI><A HREF="ppmtoilbm.html#lbAI">AUTHORS</A>
+</UL>
+</BODY>
+</HTML>

@@ -1,0 +1,380 @@
+<html>
+<head>
+<title>../../../gri-2.12.10-src/doc/tst_suite/tst_var_syn.gri</title>
+</head>
+<body bgcolor="#FFFFFF">
+<i># This html document was prepared by gri2html based on the Gri script named</i>
+<br><i>#    <a href="../../../gri-2.12.10-src/doc/tst_suite/tst_var_syn.gri">../../../gri-2.12.10-src/doc/tst_suite/tst_var_syn.gri</a></i>
+<br># <i>Gri is available for free at <a href="http://gri.sourceforge.net">http://gri.sourceforge.net</a></i>
+<pre>
+show <font color=#2F4F4F>"doc/tst_suite/tst_var_syn.gri ..."</font> ...
+rpnfunction same - abs 1e-10 &gt;          <font color=#B22222># Are numbers virtually same?</font>
+
+<font color=#B22222># New and delete (variables)</font>
+ <font color=#0000EE>.v. =</font> 1
+new<font color=#CDAD00> .v.</font>
+<font color=#0000EE>.v. =</font> 2
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .v.</font> 2 same}                 <font color=#2F4F4F>" failed test 1.1"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>".v." defined}              " failed test 1.2"</font>
+delete<font color=#CDAD00> .v.</font>
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .v.</font> 1 same}                 <font color=#2F4F4F>" failed test 1.3"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>".v." defined}              " failed test 1.4"</font>
+delete<font color=#CDAD00> .v.</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>".v." defined !}            " failed test 1.4"</font>
+
+<font color=#B22222># New and delete (synonyms)</font>
+<font color=#0000EE>\v =</font> <font color=#2F4F4F>"hi"</font>
+new<font color=#0000EE> \v
+</font><font color=#0000EE>\v =</font> <font color=#2F4F4F>"hello"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\v" "hello" =</font>=}            " failed test 2.1"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\\v" defined}              " failed test 2.2"</font>
+delete<font color=#0000EE> \v
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\v" "hi" =</font>=}               " failed test 2.3"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\\v" defined}              " failed test 2.4"</font>
+delete<font color=#0000EE> \v
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\\v" defined !}            " failed test 2.5"</font>
+
+<font color=#B22222># Multi-word synonyms</font>
+<font color=#0000EE>\h =</font> <font color=#2F4F4F>"Hi there buddy"</font>
+assert {<font color=#9400D3>rpn</font>  <font color=#0000EE>\[]h    3      =</font>=}         <font color=#2F4F4F>" failed test 3.1"</font>
+<font color=#0000EE>.i. =</font><font color=#0000EE> \[]h
+</font>assert {<font color=#9400D3>rpn</font> <font color=#CDAD00> .i.</font>     3      ==}         <font color=#2F4F4F>" failed test 3.2"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\[0]h" "Hi"    =</font>=}         " failed test 3.3"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\[1]h" "there" =</font>=}         " failed test 3.4"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\[2]h" "buddy" =</font>=}         " failed test 3.5"</font>
+<font color=#0000EE>\h =</font> <font color=#2F4F4F>"Hi means<font color=#0000EE> \"hello\""</font>
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\[0]h" "Hi"        =</font>=}     " failed test 3.6"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\[1]h" "means"     =</font>=}     " failed test 3.7"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\[2]h" "\"hello<font color=#0000EE>\"" =</font>=}     " failed test 3.8"</font>
+<font color=#0000EE>.i. =</font> 1
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\[.i.]h" "means"   =</font>=}     " failed test 3.9"</font>
+<font color=#0000EE>\i =</font> <font color=#2F4F4F>"1"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\[<font color=#0000EE>\i]h"  "means"   =</font>=}     " failed test 3.10"</font>
+
+<font color=#B22222># Setting by quoted name</font>
+set <font color=#2F4F4F>".var."</font> to 10
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .var.</font> 10 ==}                <font color=#2F4F4F>" failed test 4.1"</font>
+set <font color=#2F4F4F>"\\syn" to "hi"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\syn" "hi" =</font>=}             " failed test 4.2"</font>
+
+<font color=#B22222># Setting by quoted name, in a new command</font>
+<font color=#0000EE>`hi pi <font color=#2F4F4F>"\\Greeting" ".Pi."</font>'</font>
+{
+    set <font color=#2F4F4F>"<font color=#CDAD00>\.word2.</font>" to "hi"</font>
+    set <font color=#2F4F4F>"<font color=#CDAD00>\.word3.</font>"</font> to 3.14
+}
+hi pi <font color=#2F4F4F>"\\g" ".p."</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\g" "hi" =</font>=}                       " failed test 5.1"</font>
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .p.</font>  3.14 ==}                       <font color=#2F4F4F>" failed test 5.2"</font>
+
+<font color=#B22222># Execution of synonyms</font>
+<font color=#0000EE>\ret =</font> <font color=#2F4F4F>"\string =<font color=#0000EE> \"Hello\""</font>
+</font>\ret
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\string" "Hello" =</font>=}               " failed test 6.1"</font>
+
+<font color=#B22222># Parsing of individual words in synonyms (tests SourceForge bug 114983)</font>
+<font color=#0000EE>`Newcommand <font color=#2F4F4F>"\pat"</font>''</font>
+{
+    <font color=#0000EE>\t =</font> <font color=#2F4F4F>"A .2"</font> 
+    assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\[0].word1." "<font color=#0000EE>\[0]t" =</font>=}       " failed test 7.1"</font>
+} 
+Newcommand <font color=#2F4F4F>"A .2"</font> 
+
+<font color=#B22222># Test aliased synonyms</font>
+
+<font color=#B22222># Part 1. check to see if can delete without either a </font>
+<font color=#B22222># single or a double backslash, and either with </font>
+<font color=#B22222># enclosing double-quotes, or not.</font>
+<font color=#0000EE>\a =</font> <font color=#2F4F4F>"HI"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\\a"    defined   }                " failed test 8.1"</font>
+delete<font color=#0000EE> \a
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\\a"    defined ! }                " failed test 8.2"</font>
+<font color=#0000EE>\a =</font> <font color=#2F4F4F>"HI"</font>
+delete<font color=#0000EE> \a
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\\a"    defined ! }                " failed test 8.3"</font>
+
+new<font color=#0000EE> \a
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\\a"     defined   }               " failed test 9.1"</font>
+<font color=#0000EE>\a =</font> <font color=#2F4F4F>"greeting"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\\a"     defined   }               " failed test 9.2"</font>
+delete<font color=#0000EE> \a
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\\a"     defined ! }               " failed test 9.3"</font>
+
+<font color=#B22222># Part 5. sprintf</font>
+sprintf<font color=#0000EE> \a</font> <font color=#2F4F4F>"%.1f"</font> 10
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\a" "10.0" =</font>= }                    " failed test 10.1"</font>
+<font color=#0000EE>\alias_for_a =</font> <font color=#2F4F4F>"\\a"</font>
+sprintf<font color=#0000EE> \@alias_for_a</font> <font color=#2F4F4F>"%.1f"</font> 20
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\a" "20.0" =</font>= }                    " failed test 10.2"</font>
+
+<font color=#B22222># Part 6. Environment variables (SF bug 117415)</font>
+<font color=#0000EE>\alias_for_a =</font> <font color=#2F4F4F>"\\a"</font>
+get env<font color=#0000EE> \@alias_for_a</font> <font color=#2F4F4F>"SHELL"</font>
+get env<font color=#0000EE> \b</font> <font color=#2F4F4F>"SHELL"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\a" "<font color=#0000EE>\b" =</font>=}                       " failed test 11.1"</font>
+
+<font color=#B22222># Part 7 'read' (SF bug 117412)</font>
+<font color=#0000EE>\TMPFILE =</font> tmpname
+<font color=#9400D3>system</font> <font color=#FF0000>echo <font color=#2F4F4F>"Hello"</font> &gt;<font color=#0000EE> \TMPFILE</font>
+</font>open <font color=#2F4F4F>"\TMPFILE"</font>
+read<font color=#0000EE> \a
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\a" "Hello" =</font>=}                    " failed test 12.1"</font>
+<font color=#0000EE>\a =</font> <font color=#2F4F4F>"JUNK"</font>
+<font color=#0000EE>\alias_for_a =</font> <font color=#2F4F4F>"\\a"</font>
+rewind
+read<font color=#0000EE> \\a
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\a" "Hello" =</font>=}                    " failed test 12.2"</font>
+<font color=#0000EE>\a =</font> <font color=#2F4F4F>"JUNK"</font>
+<font color=#0000EE>\alias_for_a =</font> <font color=#2F4F4F>"\\a"</font>
+rewind
+read<font color=#0000EE> \@alias_for_a
+</font>close
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\a" "Hello" =</font>=}                    " failed test 12.3"</font>
+<font color=#9400D3>system</font> <font color=#FF0000>rm -f<font color=#0000EE> \TMPFILE</font>
+</font>
+<font color=#B22222># Part 8 -- ensure not trying to evaluate inside 'false' if parts.</font>
+<font color=#0000EE>\str =</font> <font color=#2F4F4F>"Hello"</font>
+<font color=#0000EE>\t =</font> {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\s" "tr"</font> strcat}	<font color=#B22222># construct a name</font>
+<font color=#9400D3>if</font> {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\\t"</font> defined}		<font color=#B22222># test <font color=#9400D3>if</font> defined</font>
+    <font color=#0000EE>.val. =</font> 1
+<font color=#9400D3>end if</font>
+<font color=#9400D3>if</font> {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\\x"</font> defined}		<font color=#B22222># this one is not defined</font>
+    <font color=#0000EE>.val. =</font> 2
+<font color=#9400D3>end if</font>
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .val.</font> 1 ==}                         <font color=#2F4F4F>" failed test 12.4"</font>
+
+<font color=#B22222>#</font>
+<font color=#0000EE>\a1 =</font> <font color=#2F4F4F>"1"</font>
+<font color=#0000EE>\b1 =</font> <font color=#2F4F4F>"2"</font>
+<font color=#0000EE>\a2 =</font> <font color=#2F4F4F>"10"</font>
+<font color=#0000EE>\b2 =</font> <font color=#2F4F4F>"20"</font>
+read columns x y
+\a1<font color=#0000EE> \b1
+</font>\a2<font color=#0000EE> \b2
+</font>
+assert {<font color=#9400D3>rpn</font> x 0 @  1 ==}                        <font color=#2F4F4F>" failed test 13.1"</font>
+assert {<font color=#9400D3>rpn</font> x 1 @ 10 ==}                        <font color=#2F4F4F>" failed test 13.2"</font>
+assert {<font color=#9400D3>rpn</font> y 0 @  2 ==}                        <font color=#2F4F4F>" failed test 13.3"</font>
+assert {<font color=#9400D3>rpn</font> y 1 @ 20 ==}                        <font color=#2F4F4F>" failed test 13.4"</font>
+
+<font color=#0000EE>`NC ...'</font>
+{
+    read columns x y
+   <font color=#0000EE> \.word1</font> <font color=#CDAD00>\.word2.</font>
+    
+}
+NC 1 10
+assert {<font color=#9400D3>rpn</font> x 0 @  1 ==}                        <font color=#2F4F4F>" failed test 14.1"</font>
+assert {<font color=#9400D3>rpn</font> y 0 @ 10 ==}                        <font color=#2F4F4F>" failed test 14.2"</font>
+
+<font color=#0000EE>\a =</font> <font color=#2F4F4F>"1  2"</font>
+<font color=#0000EE>\b =</font> <font color=#2F4F4F>"10 20"</font>
+<font color=#0000EE>\index =</font> <font color=#2F4F4F>"0"</font>
+read columns x y
+\[\index]a<font color=#0000EE> \[1]b
+</font>
+assert {<font color=#9400D3>rpn</font> x 0 @  1 ==}                        <font color=#2F4F4F>" failed test 15.1"</font>
+assert {<font color=#9400D3>rpn</font> y 0 @ 20 ==}                        <font color=#2F4F4F>" failed test 15.2"</font>
+
+
+<font color=#0000EE>`NC2 ...'</font>
+{
+    read columns x y
+   <font color=#0000EE> \[0].word1.</font><font color=#0000EE> \[0].word2.
+</font>   <font color=#0000EE> \[1].word1.</font><font color=#0000EE> \[1].word2.
+</font>    
+}
+NC2 <font color=#2F4F4F>"1 2" "100 200"</font>
+assert {<font color=#9400D3>rpn</font> x 0 @   1 ==}                        <font color=#2F4F4F>" failed test 16.1"</font>
+assert {<font color=#9400D3>rpn</font> x 1 @   2 ==}                        <font color=#2F4F4F>" failed test 16.2"</font>
+assert {<font color=#9400D3>rpn</font> y 0 @ 100 ==}                        <font color=#2F4F4F>" failed test 16.3"</font>
+assert {<font color=#9400D3>rpn</font> y 1 @ 200 ==}                        <font color=#2F4F4F>" failed test 16.4"</font>
+
+
+<font color=#B22222># Part 9. New commands with variables</font>
+
+<font color=#B22222># Rvalue: synonyms/variables</font>
+<font color=#0000EE>`ampersand_rvalue &.v. &\s'</font>
+{
+    new<font color=#0000EE> \syn
+</font>    <font color=#0000EE>\syn =</font> <font color=#2F4F4F>"Shadow"</font>
+    new<font color=#CDAD00> .a.</font>
+    <font color=#0000EE>.a. =</font> 0
+    assert {<font color=#9400D3>rpn</font> <font color=#0000EE><font color=#CDAD00>\.word1.</font> 1 =</font>=}                   <font color=#2F4F4F>" failed test 17.1"</font>
+    assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE><font color=#CDAD00>\.word2.</font>" "Brightness" =</font>=}      " failed test 17.2"</font>
+    delete<font color=#0000EE> \syn
+</font>    delete<font color=#CDAD00> .a.</font>
+}
+<font color=#0000EE>.a. =</font> 1
+<font color=#0000EE>\syn =</font> <font color=#2F4F4F>"Brightness"</font>
+ampersand_rvalue &.a. &\syn
+
+<font color=#B22222># Rvalue + Lvalue: synonym</font>
+<font color=#0000EE>`append &\s'</font>
+{
+    <font color=#0000EE><font color=#0000EE>\<font color=#0000EE>.word1. =</font></font></font> <font color=#2F4F4F>"<font color=#CDAD00>\.word1.</font> and bye"</font>
+}
+<font color=#0000EE>\a =</font> <font color=#2F4F4F>"hi"</font>
+append &\a
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\a" "hi and bye" =</font>=}                "failed test 18.3"</font>
+
+<font color=#B22222># Rvalue + Lvalue: variable in the = form of assignment</font>
+<font color=#0000EE>`double &.var.'</font>
+{
+    <font color=#0000EE><font color=#0000EE>\<font color=#0000EE>.word1. =</font></font></font> {<font color=#9400D3>rpn</font> <font color=#CDAD00>\.word1.</font> 2 *}
+}
+<font color=#0000EE>.a. =</font> 10
+double &.a.
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .a.</font> 20 ==}                           <font color=#2F4F4F>"failed test 18.4"</font>
+
+<font color=#0000EE>`Double &.var.'</font>
+{
+    <font color=#0000EE><font color=#0000EE>\<font color=#0000EE>.word1. *=</font></font></font> 2
+}
+<font color=#0000EE>.a. =</font> 10
+Double &.a.
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .a.</font> 20 ==}                          <font color=#2F4F4F>" failed test 18.5"</font>
+
+<font color=#0000EE>`halve &.var.'</font>
+{
+    <font color=#0000EE><font color=#0000EE>\<font color=#0000EE>.word1. =</font></font></font> {<font color=#9400D3>rpn</font> <font color=#CDAD00>\.word1.</font> 2 /}
+}
+halve &.a.
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .a.</font> 10 ==}                          <font color=#2F4F4F>" failed test 18.6"</font>
+
+<font color=#0000EE>`NC3 &\friendly'</font>
+{
+    <font color=#0000EE><font color=#0000EE>\<font color=#0000EE>.word1. =</font></font></font> <font color=#2F4F4F>"Howdy"</font>
+}
+<font color=#0000EE>\greeting =</font> <font color=#2F4F4F>"Hi"</font>
+NC3 &\greeting
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\greeting" "Howdy" =</font>=}             " failed test 18.7"</font>
+
+<font color=#0000EE>`postpend_dat &\filename'</font>
+{
+    <font color=#0000EE><font color=#0000EE>\<font color=#0000EE>.word1. =</font></font></font> {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#CDAD00>\.word1.</font>" ".dat"</font> strcat}
+}
+<font color=#0000EE>\filename =</font> <font color=#2F4F4F>"test"</font>
+postpend_dat &\filename
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"test.dat" "<font color=#0000EE>\filename" =</font>=}           " failed test 18.8"</font>
+
+<font color=#B22222># new</font>
+<font color=#0000EE>`test_new &\s'</font>
+{
+    new <font color=#CDAD00>\.word1.</font>
+    new<font color=#0000EE> \a
+</font>    <font color=#0000EE>\a =</font> <font color=#2F4F4F>"This will dissapear"</font>
+    <font color=#0000EE><font color=#0000EE>\<font color=#0000EE>.word1. =</font></font></font> <font color=#2F4F4F>"Think locally"</font>
+    delete<font color=#0000EE> \a
+</font>}
+<font color=#0000EE>\a =</font> <font color=#2F4F4F>"Act globally"</font>
+test_new &\a
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\a" "Think locally" =</font>=}             " failed test 18.9"</font>
+delete<font color=#0000EE> \a
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\a" "Act globally" =</font>=}              " failed test 18.10"</font>
+
+<font color=#0000EE>`test_new_delete &\s'</font>
+{
+    new<font color=#0000EE> \a
+</font>    <font color=#0000EE>\a =</font> <font color=#2F4F4F>"Insurrection"</font>
+    assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE><font color=#CDAD00>\.word1.</font>" "Act globally" =</font>=}    " failed test 18.11"</font>
+    delete <font color=#CDAD00>\.word1.</font>
+    assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE><font color=#CDAD00>\.word1.</font>" "Or <font color=#9400D3>else</font>" =</font>=}         " failed test 18.12"</font>
+    delete<font color=#0000EE> \a
+</font>}
+<font color=#0000EE>\a =</font> <font color=#2F4F4F>"Or <font color=#9400D3>else</font>"</font>
+new<font color=#0000EE> \a
+</font><font color=#0000EE>\a =</font> <font color=#2F4F4F>"Act globally"</font>
+test_new_delete &\a
+
+<font color=#B22222># Nexting</font>
+<font color=#0000EE>`nest2 &.v. &\s'</font>
+{
+    assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE><font color=#CDAD00>\.word1.</font>" "HI" =</font>=}              " failed test 18.13"</font>
+    assert {<font color=#9400D3>rpn</font> <font color=#0000EE><font color=#CDAD00>\.word2.</font> 0.5 =</font>=}                 <font color=#2F4F4F>" failed test 18.14"</font>
+}
+<font color=#0000EE>`nest1 &.v. &\s'</font>
+{
+    nest2 &<font color=#CDAD00>\.word2.</font> &<font color=#CDAD00>\.word1.</font>	<font color=#B22222># reversed</font>
+}
+<font color=#0000EE>.a. =</font> 0.5
+<font color=#0000EE>\s =</font> <font color=#2F4F4F>"HI"</font>
+nest1 &.a. &\s
+<font color=#B22222># defined</font>
+<font color=#0000EE>`check_defined &.v.'</font>
+{
+    assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\<font color=#CDAD00>\.word1.</font>" defined}             " failed test 18.15"</font>
+    delete<font color=#CDAD00> .a.</font>
+    assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"\<font color=#CDAD00>\.word1.</font>" defined !}           " failed test 18.16"</font>
+}
+<font color=#0000EE>.a. =</font> 100
+check_defined &.a.
+
+<font color=#B22222># System</font>
+<font color=#0000EE>\t =</font> <font color=#9400D3>system</font> <font color=#FF0000>perl &lt;&lt;<font color=#2F4F4F>"EOF"</font> </font>
+{print <font color=#2F4F4F>"Hi"</font>}; 
+EOF 
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\t" "Hi" =</font>=}                       " failed test 19.1"</font>
+<font color=#0000EE>\t =</font> <font color=#9400D3>system</font> <font color=#FF0000>perl &lt;&lt;<font color=#2F4F4F>"EOF"</font> </font>
+{print <font color=#2F4F4F>"Hello"</font>}; 
+ EOF 
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\t" "Hello" =</font>=}                    " failed test 19.2"</font>
+<font color=#0000EE>`NC4'</font>
+{ 
+    <font color=#0000EE>\t =</font> <font color=#9400D3>system</font> <font color=#FF0000>perl &lt;&lt;<font color=#2F4F4F>"EOF"</font> </font>
+    {print <font color=#2F4F4F>"Howdie"</font>};
+EOF 
+} 
+NC4
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\t" "Howdie" =</font>=}                   " failed test 19.3"</font>
+<font color=#0000EE>`NC5'</font>
+{ 
+    <font color=#0000EE>\t =</font> <font color=#9400D3>system</font> <font color=#FF0000>perl &lt;&lt;<font color=#2F4F4F>"EOF"</font> </font>
+        {print <font color=#2F4F4F>"G'day"</font>};
+    EOF 
+} 
+NC5
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\t" "G'day" =</font>=}                    " failed test 19.4"</font>
+
+<font color=#B22222>### BLOCK 20 ###</font>
+<font color=#B22222># Alias as lvalue (e.g. \@ptr = ...)</font>
+<font color=#B22222># (1) lvalue synonyms</font>
+<font color=#0000EE>\greeting =</font> <font color=#2F4F4F>"You say goodbye"</font>
+<font color=#0000EE>\alias =</font> <font color=#2F4F4F>"\\greeting"</font>
+<font color=#0000EE>\@alias =</font> <font color=#2F4F4F>"And I say hello"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\greeting" "And I say hello" =</font>=}   " failed test 20.1"</font>
+<font color=#B22222># (2) lvalue variables</font>
+<font color=#0000EE>.b. =</font> 1
+<font color=#0000EE>\bptr =</font> <font color=#2F4F4F>".b."</font>
+<font color=#0000EE>\@bptr *=</font> 2
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .b.</font> 2 ==}                           <font color=#2F4F4F>" failed test 20.2"</font>
+<font color=#0000EE>\@bptr =</font> 10
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .b.</font> 10 ==}                          <font color=#2F4F4F>" failed test 20.3"</font>
+
+<font color=#B22222># Alias as rvalue (e.g. show "\@ptr")</font>
+<font color=#B22222># (1) rvalue synonyms</font>
+<font color=#0000EE>\a =</font> <font color=#2F4F4F>"HI"</font>
+<font color=#0000EE>\aptr =</font> <font color=#2F4F4F>"\\a"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\@aptr" "HI" =</font>=}                   " failed test 20.4"</font>
+<font color=#0000EE>\@aptr =</font> <font color=#2F4F4F>"BYE"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\@aptr" "BYE" =</font>=}                  " failed test 20.5"</font>
+<font color=#0000EE>\aa =</font> <font color=#2F4F4F>"\@aptr"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\@aptr" "BYE" =</font>=}                  " failed test 20.6"</font>
+<font color=#B22222># (2) rvalue variables</font>
+<font color=#0000EE>.a. =</font> 1
+<font color=#0000EE>\aptr =</font> <font color=#2F4F4F>".a."</font>
+assert {<font color=#9400D3>rpn</font> <font color=#0000EE>\@aptr 1 =</font>=}                        <font color=#2F4F4F>" failed test 20.7"</font>
+<font color=#0000EE>.aa. =</font> {<font color=#9400D3>rpn</font><font color=#CDAD00> .a.</font> 1 +}
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .aa.</font> 2 ==}                          <font color=#2F4F4F>" failed test 20.8"</font>
+
+<font color=#B22222># Missing values</font>
+set missing value 0
+<font color=#0000EE>.x. =</font> 0
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .x.</font> ismissing}                      <font color=#2F4F4F>" failed test 21.1"</font>
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .x.</font> 1 + ismissing}                  <font color=#2F4F4F>" failed test 21.2"</font>
+set missing value 1e33
+
+show <font color=#2F4F4F>" passed"</font>
+</pre>
+</body>
+</html>

@@ -1,0 +1,54 @@
+UNSLICE(1)                                           UNSLICE(1)
+
+
+
+
+
+NAME
+       unslice - Quickly assemble image slices
+
+SYNOPSIS
+       unslice  [  -f  ctlfile  ]  [  -y  ymax ] [ -o outfile ]
+       infiles ...
+
+DESCRIPTION
+       Unslice quickly assembles a number of  horizontal  image
+       strips  into  a  single output image.  A typical use for
+       unslice  is  to  put  together  portions  of  an   image
+       ("slices")  computed  independently into a single output
+       picture.  Because unslice uses  the  "raw"  RLE  library
+       calls  to read and write the images, it runs much faster
+       than doing the equivalent operations with crop and comp.
+
+       unslice  has  two  modes  of operation.  If given the -f
+       flag, unslice reads a control file  telling  it  how  to
+       assemble the images.  This is a text file with two deci-
+       mal numbers on each line, one line for each slice to  be
+       assembled  into  the  output image.  Each line gives the
+       starting and stopping  scanlines  (inclusive)  for  each
+       slice.   These must be in ascending order.  This is use-
+       ful if the slices have excess image area that should  be
+       cropped away.
+
+       If  no control file is given, the -y flag is used.  This
+       tells unslice what the maximum Y  value  of  the  output
+       image  is.   Unslice reads the files in order, using the
+       RLE headers to determine where to place the slices.   If
+       two  slices overlap, the first scanlines from the second
+       slice are thrown away.  In both cases, the  slices  must
+       be in ascending order, and are expected to be of uniform
+       width.
+
+SEE ALSO
+       crop(1),  rlecomp(1),  rlepatch(1),  repos(1),   urt(1),
+       RLE(5).
+
+AUTHOR
+       John W. Peterson
+
+BUGS
+       Unslice has really been superceded by rlepatch(1).
+
+
+
+1                         May 21, 1987               UNSLICE(1)

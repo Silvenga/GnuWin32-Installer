@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: contour plots</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile ContourPlots.html "Gri: contour plots" "Contour Plots" --> 
+
+<!-- @node   Contour Plots, Pre-gridded Data, Formula Plots, Top -->
+<a name="ContourPlots" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="index.html#Top" shape="rect" coords="516,2,532,24" href="index.html#Top">
+<area alt="Gri: xy plots" shape="rect" coords="557,2,573,24" href="X-Y.html">
+<area alt="Gri: image plots" shape="rect" coords="581,2,599,24" href="Images.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: image plots" shape="rect" coords="581,2,599,24" href="Images.html">
+</map>
+<h1>6: Contour Plots</h1>
+
+Contour plots can be done with either pregridded data or randomly
+distributed (ie, ungridded) data.
+<UL>
+<LI><a href="ContourPlots.html#Pre-griddedData">Pre-gridded Data</a>: Contouring f(x1, y1, x2, y2, ...)
+<LI><a href="ContourPlots.html#UngriddedData">Ungridded Data</a>: Contouring f(x, y) where (x,y) are not on a grid
+</UL>
+<p>
+<!-- @node   Pre-gridded Data, Ungridded Data, Contour Plots, Contour Plots -->
+<a name="Pre-griddedData" ></a>
+<h2>6.1: Pre-gridded Data</h2>
+
+This section presents two examples of contouring pre-gridded data, the
+first example illustrating a boilerplate program to contour data
+stored in a simple matrix form in a file, the second example
+illustrating a case with more control of the details (e.g., a nonuniform
+grid).
+<p>
+
+<h3>6.1.1: Simple example</h3>
+
+This example was hardwired to know the size of the grid, etc.  Here's 
+an example which is more general, in that it determines the dimensions
+of the grid data from using unix system commands.  Note that the grid is
+set to run from 0 to 1 in both x and y; you'll most likely want
+to change that after you see the initial plot, but this should get you 
+started.
+<p>
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\file = "somefile.dat"
+\rows = system wc \file      | awk '{print $1}'
+\cols = system head -1 \file | awk '{print NF}'
+set x grid 0 1 /\cols
+set y grid 0 1 /\rows
+open \file
+read grid data \rows \cols
+close
+draw contour
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+<h3>6.1.2: Complicated example</h3>
+
+To get a simple contour graph based on pre-gridded
+data, with full control of axes, etc, do something like this:
+<p>
+<A HREF="example4.png"> 
+<IMG ALT="Example 4" SRC="example4-tiny.png" 
+ALIGN=top> 
+</A> 
+<A HREF="example4.html">The command-file.</A> <P> 
+
+
+
+
+
+Here several new things have been introduced.
+<p>
+First, you've got to define a grid in xy space.  This example uses a
+non-uniform x-grid, and reads it in from the commandfile.  In this form,
+the blank line is essential; it tells Gri that the end of data has been
+located; if you like, you can specify the number of lines to read, as in
+`<font color="#82140F"><code>read grid x 3</code></font>'.
+<p>
+The y-grid for this example is uniform, however, so it may be specified
+with the `<font color="#82140F"><code>set y grid</code></font>' command.  It obtains values (10, 12.5, 15,
+17.5, 20).  The `<font color="#82140F"><code>set x|y grid</code></font>' commands accept negative increments.
+Furthermore, it is possible to specify the number of steps, rather than
+the increment size, by putting `<font color="#82140F"><code>/</code></font>' before the third number; thus
+`<font color="#82140F"><code>set x grid 0 1 /5</code></font>' and `<font color="#82140F"><code>set x grid 0 1 0.2</code></font>' are equivalent.
+<p>
+Having defined a grid, it is time to read in the gridded data.  Here this
+is done with the `<font color="#82140F"><code>read grid data</code></font>' command.  Since Gri already knows
+the grid dimensions, it will read the data appropriately.  You could
+also have told it (`<font color="#82140F"><code>read grid data 3 5</code></font>').  
+<p>
+The first dataline is the top of the y-grid.  In other words, the data
+appear in the file just as they would on the graph, assuming that the
+x-grid and y-grid both increase.  
+<p>
+Sometimes you want to read in the transpose of a matrix.  Gri lets you
+do that.  If the `<font color="#82140F"><code>bycolumns</code></font>' keyword is present at the end of the
+`<font color="#82140F"><code>read grid</code></font>' command, the first dataline will contain the first
+<b>column</b>, of the data.
+<p>
+If you have an extraneous column of data to the left of your data
+matrix, do `<font color="#82140F"><code>read grid data * 2 3</code></font>'
+<p>
+Now Gri has the grid in its head.  We tell it to draw some contours
+with the `<font color="#82140F"><code>draw contour</code></font>' command.   As the comments in the example
+show, the contour values will be selected automatically, but you can
+alter that.
+<p>
+
+
+
+
+<!-- @node   Ungridded Data, Images, Pre-gridded Data, Contour Plots     -->
+<a name="UngriddedData" ></a>
+<h2>6.2: Ungridded data</h2>
+
+When you have f=f(x,y) points at random x and y, you must cast them onto
+a grid to contour them.  This is a difficult problem.  There are many
+ways to grid data, and all have both good and bad features.  You should
+try various methods, and various settings of the parameters of the
+methods.  If you have a favorite gridding method that you prefer, you
+should probably pre-grid the data yourself.  If not, Gri can do it for
+you.  Gri has two methods for doing this, the ``boxcar'' method and the
+``objective analysis'' method.  Each method puts holes in the grid
+wherever there are too few data to map to grid points, unless you
+specifically ask to fill in the whole grid.
+<p>
+The next two sections show first an example, then a discussion of the
+methods and how to use them.
+<p>
+<h3>6.2.1: Example</h3>
+
+This example uses data taken from Figure 5 of S. E.  Koch and M.
+DesJardins and P. J. Kocin, 1983.  ``An interactive Barnes objective map
+anlaysis scheme for use with satellite and conventional data,'', J.
+Climate Appl.  Met., vol 22, p. 1487-1503.  Readers should compare
+Figures 5 and 6 of that paper to the results shown here.
+<p>
+<A HREF="example5.png"> 
+<IMG ALT="Example 5" SRC="example5-tiny.png" 
+ALIGN=top> 
+</A> 
+<A HREF="example5.html">The command-file.</A> <P> 
+
+
+
+
+
+
+
+<h3>6.2.2: Discussion of Methods</h3>
+
+The various commands for converting columns to a grid are given in
+(see <a href="Convert.html#ConvertColumnsToGrid">Convert Columns To Grid</a>).  Generally, the Barnes method is best.
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

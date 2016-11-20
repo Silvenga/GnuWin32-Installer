@@ -1,0 +1,204 @@
+README file for enclosed data files.
+
+The Gcal package encloses a collection of reminder/appointment files of
+other packages, namely the BSD-`calendar' reminder files and the
+`[X]Calentool-2.3' appointment files.  These original and untouched
+files are stored in the `calendars/' and `dates/' subdirectories, and
+are automatically converted during the installation process of `gcal'
+by means of `awk' or `perl'.  The AWK and Perl scripts (stored in the
+`scripts/' subdirectory) which I've worked out are not perfect but do
+their job well for the enclosed reminder/appointment files.
+
+These scripts don't break up the text part at any margin by default.
+If you want to have text parts break up at a special margin, define
+this in the variable LINEBREAK (near the top of each script) explicitly
+before you use the `install' target of the Makefile.  I recommend to
+use a margin value of 40...50.  This is only an experimental feature.
+It does not guarantee any _nicer_ representation of texts, but I've
+implemented it because some people might find it useful.
+
+
+Here is a short description of the other Gcal example resource files as
+they can be found in this file directory:
+
+   * The file `sdata.rc' shows how some Sun based astronomical times
+     and data can be detected.  The file `mdata.rc' shows how some Moon
+     based astronomical times and data can be detected.  Both files do
+     no respect Daylight Savings.  Take these files as examples to
+     manage astronomical times and data for locations without
+     daylight-saving time.  The example file `bkk.rc' demonstrates this
+     for Bangkok, Thailand.
+
+   * The file `de-sdata.rc' shows how some Sun based astronomical times
+     and data can be detected for locations in Germany.  The file
+     `de-mdata.rc' shows how some Moon based astronomical times and
+     data can be detected for locations in Germany.  Both files respect
+     daylight-saving times as used nowadays in Germany.  Take these
+     files as examples to manage astronomical times and data for
+     locations with daylight-saving time.  The example file `ms.rc'
+     demonstrates this for Mu"nster, Germany -- my home town.
+
+   * The file `sun-moon.rc' shows how the most important Sun/Moon based
+     astronomical times and data can be detected for *GENERIC*
+     locations.  This file should either be used
+
+       A. with a Gcal location response file as it is created by the
+          `[gcal-]ddiffdrv' script/batch file (see `misc/README', for
+          further details) like:
+
+               gcal -f./sun-moon.rc @LOCATION-RESPONSE-FILE
+
+     or
+
+       B. by directly passing the name and the co-ordinate with or
+          without the altitude part of the location with the
+          `--text-variable=ARGUMENT' option via the command line like:
+
+               gcal -f./sun-moon.rc --te='$l=DE-Muenster:$c=+5158+00738'
+
+     The data and times are always calculated for GMT unless you specify
+     the timezone of the location explicitly by passing it via the Gcal
+     text variable $Z, e.g.:
+
+          --text-variable='$z=60'
+
+     or
+
+          --text-variable='$z=+1\:'
+
+     if the location's timezone is GMT-1 (CET respectively CEWT).
+
+     The data and times are always calculated for the sea-level
+     altitude +0 unless you specify the altitude of the location either
+     as part of the co-ordinate of the location or explicitly by
+     passing it via the Gcal text variable $H, e.g.:
+
+          --text-variable='$h=+61'
+
+     if the location's altitude is +61 meters above the sea-level (you
+     have to give the sign explicitly).
+
+     So the complete call for the (A) case would be:
+
+          gcal -f./sun-moon.rc @LOCATION-RESPONSE-FILE --te='$z=60:$h=+61'
+
+     And the complete call for the (B) case would either be:
+
+          gcal -f./sun-moon.rc --te='$l=DE-Muenster:$c=+5158+00738+61:$z=60'
+
+     or
+
+          gcal -f./sun-moon.rc --te='$l=DE-Muenster:$c=+5158+00738:$z=60:$h=+61'
+
+   * The file `wloc.rc' shows how air line distances between geographic
+     point locations can be detected.
+
+   * An example `birthday.rc' file simply shows some nonsense birthdays.
+
+   * Some examples of different world time tables can be found in the
+     files `wtt1.rc', `wtt2.rc' and `wtt3.rc'.
+
+   * Other examples concerning ANSI-colored texts can be found in the
+     file `ansipic.rc', and some examples of _large_ text graphics are
+     stored in the `textpic.rc' file.  I don't know whether there are
+     any Copyright conditions on the texts stored in both files, but I
+     guess there are none (hopefully).
+
+
+By the way, if you have more of this stuff or if you have other
+reminder/appointment files as distributed in the `calendars/' and
+`dates/' subdirectories, I'd appreciate if you send them to my eMail
+address (uuencoded `.tar.gz' preferred), so I'm able to add them to the
+next release of Gcal.
+
+
+Already received reminder/appointment files (thanks to the authors):
+
+`meteoric.rc'
+
+    Date:
+          18-Sep-1996
+
+    Author:
+          Claus-Peter Ru"ckemann <ruckema@uni-muenster.de>
+
+    Description:
+          Meteoric showers - interval / maximum / number / radiant /
+          velocity / comet
+
+
+
+Because the collection of reminder/appointment files is enclosed
+original and untouched AS IS, there is no warranty of any kind, either
+expressed or implied!  The entire risk as to the quality and fitness
+for a particular purpose is with you.
+
+
+
+If conversion from other calendar management tools is required, some
+converters can be found in the `[X]Calentool-2.3' package (written by
+Bill Randle):
+
+`cm2calentool.e'
+     Converts _sun calendar manager_ files to `Calentool' appointment
+     files
+
+`cal2ct.c'
+     Converts `calendar' files to `Calentool' appointment files
+
+`month2ct.c'
+     Converts `month' files to `Calentool' appointment files
+
+`mt2ct.c'
+     Converts `monthtool' files to `Calentool' appointment files
+
+Once you have converted a reminder/appointment file into the
+`[X]Calentool-2.3' appointment file format, you can convert this file
+to the Gcal format using `awk' or `perl' and the according script file
+`ct2gcal.awk' respectively `ct2gcal.pl'.
+
+
+
+Because the `%s[DATE]' ("starting date" of event) and `%e[DATE]'
+("ending date" of event) special texts respected by former versions of
+the Gcal program in the text part of a resource file line do not exist
+in this style anymore in Gcal-2.20 or newer, there is a `old2v220' AWK
+respectively Perl script in the `data/scripts' directory which converts
+old-style resource files into the style used by Gcal-2.20 or newer.
+See the top-level `ATTENTION' file for more details.
+
+If you have _old_, pre Gcal version 2.20 resource files, you first have
+to convert them manually into the Gcal-2.20 style by processing them
+using the `old2v220' AWK respectively Perl scripts, for example:
+
+     $ awk -f old2v220.awk FILE-OLD.rc > FILE-v220.rc
+     or
+     $ perl old2v220.pl FILE-OLD.rc > FILE-v220.rc
+
+
+
+By reason of implementing the optional format instruction which can be
+used by many special texts in the text part of a resource file line
+now, some of these special texts do not exist in this style anymore in
+Gcal-3.00 or newer.  There is a `v2x2v300' AWK respectively Perl script
+in the `data/scripts' directory which converts old-style resource
+files, i.e. resource files that were used with Gcal-2.20 and Gcal-2.40,
+into the style used by Gcal-3.00 or newer.  See the top-level
+`ATTENTION' file for more details.
+
+If you have Gcal version 2.20 or version 2.40 resource files and you
+want to use them with Gcal version 3.00, you first have to convert them
+manually into the Gcal-3.00 style by processing them using the
+`v2x2v300' AWK respectively Perl scripts, for example:
+
+     $ awk -f v2x2v300.awk FILE-OLD.rc > FILE-v300.rc
+     or
+     $ perl v2x2v300.pl FILE-OLD.rc > FILE-v300.rc
+
+It is very possible that the conversion done by using the `v2x2v300'
+AWK respectively Perl scripts is not sufficient, i.e. the resulting file
+contains unwanted Gcal special texts or some of the required Gcal
+special texts are crippled or protected by a `\' character.  In this
+case, you have to edit the resulting file manually to correct the
+broken text.  Sorry!
+

@@ -1,0 +1,134 @@
+<html>
+<head>
+<title>../../../gri-2.12.10-src/doc/examples/example8.gri</title>
+</head>
+<body bgcolor="#FFFFFF">
+<i># This html document was prepared by gri2html based on the Gri script named</i>
+<br><i>#    <a href="../../../gri-2.12.10-src/doc/examples/example8.gri">../../../gri-2.12.10-src/doc/examples/example8.gri</a></i>
+<br># <i>Gri is available for free at <a href="http://gri.sourceforge.net">http://gri.sourceforge.net</a></i>
+<pre>
+<font color=#B22222># Example 8 -- Plot T=T(x,rho) section of eubex data</font>
+
+<font color=#0000EE>`Initialize Parameters'</font>
+{
+    <font color=#0000EE>\FILE_DATA =</font> <font color=#2F4F4F>"example8a.dat"</font> <font color=#B22222># T vs rho</font>
+    <font color=#0000EE>\FILE_LOCN =</font> <font color=#2F4F4F>"example8b.dat"</font> <font color=#B22222># section distances</font>
+    set missing value -99.0
+    <font color=#B22222>#</font>
+    <font color=#B22222># Following values from ~/eubex/processing/to_rho_bins/do_rho_inter</font>
+    <font color=#0000EE>\RHO_MIN =</font> <font color=#2F4F4F>"28.1"</font>
+    <font color=#0000EE>\RHO_MAX =</font> <font color=#2F4F4F>"27.5"</font>
+    <font color=#0000EE>\RHO_INC =</font> <font color=#2F4F4F>"-0.002"</font>
+    <font color=#0000EE>\NY =</font> <font color=#2F4F4F>"301"</font>
+    <font color=#0000EE>\xmin =</font> <font color=#2F4F4F>"350"</font>
+    <font color=#0000EE>\xmax =</font> <font color=#2F4F4F>"0"</font>
+    <font color=#0000EE>\xinc =</font> <font color=#2F4F4F>"-100"</font>
+    <font color=#0000EE>\ymin =</font> <font color=#2F4F4F>"28.1"</font>
+    <font color=#0000EE>\ymax =</font> <font color=#2F4F4F>"27.8"</font>
+    <font color=#0000EE>\yinc =</font> <font color=#2F4F4F>"-0.1"</font>
+    <font color=#0000EE>\zmin =</font> <font color=#2F4F4F>"0"</font>
+    <font color=#0000EE>\zmax =</font> <font color=#2F4F4F>"2.5"</font>
+}
+<font color=#0000EE>`Initialize Axes'</font>
+/*
+Set up axes
+*/
+{
+    set x name <font color=#2F4F4F>"km"</font>
+    set x size 10
+    set x axis<font color=#0000EE> \xmin</font><font color=#0000EE> \xmax</font><font color=#0000EE> \xinc
+</font>    set y name <font color=#2F4F4F>"$\sigma_T$"</font>
+    set y size 5
+    set y axis name horizontal
+    set y axis<font color=#0000EE> \ymin</font><font color=#0000EE> \ymax</font><font color=#0000EE> \yinc
+</font>    set y format <font color=#2F4F4F>"%.1f"</font>
+}
+<font color=#0000EE>`Initialize Files'</font>
+{
+    query<font color=#0000EE> \data</font> <font color=#2F4F4F>"Data file?   " ("\FILE_DATA"</font>)
+    query<font color=#0000EE> \locn</font> <font color=#2F4F4F>"Station locn?" ("\FILE_LOCN"</font>)
+}
+<font color=#0000EE>`Read Data'</font>
+{
+    <font color=#B22222># Read x-locations</font>
+    <font color=#9400D3>system</font> <font color=#FF0000>awk '{print $2}' &lt;<font color=#0000EE> \locn</font> &gt; TMP</font>
+    <font color=#9400D3>system</font> <font color=#FF0000>wc TMP | awk '{print $1}' &gt; NUM</font>
+    open NUM
+    read<font color=#CDAD00> .gridx_number.</font>
+    close
+    <font color=#9400D3>system</font> <font color=#FF0000>rm NUM </font>
+    open TMP
+    read grid x<font color=#CDAD00> .gridx_number.</font>
+    close
+    <font color=#9400D3>system</font> <font color=#FF0000>rm TMP</font>
+    <font color=#B22222># Create y-locations</font>
+    set y grid<font color=#0000EE> \RHO_MIN</font><font color=#0000EE> \RHO_MAX</font><font color=#0000EE> \RHO_INC
+</font>    <font color=#B22222>#</font>
+    <font color=#B22222># Read data</font>
+    open<font color=#0000EE> \data
+</font>    read grid data<font color=#0000EE> \NY<font</font> color=#CDAD00> .gridx_number.</font>
+    close
+}
+<font color=#0000EE>`Plot Contours'</font>
+{
+    set graylevel<font color=#CDAD00> .contour_graylevel.</font>
+    set clip on
+    set line width 0.5
+    draw contour -3 3 0.25 unlabelled
+    <font color=#B22222>#</font>
+    <font color=#B22222># wide line at 0 degrees</font>
+    set line width 2
+    draw contour 0 unlabelled
+}
+<font color=#0000EE>`Plot Image And Maybe Contours'</font>
+{
+    <font color=#0000EE>\imagefile =</font> <font color=#2F4F4F>"image"</font>
+    set image range<font color=#0000EE> \zmin</font><font color=#0000EE> \zmax
+</font>    convert grid to image box<font color=#0000EE> \xmin</font> <font color=#0000EE> \ymin</font><font color=#0000EE> \xmax</font><font color=#0000EE> \ymax
+</font>    query<font color=#0000EE> \dohisto</font> <font color=#2F4F4F>"Do histogram scaling? (yes|no)" ("yes"</font>)
+    <font color=#0000EE>\incs =</font> <font color=#2F4F4F>"no"</font>
+    <font color=#9400D3>if</font> {<font color=#2F4F4F>"<font color=#0000EE>\dohisto" =</font>= "yes"</font>}
+	set image grayscale using histogram
+    <font color=#9400D3>else</font>
+	<font color=#0000EE>\zinc =</font> <font color=#2F4F4F>"0.25"</font>
+	query<font color=#0000EE> \incs</font> <font color=#2F4F4F>"In linear scaling, band at an increment of<font color=#0000EE> \zinc?"</font> ("yes"</font>)
+	<font color=#9400D3>if</font> {<font color=#2F4F4F>"<font color=#0000EE>\incs" =</font>= "yes"</font>}
+	    set image grayscale black<font color=#0000EE> \zmin</font> white<font color=#0000EE> \zmax</font> increment<font color=#0000EE> \zinc
+</font>	<font color=#9400D3>else</font>
+	    set image grayscale black<font color=#0000EE> \zmin</font> white<font color=#0000EE> \zmax
+</font>	<font color=#9400D3>end if</font>
+    <font color=#9400D3>end if</font>
+    write image rasterfile to<font color=#0000EE> \imagefile
+</font>    show <font color=#2F4F4F>"wrote image rasterfile `\imagefile '"</font>
+    draw image
+    draw image palette
+    query<font color=#0000EE> \do_contours</font> <font color=#2F4F4F>"Do contours as well (yes|no)" ("yes"</font>)
+    <font color=#9400D3>if</font> {<font color=#2F4F4F>"<font color=#0000EE>\do_contours" =</font>= "yes"</font>}
+	Plot Contours
+    <font color=#9400D3>end if</font>
+    draw title <font color=#2F4F4F>"Example 8 --<font color=#0000EE> \data</font> black=\zmin white=\zmax"</font>
+    <font color=#9400D3>if</font> {<font color=#2F4F4F>"<font color=#0000EE>\dohisto" =</font>= "yes"</font>}
+	draw title <font color=#2F4F4F>"Histogram enhanced grayscales"</font>
+    <font color=#9400D3>else</font>
+	<font color=#9400D3>if</font> {<font color=#2F4F4F>"<font color=#0000EE>\incs" =</font>= "yes"</font>}
+	    draw title <font color=#2F4F4F>"Grayscale banded at intervals of<font color=#0000EE> \zinc"</font>
+</font>	<font color=#9400D3>end if</font>
+    <font color=#9400D3>end if</font>
+}
+Initialize Parameters
+Initialize Axes
+Initialize Files
+Read Data
+query<font color=#0000EE> \doimage</font> <font color=#2F4F4F>"Draw image (yes|no)" ("no"</font>)
+<font color=#9400D3>if</font> {<font color=#2F4F4F>"<font color=#0000EE>\doimage" =</font>= "yes"</font>}
+    <font color=#0000EE>.contour_graylevel. =</font> 1	<font color=#B22222># white contours </font>
+    Plot Image And Maybe Contours
+<font color=#9400D3>else</font>
+    <font color=#0000EE>.contour_graylevel. =</font> 0	<font color=#B22222># black contours </font>
+    Plot Contours
+    draw title <font color=#2F4F4F>"Example 8"</font>
+<font color=#9400D3>end if</font>
+
+</pre>
+</body>
+</html>

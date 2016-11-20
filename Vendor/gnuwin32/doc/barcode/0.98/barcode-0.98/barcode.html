@@ -1,0 +1,858 @@
+<html lang="en">
+<head>
+<title>Barcode 0.98</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Barcode 0.98">
+<meta name="generator" content="makeinfo 4.7">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc { font-variant:small-caps }
+  span.roman { font-family: serif; font-weight: normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">Barcode 0.98</h1>
+<div class="node">
+<p><hr>
+<a name="Top"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Overview">Overview</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#dir">(dir)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+<br>
+</div>
+
+<h2 class="unnumbered">Barcode tools</h2>
+
+<p>This file documents version 0.98 of the barcode
+library and sample programs (March 2002).
+
+<ul class="menu">
+<li><a accesskey="1" href="#Overview">Overview</a>
+<li><a accesskey="2" href="#The-Barcode-Object">The Barcode Object</a>
+<li><a accesskey="3" href="#Supported-Flags">Supported Flags</a>
+<li><a accesskey="4" href="#The-API">The API</a>
+<li><a accesskey="5" href="#The-barcode-Executable">The barcode Executable</a>
+<li><a accesskey="6" href="#Supported-Encodings">Supported Encodings</a>
+<li><a accesskey="7" href="#PCL-Output">PCL Output</a>
+<li><a accesskey="8" href="#Bugs-and-Pending-Issues">Bugs and Pending Issues</a>
+</ul>
+
+<!-- ########################################################################## -->
+<!-- ########################################################################## -->
+<div class="node">
+<p><hr>
+<a name="Overview"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#The-Barcode-Object">The Barcode Object</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">1 Overview</h2>
+
+<p>The <dfn>barcode</dfn> package is mainly a C library for creating bar-code
+output files. It also includes a command line front-end and (in a
+foreseeable future) a graphic frontend.
+
+   <p>The package is designed as a library because we think the main use for
+barcode-generation tools is inside more featured applications. The
+library addresses bar code printing as two distinct problems: creation
+of bar information and actual conversion to an output format. To this
+aim we use an intermediate representation for bar codes, which is
+currently documented in the <span class="file">ps.c</span> source file (not in this
+document).
+
+   <p>Note that the library and the accompanying material is released
+according to the GPL license, not the LGPL one. A copy of the GPL is
+included in the distribution tarball.
+
+<!-- ########################################################################## -->
+<div class="node">
+<p><hr>
+<a name="The-Barcode-Object"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Supported-Flags">Supported Flags</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">2 The Underlying Data Structure</h2>
+
+<p>Every barcode-related function acts on a data structure defined in the
+<span class="file">barcode.h</span> header, which must be included by any C source file
+that uses the library. The header is installed by <tt>make install</tt>.
+
+   <p>The definition of the data structure is included here for reference:
+
+<pre class="lisp">     struct Barcode_Item {
+         int flags;         /* type of encoding and other flags */
+         char *ascii;       /* malloced */
+         char *partial;     /* malloced too */
+         char *textinfo;    /* information about text placement */
+         char *encoding;    /* code name, filled by encoding engine */
+         int width, height; /* output units */
+         int xoff, yoff;    /* output units */
+         int margin;        /* output units */
+         double scalef;     /* requested scaling for barcode */
+         int error;         /* an errno-like value, in case of failure */
+     };
+</pre>
+   <p>The exact meaning of each field and the various flags implemented are
+described in the following sections.
+
+   <p>Even though you won't usually need to act on the contents of this
+structure, some of the functions in the library receive arguments that
+are directly related to one or more of these fields.
+
+<!-- ========================================================================== -->
+<ul class="menu">
+<li><a accesskey="1" href="#The-Field-List">The Field List</a>
+<li><a accesskey="2" href="#The-Intermediate-Representation">The Intermediate Representation</a>
+</ul>
+
+<!--  -->
+<div class="node">
+<p><hr>
+<a name="The-Field-List"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#The-Intermediate-Representation">The Intermediate Representation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#The-Barcode-Object">The Barcode Object</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#The-Barcode-Object">The Barcode Object</a>
+<br>
+</div>
+
+<h3 class="section">2.1 The Fields</h3>
+
+     <dl>
+<dt><code>int flags;</code><dd>
+The flags are, as you may suspect, meant to specify the exact
+behaviour of the library. They are often passed as an argument
+to <i>barcode</i> functions and are discussed in the next section.
+
+     <br><dt><code>char *ascii;</code><dt><code>char *partial;</code><dt><code>char *textinfo;</code><dt><code>char *encoding;</code><dd>
+These fields are internally managed by the library, and you are
+not expected to touch them if you use the provided API. All
+of them are allocated with <i>malloc</i>.
+
+     <br><dt><code>int width;</code><dt><code>int height;</code><dd>
+They specify the width and height of the <i>active</i> barcode
+region (i.e., excluding the white margin), in the units used
+to create output data (for postscript they are points, 1/72th
+of an inch, 0.352 mm). The fields can be either assigned to
+in the structure or via <i>Barcode_Position()</i>, at your
+choice.  If either value or both are left to their default
+value of zero, the output engine will assign default values
+according to the specified scaling factor. If the specified
+width is bigger than needed (according to the scaling factor),
+the output barcode will be centered in its requested
+region. If either the width of the height are too small for
+the specified scale factor, the output bar code will expand
+symmetrically around the requested region.
+
+     <br><dt><code>int xoff;</code><dt><code>int yoff;</code><dd>
+The fields specify offset from the coordinate origin of the
+output engine (for postscript, position 0,0 is the lower left
+corner of the page).  The fields can be either assigned to in
+the structure or via <i>Barcode_Position()</i>, at your choice. 
+The offset specifies where the white margin begins, not where
+the first bar will be printed. To print real ink to the
+specified position you should set <i>margin</i> to 0.
+
+     <br><dt><code>int margin;</code><dd>
+The white margin that will be left around the printed area of
+the bar code. The same margin is applied to all sides of the
+printed area. The default value for the margin is defined in
+<span class="file">barcode.h</span> as <tt>BARCODE_DEFAULT_MARGIN</tt> (10).
+
+     <br><dt><code>double scalef;</code><dd>
+The enlarge or shrink value for the bar code over its default
+dimension. The <i>width</i> and <i>scalef</i> fields interact deeply
+in the creation of the output, and a complete description of
+the issues appears later in this section.
+
+     <br><dt><code>int error;</code><dd>
+The field is used when a <i>barcode</i> function fails to host
+an <tt>errno</tt>-like integer value.
+
+</dl>
+
+<h4 class="unnumberedsubsec">Use of the <i>width</i> and <i>scalef</i> fields.</h4>
+
+<p>A width unit is the width of the thinnest bar and/or space in the
+chosen code; it defaults to 1 point if the output is postscript or
+encapsulated postscript.
+
+   <p>Either or both the code width and the scale factor can be left
+unspecified (i.e., zero). The library deals with defaults in the
+following way:
+
+     <dl>
+<dt><i>Both unspecified</i><dd>
+If both the width and the scale factor are unspecified, the
+scale factor will default to 1.0 and the width is calculated
+according to the actual width of the bar code being printed.
+
+     <br><dt><i>Width unspecified</i><dd>
+If the width is not specified, it is calculated according to
+the values of <i>scalef</i>.
+
+     <br><dt><i>Scale factor unspecified</i><dd>
+If the scale factor is not specified, it will be chosen so
+that the generated bar code exactly fits the specified width.
+
+     <br><dt><i>Both specified</i><dd>
+The code will be printed inside the specified region according
+to the specified scale factor. It will be aligned to the left. 
+If, however, the chosen width is too small for the specific
+bar code and scaling factor, then the code will extend
+symmetrically to the left and to the right of the chosen
+region.
+
+   </dl>
+
+<!--  -->
+<div class="node">
+<p><hr>
+<a name="The-Intermediate-Representation"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#The-Field-List">The Field List</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#The-Barcode-Object">The Barcode Object</a>
+<br>
+</div>
+
+<h3 class="section">2.2 The Intermediate Representation</h3>
+
+<p>The encoding functions print their output into the <tt>partial</tt> and
+<tt>texinfo</tt> fields of the barcode data structure. Those fields, together
+with position information, are then used to generate actual output. 
+This is an informal description of the intermediate format.
+
+   <p>The first char in <tt>partial</tt> tells how much extra space to add to the
+left of the bars. For EAN-13, it is used to leave space to print the
+first digit, other codes may have '0' for no-extra-space-needed.
+
+   <p>The next characters are alternating bars and spaces, as multiples of the
+base dimension which is 1 unless the code is rescaled. Rescaling is
+calculated as the ratio from the requested width and the calculated
+width.  Digits represent bar/space dimensions. Lower-case letters
+represent those bars that should extend lower than the others: 'a' is
+equivalent to '1', 'b' is '2' and so on up to 'i' which is equivalent to
+'9'. Other letters will be used for encoding-specific meanings, as soon
+as I implement them.
+
+   <p>The <tt>textinfo</tt> string is made up of fields <tt>%lf:%lf:%c</tt> separated by
+blank space. The first integer is the x position of the character,
+the second is the font size (before rescaling) and the char item is
+the character to be printed.
+
+   <p>Both the <tt>partial</tt> and <tt>textinfo</tt> strings may include &ldquo;<tt>-</tt>&rdquo; or
+&ldquo;<tt>+</tt>&rdquo; as special characters (in <tt>textinfo</tt> the char should be a
+stand-alone word).  They state where the text should be printed: below
+the bars (&ldquo;<tt>-</tt>&rdquo;, default) or above the bars. This is used, for
+example, to print the add-5 and add-2 codes to the right of UPC or EAN
+codes (the add-5 extension is mostly used in ISBN codes).
+
+<!-- ========================================================================== -->
+<div class="node">
+<p><hr>
+<a name="Supported-Flags"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#The-API">The API</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#The-Barcode-Object">The Barcode Object</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">3 The Flags</h2>
+
+<p>The following flags are supported by version 0.98 of the
+library:
+
+     <dl>
+<dt><code>BARCODE_ENCODING_MASK</code><dd>
+The mask is used to extract the encoding-type identifier from
+the <i>flags</i> field.
+
+     <br><dt><code>BARCODE_EAN</code><dt><code>BARCODE_UPC</code><dt><code>BARCODE_ISBN</code><dt><code>BARCODE_128B</code><dt><code>BARCODE_128C</code><dt><code>BARCODE_128</code><dt><code>BARCODE_128RAW</code><dt><code>BARCODE_39</code><dt><code>BARCODE_I25</code><dt><code>BARCODE_CBR</code><dt><code>BARCODE_MSI</code><dt><code>BARCODE_PLS</code><dt><code>BARCODE_93</code><dd>
+The currently supported encoding types: EAN (13 digits, 8
+digits, 13 + 2 add-on and 13 + 5 add-on), UPC (UPC-A, UPC-E,
+UPC-A with 2 or 5 digit add-on), ISBN (with or without the
+5-digit add-on), CODE128-B (the whole set of printable
+ASCII characters), CODE128-C (two digits encoded by each barcode
+symbol), CODE128 (all ASCII values), a &ldquo;raw-input&rdquo; pseudo-code
+that generates CODE128 output, CODE39 (alphanumeric),
+"interleaved 2 of 5" (numeric), Codabar (numeric plus a few
+symbols), MSI (numeric) and Plessey (hex digits). 
+See <a href="#Supported-Encodings">Supported Encodings</a>.
+
+     <br><dt><code>BARCODE_ANY</code><dd>
+This special encoding type (represented by a value of zero, so
+it will be the default) tells the encoding procedure to look
+for the first encoding type that can deal with a textual
+string.  Therefore, a 11-digit code will be printed as UPC (as
+well as 6-digit, 11+2 and 11+5), a 12-digit (or 7-digit, or
+12+2 or 12+5) as EAN13, an ISBN code (with or without hyphens,
+with or without add-5) will be encoded in its EAN13
+representation, an even number of digits is encoded using
+CODE128C and a generic string is encoded using CODE128B. Since
+code-39 offers a much larger representation for the same
+text string, code128-b is preferred over code39 for
+alphanumeric strings.
+
+     <br><dt><code>BARCODE_NO_ASCII</code><dd>
+Instructs the engine not to print the ascii string on
+output. By default the bar code is accompanied with an ascii
+version of the text it encodes.
+
+     <br><dt><code>BARCODE_NO_CHECKSUM</code><dd>
+Instructs the engine not to add the checksum character to the
+output. Not all the encoding types can drop the checksum;
+those where the checksum is mandatory (like EAN and UPC)
+just ignore the flag.
+
+     <br><dt><code>BARCODE_OUTPUT_MASK</code><dd>
+The mask is used to extract the output-type identifier from
+the <i>flags</i> field.
+
+     <br><dt><code>BARCODE_OUT_PS</code><dt><code>BARCODE_OUT_EPS</code><dt><code>BARCODE_OUT_PCL</code><dt><code>BARCODE_OUT_PCL_III</code><dd>
+The currently supported encoding types: full-page postscript
+and encapsulated postscript; PCL (print command language, for
+HP printers) and PCL-III (same as PCL, but uses a font not
+available on older printers).
+
+     <br><dt><code>BARCODE_OUT_NOHEADERS</code><dd>
+The flag instructs the printing engine not to print the header
+and footer part of the file. This makes sense for the
+postscript engine but might not make sense for other engines;
+such other engines will silently ignore the flag just like
+the PCL back-end does.
+
+   </dl>
+
+<!-- ########################################################################## -->
+<div class="node">
+<p><hr>
+<a name="The-API"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#The-barcode-Executable">The barcode Executable</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Supported-Flags">Supported Flags</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">4 Functions Exported by the Library</h2>
+
+<!-- MANPAGE barcode.3 -->
+<!-- M .TH BARCODE 3 "October 1999" "GNU" "GNU barcode" -->
+<!-- M .UC 4 -->
+<!-- M .SH NAME -->
+<!-- M barcode \- a library to create and print bar codes -->
+<!-- M .SH SYNOPSIS -->
+<!-- M .B #include <barcode.h> -->
+<!-- M .sp -->
+<!-- M .BI "struct Barcode_Item *Barcode_Create(char *" text ");" -->
+<!-- M .br -->
+<!-- M .BI "int Barcode_Delete(struct Barcode_Item *" bc ");" -->
+<!-- M .br -->
+<!-- M .BI "int Barcode_Encode(struct Barcode_Item *" bc ", int " flags ");" -->
+<!-- M .br -->
+<!-- M .BI "int Barcode_Print(struct Barcode_Item *" bc ", FILE *" f ", int " flags ");" -->
+<!-- M .br -->
+<!-- M .BI "int Barcode_Position(struct Barcode_Item *" bc ", int " wid ", int " hei ", int " xoff ", int " yoff " , double " scalef ");" -->
+<!-- M .br -->
+<!-- M .BI "int Barcode_Encode_and_Print(char *" text ", FILE *" f ", int " wid ", int " hei ", int " xoff ", int " yoff ", int " flags ");" -->
+<!-- M .br -->
+<!-- M .BI "int Barcode_Version(char *" versionname ");" -->
+<!-- M -->
+<!-- M .SH DESCRIPTION -->
+<!-- M -->
+<!-- M The barcode family of library functions is meant to ease -->
+<!-- M creation of bar-code printouts. -->
+<!-- M -->
+<!-- M The information below is extracted from the texinfo file, which is the -->
+<!-- M preferred source of information. -->
+<p>The functions included in the barcode library are declared in the
+header file <tt>barcode.h</tt>.  They perform the following tasks:
+
+     <dl>
+<dt><code>struct Barcode_Item *Barcode_Create(char *text);</code><dd>The function creates a new barcode object to deal with a
+specified text string.  It returns NULL in case of failure and
+a pointer to a barcode data structure in case of success.
+
+     <br><dt><code>int Barcode_Delete(struct Barcode_Item *bc);</code><dd>Destroy a barcode object. Always returns 0 (success)
+
+     <br><dt><code>int Barcode_Encode(struct Barcode_Item *bc, int flags);</code><dd>Encode the text included in the <i>bc</i> object. Valid flags are
+the encoding type (other flags are ignored) and
+BARCODE_NO_CHECKSUM (other flags are silently ignored); if the
+flag argument is zero, <tt>bc-&gt;flags</tt> will apply. The function
+returns 0 on success and -1 in case of error. After
+successful termination the data structure will host the
+description of the bar code and its textual representation,
+after a failure the <tt>error</tt> field will include the reason of
+the failure.
+
+     <br><dt><code>int Barcode_Print(struct Barcode_Item *bc, FILE *f, int flags);</code><dd>Print the bar code described by <tt>bc</tt> to the specified file. 
+Valid flags are the output type, <tt>BARCODE_NO_ASCII</tt> and
+<tt>BARCODE_OUT_NOHEADERS</tt>, other flags are ignored. If any of
+these flags is zero, it will be inherited from <tt>bc-&gt;flags</tt>
+which therefore takes precedence. The function returns 0 on
+success and -1 in case of error (with <tt>bc-&gt;error</tt> set
+accordingly). In case of success, the bar code is printed to
+the specified file, which won't be closed after use.
+
+     <br><dt><code>int Barcode_Position(struct Barcode_Item *bc, int wid, int hei, int xoff, int yoff, double scalef);</code><dd>The function is a shortcut to assign values to the data
+structure.
+
+     <br><dt><code>int Barcode_Encode_and_Print(char *text, FILE *f, int wid, int hei, int xoff, int yoff, int flags);</code><dd>The function deals with the whole life of the barcode
+object by calling the other functions; it uses all the specified
+flags.
+
+     <br><dt><code>int Barcode_Version(char *versionname);</code><dd>Returns the current version as an integer number of the form
+major * 10000 + minor * 100 + release. Therefore, version
+1.03.5 will be returned as 10305 and version 0.53 as 5300.  If
+the argument is non-null, it will be used to return the version
+number as a string. Note that the same information is available from
+two preprocessor macros: <tt>BARCODE_VERSION</tt> (the string) and
+<tt>BARCODE_VERSION_INT</tt> (the integer number).
+
+   </dl>
+
+<!-- MANPAGE END -->
+<!-- ########################################################################## -->
+<div class="node">
+<p><hr>
+<a name="The-barcode-Executable"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Supported-Encodings">Supported Encodings</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#The-API">The API</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">5 The <i>barcode</i> frontend program</h2>
+
+<!-- MANPAGE barcode.1 -->
+<!-- M .TH BARCODE 1 "October 2001" "GNU" "GNU barcode" -->
+<!-- M .UC 4 -->
+<!-- M .SH NAME -->
+<!-- M barcode \- a stand alone program to run the barcode library -->
+<!-- M .SH SYNOPSIS -->
+<!-- M .B barcode -->
+<!-- M [\-b - | string] [\-e encoding] [\-o - | outfile] [ -->
+<!-- M .I other-flags -->
+<!-- M ] -->
+<!-- M .SH DESCRIPTION -->
+<!-- M -->
+<!-- M The information below is extracted from the texinfo file, which is the -->
+<!-- M preferred source of information. -->
+<!-- M .PP -->
+<p>The <b>barcode</b> program is a front-end to access some features of the
+library from the command line.  It is able to read user supplied
+strings from the command line or a data file (standard input by default)
+and encode all of them.
+
+<!-- M .SH OPTIONS -->
+<!-- M .PP -->
+<ul class="menu">
+<li><a accesskey="1" href="#The-Command-Line">The Command Line</a>
+</ul>
+
+<!--  -->
+<div class="node">
+<p><hr>
+<a name="The-Command-Line"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#The-barcode-Executable">The barcode Executable</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#The-barcode-Executable">The barcode Executable</a>
+<br>
+</div>
+
+<h3 class="section">5.1 The Command Line</h3>
+
+<p><b>barcode</b> accepts the following options:
+
+     <dl>
+<dt><code>--help or -h</code><dd>Print a usage summary and exit.
+
+     <br><dt><code>-i filename</code><dd>Identify a file where strings to be encoded are read from. If
+missing (and if <tt>-b</tt> is not used) it defaults to standard
+input. Each data line of the input file will be used to create
+one barcode output.
+
+     <br><dt><code>-o filename</code><dd>Output file. It defaults to standard output.
+
+     <br><dt><code>-b string</code><dd>Specify a single &ldquo;barcode&rdquo; string to be encoded. 
+The option can be used multiple times in order to encode
+multiple strings (this will result in multi-page postscript
+output or a table of barcodes if <tt>-t</tt> is specified).  The
+strings must match the encoding chosen; if it doesn't
+match the program will print a warning to <tt>stderr</tt> and
+generate &ldquo;blank&rdquo; output (although not zero-length). 
+Please note that a string including spaces or
+other special characters must be properly quoted.
+
+     <br><dt><code>-e encoding</code><dd><b>encoding</b> is the name of the chosen encoding format being
+used. It defaults to the value of the environment variable
+<tt>BARCODE_ENCODING</tt> or to auto detection if the environment is
+also unset.
+
+     <br><dt><code>-g geometry</code><dd>The geometry argument is of the form &ldquo;[<i>&lt;width&gt;</i> <tt>x</tt>
+<i>&lt;height&gt;</i>] [<tt>+</tt> <i>&lt;xmargin&gt;</i> <tt>+</tt> <i>&lt;ymargin&gt;</i>]&rdquo; (with
+no intervening spaces). Unspecified margin values will result in
+no margin; unspecified size results in default size. 
+The specified values represent print points by
+default, and can be inches, millimeters or other units
+according to the <tt>-u</tt> option or the <tt>BARCODE_UNIT</tt>
+environment variable.  The argument is used to place the
+printout code on the page. Note that an additional white
+margin of 10 points is added to the printout. If the option is
+unspecified, <tt>BARCODE_GEOMETRY</tt> is looked up in the
+environment, if missing a default size and no margin (but the
+default 10 points) are used.
+
+     <br><dt><code>-t table-geometry</code><dd>Used to print several barcodes to a single page, this option
+is meant to be used to print stickers. The argument is of the
+form &ldquo;<i>&lt;columns&gt;</i> <tt>x</tt> <i>&lt;lines&gt;</i> [<tt>+</tt> <i>&lt;leftmargin&gt;</i>
+<tt>+</tt> <i>&lt;bottommargin&gt;</i> [<tt>-</tt> <i>&lt;rightmargin&gt;</i> [<tt>-</tt>
+<i>&lt;topmargin&gt;</i>]]]&rdquo; (with no intervening spaces); if missing,
+the top and right margin will default to be the same as the
+bottom and left margin. The margins are specified in print
+points or in the chosen unit (see <tt>-u</tt> below).  If the
+option is not specified, <tt>BARCODE_TABLE</tt> is looked up in the
+environment, otherwise no table is printed and each barcode
+will get its own page.  The size (but not the position)
+of a barcode item within a table can also be selected using
+<tt>-g</tt> (see "geometry" above), without struggling with
+external and internal margins.  I still think management of
+geometries in a table is suboptimal, but I can't make it
+better without introducing incompatibilities.
+
+     <br><dt><code>-m margin(s)</code><dd>Specifies an internal margin for each sticker in the
+table. The argument is of the form
+&ldquo;<i>&lt;xmargin&gt;</i><tt>,</tt><i>&lt;ymargin&gt;</i>&rdquo; and the margin is applied
+symmetrically to the sticker. If unspecified, the environment
+variable <tt>BARCODE_MARGIN</tt> is used or a default internal
+margin of 10 points is used.
+
+     <br><dt><code>-n</code><dd>&ldquo;Numeric&rdquo; output: don't print the ASCII form of the code,
+only the bars.
+
+     <br><dt><code>-c</code><dd>No checksum character (for encodings that allow it, like code 39,
+other codes, like UPC or EAN, ignore this option).
+
+     <br><dt><code>-E</code><dd>Encapsulated postscript (default is normal postscript). When
+the output is generated as EPS only one barcode is encoded.
+
+     <br><dt><code>-P</code><dd>PCL output. Please note that the Y direction goes from top
+to bottom for PCL, and the origin for an image is the top-left
+corner instead of the bottom-left
+
+     <br><dt><code>-p pagesize</code><dd>Specify a non-default page size. The page size can be specified
+in millimeters, inches or plain numbers (for example: "<tt>210x297mm</tt>",
+"<tt>8.5x11in</tt>", "<tt>595x842</tt>"). A page specification as numbers
+will be interpreted according to the current unit specification
+(see <tt>-u</tt> below). If libpaper is available,
+you can also specify the page size with its name, like "<tt>A3</tt>"
+or "<tt>letter</tt>" (libpaper is a standard component of Debian
+GNU/Linux, but may be missing elsewhere). The default page
+size is your system-wide default if libpaper is there, A4 otherwise.
+
+     <br><dt><code>-u unit</code><dd>Choose the unit used in size specifications. Accepted values
+are &ldquo;mm&rdquo;, &ldquo;cm&rdquo;, &ldquo;in&rdquo; and &ldquo;pt&rdquo;. By default, the program
+will check <tt>BARCODE_UNIT</tt> in the environment, and assume
+points otherwise (this behaviour is compatible with 0.92 and
+previous versions. If <tt>-u</tt> appears more than once, each
+instance will modified the behaviour for the arguments at its
+right, as the command line is processes left to right. The
+program internally works with points, and any size is
+approximated to the nearest multiple of one point. The <tt>-u</tt>
+option affect <tt>-g</tt> (geometry), <tt>-t</tt> (table) and <tt>-p</tt>
+(page size).
+
+   </dl>
+
+<!-- M .SH ENCODING TYPES -->
+<!-- M .PP -->
+<!-- ########################################################################## -->
+<div class="node">
+<p><hr>
+<a name="Supported-Encodings"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#PCL-Output">PCL Output</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#The-barcode-Executable">The barcode Executable</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">6 Supported Encodings</h2>
+
+<p>The program encodes text strings passed either on the command line
+(with -b) or retrieved from standard input. The text representation is
+interpreted according to the following rules. When auto-detection
+of the encoding is enabled (i.e, no explicit encoding type is specified),
+the encoding types are scanned to find one that can digest the text string. 
+The following list of supported types is sorted in the same order
+the library uses when auto-detecting a suitable encoding for a string.
+
+     <dl>
+<dt><var>EAN</var><dd>The EAN frontend is similar to UPC; it accepts strings of
+digits, 12 or 7 characters long. Strings of 13 or 8 characters
+are accepted if the provided checksum digit is correct. 
+I expect most users to feed input without a
+checksum, though. The add-2 and add-5 extension are accepted for both
+the EAN-13 and the EAN-8 encodings. 
+The following are example of valid input strings:
+&ldquo;<tt>123456789012</tt>&rdquo; (EAN-13), &ldquo;<tt>1234567890128</tt>&rdquo; (EAN-13 wih
+checksum),  &ldquo;<tt>1234567</tt>&rdquo; (EAN-8), &ldquo;<tt>12345670 12345</tt>&rdquo; (EAN-8
+with checksum and add-5),
+&ldquo;<tt>123456789012 12</tt>&rdquo; (EAN-13 with add-2),
+&ldquo;<tt>123456789012 12345</tt>&rdquo; (EAN-13 with add-5).
+
+     <br><dt><var>UPC</var><dd>The UPC frontend accepts only strings made up of digits (and,
+if a supplemental encoding is used, a blank to separate it). 
+It accepts strings of 11 or 12 digits (UPC-A) and 6 or 7 or 8
+digits (UPC-E).
+
+     <p>The 12th digit of UPC-A is the checksum and is added by the
+library if not specified in the input; if it is specified, it
+must be the right checksum or the code is rejected as invalid. 
+For UPC-E, 6 digit are considered to be the middle part of the
+code, a leading 0 is assumed and the checksum is added;
+7 digits are either considered the initial part (leading digit
+0 or 1, checksum missing) or the final part (checksum specified,
+leading 0 assumed); 8 digits are considered to be the complete code,
+with leading 0 or 1 and checksum. 
+For both UPC-A and UPC-E, a trailing string of 2 digits or 5 digits
+is accepted as well. Therefore, the following are examples
+of valid strings that can be encoded as UPC:
+&ldquo;<tt>01234567890</tt>&rdquo; (UPC-A)
+&ldquo;<tt>012345678905</tt>&rdquo; (UPC-A with checksum), &ldquo;<tt>012345</tt>&rdquo;
+(UPC-E), &ldquo;<tt>01234567890 12</tt>&rdquo; (UPC-A, add-2) and
+&ldquo;<tt>01234567890 12345</tt>&rdquo; (UPC-A, add-5), &ldquo;<tt>0123456 12</tt>&rdquo;
+(UPC-E, add-2). 
+Please note that when setting <tt>BARCODE_ANY</tt> to auto-detect
+the encoding to be used, 12-digit strings and 7-digit strings
+will always be identified as EAN. This because I expect most
+user to provide input without a checksum. If you need to
+specify UPC-with-checksum as input you must explicitly set
+<tt>BARCODE_UPC</tt> as a flag or use <tt>-e upc</tt> on the command line.
+
+     <br><dt><var>ISBN</var><dd>ISBN numbers are encoded as EAN-13 symbols, with an optional
+add-5 trailer. The ISBN frontend of the library accepts real
+ISBN numbers and deals with any hyphen and, if present, the
+ISBN checksum character before encoding data. Valid
+representations for ISBN strings are for example:
+&ldquo;<tt>1-56592-292-1</tt>&rdquo;, &ldquo;<tt>3-89721-122-X</tt>&rdquo; and &ldquo;<tt>3-89721-122-X
+06900</tt>&rdquo;.
+
+     <br><dt><var>code 128-B</var><dd>This encoding can represent all of the printing ASCII
+characters, from the space (32) to DEL (127). The checksum
+digit is mandatory in this encoding.
+
+     <br><dt><var>code 128-C</var><dd>The &ldquo;C&rdquo; variation of Code-128 uses Code-128 symbols to
+represent two digits at a time (Code-128 is made up of 104
+symbols whose interpretation is controlled by the start symbol
+being used). Code 128-C is thus the most compact way to
+represent any even number of digits. The encoder refuses to
+deal with an odd number of digits because the caller is
+expected to provide proper padding to an even number of
+digits. (Since Code-128 includes control symbols to switch
+charset, it is theoretically possible to represent the odd
+digit as a Code 128-A or 128-B symbol, but this tool doesn't
+currently implement this option).
+
+     <br><dt><var>code 128 raw</var><dd>Code-128 output represented symbol-by-symbol in the input
+string.  To override part of the problems outlined below in
+specifying code128 symbols, this pseudo-encoding allows the
+used to specify a list of code128 symbols separated by
+spaces. Each symbol is represented by a number in the range
+0-105.  The list should include the leading character.The
+checksum and the stop character are automatically added by the
+library. Most likely this pseudo-encoding will be used with
+<tt>BARCODE_NO_ASCII</tt> and some external program to supply the
+printed text.
+
+     <br><dt><var>code 39</var><dd>The code-39 standard can encode uppercase letters, digits, the
+blank space, plus, minus, dot, star, dollar, slash, percent. 
+Any string that is only composed of such characters is
+accepted by the code-39 encoder. To avoid loosing information,
+the encoder refuses to encode mixed-case strings (a lowercase
+string is nonetheless accepted as a shortcut, but is encoded
+as uppercase).
+
+     <br><dt><var>interleaved 2 of 5</var><dd>This encoding can only represent an even number of digits
+(odd digits are represented by bars, and even digits by the
+interleaving spaces). The name stresses the fact that two
+of the five items (bars or spaces) allocated to each symbol
+are wide, while the rest are narrow. The checksum digit is
+optional (can be disabled via <tt>BARCODE_NO_CHECKSUM</tt>). 
+Since the number of digits, including the checksum, must be even,
+a leading zero is inserted in the string being encoded if needed
+(this is specifically stated in the specs I have access to).
+
+     <br><dt><var>code 128</var><dd>Automatic selection between alphabet A, B and C of the Code-128
+standard. This encoding can represent all ASCII symbols, from
+0 (NUL) to 127 (DEL), as well as four special symbols, named
+F1, F2, F3, F4. The set of symbols available in this encoding
+is not easily represented as input to the <i>barcode</i> library,
+so the following convention is used.  In the input string,
+which is a C-language null-terminated string, the NUL char
+is represented by the value 128 (0x80, 0200) and the F1-F4 characters
+are represented by the values 193-196 (0xc1-0xc4, 0301-0304). 
+The values have been chosen to ease their representation as
+escape sequences.
+
+     <p>Since the shell doesn't seem to interpret escape sequences on the
+command line, the "-b" option cannot be easily used to designate
+the strings to be encoded. As a workaround you can resort
+to the command <tt>echo</tt>, either within back-ticks or used
+separately to create a file that is then fed to the standard-input
+of <i>barcode</i> &ndash; assuming your <tt>echo</tt> command processes escape
+sequences.  The newline character is especially though to encode
+(but not impossible unless you use a <tt>csh</tt> variant.
+
+     <p>These problems only apply to the command-line tool; the use of
+library functions doesn't give any problem. In needed, you can
+use the &ldquo;<i>code 128 raw</i>&rdquo; pseudo-encoding to represent
+code128 symbols by their numerical value. This encoding is
+used late in the auto-selection mechanism because (almost) any
+input string can be represented using code128.
+
+     <br><dt><var>Codabar</var><dd>Codabar can encode the ten digits and a few special symbols
+(minus, plus, dollar, colon, bar, dot). The characters
+&ldquo;<tt>A</tt>&rdquo;, &ldquo;<tt>B</tt>&rdquo;, &ldquo;<tt>C</tt>&rdquo; and &ldquo;<tt>D</tt>&rdquo; are used to
+represent four different start/stop characters. The input
+string to the barcode library can include the start and stop
+characters or not include them (in which case &ldquo;<tt>A</tt>&rdquo; is
+used as start and &ldquo;<tt>B</tt>&rdquo; as stop). Start and stop
+characters in the input string can be either all lowercase or
+all uppercase and are always printed as uppercase.
+
+     <br><dt><var>Plessey</var><dd>Plessey barcodes can encode all the hexadecimal
+digits. Alphabetic digits in the input string must either be
+all lowercase or all uppercase. The output text is always
+uppercase.
+
+     <br><dt><var>MSI</var><dd>MSI can only encode the decimal digits. While the standard
+specifies either one or two check digits, the current
+implementation in this library only generates one check digit.
+
+     <br><dt><var>code 93</var><dd>The code-93 standard can natively encode 48 different characters,
+including uppercase letters, digits, the blank space, plus, minus,
+dot, star, dollar, slash, percent, as well as five special
+characters:  a start/stop delimiter and four "shift characters" used
+for extended encoding.    Using this "extended encoding" method, any
+standard 7-bit ASCII character can be encoded, but it takes up two
+symbol lengths in barcode if the character is not natively supported
+(one of the 48). 
+The encoder here fully implements the code 93 encoding standard. 
+Any characters natively supported (A-Z, 0-9, ".+-/$&amp;%") will be
+encoded as such - for any other characters (such as lower case
+letters, brackets, parentheses, etc.), the encoder will revert
+to extended encoding. 
+As a note, the option to exclude the checksum will eliminate the
+two modulo-47 checksums (called C and K) from the barcode, but this
+probably will make it unreadable by 99% of all scanning systems. 
+These checksums are specified to be used at the firmware level,
+and their absence will be interpreted as an invalid barcode.
+
+   </dl>
+
+<!-- M .SH PCL OUTPUT -->
+<!-- ########################################################################## -->
+<div class="node">
+<p><hr>
+<a name="PCL-Output"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Bugs-and-Pending-Issues">Bugs and Pending Issues</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Supported-Encodings">Supported Encodings</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">7 PCL Output</h2>
+
+<p>While the default output is Postscript (possibly EPS), and Postscript
+can be post-processed to almost anything, it is sometimes desirable to
+create output directly usable by the specific printer at hand. 
+PCL is currently supported as an output format for this reason. 
+Please note that the Y coordinate for PCL goes from top to bottom, while
+for Postscript it goes from bottom to top. Consistently, while in
+Postscript you specify the bottom-left corner as origin, for PCL
+you specify the top-left corner.
+
+   <p>Barcode output for PCL Printers (HP LaserJet and compatibles),
+was developed using PCL5 Reference manuals from HP. 
+that really refers to these printers:
+     <ul>
+<li>LaserJet III, III P, III D, III Si,
+
+     <li>LaserJet 4 family
+
+     <li>LaserJet 5 family
+
+     <li>LaserJet 6 family
+
+     <li>Color LaserJet
+
+     <li>DeskJet 1200 and 1600.
+
+   </ul>
+
+   <p>However, barcode printing uses a very small subset of PCL, probably also
+LaserJet II should print it without problem, but the resulting text may
+be horrible.
+
+   <p>The only real difference from one printer to another really depends on
+which font are available in the printer, used in printing the label
+associated to the bars (if requested).
+
+   <p>Earlier LaserJet supports only bitmaps fonts, so these are not
+"scalable". (Ljet II ?), Also these fonts, when available, have a
+specified direction, and not all of them are available in
+both Portrait and Landscape mode.
+
+   <p>From LaserJet 4 series, (except 4L/5L that are entry-level printers),
+Arial scalable font should be available, so it's the "default font"
+used by this program.
+
+   <p>LaserJet III series printers (and 4L, 5L), don't feature "Arial" as a
+resident font, so you should use <tt>BARCODE_OUT_PCL_III</tt> instead of
+<tt>BARCODE_OUT_PCL.</tt>, and font the font used will be "Univers" instead
+of "Arial".
+
+   <p>Results on compatible printers, may depend on consistency of
+PCL5 compatibility, in doubt, try BARCODE_OUT_PCL_III
+
+   <p>PJL commands are not used here, as it's not very compatible.
+
+   <p>Tested Printers:
+     <ul>
+<li>Hp LaserJet 4050
+<li>Hp LaserJet 2100
+<li>Epson N-1200 emul PCL
+<li>Toshiba DP2570 (copier) + PCL option
+<li>Epson EPL-7100 emul. HP LaserJet II: bars print fine but text is bad. 
+</ul>
+
+<!-- M .SH BUGS -->
+<!-- ########################################################################## -->
+<div class="node">
+<p><hr>
+<a name="Bugs-and-Pending-Issues"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#PCL-Output">PCL Output</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">8 Bugs and Pending Issues.</h2>
+
+<p>The current management of borders/margins is far from optimal. The
+&ldquo;default&rdquo; margin applied by the library interferes with the external
+representation, but I feel it is mandatory to avoid creating barcode
+output with no surrounding white space (the problem is especially
+relevant for EPS output).
+
+   <p>EAN-128 is not (yet) supported. I plan to implement it pretty soon and
+then bless the package as version 1.0.
+
+<!-- M .SH "SEE ALSO" -->
+<!-- M \fBbarcode(3)\fP -->
+<!-- M -->
+<!-- M .SH AUTHORS -->
+<!-- M Alessandro Rubini <rubini@gnu.org> (maintainer) -->
+<!-- M .PP -->
+<!-- M Leonid A. Broukhis <leob@mailcom.com> (several encodings) -->
+<!-- M .PP -->
+<!-- M Andrea Scopece <a.scopece@tin.it> (PCL output) -->
+<!-- MANPAGE END -->
+</body></html>
+

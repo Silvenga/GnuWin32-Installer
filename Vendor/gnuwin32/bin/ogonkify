@@ -1,0 +1,299 @@
+#!/usr/bin/perl
+# Convert the PostScript output of Netscape to use an arbitrary encoding.
+# Do font remapping if asked for.
+# By J. Chroboczek <jec at dcs.ed.ac.uk>
+#
+# Copyright (c) 1996-1999 by J. Chroboczek
+# This code may be distributed under the terms of the 
+# GNU Public License, either version 3 of the license, or (at your
+# option) any later version.
+
+# Time-stamp: <99/05/14 04:09:10 jec>
+
+# Warning: this program is written in Perl
+
+$PROGNAME='ogonkify';
+$VERSION='v. 0.7.0 by J. Chroboczek';
+
+# Directory with the IBM Courier fonts
+$IBMFONTS="";
+# Directory with ogonkify's prologs
+$LIBDIR="c:/progra~1/A2Ps/share/ogonkify";
+
+@procsets=();
+@downloadFonts=();
+$encoding='L2';
+%encodings=('L1',"$LIBDIR/latin1.enc",'L2',"$LIBDIR/latin2.enc",
+            'L3',"$LIBDIR/latin3.enc",'L4',"$LIBDIR/latin4.enc",
+            'L5',"$LIBDIR/latin5.enc",'L6',"$LIBDIR/latin6.enc",
+            'L7',"$LIBDIR/latin7.enc",'L9',"$LIBDIR/latin9.enc",
+            'CP1250',"$LIBDIR/cp1250.enc",'cp1250',"$LIBDIR/cp1250.enc",
+            'ibmpc',"$LIBDIR/ibmpc.enc",'mac',"$LIBDIR/mac.enc",
+            'HP',"$LIBDIR/hp.enc");
+%encodingvecs=('L1','ISOLatin1Encoding','L2','ISOLatin2Encoding',
+               'L3','ISOLatin3Encoding','L4','ISOLatin4Encoding',
+               'L5','ISOLatin5Encoding','L6','ISOLatin6Encoding',
+               'L7','ISOLatin7Encoding','L9','ISOLatin9Encoding',
+               'CP1250','CP1250Encoding','cp1250','CP1250Encoding',
+               'ibmpc','IBMPCEncoding', 'mac','MacintoshEncoding',
+               'HP','HPRomanEncoding');
+@standardFont=
+  ('Courier', 'Courier-Oblique', 'Courier-Bold', 'Courier-BoldItalic',
+   'Times-Roman', 'Times-Italic', 'Times-Bold', 'Times-BoldItalic',
+   'Helvetica', 'Helvetica-Oblique', 'Helvetica-Bold',
+   'Helvetica-BoldOblique');
+%remappings=();
+$doNetscape=0;
+$doMosaic=0;
+$doStarOffice=0;
+$doApplixWare=0;
+$doXfig=0;
+$doMp=0;
+$recodeStandardFonts=0;
+$eurify=0;
+
+sub courierRemappings {
+  $remappings{'Courier-Oblique'}="Courier-Italic";
+  $remappings{'Courier-BoldOblique'}="Courier-BoldItalic";
+  if($doApplixWare) {
+    $remappings{'Courier_AX'}="Courier";
+    $remappings{'Courier-Bold_AX'}="Courier-Bold";
+    $remappings{'Courier-Oblique_AX'}="Courier-Italic";
+    $remappings{'Courier-BoldOblique_AX'}="Courier-BoldItalic";
+  }
+}
+
+sub timesRemappings {
+  $remappings{'Times-Roman'}="Times-Roman-Ogonki";
+  $remappings{'Times-Bold'}="Times-Bold-Ogonki";
+  $remappings{'Times-Italic'}="Times-Italic-Ogonki";
+  $remappings{'Times-BoldItalic'}="Times-BoldItalic-Ogonki";
+  if($doApplixWare) {
+    $remappings{'Times-Roman_AX'}="Times-Roman-Ogonki";
+    $remappings{'Times-Bold_AX'}="Times-Bold-Ogonki";
+    $remappings{'Times-Italic_AX'}="Times-Italic-Ogonki";
+    $remappings{'Times-BoldItalic_AX'}="Times-BoldItalic-Ogonki";
+  }
+}
+
+sub helveticaRemappings {
+  $remappings{'Helvetica'}="Helvetica-Ogonki";
+  $remappings{'Helvetica-Bold'}="Helvetica-Bold-Ogonki";
+  $remappings{'Helvetica-Oblique'}="Helvetica-Oblique-Ogonki";
+  $remappings{'Helvetica-BoldOblique'}="Helvetica-BoldOblique-Ogonki";
+  if($doApplixWare) {
+    $remappings{'Helvetica_AX'}="Helvetica-Ogonki";
+    $remappings{'Helvetica-Bold_AX'}="Helvetica-Bold-Ogonki";
+    $remappings{'Helvetica-Oblique_AX'}="Helvetica-Oblique-Ogonki";
+    $remappings{'Helvetica-BoldOblique_AX'}="Helvetica-BoldOblique-Ogonki";
+  }
+}
+
+sub adobeCourierRemappings {
+  $remappings{'Courier'}="Courier-Ogonki";
+  $remappings{'Courier-Bold'}="Courier-Bold-Ogonki";
+  $remappings{'Courier-Oblique'}="Courier-Oblique-Ogonki";
+  $remappings{'Courier-BoldOblique'}="Courier-BoldOblique-Ogonki";
+  if($doApplixWare) {
+    $remappings{'Courier_AX'}="Courier-Ogonki";
+    $remappings{'Courier-Bold_AX'}="Courier-Bold-Ogonki";
+    $remappings{'Courier-Oblique_AX'}="Courier-Oblique-Ogonki";
+    $remappings{'Courier-BoldOblique_AX'}="Courier-BoldOblique-Ogonki";
+  }
+}
+
+sub courierFonts {
+  while(<$IBMFONTS>) {
+    $downloadFonts[$#downloadFonts+1]=$_;
+  }
+}
+
+sub timesFonts {
+  $compositeProcset=TRUE;
+  $downloadFonts[$#downloadFonts+1]="$LIBDIR/ptmr-o.ps";
+  $downloadFonts[$#downloadFonts+1]="$LIBDIR/ptmri-o.ps";
+  $downloadFonts[$#downloadFonts+1]="$LIBDIR/ptmb-o.ps";
+  $downloadFonts[$#downloadFonts+1]="$LIBDIR/ptmbi-o.ps";
+}
+
+sub adobeCourierFonts {
+  $compositeProcset=TRUE;
+  $downloadFonts[$#downloadFonts+1]="$LIBDIR/pcrr-o.ps";
+  $downloadFonts[$#downloadFonts+1]="$LIBDIR/pcrro-o.ps";
+  $downloadFonts[$#downloadFonts+1]="$LIBDIR/pcrb-o.ps";
+  $downloadFonts[$#downloadFonts+1]="$LIBDIR/pcrbo-o.ps";
+}
+
+sub helveticaFonts {
+  $compositeProcset=TRUE;
+  $downloadFonts[$#downloadFonts+1]="$LIBDIR/phvr-o.ps";
+  $downloadFonts[$#downloadFonts+1]="$LIBDIR/phvro-o.ps";
+  $downloadFonts[$#downloadFonts+1]="$LIBDIR/phvb-o.ps";
+  $downloadFonts[$#downloadFonts+1]="$LIBDIR/phvbo-o.ps";
+}
+
+sub procset {
+  local($ps)=@_;
+  open(PROCSET,$ps);
+  if($_=<PROCSET>) {
+    print;
+  } else {
+    die "File $ps not found; stopped";
+  }
+  while(<PROCSET>) {
+    print;
+  }
+}
+
+sub downloadFont {
+  local($ps)=@_;
+#  print("%%BeginResource: font $ps\n"); # this is not DSC conforming
+  open(PROCSET,$ps);
+  if($_=<PROCSET>) {
+    print;
+  } else {
+    die "File $ps not found; stopped";
+  }
+  while(<PROCSET>) {
+    print;
+  }
+  print("%%EndResource\n");
+}
+
+sub remap {
+  local($from,$to,$newencoding)=@_;
+  print <<"ALAMAKOTA";
+/$to findfont
+dup length 1 add dict begin
+{1 index /FID ne {def} {pop pop} ifelse} forall
+ALAMAKOTA
+  if($newencoding) {
+    print "/Encoding $newencoding def\n";
+  }
+  print <<"ALAMAKOTA";
+currentdict end
+/$from exch definefont pop
+ALAMAKOTA
+}
+
+sub eurifyFont {
+  local($name)=@_;
+  print "/$name /$name eurifyFont\n";
+}
+
+sub usage {
+  local($oldfh)=select(STDERR);
+  print <<"ALAMAKOTA";
+$PROGNAME $VERSION
+$PROGNAME -p<procset> -e<encoding> -rOld=New 
+  -a -c -h -t -A -C -H -T -AT -CT -ATH -CTH -E
+  -N -M -mp -SO -AX -F -RS 
+  -- file ...
+ALAMAKOTA
+  select($oldfh);
+}
+
+
+while(defined($_ = $ARGV[0]) && /^-/) {
+  shift;
+  if(/^--$/) {last;}
+  elsif (/^-p$/) { $procsets[$#procsets+1]=$ARGV[0]; shift; }
+  elsif (/^-p(.*)/) { $procsets[$#procsets+1]=$1; }
+  elsif (/^-e$/) { $encoding=$ARGV[0]; shift; }
+  elsif (/^-e(.*)/) { $encoding=$1 ; }
+  elsif (/^-r(.*)=(.*)/) { $remappings{$1}=$2; }
+  elsif (/^-c$/) { &courierRemappings; }
+  elsif (/^-C$/) { &courierRemappings; &courierFonts; }
+  elsif (/^-a$/) { &adobeCourierRemappings; }
+  elsif (/^-t$/) { &timesRemappings; }
+  elsif (/^-h$/) { &helveticaRemappings ; }
+  elsif (/^-T$/) { &timesRemappings; &timesFonts; }
+  elsif (/^-A$/) { &adobeCourierRemappings; &adobeCourierFonts; }
+  elsif (/^-H$/) { &helveticaRemappings; &helveticaFonts; }
+  elsif (/^-CT$/){ &courierRemappings; &timesRemappings; 
+                   &courierFonts; &timesFonts; }
+  elsif (/^-AT$/){ &adobeCourierRemappings; &timesRemappings; 
+                   &adobeCourierFonts; &timesFonts; }
+  elsif (/^-CTH$/){ &courierRemappings; &timesRemappings; &helveticaRemappings;
+                    &courierFonts; &timesFonts; &helveticaFonts; }
+  elsif (/^-ATH$/){ &adobeCourierRemappings; &timesRemappings; 
+                    &helveticaRemappings;
+                    &adobeCourierFonts; &timesFonts; &helveticaFonts; }
+  elsif(/^-E$/) { $compositeProcset=TRUE; $eurify=TRUE; }
+  elsif (/^-RS$/) { $recodeStandardFonts=TRUE; }
+  elsif (/^-N$/) { $doNetscape=TRUE; }
+  elsif (/^-SO$/) { $doStarOffice=TRUE; }
+  elsif (/^-AX$/) { $doApplixWare=TRUE; }
+  elsif (/^-M$/) { $doMosaic=TRUE; }
+  elsif (/^-mp$/) { $doMp=TRUE; }
+  elsif (/^-F$/) { $doXfig=TRUE; }
+  else { &usage ; die "\n"; }
+}
+
+if(!$encodings{$encoding}) {
+  die "Unknown encoding $encoding";
+}
+
+$where=0;
+while(<>) {
+  if($where==0) {
+    print;
+    if(($doMosaic || $doMp) && /^%%EndComments/) {
+      $_="%%BeginProlog\n";
+      print;
+    }
+    if(/^%%BeginProlog/) {
+      $where=1;
+      &procset($encodings{$encoding});
+      if($compositeProcset) {
+        &procset("$LIBDIR/compose.ps");
+        &procset("$LIBDIR/ogonki.enc");
+      }
+      for(@procsets) {
+        &procset($_);
+      }
+      for(@downloadFonts) {
+        &downloadFont($_);
+      }
+      if($eurify) {
+        for(@standardFont) {
+          &eurifyFont($_);
+        }
+      }
+      while(($from,$to)=each %remappings) {
+        &remap($from,$to);
+      }
+      if($recodeStandardFonts) {
+        for(@standardFont) {
+          &remap($_, $_, 
+                 $encodingvecs{$encoding});
+        }
+      }
+    }
+  } elsif($where==1) {
+      if(/^%%EndProlog/) {
+        $where=2;
+      } else {
+        if ($doNetscape && m|/Encoding[ \t]+isolatin1encoding[ \t]*def|) {
+          s/isolatin1encoding/$encodingvecs{$encoding}/;
+        } elsif ($doMosaic && m|/Encoding[ \t]+ISOLatin1Encoding[ \t]*D|) {
+          s/ISOLatin1Encoding/$encodingvecs{$encoding}/;
+        } elsif ($doMp && m|/Encoding[ \t]+ISOLatin1Encoding[ \t]*def|) {
+          s/ISOLatin1Encoding/$encodingvecs{$encoding}/;
+        } elsif ($doStarOffice && m/ISOLatin1Encoding/) {
+          s/ISOLatin1Encoding/$encodingvecs{$encoding}/;
+        } elsif ($doXfig && 
+                 m|/([^ \t]+)[ \t]+/([^ \t]+)[ \t]+isovec[ \t]+ReEncode|) {
+          &remap($2,$1,$encodingvecs{$encoding});
+          next;
+        }       
+      }
+      print;
+  } elsif($where==2) {
+    print;
+  }
+}
+
+### Local Variables: ***
+### mode: perl ***
+### End: ***

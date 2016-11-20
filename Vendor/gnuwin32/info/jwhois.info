@@ -1,0 +1,488 @@
+Detta är jwhois.info, skapad av makeinfo version 4.7 från jwhois.texi.
+
+START-INFO-DIR-ENTRY
+* jwhois: (jwhois).     Whois client.
+END-INFO-DIR-ENTRY
+
+   This file documents JWHOIS, a Whois client.
+
+   Copyright (C) 1999-2005  Free Software Foundation, Inc.
+
+   Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+   Permission is granted to copy and distribute modified versions of
+this manual under the conditions for verbatim copying, provided that
+the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+
+File: jwhois.info,  Node: Top,  Next: Introduction,  Prev: (dir),  Up: (dir)
+
+   This file documents the GNU jwhois package, en extended Whois client.
+This is edition 3.2.1, for jwhois version 3.2.3, last updated 30 June
+2002.
+
+* Menu:
+
+* Introduction::                Introduction
+* Invocation::                  How to invoke jwhois
+* Site Configuration::          Syntax of the configuration file
+* RIPE Extensions::             Extensions for RIPE databases
+* Reporting bugs::              Reporting bugs
+
+ --- The Detailed Node Listing ---
+
+Site Configuration
+
+* Global options::              Global configuration options
+* Whois servers::               Syntax for selecting whois servers
+* Server options::              Syntax for server options
+
+
+File: jwhois.info,  Node: Introduction,  Next: Invocation,  Prev: Top,  Up: Top
+
+1 Introduction
+**************
+
+JWHOIS is an Internet Whois client that contains an extensible
+configuration file which defines its operation. The client supports
+queries to foreign hosts either through the RFC 954 - NICNAME/WHOIS
+protocol, the RFC 2167 - Referral Whois 1.5 protocol, or HTTP using an
+external browser.
+
+   Upon execution, JWHOIS searches through the its configuration to
+find the most specific whois server to query. Depending upon the reply
+from that whois server, JWHOIS can assume the query was successfull and
+display the result to the user, or optionally redirect the query to
+another server to find more specific information.
+
+
+File: jwhois.info,  Node: Invocation,  Next: Site Configuration,  Prev: Introduction,  Up: Top
+
+2 Invocation
+************
+
+JWHOIS uses the following command-line options:
+`--version'
+     Print the program version and licensing information.
+
+`--help'
+     Print a usage message summarizing the command-line options.
+
+`-c FILE'
+
+`--config=FILE'
+     Reads configuration from FILE instead of from the default system
+     global configuration file.
+
+`-h HOST'
+
+`--host=HOST'
+     Overrides any specifications in the configuration file and queries
+     HOST directly.
+
+`-p PORT'
+
+`--port=PORT'
+     Specifies a port number to use when querying a HOST
+
+`-f'
+
+`--force-lookup'
+     Forces a query to be made to a host even if a current object is
+     available from the cache.
+
+`-v'
+
+`--verbose'
+     Outputs verbose debugging information while running (use this
+     before sending a bugreport to ensure that it's indeed a bug and
+     not a misconfiguration). You can increase the verbosity by giving
+     several verbose commands to jwhois, such as `-vv'.
+
+`-n'
+
+`--no-redirect'
+     Disable features that redirect queries from one server to another.
+
+`-s'
+
+`--no-whoisservers'
+     Disable the built-in support for whois-servers.net.
+
+`-a'
+
+`--raw'
+     Send query verbatim to receiving hosts instead of rewriting them
+     according to the configuration.
+
+`-i'
+
+`--display-redirections'
+     Display every step in a redirection (default is to display only the
+     last answer).
+
+`-d'
+
+`--disable-cache'
+     Completely disable both reading and writing to cache
+
+`-r'
+
+`--rwhois'
+     Force the query to use the rwhois protocoll instead of HTTP or
+     whois.
+
+`--rwhois-display=DISPLAY'
+     Asks receiving rwhois servers to display the results in the
+     DISPLAY display instead of the default dump display.
+
+`--rwhois-limit=LIMIT'
+     asks receiving rwhois servers to limit their responses to LIMIT
+     matches.
+
+
+   The query can optionally contain the character `@' followed by a
+host name to direct the search to that host. This works exactly like
+specifying the host with `--host' or `-h'.
+
+
+File: jwhois.info,  Node: Site Configuration,  Next: Global options,  Prev: Invocation,  Up: Top
+
+3 Site Configuration
+********************
+
+JWHOIS is configurable via its configuration file, normally called
+`jwhois.conf'. This file is looked for in the sysconfdir that was
+specified when compiling the program (default is `/usr/local/etc/' on
+most systems).
+
+   If no configuration file can be found, JWHOIS will default all
+queries to `whois.internic.net'.
+
+   An example configuration file that includes most known Whois servers
+can be found in the `example' subdirectory of the official distribution.
+This example configuration also contains a lot of well used options
+that should be suitable for most setups.
+
+   The configuration file is split into a number of blocks. Each block
+can contain a number of different options which are explained in the
+sections below. You can also get an overview of the syntax by looking
+at the example configuration file included in the distribution.
+
+* Menu:
+
+* Global options::              Global configuration options
+* Whois servers::               Syntax for selecting whois servers
+* Server options::              Syntax for server options
+
+
+File: jwhois.info,  Node: Global options,  Next: Whois servers,  Prev: Site Configuration,  Up: Top
+
+4 Global options
+****************
+
+The global options of JWHOIS configure some basic facilities that are
+to be used for all hosts and queries made.
+
+`cachefile'
+     By default, the location of the cache file is
+     `/usr/local/var/jwhois.db', but this can be changed at compile
+     time. The option `cachefile' also changes the location.
+
+`cacheexpire'
+     The default expire time for all cached objects it 7 days (168
+     hours). this can be changed with the `cacheexpire' option. The
+     value is the number of hours that objects is considered to be
+     current.
+
+`whois-servers-domain'
+     Whois-servers.net is a service offered by the CenterGate Research
+     Group. They register CNAMEs in the `whois-servers.net' domain for
+     every known top-level domain, pointing to the appropriate whois
+     server.
+
+     When querying for `wildebeest.se' for example, JWHOIS would look
+     for an address `se.whois-servers.net' and query the appropriate
+     server based on that information.
+
+     If you wish to make whois-servers.net-style queries using another
+     domain name than `whois-servers.net', you can change this option
+     to the domain name you want.
+
+`browser-pathname'
+
+`browser-stdarg'
+
+`browser-postarg'
+
+`post-as-file'
+     These options control the HTTP support on JWHOIS.
+     `browser-pathname' should be set to the path and executable of the
+     browser you wish to use to download information from
+     HTTP-gateways. This is normally a program such as LYNX or CURL.
+
+     `browser-stdarg' sets the arguments to pass to the browser in
+     order to have the browser direct its options to the standard
+     output. JWHOIS catches this information and displays it to the
+     user.
+
+     `browser-postarg' sets the arguments used to enable a processing
+     of POST requests.
+
+     `post-as-file' selects the way POST data is sent to the browser.
+     If set to TRUE, LYNX-style processing is enabled, which means that
+     the program, when passed the option specified in `browser-postarg',
+     should accept one variable per line of input on standard input,
+     terminated with three dashes.  If set to FALSE, W3M-style
+     processing is enabled, which means that the program, when passed
+     this option, should consider the parameter that follows the one
+     specified in `browser-postarg' as a file name from which to read
+     POST data.
+
+
+   Examples:
+
+     cachefile = "/var/lib/jwhois.db";
+     cacheexpire = 168;
+     browser-pathname = "/usr/bin/lynx";
+     browser-stdarg = "-dump";
+     browser-postarg = "-post_data";
+
+
+File: jwhois.info,  Node: Whois servers,  Next: Server options,  Prev: Global options,  Up: Top
+
+5 Whois servers
+***************
+
+When making a query, JWHOIS looks at the `whois-servers' block to
+determine which host to send the query to. This block consists of a
+number of rules. Each rule is evaluated in turn, starting with the
+first one in `whois-servers'.  A rule consists of a key and a value.
+The key can be either a special option, or a CIDR block or regular
+expression that is matched against the query that the user specified.
+
+   The special option `type' takes one value, either `cidr' or `regex'.
+This defines the current blocks matching. Each block can match either
+with CIDR blocks or regular expressions, never both.
+
+   If the key is a regular expression, the value can take on of two
+forms. Either a single string containing the hostname of the
+appropriate whois-server, optionally postfixed with a colon and a port
+number, or a block.
+
+   If the value of the regular expression is a block, it can contain
+any number of options. The options `whois-server' and `query-format'
+are supported today.
+
+   `whois-server' specifies the hostname of the whois server to send a
+query to, optionally postfixed with a colon and a port number, just as
+if the value had been a single string containing the whois server
+hostname.
+
+   `query-format' rewrites queries matching this rule according to the
+contents of the options value. The special characters `$*' are replaced
+with the original query.  If a `query-format' is specified both on an
+individual rule and on a server option, the most `query-format' for the
+individual rule will be used since it is most specific.
+
+   The special keyword `default' can be used to mark an entry as valid
+for all keys. The most specific rule will be used when searching for a
+host to query.
+
+   Examples:
+
+     whois-servers {
+             type = regex;
+
+     	"\\([0-9]+\\.\\)+[0-9]+" = "struct cidr-blocks";
+             ".*-[A-Z]+$" = "struct handles";
+
+             default = "whois.internic.net";
+     };
+     handles {
+             type = regex;
+
+             ".*-RIPE$" = "whois.ripe.net";
+     };
+
+     cidr {
+             type = cidr;
+
+             "61.0.0.0/8" {
+                     whois-server = "whois.apnic.net";
+                     query-format = "$* /e";
+             }
+             default = "whois.arin.net";
+     };
+
+
+File: jwhois.info,  Node: Server options,  Next: RIPE Extensions,  Prev: Whois servers,  Up: Top
+
+6 Server options
+****************
+
+The `server-options' block defines a number of parameters that are
+specific to each host.
+
+`whois-redirect'
+     This option, previously located in a separate content-redirect
+     block of the configuration file, matches output from standard
+     whois servers and redirects the query to another host based on the
+     output.
+
+     The most commonly used option here is to redirect the query from
+     the Internic shared whois server to the whois server of each
+     individual registrar.
+
+     The value of the key `whois-redirect' should contain a regular
+     expression which matches one or two string. If it matches one
+     string, it will be treated as the hostname of a server to ask for
+     more information. If it matches two strings, the first string will
+     be treated as the hostname and the second as the port number.
+
+     The matching follows standard regular expressions and grouping of
+     regular expressions into one string is done by enclosing the group
+     in parentheses.
+
+`query-format'
+     By specifying a `query-format', the query can be rewritten before
+     being sent to the target whois server. This is useful for example
+     if the server defaults to output its information in another
+     language than English, and you wish to always rewrite queries sent
+     to it according to some syntax that enables output in English.
+
+     The value of this option is a simple string where the special
+     characters `$*' will be replaced with the original query.  If a
+     `query-format' is specified both on an individual rule and on a
+     server option, the `query-format' for the individual rule will be
+     used since it is most specific.
+
+     For more advanced query rewrites, it is also possible to access
+     subfields of the domain query. These subfields are counted from
+     the left or the right, starting at 1 (one). To select the fields,
+     the syntax `${start-end}' (left to right) or `${start+end}' (right
+     to left). Either of the start or end fields can be omitted, and
+     the two formats cannot be combined in one query. You can also
+     select a single field (counting from the left) by using the format
+     `${fieldnumber}'. To do this when counting from the right, you
+     need to write `${fieldnumber+fieldnumber}'. Please note that the
+     first field number is always the leftmost field, so the numerical
+     values are swapped when counting right to left.
+
+     To include a verbatim `$' in the query, write `$$'.
+
+     You can use `query-format' also for HTTP based queries, but it
+     cannot be combined with `http-action', `form-element' or
+     `form-extra'.
+
+`http'
+     The `http' option specifies that this server supports queries made
+     via HTTP. The value should be set to `true' if this is the case.
+     The options `http-method', `http-action' and `form-element' must
+     also be set for this to work.
+
+`http-method'
+     When asking servers for information through HTTP, this option
+     specifies the HTTP method to use. It can be either `GET' or
+     `POST'. Many servers support either method, so selecting one is a
+     matter of personal preference.
+
+`http-action'
+     This option specifies the action of the HTTP query sent to a
+     remote host. Most often, this is simply the pathname of the URL.
+
+`form-element'
+     The `form-element' is the name of the HTML form element which
+     should contain the query. Usually this is something simple, like
+     `domain', but you need to verify this by looking at each servers
+     HTML documents before setting this option to its correct value.
+
+`form-extra'
+     Lists any extra form elements that are to be submitted with the
+     query.
+
+`rwhois'
+     Set this option to `true' if the server supports the rwhois
+     protocol, this option makes JWHOIS send all queries to the server
+     as rwhois queries.
+
+`rwhois-display'
+     If the server supports rwhois and you wish to select another
+     display than the default dump format, you can set this option to
+     the display you wish to use.
+
+`rwhois-limit'
+     If the server supports rwhois and you wish to limit the amount of
+     responses to a query, you can set this option to the number of
+     responses you would like to receive at maximum.
+
+
+   Examples:
+     server-options {
+     	"rwhois\\.nic\\.ve" {
+     		rwhois = true;
+     		rwhois-display = "dump";
+     		rwhois-limit = 10;
+     	}
+     	"whois\\.crsnic\\.net" {
+     		whois-redirect = ".*Whois Server: \\(.*\\)";
+     	}
+     	"whois\\.ncst\\.ernet\\.in" {
+     		query-format = "domain $*";
+     	}
+     	"www\\.nic-se\\.se" {
+     		http = true;
+     		http-method = "GET";
+     		http-action = "/cgi-bin/whois/www-to-whois";
+     		form-element = "domain";
+     	}
+     }
+
+
+File: jwhois.info,  Node: RIPE Extensions,  Next: Reporting bugs,  Prev: Server options,  Up: Top
+
+7 RIPE Extensions
+*****************
+
+RIPE (Réseaux IP Européens) has defined a number of options that can be
+used against a RIPE-compatible whois server (ripe.net, apnic.net and
+others).  Unfortunately, there is really no way of telling whether a
+host we are connecting to is RIPE-compatible or not.  RIPE extensions
+are therefore not directly incorporated into the JWHOIS client.  A list
+of the options can be found in RIPE Document 157 which you can get from
+the RIPE ftp server, `ftp://ftp.ripe.net/ripe/docs/'.
+
+   It is possible to use these options together with JWHOIS by changing
+the format of the query slightly. If you were to search for all entries
+in the RIPE database which lists the admin-c, tech-c or zone-c as
+CO19-RIPE, you could use the following command syntax:
+
+     $ jwhois -h whois.ripe.net -- -i admin-c,tech-c,zone-c CO19-RIPE
+
+   `--' is used to separate the RIPE options from the jwhois options.
+
+
+File: jwhois.info,  Node: Reporting bugs,  Prev: RIPE Extensions,  Up: Top
+
+8 Reporting bugs
+****************
+
+Email bug reports to `bug-jwhois@gnu.org'.
+
+
+
+Tag Table:
+Node: Top675
+Node: Introduction1430
+Node: Invocation2163
+Node: Site Configuration4265
+Node: Global options5453
+Node: Whois servers8127
+Node: Server options10509
+Node: RIPE Extensions15396
+Node: Reporting bugs16421
+
+End Tag Table

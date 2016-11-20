@@ -1,0 +1,150 @@
+Ppmchange User Manual(0)               Ppmchange User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       ppmchange - change all pixels of one color to another in
+       a PPM image
+
+
+SYNOPSIS
+       ppmchange
+
+       [-closeness=closeness_percent]       [-remainder=remain-
+       der_color] [-closeok] [oldcolor newcolor] ...  [ppmfile]
+
+
+EXAMPLES
+       ppmchange red blue redimage.ppm >blueimage.ppm
+
+       ppmchange red red -remainder=black myimage.ppm >redblack.ppm
+
+       ppmchange -closeness=90 white white black black
+
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       ppmchange reads a PPM image as  input  and  changes  all
+       pixels of colr oldcolor to color newcolor.
+
+       You may specify up to 256 oldcolor/newcolor pairs on the
+       command line.  ppmchange leaves all colors not mentioned
+       unchanged,  unless you specify the -remainder option, in
+       which case they are all changed to the single  specified
+       color.
+
+       You  can specify that colors similar, but not identical,
+       to the ones you specify get  replaced  by  specifying  a
+       'closeness' factor.
+
+       Specify  the colors as described for the argument of the
+       ppm_parsecolor() library routine .
+
+       If a pixel matches two  different  oldcolors,  ppmchange
+       replaces  it with the newcolor of the leftmost specified
+       one.
+
+       The maxval of the output image is the same  as  that  of
+       the  input  image.   If a newcolor you specify cannot be
+       exactly represented  in  that  maxval,  ppmchange  fails
+       unless  you  specify  the -closeok option, in which case
+       ppmchange assumes a color that is as close  as  possible
+       to  what  you specified but can be represented with your
+       maxval.
+
+       A common way that you  can  have  this  maxval  problem,
+       where  the  color you specify cannot be represented with
+       your maxval, is that your input  is  a  PBM  (black  and
+       white)  image  that  you  are colorizing.  The maxval in
+       this case is 1, which  severely  limits  the  colors  to
+       which  you  can  change.   To  avoid  this  problem, use
+       pnmdepth to make the maxval of your input something con-
+       sistent with your colors.  255 is usually a good choice.
+
+       Before  Netpbm  10.22  (April  2004),  ppmchange  always
+       behaved  as if the user specified -closeok and there was
+       no -closeok option.
+
+
+
+OPTIONS
+       -closeness closeness_percent
+              closeness is an integer  per  centage  indicating
+              how close to the color you specified a pixel must
+              be to get replaced.  By default, it is  0,  which
+              means the pixel must be the exact color you spec-
+              ified.
+
+              A pixel gets replaced if the  distance  in  color
+              between  it  and  the color you specified is less
+              than or equal to closeness per cent of  the  max-
+              val.
+
+              The  'distance' in color is defined as the carte-
+              sian sum of the individual  differences  in  red,
+              green,  and blue intensities between the two pix-
+              els, normalized so that  the  difference  between
+              black and white is 100%.
+
+              This  is probably simpler than what you want most
+              the time.  You probably would like to change col-
+              ors  that have similar chrominance, regardless of
+              their intensity.  So if there's a red  barn  that
+              is  variously  shadowed, you want the entire barn
+              changed.  But because the shadowing significantly
+              changes  the  color according to ppmchange's dis-
+              tance formula, parts of  the  barn  are  probably
+              about as distant in color from other parts of the
+              barn as they are from green  grass  next  to  the
+              barn.
+
+              Maybe  ppmchange  will be enhanced some day to do
+              chrominance analysis.
+
+
+       -closeok
+              This option affects how  ppmchange  interprets  a
+              color  you  specify  in  the arguments.  When you
+              specify this option, ppmchange may  use  a  color
+              close  to,  but not the same as what you specify.
+              See the description section  for details.
+
+              This option was new in Netpbm 10.22 (April 2004).
+              Before  that,  ppmchange always behaved as if you
+              specified this option.
+
+
+       -remainder color
+              ppmchange changes all pixels which are not  of  a
+              color  for which you specify an explicit replace-
+              ment color on the command line to color color.
+
+              An example application of this is
+
+              ppmchange -remainder=black red red
+
+              to lift only the red portions from an image, or
+              ppmchange -remainder=black red white | ppmtopgm
+
+              to create a mask file for the red portions of the
+              image.
+
+
+
+
+SEE ALSO
+       pgmtoppm(1), ppmcolormask(1), ppm(1)
+
+
+AUTHOR
+       Wilson  H. Bent. Jr. (whb@usc.edu) with modifications by
+       Alberto Accomazzi (alberto@cfa.harvard.edu)
+
+
+
+netpbm documentation     21 April 2004 Ppmchange User Manual(0)

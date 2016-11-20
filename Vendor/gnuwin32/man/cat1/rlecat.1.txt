@@ -1,0 +1,87 @@
+RLECAT(1)                                             RLECAT(1)
+
+
+
+
+
+NAME
+       rlecat - concatenate and repeat images.
+
+SYNOPSIS
+       rlecat [ -c ] [ -n repeat-count ] [ -o outfile ] [ files
+       ...  ]
+
+DESCRIPTION
+       This program  will  concatenate  all  the  input  RLE(5)
+       images,  adding  titles,  and  optionally  repeating the
+       images a specified number  of  times.   For  each  input
+       file,  it  copies  all images to the output file.  If an
+       image does not have a title or TITLE  comment,  and  the
+       input  is  not  coming from the standard input, then the
+       file name (and an image number, if it is not  the  first
+       image  in the file) is added as a TITLE comment.  If the
+       input file were  named  'images.rle',  the  first  image
+       would  be  given  a comment TITLE=images.rle, the second
+       would get a comment TITLE=images.rle(2), and so on.
+
+OPTIONS
+       -c     With -n, specifies that the output images  should
+              be   "collated".   In  other  words,  the  repeat
+              sequence will be 1 2 3 ... 1 2 3 ...  instead  of
+              the default of 1 1 ... 2 2 ... 3 3 ...
+
+       -n repeat-count
+              Specifies   that   each  input  image  should  be
+              repeated repeat-count times.  The  "repeat  unit"
+              (if  -c is specified, this is the entire concate-
+              nated sequence of input images, otherwise  it  is
+              just each image, separately) is written to a tem-
+              porary file, and then copied to  the  output  the
+              requisite number of times.
+
+       -o outfile
+              If  specified, the output will be written to this
+              file.  If outfile is "-", or if it is not  speci-
+              fied,  the output will be written to the standard
+              output stream.
+
+       files  The input will be read from these  files.   If  a
+              file  name  is  "-",  or  none are specified, the
+              input  will  be  read  from  the  standard  input
+              stream.
+
+EXAMPLES
+       rlebg 128 128 128 | rlecat -n 25
+              Generates  25 copies of a gray background; useful
+              for using rlecomp(1) to put background on an ani-
+              mation sequence (with 25 or fewer frames).
+
+       rlecat *.rle | <some processing> | getx11
+              Adds  TITLE comments so the individual images are
+              correctly identified by getx11(1).
+
+       rlecat -c -r 3 anim*.rle
+              Generates an animation  with  3  repeats  of  the
+              action.
+
+       rlecat -r 3 anim*.rle
+              Generates  a  "triple-framed"  animation  -  each
+              frame is repeated 3 times.
+
+FILES
+       /tmp/rlecatXXXXXXXX
+
+SEE ALSO
+       rleaddcom(1), rlehdr(1), urt(1), RLE(5).
+
+AUTHOR
+       Spencer W. Thomas, University of Michigan
+
+BUGS
+       If the /tmp directory is not writable, or  if  there  is
+       not  sufficient space on /tmp to hold a repeat unit, the
+       program will not work correctly.
+
+
+
+1                      November 12, 1990              RLECAT(1)

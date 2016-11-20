@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: `while' command</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile While.html "Gri: `while' command" "Gri Commands" --> 
+
+<!-- @node   While, Write, Unlink, List Of Gri Commands -->
+<a name="While" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="ListOfGriCommands.html#ListOfGriCommands" shape="rect" coords="516,2,532,24" href="ListOfGriCommands.html#ListOfGriCommands">
+<area alt="Gri: `unlink' command" shape="rect" coords="557,2,573,24" href="Unlink.html">
+<area alt="Gri: Write commands" shape="rect" coords="581,2,599,24" href="Write.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: Write commands" shape="rect" coords="581,2,599,24" href="Write.html">
+</map>
+<h3>9.3.52: `<font color="#82140F"><code>while</code></font>'</h3>
+
+<!-- latex: \index{while} -->
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`while .test.|{rpn ...}'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Perform statements in loop while the value of `<font color="#82140F"><code>.test.</code></font>' or the RPN
+expression is nonzero.  The end of the loop designated by a line
+containing the words `<font color="#82140F"><code>end while</code></font>'.  The value `<font color="#82140F"><code>.test.</code></font>' may be
+an rpn expression.  To leave the loop prematurely, use a `<font color="#82140F"><code>break</code></font>'
+statement.  Upon encountering a `<font color="#82140F"><code>break</code></font>' statement, Gri jumps to the
+line immediately following the loop.  If the `<font color="#82140F"><code>-chatty</code></font>' option is
+nonzero, a notification is printed every 1000 passes through the loop,
+as a debugging measure to catch unintended infinite loops.
+<p>
+
+<b>Examples</b>:
+<p>
+<ul>
+<li>
+Loop forever, printing a message over and over.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+while 1
+  show "This loops forever. Need to 'break'"
+end while
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+Repeatedly read two numbers, and plot a bullet at the indicated
+location.  If (or, hopefully, ``when'') the end of the file is
+encountered, break out of the loop; otherwise continue plotting forever.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+while 1
+  read .x. .y.
+  if ..eof..
+    break
+  end if
+  draw symbol bullet at .x. .y.
+end while
+<p>
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<li>
+Loop 10 times, printing the values of `<font color="#82140F"><code>.i.</code></font>' as they range 0, 1,
+..., 9.  After exiting from the loop, `<font color="#82140F"><code>.i.</code></font>' will equal 10.  Be
+<b>careful</b> to use the correct rpn greater-than test to avoid an
+infinite loop.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+.i. = 0
+while {rpn .i. 10 &gt;}
+  show .i.
+  .i. += 1
+end while
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+</ul>
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

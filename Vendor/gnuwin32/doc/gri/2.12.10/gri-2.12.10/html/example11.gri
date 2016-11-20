@@ -1,0 +1,168 @@
+# Example 11 -- Fancy plot
+
+.thin. = 0.5			# for whole data set
+.thick. = 2			# for bravo time period
+.gray_for_guiding_lines. = 0.75	# for guiding lines
+.tmin. = 1964			# time axis
+.tmax. = 1974
+.tinc. = 5
+.tincinc. = 1
+.missing_value. = -9
+\file = "./example11.dat"
+#
+# Guiding lines to draw on both panels.
+#
+.1xl. = 1962
+.1yb. = -3
+.1xr. = 1968
+.1yt. = 3
+.1slope. = {rpn .1yt. .1yb. - .1xr. .1xl. - /}
+.1intercept. = {rpn .1yb. .1slope. .1xl. * -}
+.2xl. = 1966.4
+.2yb. = 3
+.2xr. = 1980
+.2yt. = -1
+.2slope. = {rpn .2yt. .2yb. - .2xr. .2xl. - /}
+.2intercept. = {rpn .2yb. .2slope. .2xl. * -}
+#
+# PANEL 1: Bravo time period.
+#
+set x margin 3
+set x size 15
+set y margin 3
+set y size 5
+# Draw border big enough for this and next panel.
+draw border box {rpn ..xmargin.. 2 -} {rpn ..ymargin.. 2 -} {rpn ..xmargin.. ..xsize.. + 2 +} {rpn ..ymargin.. ..ysize.. 2 * 3 + + 2 +} 0.2 0.75
+set missing value .missing_value.
+set ignore error eof
+set x name "Year"
+set x axis .tmin. .tmax. .tinc. .tincinc.
+set y name "Area / 10$^5$km$^2$"
+set y axis -3 3 1
+draw axes
+#
+# Draw index lines 1 and 2.
+# 
+# Upward sloped line.
+set line width .thin.
+set graylevel .gray_for_guiding_lines.
+if {rpn .1intercept. ..xright.. .1slope. * + ..ytop.. <}
+    draw line from              \
+	..xleft..               \
+	{rpn .1intercept. ..xleft.. .1slope. * +} \
+	to                      \
+	{rpn ..ytop.. .1intercept. - .1slope. /} \
+	..ytop..
+else
+    draw line from              \
+	..xleft..               \
+	{rpn .1intercept. ..xleft.. .1slope. * +} \
+	to                      \
+	..xright..              \
+	{rpn .1intercept. ..xright.. .1slope. * +}
+end if
+set graylevel 0
+# 
+# Downward sloped line.
+set line width .thin.
+set graylevel .gray_for_guiding_lines.
+if {rpn .2intercept. ..xleft.. .2slope. * + ..ytop.. <}
+    draw line from              \
+	{rpn ..ytop.. .2intercept. - .2slope. /} \
+	..ytop..                \
+	to                      \
+	..xright..              \
+	{rpn .2intercept. ..xright.. .2slope. * +}  
+else
+    draw line from              \
+	..xleft..               \
+	{rpn .2intercept. ..xleft.. .2slope. * +} \
+	to                      \
+	..xright..              \
+	{rpn .2intercept. ..xright.. .2slope. * +}
+end if
+set graylevel 0
+#
+# Finally, draw the data curve on top, after first
+# whiting out a background.
+set input data window x .tmin. .tmax.
+open \file
+read columns x y
+close
+y /= 1e5
+set line width ..linewidthaxis..
+draw zero line
+set line width {rpn .thick. 3 *}
+set graylevel 1
+draw curve
+set graylevel 0
+set line width .thick.
+draw curve
+
+#
+# PANEL 2: Longer timescale.
+#
+delete x scale
+set x margin bigger 5
+set x size 10
+set x name ""
+set y name ""
+set y margin bigger {rpn ..ysize.. 3 +}
+#
+# Draw long data set in thin pen.
+set input data window x off
+open \file
+read columns x y
+close
+y /= 1e5
+#
+# Draw guiding lines, axes, etc.
+set x axis 1952 1980 5 1
+draw axes frame
+set line width .thin.
+set graylevel .gray_for_guiding_lines.
+draw line from .1xl. .1yb. to .1xr. .1yt.
+draw line from .2xl. .2yb. to .2xr. .2yt.
+set graylevel 0
+set line width ..linewidthaxis..
+draw zero line
+
+
+draw x axis at bottom
+.old. = ..fontsize..
+set font size 0
+draw y axis at left
+set font size .old.
+delete .old.
+#
+# Draw full curve (first whiting out region around it).
+set line width {rpn .thin. 4 *}
+set graylevel 1
+draw curve
+set graylevel 0
+set line width .thin.
+draw curve
+#
+# Draw bravo time period (first whiting out region around it).
+set input data window x .tmin. .tmax.
+open \file
+read columns x y
+close
+y /= 1e5
+set line width {rpn .thick. 3 *}
+set graylevel 1
+draw curve
+set graylevel 0
+set line width .thick.
+draw curve
+#
+# Done
+set font size 20
+\label = "Example 11 (Arctic ice anomaly)"
+draw label "\label" at          \
+    {rpn 8.5 2.54 * "\label" width - 2 /} \
+    {rpn ..ytop.. yusertocm 0.7 +} \
+    cm
+if !..publication..
+    draw time stamp
+end if

@@ -1,0 +1,25 @@
+This directory contains a subset of the Utah Raster Toolkit library.
+
+The source files are taken directly from that library, but only the ones
+Netpbm needs, so the resulting librle.a is smaller than the original.
+
+The files were extracted by Bryan Henderson on 2000.05.18, from a
+package taken from ftp.iastate.edu/pub/utah-raster/ called urt-3.1b on
+2000.04.13.
+
+A user who has the original library installed can use it instead of
+this stripped down version by configuring the make files
+appropriately.
+
+The source files have been modified slightly to quiet compiler warnings.
+
+In rle_global.c, the global data structure rle_dflt_hdr had "stdout"
+in its initializer in the original.  But GNU C Library Version 2
+defines stdout as a variable, so that wouldn't compile.  So I changed
+it to NULL and added a line to rle_hdr_init to set that field to
+'stdout' dynamically.  2000.06.02 BJH.
+
+Redid the code to check for maths overflows and other crawly horrors.
+Removed pipe through and compress support (unsafe)
+
+Alan Cox <alan@redhat.com>

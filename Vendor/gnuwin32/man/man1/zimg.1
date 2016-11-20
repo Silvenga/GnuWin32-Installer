@@ -1,0 +1,1046 @@
+.TH ZIMG 1 "4.24.0" "Johannes Zellner"
+
+.\" FILE: "/home/joze/pub/zimg/zimg/zimg.1.in"
+.\" LAST MODIFIED: "Thu, 25 Aug 2005 21:24:28 CEST (joze)"
+.\" (C) 1999 - 2003 by Johannes Zellner <johannes@zellner.org>
+.\" $Id: zimg.1.in,v 1.68 2005/08/25 19:24:58 joze Exp $
+.\" vim:set et:
+.\" ---
+.\"   
+.\"   Copyright (c) 1999 - 2003, Johannes Zellner <johannes@zellner.org>
+.\"   All rights reserved.
+.\"   
+.\"   Redistribution and use in source and binary forms, with or without
+.\"   modification, are permitted provided that the following conditions
+.\"   are met:
+.\"   
+.\"     * Redistributions of source code must retain the above copyright
+.\"       notice, this list of conditions and the following disclaimer.
+.\"     * Redistributions in binary form must reproduce the above copyright
+.\"       notice, this list of conditions and the following disclaimer in the
+.\"       documentation and/or other materials provided with the distribution.
+.\"     * Neither the name of Johannes Zellner nor the names of contributors
+.\"       to this software may be used to endorse or promote products derived
+.\"       from this software without specific prior written permission.
+.\"       
+.\"   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+.\"   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+.\"   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+.\"   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR
+.\"   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+.\"   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+.\"   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+.\"   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+.\"   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+.\"   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+.\"   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+.\"	# CS - begin code excerpt
+.de CS
+.RS
+.nf     \" literal layout
+.ta .25i .5i .75i 1i
+..
+.\"	# CE - end code excerpt
+.de CE
+.fi
+.RE
+..
+
+.SH NAME
+zimg \- render 2d data of arbitrary format
+
+
+.SH SYNOPSIS
+.TP 6
+\fBzimg\fP [\fIoptions\fP] [\fIfile ...\fP]
+
+
+.SH DESCRIPTION
+The \fBzimg\fP program generates png images from arbitrary formatted
+2-D ascii or binary data. Optionally, jpeg, ppm or pgm images can be
+generated instead of png.
+
+
+.SH INPUT FILES
+
+If no input files are given, \fBzimg\fP reads from stdin.
+
+If the input file ends in \fB.gz\fP, \fB.bz2\fP, \fB.z\fP or \fB.Z\fP
+and your operating system supports the popen() call, the file is
+filtered through gunzip, bunzip2 or uncompress, respectively.
+
+If an input file is not accessible, the availability of the file with
+the suffixes \fB.gz\fP, \fB.bz2\fP, \fB.z\fP or \fB.Z\fP appended
+is checked (\fBmultiview\fP).
+
+If no command line options are specified, \fBzimg\fP assumes plain
+ascii input, where the dimensions of the image are taken from
+the first two convertable integers and comment lines are marked by a 
+hash `#' mark at the very first column of each line.  If ascii data is
+read the first lines are parsed for zimg \fBmodelines\fP until the
+first data point is read. See below in the section \fBMODELINES\fP.
+
+Currently the `ESRF data format' (edf and ehf) is the only binary input
+format which is detected automatically by \fBzimg\fP (if this option
+was not disabled at compile time). In the case of ehf, the data is read
+from a different file as specified by the tag \fIEDF_BinaryFileName\fP.
+
+If the size was not specified and no binary option was selected,
+the first bytes of the source file are examined to check if the
+source is already a png file. This works only on systems where
+there's no difference between reading ascii and binary data (UNIX).
+If the source file is a png, all options except the colormap,
+labelling and output options are ignored. This is mainly useful for
+labelling a png file later (or a png file that was not created by
+\fBzimg\fP).  It can also be used to just convert png to jpeg.
+Or you can specify a different colormap, to change the colormap
+entries of the source png.  Note that this check for source png's
+is not available if \fBzimg\fP was linked with an older libgd version.
+If the source is a png, the \fB--dump-colormap\fP switch dumps the colormap
+entries of the png file instead of the zimg colors.
+
+.SH OPTIONS
+
+In almost all cases you'll need to specify at least a few command line
+options to tell \fBzimg\fP something about the input format and specify
+the output style.
+
+.PP
+Note, that the order of command line options is important: in the
+case of mutually exclusive options the last one wins;  in the case of
+a switch which turns an option on, a second occurence of this switch
+turns the option off again.  Example: -x -x does nothing. This is
+useful for overwriting options which were set in the resource files
+~/.zimgrc and .zimgrc (see section FILES).
+If an options overwrites another option (e.g. in `--red --blue', the
+second switch would overwrite the first), this is silently ignored.
+
+Some switches can be defined more than once and are \fIposition dependent\fP.
+These switches include
+    \fB--differentiate\fP
+    \fB--curvature\fP
+    \fB--smooth\fP
+    \fB--logarithmic\fP
+    \fB--fabs\fP
+    \fB--absolute\fP
+    \fB--relative\fP
+
+This means that in
+.CS
+    zimg --relative=10-60 --differentiate
+.CE
+the relative scaling applies to the raw data, but in
+.CS
+    zimg --differentiate --relative=10-60
+.CE
+the relative scaling applies to the differentiated data.
+
+.PP
+Spaces separating the single-letter options
+from their parameters are optional.
+
+The availability of some options are compile-time dependent.  Use the
+\fB--help\fP option to get a list of valid options for your binary version of
+\fBzimg\fP.
+
+
+.TP 5
+\fB-r, --size\fP=\fIwidth\fP[,\fIheight\fP]
+specifies the \fIwidth\fP and \fIheight\fP of the 2-D data. If \fIheight\fP
+is not given it is set equal to \fIwidth\fP. The separator 'x' (instead of ',')
+can be used also for backwards compatibility.  
+
+.TP 5
+\fB-M, --matrix\fP
+Input is assumed to be in ascii matrix format. The ascii input file should have
+the data in rows and columns. The number of rows is the image dimension in
+vertical direction. The number of columns is the image in horizontal direction.
+The dimension of the data can be overwritten by the \fI--size\fP switch.
+
+.TP 5
+\fB-p, --pattern\fP=\fIpattern\fP
+Mark comment blocks.  This option is used when reading unformatted
+ascii data. Each line will be truncated at \fIpattern\fP.  This options
+might be used repeatedly to specify more than one comment pattern.
+This option was not really tested and might be still buggy.
+For the future it is planned to include also regular expressions.
+
+.TP 5
+\fB-n, --column\fP=\fInumber\fP
+read column \fInumber\fP (ascii input). Multiple columns can be selected
+by using this option repeatedly.  Currently this is limited to the
+32 first columns.  If \fInumber\fP is omitted, the data of all columns will be
+used.
+
+.TP 5
+\fB--skip\fP[=\fIbytes/lines\fP]
+skip this amount of \fIlines\fP when reading ascii data.
+Skip \fIbytes\fP, if reading binary data. Note that the unit is \fIbytes\fP,
+irrespective of the input type (short ..). If the optional size argument
+is missing, the option is reset to its default. This default behavior
+is as follows: for binary data, all available data is read from the
+input stream and the header size (which will be skipped) is then
+calculated as the difference between the size of input data and the
+size of the image as specified by the -r switch. Or in short: the last
+<width>x<height> items of the input stream will be taken.  If you
+don't like this feature you can disable it explicitly by using
+the switch `--skip=0'.
+For ascii data no skipping will be done by default.
+
+.TP 5
+\fB--options\fP=/\fIregexp\fP/\fIswitches\fP
+apply \fIswitches\fP, if the input filename matches \fIregexp\fP.
+Especially useful if used in a \fB.zimgrc\fP file. The separator
+character can be any character which is not present in regexp,
+for example \fB--options\fP=#\fI/usr/local\fP#\fIswitches\fP.
+See also the \fB--input-filter\fP switch.
+\fB--options\fP is only available if your system provides
+the POSIX regular expression functions regcomp / regexec (check
+\fBzimg -V\fP for availability).
+
+.TP 5
+\fB--input-filter\fP=\fIfilter\fP
+filter input files thru \fIfilter\fP. If \fIfilter\fP contains a %s, it
+is substituted with the file name, else the filename is appended to the
+\fIfilter\fP. This switch is especially useful if used in
+a \fB.zimgrc\fP file. Example: --options='/\.int$/--input-filter=int < %s'.
+See also the \fB--options\fP switch. \fB--input-filter\fP is only available
+if your system supports the popen() call (check \fBzimg -V\fP for availability).
+
+.TP 5
+\fB-o, --output\fP=\fIpath\fP
+normally \fBzimg\fP writes to stdout. You don't ever need this option,
+if you redirect stdout to you destination file or pipe. If more than one
+input file is given, \fIpath\fP should be an existing directory where
+the output files should be stored. In this case the output names are
+constructed from \fIpath\fP, the input file name and a suffix ".gif", ".png",
+".jpg", "ppm" or "pgm" depending on the gd version which was used at compile
+time and eventually the \fB-j\fP, \fB-P\fP, \fB--ppm\fP or \fB--pgm\fP switch.
+Using \fI-\fP for \fIpath\fP will force stdout also for multiple input files;
+however, this makes sense only with \fIppm\fP and \fIpgm\fP output image formats
+because png and jpeg formats do not allow multiple images in one file (only the
+first one would be read).
+
+.TP 5
+\fB--big-endian
+binary input data is big-endian. This option overwrites \fB--swap\fP
+and can be overwritten by \fB--swap\fP and \fB--little-endian\fP.
+This switch does nothing if the machine where \fBzimg\fP runs is
+also big-endian, otherwise the words get swapped.
+
+.TP 5
+\fB--little-endian
+binary input data is little-endian. This option is the opposite of
+big-endian, overwrites \fB--swap\fP and can be overwritten by
+\fB--swap\fP and \fB--big-endian\fP.  This switch does nothing
+if the machine where \fBzimg\fP runs is also little-endian,
+otherwise the words get swapped.
+
+.TP 5
+\fB--swap
+swap bytes when reading binary input. This might be necessary when
+using binary files from different platforms. If \fBzimg\fP runs
+on a little-endian machine (e.g. Intel) \fB--swap\fP assumes the
+binary input data created by a big-endian machine and vice versa.
+All three switches \fB--swap\fP, \fB--big-endian\fP and
+\fB--little-endian\fP overwrite each other and therefore it is
+recommended to use only one of these switches.
+
+.TP 5
+\fB-f, --float
+read binary float (normally 4 bytes) data.
+
+.TP 5
+\fB-d, --double
+read binary double (normally 8 bytes) data.
+
+.TP 5
+\fB--char
+read signed char data.
+
+.TP 5
+\fB--short
+read signed short data.
+
+.TP 5
+\fB--int
+read signed int data.
+
+.TP 5
+\fB--long-int
+read signed long-int data.
+
+.TP 5
+\fB-c, --unsigned-char
+read unsigned char data.
+
+.TP 5
+\fB-s, --unsigned-short
+read unsigned short data.
+
+.TP 5
+\fB-i, --unsigned-int
+read unsigned int data.
+
+.TP 5
+\fB--unsigned-long-int
+read unsigned long int data.
+
+.TP 5
+\fB--complex-float\fP[=\fI(abs/length|phase|real|imaginary)\fP]
+input data is \fIbinary\fP complex float. (ascii parsing of complex
+numbers is not implemented yet. The value of the switch determines
+how to display the complex numbers. The default is \fIabs\fP or
+the alias \fIlength\fP (the length of the complex number).
+
+.TP 5
+\fB--complex-double\fP=\fI(abs/length|phase|real|imaginary)\fP
+Like \fI--complex-float\fP, but for complex double \fIbinary\fP input data.
+
+.TP 5
+\fB--red
+use a red scale color map.
+
+.TP 5
+\fB--blue
+use a blue scale color map.
+
+.TP 5
+\fB--grey, --gray
+use a grey scale color map.
+
+.TP 5
+\fB-m, --colormap\fP[=\fIpath\fP]
+use custom colormap from the file \fIpath\fP. The file must hold r g b
+triplets with values ranging from 0 to 0xff (255). There must be exactly
+one triplet per line, where empty lines and lines beginning with a hash `#'
+mark are skipped. The maximum number of colors is defined in zimg.h
+and it is currently 240 (16 colors are reserved for "LINE COLORS").
+The colormap file is searched in the current directory, then in
+~/.zimg/cmap, then in /usr/local/share/zimg/cmap.
+If the optional argument \fInumber\fP is omitted, the colormap is
+reset to the default.
+
+.TP 5
+\fB-m, --colormap\fP[=\fIred[,green[,blue]]\fP]
+create a colormap using predefined colormap formulae.  red, green
+and blue must be integers between -36 and 36.  If \fIblue\fP and/or
+\fIgreen\fP are missing, they're set to green or red respectively
+(so a gray colormap value can be created by specifying red only).
+The numbers select one of the predefined formulae which are used
+to map the z value to a color intensity.  Negative numbers invert
+the color intensity. Currently the following formulae are defined
+where x ranges from [0, 1]:
+If the optional argument \fInumber\fP is omitted, the colormap is
+reset to the default.
+Note: these formulae are the same as in \fBgnuplot\fP (version 3.8 and later),
+where you can try and test them using commands \fI[set|show|test] palette\fP.
+
+.CS
+    0    x = 0
+    1    x = 0.5
+    2    x = 1
+    3    x = x    (identity)
+    4    x = x * x
+    5    x = x * x * x
+    6    x = x * x * x * x
+    7    x = sqrt(x)
+    8    x = sqrt(sqrt(x))
+    9    x = sin(90 * x)
+   10    x = cos(90 * x)
+   11    x = fabs(x - 0.5); 
+   12    x = (2 * x - 1) * (2 * x - 1); 
+   13    x = sin(180 * x); 
+   14    x = fabs(cos(180 * x)); 
+   15    x = sin(360 * x); 
+   16    x = cos(360 * x); 
+   17    x = fabs(sin(360 * x)); 
+   18    x = fabs(cos(360 * x)); 
+   19    x = fabs(sin(720 * x)); 
+   20    x = fabs(cos(720 * x)); 
+   21    x = 3 * x; 
+   22    x = 3 * x - 1; 
+   23    x = 3 * x - 2; 
+   24    x = fabs(3 * x - 1); 
+   25    x = fabs(3 * x - 2); 
+   26    x = (1.5 * x - 0.5); 
+   27    x = (1.5 * x - 1.0); 
+   28    x = fabs(1.5 * x - 0.5); 
+   29    x = fabs(1.5 * x - 1.0); 
+   30
+            if (x <= 0.25)
+                return 0;
+            if (x >= 0.57)
+                return 1;
+            x = x / 0.32 - 0.78125; 
+   31
+            if (x <= 0.42)
+                return 0;
+            if (x >= 0.92)
+                return 1;
+            x = 2 * x - 0.84; 
+   32
+            if (x <= 0.42)
+                x *= 4;
+            else
+                x = (x <= 0.92) ? -2 * x + 1.84 : x / 0.08 - 11.5;
+   33
+            x = fabs(2 * x - 0.5); 
+   34
+            x = 2 * x;
+   35
+            x = 2 * x - 0.5;
+   36
+            x = 2 * x - 1;
+.CE
+
+.TP 5
+\fB-b, --cbox, --colorbox\fP[=\fIn\fP]
+draw a labelled colorbox right to the image. If the number of labels \fIn\fP
+isn't given, it is calculated automatically according to the image and font
+heights. Labelling can be turned off by specifying --colorbox=0.
+
+.TP 5
+\fB--cbox-fmt, --cbox-format\fP=\fIformat\fP
+\fIformat\fP is a c sprintf format string for floats, e.g. %3.6g
+(see the sprintf(3) manual), which is used for formatting the colorbox
+legend. Turns on \fB--cbox\fP implicitely.
+
+.TP 5
+\fB--cbox-label\fP=\fIstring\fP
+Print \fIstring\fP next to the colorbox (e.g. a unit for the colorbox numbers).
+Turns on \fB--cbox\fP implicitely.
+\fIstring\fP can be a multiline string, see for example the \fB--label\fP switch.
+
+.TP 5
+\fB--dump-colormap\fP
+dump a colormap to stdout as it can be read back with the \fI-m\fP switch.
+This can be useful for manually editing and reading back the colormap.
+The \fB--dump-colormap\fP switch disables most of the other switches -- no
+processing of data files is done. The only exception is if the source files
+are png files: in this case not the (specified) colormap of zimg,
+but the color entries of the source png are dumped.
+
+.TP 5
+\fB-I, --invert\fP
+invert the selected color map.
+
+.TP 5
+\fB-x, --xor\fP[=\fIcolor\fP]
+do an exclusive or with the specified \fIcolor\fP (defaults to white).
+For the gray scale color map this equivalent to the \fB--invert\fP switch.
+
+.TP 5
+\fB--differentiate\fP
+apply a discrete differentiation (1'st derivative) to the data.
+This is a \fIposition dependent\fP switch
+
+.TP 5
+\fB-u, --curvature\fP
+display the curvature (2'nd derivative) of the data.
+This is a \fIposition dependent\fP switch
+
+.TP 5
+\fB--smooth\fP[=\fIthreshold\fP]
+wipe out hot spots. The average and sigma of the nearest neighbors
+of each pixel are calculated. If the pixel's value is greater
+than (`threshold' * sigma + average), it will be set to the average
+of the neighbors.
+This is a \fIposition dependent\fP switch
+
+.TP 5
+\fB-z, --crange\fP=\fImin,max\fP
+sets data range for the color mappings to \fImin\fP to \fImin\fP. 
+Default is autoscaled color range according to the image data values.
+The partial notations \fB--crange\fP=\fImin,\fP and \fB--crange\fP=\fI,max\fP
+can be used, denoting the missing limiting value to be autoscaled.
+
+.TP 5
+\fB-l, --logarithmic\fP[=\fIscale\fP]
+use a logarithmic color scale where \fIscale\fP must be strictly
+positive. The data is scaled to the range 0 - \fIscale\fP, then
+the log1p () is taken. The default for \fIscale\fP is 1. The best
+way to understand this is to compare the results for different
+\fIscale\fP values.
+This is a \fIposition dependent\fP switch
+
+.TP 5
+\fB-a, --fabs\fP
+take the absolute value of the input data. The long option \fB--fabs\fP
+was named after the c function fabs(), because the \fB--absolute\fP switch
+is used for absolute scaling (see below).
+This is a \fIposition dependent\fP switch
+
+.TP 5
+\fB--absolute\fP=\fImin,max\fP
+set everything below \fImin\fP to \fImin\fP and every thing above
+\fImax\fP to \fImax\fP. The partial notations \fB--abs\fP=\fImin,\fP
+and \fB--abs\fP=\fI,max\fP can be used. If both \fImin\fP and \fImax\fP
+are given, a \fI-\fP can be used as separator instead of the \fI,\fP.
+This is a \fIposition dependent\fP switch
+
+.TP 5
+\fB--relative\fP=\fImin,max\fP
+same as above, but \fImin\fP and \fImax\fP are to be given relative
+(in percent) to the data's \fImin\fP and \fImax\fP.
+This is a \fIposition dependent\fP switch
+
+.TP 5
+\fB-N, --no-data, --nda\fP=\fI[val|@percent[,color]]\fP
+set data points which are equal to \fIval\fP to the color
+\fIcolor\fP (default: black). If \fIval\fP isn't specified,
+or if \fI@percent\fP is specified instead of val, the nda
+value is determined automatically from the border values:
+The border value which occurs most frequently will be the NDA value.
+The value \fI@percent\fP if given, must be 0 < @percent <= 100.
+If \fI@percent\fP > 1 it is divided by 100, so @75 is equivalent
+to @0.75. The \fI@percent\fP value gives the fraction of nda
+border values compared to the number of border pixels which must
+be reached at least for the automatically determined nda value
+to be valid. Example: suppose your image is 100 x 200 pixels
+large, so the number of border pixels is 600 - 2 = 598.
+If you specify --nda=@.75 and the most frequent border value
+occurs 350 times, the nda feature won't be applied, since 350
+is smaller than 0.75 * 598.
+
+.TP 5
+\fB-e, --expr\fP=\fIstring\fP
+filter data through the c-style string expression \fIstring\fP.
+This feature is compile-time dependent and only available, if
+\fIzimg -V\fP shows the string \fIdynaload\fP.
+The expression string \fIstring\fP will be compiled on the fly by
+"gcc -c -O3 -shared -o".
+The expression is wrapped in a function which will
+be called for each data value \fIz (double)\fP with the current
+\fIx (unsigned int)\fP, \fIwidth (unsigned int)\fP
+and
+\fIy (unsigned int)\fP, \fIheight (unsigned int)\fP
+values supplied. Example:
+.nf
+
+    # zimg -e "cos(z) - (width - x)" ...
+.fi
+
+
+.TP 5
+\fB-R, --expr-source\fP=\fIfile.c\fP
+Use \fIfile.c\fP as input file name for compiling the expression.
+If the switch \fB--expr\fP is not given, \fB--expr-source\fP should
+point to an existing file which holds the c source for the expression
+function. If the switch \fB--expr\fP is given, it will be wrapped
+in a c function and stored in the \fIfile.c\fP given by
+\fB--expr-source\fP. If \fB--expr-source\fP is not given,
+the expression given by \fB--expr\fP will be stored in a
+temporary c-file which will be deleted after the expression evaluation.
+
+The switch \fB--expr-source\fP can be used for reusing the expression
+source:
+.nf
+
+    # zimg -e "cos(z) - (width - x)" -R myfunc.c
+    # zimg -R myfunc.c ... file.dat
+.fi
+
+.TP 5
+\fB-O, --expr-object\fP=\fIfile.so\fP
+Use \fIfile.so\fP as output file name for compiling the expression.
+If none of the switches \fB--expr\fP and \fB--expr-source\fP is given,
+\fIfile.so\fP should exist and be a valid object file which was probably
+compiled before by \fBzimg\fP. Shared objects are searched in the
+current directory, then in the directory ~/.zimg/expr, then in
+/usr/local/lib/zimg/expr and then in the
+search path of your dynamic loader (refer to the manual pages of
+dlopen() or shl_load(), depending on the implementation).
+If \fB--expr-object\fP is not given, the expression given by
+\fB--expr\fP or \fB--expr-source\fP will be compiled to a temporary
+shared object file which will be deleted after the expression evaluation.
+
+If at least one of the switches
+\fB--expr\fP or \fB--expr-source\fP are given, the expression will be
+compiled to \fIfile.so\fP. This can be used for compiling a shared object
+file for later use:
+.nf
+
+    # zimg -e "cos(z) - (width - x)" -O myfunc.so
+    # zimg -O myfunc.so ... file.dat
+.fi
+
+For complicated expressions it might be useful to create the c-source
+for the expression with an editor and compile it 'by hand'. Please
+refer to the manual page of your c-compiler for how to create shared
+object files (for gcc it is the switch -shared). The shared object
+must export a function \fIzimg_expression\fP with \fIthe zimg_expression_t\fP
+as given in zimg.h. Example:
+
+.nf
+    #include <zimg.h>
+
+    float
+    zimg_expression(unsigned int x, unsigned int y,
+        float z, const zimg_expression_info_t* info)
+    {
+        unsigned int height = info->height;
+        return z - (float)x * (float)(height - y);
+    }
+.fi
+
+.TP 5
+\fB-S, --scale\fP=\fIxy\fP
+.TP 5
+\fB-S, --scale\fP=\fIx\fP,\fIy\fP
+Scaling of the image. If only one number is given, it is used for both
+directions. Any non-numeric character may be used as separator.
+.\"The factors should be greater than 1. SCALING IS STILL EXPERIMENTAL.
+.\"Note: now it works fine also for resizing down, i.e. -S0.25
+
+.\" .TP 5
+.\" \fB-B, --bin\fP=\fIxy\fP
+.\" .TP 5
+.\" \fB-B, --bin\fP=\fIx\fP,\fIy\fP
+.\" Integer data binning. If only one number is given, it is used for both
+.\" directions. Any non-numeric character may be used as separator.
+.\" The factors should be greater than 1. BINNING IS STILL EXPERIMENTAL.
+
+.TP 5
+\fB-C, --crop[\fP=\fIleft\fP-\fIright\fPx\fItop\fP-\fIbottom\fP]
+crop the raw data to the specified size. Note that the numbers given apply
+to the raw data, not to the eventually enlarged or binned image.
+If the optional argument is omitted, the data is cropped automatically:
+all data with the same value as the border is cropped.
+
+.TP 5
+\fB-A, --align\fP=\fIhorizontal\fP[x\fIvertical\fP][,\fIbordercolor\fP]
+align to an integer multiple of the specified pixels. If \fIvertical\fP
+is omitted, it it set to \fIhorizontal\fP. Example: -A16 will pad the
+resulting image so that its (both) dimensions are multiples of 16.
+This is useful, if the images are used to create an mpeg sequence for
+example (otherwise mpeg_encode will cut the images down so that the
+dimensions are multiples of 16). The data is centered within the resulting
+image. The optional argument \fIbordercolor\fP must be given as
+6-digit hexadecimal number, where the first digits are the red value,
+the second two digits the green value and the last two digits the
+blue value (so the color values for each color are between 0 and ff).
+Note that zimg will try to choose a color out of the existing color
+map which comes close to what you've specified, but depending on
+the color map you might not get exactly what you've requested.
+See also the \fI--textcolor\fP switch.
+If the \fIbordercolor\fP is not given, the image border color is
+chosen to be the most frequent color of the original data's border.
+
+.TP 5
+\fB--contours\fP=\fIlevels\fP[,\fIlog\fP][,\fIbg=color\fP|\fIfg=color\fP]
+draw contour lines. This option is still experimental. Optional arguments
+are probably subject to future changes. The optional argument `log'
+distributes the contour levels logarithmically over the image.
+The optional argument \fIbg=color\fP forces contour-only drawing i.e. colors
+the background with the specified color. This color must be given
+as 3 or 6 digit hex value or by the special keyword 'black'.
+\fIfg=color\fP uses the specified color as contour line color.
+bg and fg and should not be used together.
+The contour algorithm is pretty fast and does not spline when
+enlarging the image.
+
+.TP 5
+\fB--interlace\fP
+write an interlaced image. \fB--interlace\fP is off by default.
+If you write a jpeg image using the \fI--jpeg\fP switch, the
+\fB--interlace\fP switch will be interpreted to write a progressive JPEG.
+
+.TP 5
+\fB-g, --gif\fP
+write a gif instead of a png image. This switch is only available
+if libgd supports both png and gif.
+
+.TP 5
+\fB-j, --jpeg[=quality]\fP
+write a jpeg instead of a png image. \fIquality\fP must be an integer
+number between (inclusive) 0 and 100. If \fIquality\fP is omitted, an
+appropriate default quality is used.
+Jpeg is only available, if \fBzimg\fP was compiled with libgd >= 1.8.
+If you have set image interlacing using the \fI--interlace\fP switch,
+this switch is interpreted to write a progressive JPEG.
+Some programs (e.g., Web browsers) can display progressive JPEGs incrementally;
+this can be useful when browsing over a relatively slow communications link,
+for example.  Progressive JPEGs can also be slightly smaller than sequential
+(non-progressive) JPEGs.
+
+.TP 5
+\fB-P, --ppmorpgm\fP
+write a portable pixmap (ppm) or portable graymap (pgm) instead of a png image
+according to \fI--gray\fP palette. These image formats are useful when piping
+\fBzimg\fP's output directly to other programs (filters). Further, as there can
+be just a single png or jpeg image in one png or jpeg file, but several ppm or
+pgm images in one ppm or pgm file, it makes ppm and pgm output very useful for
+producing image movies from a series of input data files, see examples below.
+
+.TP 5
+\fB--ppm\fP
+write a portable pixmap (ppm) instead of a png image.
+
+.TP 5
+\fB-P, --pgm\fP
+write a portable graymap (pgm) instead of a png image; this should be used only
+together with \fI--gray\fP option, otherwise a function of r,g,b values of a
+pixel is calculated as its gray value.
+
+.TP 5
+\fB-t, --label\fP=\fI[+-][+-]y\fP,\fIstring\fP
+print \fIstring\fP at the specified position of the FINAL image. 'Final' means
+the image size with all padding and scaling applied.  The string can be
+a multiline string separated by '\\n', e.g. "this\\nis\\nmultiline\\ntext".
+\fIx\fP and \fIy\fP can be negative coordinates, in which case they're interpreted
+as offsets of the right and bottom text bounding box from the right and bottom
+border of the image respectively.
+If you specify for example \fB--label\fP=\fI-1-1\fP,\fIstring\fP, the \fIstring\fP
+is entirely visible, having the lower right border of its bounding box in the
+bottom right corner on the image.
+Long multiline strings should preferably be passed by specifying this option
+several times (e.g. for each line separately) because of limitations of the
+option parser.
+See also STRING ESCAPES.
+
+.TP 5
+\fB--vlabel\fP=\fI[+-][+-]y\fP,\fIstring\fP
+same as the \fB--label\fP option, but prints the string vertically.
+See also STRING ESCAPES.
+
+.\" TODO
+.\" The \fIstring\fP can be reset to zero length (e.g. for multifile
+.\" input together with modelines) by using one of the above switches w/o string
+.\" argument.
+
+.TP 5
+\fB--legend\fP=\fIstring\fP
+print \fIstring\fP \fBoutside\fP the image region black on white. The legend is either
+placed right or botto. of the image depending on the ratio of the resulting total image
+(smaller ratio wins).  The string can be
+a multiline string separated by '\\n', e.g. "this\\nis\\nmultiline\\ntext".
+The extra space needed for the legend is reserved automatically.
+Long multiline strings should preferably be passed by specifying this option
+several times (e.g. for each line separately) because of limitations of the
+option parser. The \fIstring\fP can be reset to zero length (e.g. for multifile
+input together with modelines) by using \fB--legend\fP w/o string argument.
+See also STRING ESCAPES.
+
+.TP 5
+\fB-F, --font\fP=\fIinteger\fP
+font size. Must be between (inclusive) 1 and 4. If the font size is not
+specified, it is chosen according to the image dimensions: a larger image
+gets a larger font size.
+
+.TP 5
+\fB-T, --textcolor\fP=\fIxxxxxx\fP
+The \fIxxxxxx\fP must be given as 6-digit or 3-digit hexadecimal number,
+where the first digit(s) are the red value, the second two digit(s) the
+green value and the last two digit(s) the blue value (so the color
+values for each color are between 0 and ff). Note that zimg will
+try to choose a color out of the existing color map which comes
+close to what you've specified, but depending on the color map you
+might not get exactly what you've requested. Alternatively the color
+can be also specified by one of the predefined color names, see the
+section "LINE COLORS".
+If the text color is not given, it will be chosen automatically and
+should give normally a high contrast.
+
+.TP 5
+\fB--line\fP=\fI[+-]x1[+-]y1[+-]x2[+-]y2\fP[...]
+draw a line or polyline from x1, y1 to x2, y2 (and more vertices) on the FINAL image.
+'Final' means the image size with all padding and scaling applied.
+Example --line=+10+10+10+20
+draws a horizontal line. All coordinates are absolute. Negative coordinates
+are interpreted from the right and bottom border respectively.
+
+.TP 5
+\fB--rline\fP=\fI[+-]x1[+-]y1[+-]x2[+-]y2\fP[...]
+same as \fB--line\fP, but all coordinates except \fIx1\fP and \fIx2\fP are interpreted
+relatively to \fIx1\fP and \fIx2\fP.
+
+.TP 5
+\fB-L, --license\fP
+Display some license information. \fBzimg\fP is published under the 
+terms of a BSD type License.
+
+.TP 5
+\fB-V, --version\fP
+Prints a version identifier for \fBzimg\fP to standard error. This is
+guaranteed to always contain the string "zimg" and the version number.
+Additionally the string "png" or "gif" indicates the output format
+which depends on the gd driver which was compiled in. Compile time
+options as edf support are appended in brackets.
+
+.TP 5
+\fB-v, --verbose\fP
+switch on some informational output. Might not be too useful.
+
+.TP 5
+\fB--statistics
+print histogram like statistics of the \fBprocessed\fP data to stderr.
+
+.TP 5
+\fB--help\fP
+Prints a help message to stderr and dies.
+
+.SH "STRING ESCAPES"
+The switches \fB--label\fP, \fB--vlabel\fP and \fB--legend\fP accept some
+string escapes. The replacement of these string escape takes place \fBafter\fP
+the data has been read and processed. String escape start with a percent
+sign '%' followed by a single character which indicates the type of
+the substitution. The following string escapes are supported:
+
+.TP 5
+\fB%c\fP
+Current time in RFC822-conformant format.
+
+.TP 5
+\fB%f\fP
+The filename of the input file
+
+.TP 5
+\fB%m\fP
+The minimum of the \fBprocessed\fP data.
+
+.TP 5
+\fB%M\fP
+The maximum of the \fBprocessed\fP data.
+
+.TP 5
+\fB%i\fP
+The integral of the \fBprocessed\fP data (valid data points only, see also
+the --no-data switch).
+
+.TP 5
+\fB%{\fP...\fB}\fP
+Will be substituted with the standard output of the shell command 
+which is given between the opening \fB{\fP and the closing \fB}\fP.
+
+
+.SH "LINE COLORS"
+Some of the switches accept a color specification, e.g.
+\fB--no-data\fP, \fB--align\fP, \fB--contours\fP, \fB--textcolor\fP
+and \fB--xor\fP.
+These "line colors" are not chosen from the colormap which is used for
+rendering the data. Line colors can be specified either as 6-digit
+or 3-digit hex value or as one of the predefined strings "black", "white",
+"red", "green", "blue", "magenta", "cyan", "yellow".
+In the case of a 6-digit hex value, the first two digits represent the red
+value, the second two digits the green value and the last two digits the
+blue value.
+In the case of a 3-digit hex value, the first digit represent the red
+value, the second digit the green value and the last digit the
+blue value.
+
+.SH MODELINES
+
+If the input data is ascii (or at least the header is ascii), \fBzimg\fP
+looks for \fBmodelines\fP like some versions of vi or vim do. This is
+done only until the first data point is read. The format for modelines
+is as follows:
+.CS
+    <space>zimg:<zimg options>:
+.CE
+You can have multiple modelines and even use a modeline to switch
+to binary input. Example:
+
+.CS
+    #!/usr/local/bin/zimg
+    # zimg: -l10 -C50-550x200-450:
+    # zimg: -m7,5,15 -t -r547x633 -s --swap:
+    ...
+.CE
+Note that in this case the order is important. Everything after the line
+containing the -s (unsigned short binary) is considered as binary data.
+So exchanging the two modelines like in the next example would interpret
+the second modeline as binary data (which is probably not what you want):
+.CS
+    #!/usr/local/bin/zimg
+    # zimg: -m7,5,15 -t -r547x633 -s --swap:
+    # zimg: -l10 -C50-550x200-450:
+    ...
+.CE
+
+.SH "EXAMPLES"
+
+.TP 5
+\fBzimg my.dat > my.png\fP
+This one of the most simple examples.  The file my.dat is assumed to hold
+the dimensions of your 2-D data as the first two convertable integers.
+Everything before the first convertable integer is silently skipped,
+so it is also valid to have the dimension specifiers after a comment 
+(hash) mark like this:
+.CS
+    # 128 128
+    45.12
+    76.70
+    ...
+
+.CE
+
+.TP 5
+\fBmy.dat > my.png\fP
+If your operating system supports the specification of an
+interpreter by preceding it with #! you can make your data
+file an executable like this (you probably have also to change
+the permissions of my.dat e.g. `chmod +x my.dat' on UNIX):
+
+.CS
+    #!/usr/local/bin/zimg
+    # 128 128
+    # zimg:--red:
+    45.12
+    76.70
+    ...
+.CE
+
+.TP 5
+\fBzimg my.dat.gz | xv -\fP
+pipe the output of \fBzimg\fP directly to your favorite image viewer
+(here: \fBxv\fP). The file will be filtered by gunzip.
+
+.TP 5
+\fBzimg --red -r1200x1200 --skip=2400 -S0.5 -s l408_01.image | xv -\fP
+read binary data which hold 1200 x 1200 unsigned short data values.
+Skip the first 2400 bytes.  Use the red scale color map.
+Scale the image down to 600 x 600 pixels and pipe it to xv.
+
+Note that the skip option is not really necessary as long as the
+data is located at the very end of the input file.  In this case
+the header size would be calculated by \fBzimg\fP.
+
+.TP 5
+\fBzimg my.png --xlabel=10,10,'love is like oxygen' --jpeg > my.jpg\fP
+read the png as source image, apply a label and write it as jpeg.
+
+.TP 5
+\fBzimg -P -o- --crange=0,100 *.edf | animate -delay 50\fP
+read all edf files, and animate them with delay of 50 ms.
+
+.TP 5
+\fBzimg -P -o- --scale=0.25 --gray *.edf | convert -delay 100 - movie.mng\fP
+read all edf files, scale them down and convert them into a gray scale
+movie (mng is an animated png). Note that not using \fI--crange\fP makes
+color scaling (z-range) individually autoscaled in each image instead of
+using the same z-range for all images as in the previous example.
+
+.TP
+\fBzimg for displaying function expressions w/o input data\fP
+
+First you've to create
+the c source which holds the function expression, for example
+sinc.c:
+
+.nf
+    #include <zimg.h>
+    #include <math.h>
+    float
+    zimg_expression(unsigned int x, unsigned int y,
+        float z, const zimg_expression_info_t* info)
+    {
+       double width = (double)info->width;
+       double height = (double)info->height;
+       double xd = (double)x - width * 0.5;
+       double yd = (double)y - height * 0.5;
+       double value;
+       xd *= 10 / width;
+       yd *= 10 / height;
+       value = sqrt(xd*xd+yd*yd);
+       return value ? sin(value) / value : 1
+    }
+
+.fi
+This expression can be displayed w/o any data file by using /dev/zero
+as input source. As the input data is not used at all, you can use the
+\fB-c\fP switch -- tell \fBzimg\fP to treat the input as bytes.
+Furthermore you've to specify the dimension of the
+image with the \fB-r\fP switch:
+.nf
+
+# zimg -c -r300 --skip=0 -Rsinc.c -Osinc.so < /dev/zero | xv -
+
+.fi
+The object file sinc.so can now be reused in subsequent \fBzimg\fP runs, e.g.
+.nf
+
+# zimg -c -r500 --skip=0 -Osinc.so < /dev/zero | xv -
+
+.fi
+Note, that you have to tell \fBzimg\fP explicitly not to skip the file header,
+otherwise it will read from /dev/zero infinitely as it thinks it is the data
+header.
+
+.SH "ENVIRONMENT VARIABLES"
+
+.\" TODO: not implemented yet
+.\" .TP 8
+.\" .B ZIMG
+.\" This variable, if found, will be assumed to contain a set of custom default
+.\" options which are read when \fBzimg\fP starts, but before any command line
+.\" options are read. Options in this variable should be in the same form as those
+.\" on the command line. Command line options will override options specified in
+.\" this variable. Only options may be specified with this variable; no source
+.\" file names are read from its value.
+
+.TP 5
+.B HOME
+When this variable is found, \fBzimg\fP looks there for a file
+with the name \fB.zimgrc\fP which may contain command line options.
+If expression evaluation support is compiled in, object files are
+searched in the directory $HOME/.zimg/expr/.
+
+.TP 5
+.B ZIMG_VIEWER
+used to view stdout, if zimg detects that stdout goes to a terminal
+(which is probably not what you want). Defaults to "xv -".
+
+
+.SH FILES
+
+The following \fBzimgrc\fP resource files are read in this order:
+
+.fi
+    /usr/local/etc/zimgrc
+    $HOME/.zimgrc
+    .zimgrc
+    zimgrc
+.nf
+
+These files are read before command line parsing is done, so command line
+options given on the command line will eventually overwrite previously defined
+settings of the resource files.
+
+The \fBzimgrc\fP recource files might contain command line options separated by
+any white spaces including newlines. Blank lines and everything behind a hash
+`#' mark is considered to be a comment.
+
+
+.SH BUGS
+probably.
+
+
+.SH "SEE ALSO"
+The official \fBzimg\fP web site at:
+
+.PP
+.RS 4
+http://zimg.sourceforge.net/
+.RE
+
+
+.SH AUTHOR
+Johannes Zellner <johannes@zellner.org>
+
+
+.SH HISTORY
+This version of \fBzimg\fP was originally derived from the program z2ppm
+which was able to write portable pixmap (ppm) files.
+
+.SH CREDITS
+.TP 2
+Thomas Boutell <boutell@boutell.com>, the author of the \fBgd\fP driver.
+.TP 2
+Petr Mikulik <mikulik@physics.muni.cz> for the color code in getcolor.c, see also
+http://www.sci.muni.cz/~mikulik/gnuplot.html, the OS/2 port, and options
+\fI--crange\fP, \fI-P\fP, \fI--ppm\fP, \fI--pgm\fP, \fI-o-\fP.
+.TP 2
+Levente Novak <novak@jaguar.dote.hu> for the DOS/DJGPP port.

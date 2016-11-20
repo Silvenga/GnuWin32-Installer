@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pamflip User Manual</TITLE></HEAD>
+<BODY>
+<H1>pamflip</H1>
+Updated: 18 February 2005
+<BR>
+<A HREF="pamflip.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pamflip - flip or rotate a PAM or PNM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pamflip</B>
+{
+<B>-leftright</B> | <B>-lr</B> |
+<B>-topbottom</B> | <B>-tb</B> |
+<B>-transpose</B> | <B>-xy</B> |
+<B>-rotate90</B> | <B>-r90</B> | <B>-cw</B> |
+<B>-rotate270</B> | <B>-r270</B> | <B>-ccw</B> |
+<B>-rotate180</B> | <B>-r180</B>
+<B>-null</B> |
+<B>-xform=</b><i>xform1</i><b>,</b><i>xform2</i>...
+}
+[<B>-memsize=</b><i>mebibytes</i>]
+[<B>-pagesize=</b><i>bytes</i>]
+[<I>pamfile</I>]
+
+<P>All options can be abbreviated to their shortest unique prefix.  You
+may use two hyphens instead of one to designate an option.  You may
+use either white space or an equals sign between an option name and
+its value.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pamflip</b> flips a PAM or PNM image top for bottom or left for right,
+or transposes it horizontal for vertical, or rotates it 1, 2, or 3
+quarter turns.
+
+<p>To rotate at other angles, use <b>pnmrotate</b>.  It is much slower,
+though.
+
+<p>The input image is <i>pamfile</i>, or Standard Input if <i>pamfile</i>
+is not specified.
+
+<p>To flip/rotate a JFIF (JPEG) image losslessly, use <b>jpegtran</b>.
+<b>jpegtran</b> is part of the Independent Jpeg Group's compression
+library package, not part of Netpbm.  The normal Netpbm way to flip a
+JFIF file would be to convert it to PNM, use <b>pamflip</b>, and convert
+back to JFIF.  But since JPEG compression is lossy, the resulting image
+would have less quality than the original.  <b>jpegtran</b>, on the other
+hand, can do this particular transformation directly on the compressed
+data without loss.
+
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<p>You must supply exactly one of the following options:
+
+<p><b>pamflip</b>'s predecessor (before Netpbm 10.7 - August 2002)
+<b>pnmflip</b> did not have the <b>-xform</b> option and instead
+allowed you to specify any number of the other options, including
+zero.  It applied all the indicated transformations, in the order
+given, just like with <b>pamflip</b>'s <b>-xform</b> option.  (Reason
+for the change: this kind of interpretation of options is inconsistent
+with the rest of Netpbm and most of the Unix world, and thus hard to
+understand and to implement).
+
+<DL>
+<DT><B>-leftright</B>
+<DT><B>-lr</B>
+<DD>Flip left for right.
+
+<DT><B>-topbottom</B>
+<DT><B>-tb</B>
+<DD>Flip top for bottom.
+
+<DT><B>-transpose</B>
+<DT><B>-xy</B>
+<DD>Transpose horizontal for vertical.  I.e. make the pixel at (x,y) be
+at (y,x).
+
+<DT><B>-rotate90</B>
+<DT><B>-r90</B>
+<DT><B>-ccw</B>
+<DD>Rotate counterclockwise 90 degrees.
+
+<DT><B>-rotate180</B>
+<DT><B>-r180</B>
+<DD>Rotate 180 degrees.
+
+<DT><B>-rotate270</B>
+<DT><B>-r270</B>
+<DT><B>-cw</B>
+<DD>Rotate counterclockwise 270 degrees (clockwise 90 degrees)
+
+<DT><B>-null</b> 
+<DD>No change.  (The purpose of this option is the
+convenience of programs that invoke <b>pamflip</b> after computing the
+kind of transformation desired, including none at all).
+
+<P>This option was new in Netpbm 10.13 (December 2002).
+     
+<DT><B>-xform=</b><i>xform1</i><b>,</b><i>xform2</i>...
+
+<DD>Apply all the transforms listed, in order.  The valid values for
+the transforms are as follows and have the same meanings as the
+identically named options above.
+<UL>
+<LI>leftright
+<LI>topbottom
+<LI>transpose
+</UL>
+
+<P>This option was new in Netpbm 10.13 (December 2002).
+
+</DL>
+
+<p>The following options help <b>pamflip</b> use memory efficiently.
+Some flipping operations on very large images can cause <b>pamflip</b>
+to have a very large working set, which means if you don't have enough
+real memory, the program can page thrash, which means it takes a
+ridiculous amount time to run.  If your entire image fits in real
+memory, you don't have a problem.  If you're just flipping top for
+bottom or left for right, you don't have a problem.  Otherwise, pay
+attention.  If you're interested in the details of the thrashing
+problem and how <b>pamflip</b> approaches it, you're invited to read
+a complete explanation in comments in the source code.
+
+<dl>
+<dt><b>-memsize=</b><i>mebibytes</i>
+
+<dd><i>mebibytes</i> is the size in mebibytes (aka megabytes) of
+<em>real</em> memory (not virtual) available for <b>pamflip</b>.
+<b>pamflip</b> does nothing special to allocate real memory or control
+it's allocation -- it gets whatever it gets just by referencing
+virtual memory normally.  This is the maximum amount that
+<b>pamflip</b> can be expected to end up with by doing that.  This is
+just about impossible for you to know, of course, but you can
+estimate.  The total real memory in your system should be a major
+factor in your estimate.
+
+<p>When you specify <b>-memsize</b> and are doing a row for column type
+of transformation, <b>pamflip</b> does the transformation in multiple
+passes, each one with a working set size less than the specified value.
+
+<p>If your estimate is even slightly too large, it's the same as
+infinity.  If you estimate too small, <b>pamflip</b> will use more
+passes than it needs to, and thus will slow down proportional to the
+underestimate.
+
+<p>If you do not specify <b>-memsize</b>, <b>pamflip</b> assumes infinite
+real memory and does the entire transformation in one pass.
+
+<p>This option did not exist before Netpbm 10.7 (August 2002).
+     
+<dt><b>-pagesize=</b><i>bytes</i>
+<dd><i>bytes</i> is the size in bytes of a paging unit -- the amount of
+memory that gets paged in or out as an indivisible unit -- in your system.
+The default is 4KiB.
+
+<p>This option did not exist before Netpbm 10.7 (August 2002).
+
+</dl>
+
+Miscellaneous options:
+<dl>
+<dt><b>-verbose</b>
+<dd>This option causes <b>pamflip</b> to issue messages to Standard Error
+about its progress.
+</dl>
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<A HREF="pnmrotate.html">pnmrotate</A>, 
+<A HREF="pnm.html">pnm</A>,
+<b>jpegtran</b> manual
+<A NAME="lbAG">&nbsp;</A>
+
+<A NAME="history"></A>
+<H2>HISTORY</H2>
+
+<P><b>pamflip</b> replaced <b>pnmflip</b> in Netpbm 10.13 (December 2002).
+<b>pamflip</b> is backward compatible, but also works on PAM images.
+
+
+<H2>AUTHOR</H2>
+
+Copyright (C) 1989 by Jef Poskanzer.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<li><A HREF="pamflip.html#lbAB">NAME</A>
+<li><A HREF="pamflip.html#lbAC">SYNOPSIS</A>
+<li><A HREF="pamflip.html#lbAD">DESCRIPTION</A>
+<li><A HREF="pamflip.html#lbAE">OPTIONS</A>
+<li><A HREF="pamflip.html#lbAF">SEE ALSO</A>
+<li><A HREF="pamflip.html#history">HISTORY</A>
+<li><A HREF="pamflip.html#lbAG">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

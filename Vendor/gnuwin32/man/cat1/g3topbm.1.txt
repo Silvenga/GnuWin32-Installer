@@ -1,0 +1,112 @@
+G3topbm User Manual(0)                   G3topbm User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       g3topbm - convert a Group 3 fax file into a PBM image
+
+
+SYNOPSIS
+       g3topbm      [-kludge]     [-reversebits]     [-stretch]
+       [-stop_error] [g3file]
+
+       Minimum unique abbreviation  of  option  is  acceptable.
+       You  may  use double hyphens instead of single hyphen to
+       denote options.  You may use white space in place of the
+       equals sign to separate an option name from its value.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       g3topbm reads a Group 3 fax file as input and produces a
+       PBM image as output.
+
+
+OPTIONS
+       -kludge
+              Tells g3topbm to ignore the first  few  lines  of
+              the  file;  sometimes fax files have some junk at
+              the beginning.
+
+
+       -reversebits
+              Tells g3topbm to interpret bits least-significant
+              first,  instead  of  the default most-significant
+              first.  Apparently some fax modems do it one  way
+              and  others  do  it  the other way.  If you get a
+              whole bunch of  'bad  code  word'  messages,  try
+              using this flag.
+
+
+       -stretch
+              Tells  g3topbm to stretch the image vertically by
+              duplicating each row.  This is for the  low-qual-
+              ity transmission mode.
+
+
+       -stop_error
+              Tells  g3topbm to fail when it finds a problem in
+              the input.  'Fail' means  it  terminates  with  a
+              nonzero status code with the contents of the out-
+              put file undefined.
+
+              If you don't specify this  option,  g3topbm  does
+              its  best to work around input errors and salvage
+              as much of the image as possible  in  the  output
+              image.   It  first  tries  to  resynchronize to a
+              later line by searching for the next End Of  Line
+              marker,  skipping  any  lines or partial lines in
+              between.  It saves the beginning of the  line  in
+              which  it  encountered the problem.  If the input
+              file ends prematurely,  g3topbm  produces  output
+              containing  the  lines up to where it encountered
+              the problem.
+
+              g3topbm issues warning messages when it continues
+              in spite of input errors.
+
+              This  option  was  new  in  Netpbm  10.24 (August
+              2004).  Before that, g3topbm always  failed  when
+              it  encountered  premature  EOF  and never failed
+              when it encountered other problems.
+
+
+
+
+ABOUT G3
+       G3 is the near universal format used  by  fax  machines.
+       There is also a newer, more capable G4.
+
+       The  standard for Group 3 fax is defined in CCITT Recom-
+       mendation T.4.  In the U.S., that is implemented by  EIA
+       standards  EIA-465  and  EIA-466.  These standards cover
+       the layers below the image format (which are  irrelevant
+       to g3topbm as well.
+
+       G3 faxes are 204 dots per inch (dpi) horizontally and 98
+       dpi (196 dpi optionally,  in  fine-detail  mode)  verti-
+       cally.  Since G3 neither assumes error free transmission
+       nor retransmits when errors occur, the  encoding  scheme
+       used  is  differential  only  over  small segments never
+       exceeding 2 lines at standard resolution or 4 lines  for
+       fine-detail.   (The  incremental  G3  encoding scheme is
+       called  two-dimensional  and  the  number  of  lines  so
+       encoded is specified by a parameter called k.)
+
+
+
+SEE ALSO
+       pbmtog3(1), pbm(1)
+
+
+AUTHOR
+       Copyright   (C)   1989   by   Paul  Haeberli  <paul@man-
+       ray.sgi.com>.
+
+
+
+netpbm documentation    02 October 1989  G3topbm User Manual(0)

@@ -1,0 +1,70 @@
+REMOVEXATTR(2)            System calls           REMOVEXATTR(2)
+
+
+
+
+
+NAME
+       removexattr,  lremovexattr,  fremovexattr  -  remove  an
+       extended attribute
+
+SYNOPSIS
+       #include <sys/types.h>
+       #include <attr/xattr.h>
+
+       int removexattr (const char *path, const char *name);
+       int lremovexattr (const char *path, const char *name);
+       int fremovexattr (int filedes, const char *name);
+
+DESCRIPTION
+       Extended attributes are name:value pairs associated with
+       inodes  (files,  directories,  symlinks, etc).  They are
+       extensions to the normal attributes which are associated
+       with  all  inodes in the system (i.e. the stat(2) data).
+       A complete overview of extended attributes concepts  can
+       be found in attr(5).
+
+       removexattr removes the extended attribute identified by
+       name and associated with the given path in the  filesys-
+       tem.
+
+       lremovexattr  is identical to removexattr, except in the
+       case of a symbolic link, where the extended attribute is
+       removed  from  the  link  itself,  not  the file that it
+       refers to.
+
+       fremovexattr  is  identical  to  removexattr,  only  the
+       extended attribute is removed from the open file pointed
+       to by filedes (as returned by open(2)) in place of path.
+
+       An  extended  attribute name is a simple NULL-terminated
+       string.  The name includes a namespace  prefix  -  there
+       may  be  several, disjoint namespaces associated with an
+       individual inode.
+
+RETURN VALUE
+       On  success,  zero  is  returned.   On  failure,  -1  is
+       returned and errno is set appropriately.
+
+       If  the  named attribute does not exist, errno is set to
+       ENOATTR.
+
+       If extended attributes are not supported by the filesys-
+       tem, or are disabled, errno is set to ENOTSUP.
+
+       The  errors  documented  for the stat(2) system call are
+       also applicable here.
+
+AUTHORS
+       Andreas  Gruenbacher,  <a.gruenbacher@computer.org>  and
+       the  SGI  XFS development team, <linux-xfs@oss.sgi.com>.
+       Please  send  any  bug  reports  or  comments  to  these
+       addresses.
+
+SEE ALSO
+       getfattr(1), setfattr(1), open(2), stat(2), setxattr(2),
+       getxattr(2), listxattr(2), and attr(5).
+
+
+
+Dec 2001              Extended Attributes        REMOVEXATTR(2)

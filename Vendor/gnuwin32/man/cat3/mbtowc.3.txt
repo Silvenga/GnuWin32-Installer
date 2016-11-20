@@ -1,0 +1,69 @@
+MBTOWC(3)          Linux Programmer's Manual          MBTOWC(3)
+
+
+
+
+
+NAME
+       mbtowc  - convert a multibyte sequence to a wide charac-
+       ter
+
+SYNOPSIS
+       #include <stdlib.h>
+
+       int mbtowc (wchar_t* pwc, const char* s, size_t n);
+
+DESCRIPTION
+       The main case for this function is when s  is  not  NULL
+       and  pwc  is not NULL. In this case, the mbtowc function
+       inspects at most n bytes of the multibyte string  start-
+       ing  at  s, extracts the next complete multibyte charac-
+       ter, converts it to a wide character and  stores  it  at
+       *pwc.  It  updates an internal shift state only known to
+       the mbtowc function. It s does not point to a '\0' byte,
+       it  returns  the number of bytes that were consumed from
+       s, otherwise it returns 0.
+
+       If the n bytes starting at s do not contain  a  complete
+       multibyte  character,  or  if  they  contain  an invalid
+       multibyte sequence, mbtowc returns -1. This  can  happen
+       even  if  n  >= MB_CUR_MAX, if the multibyte string con-
+       tains redundant shift sequences.
+
+       A different case is when s is not NULL but pwc is  NULL.
+       In  this  case  the  mbtowc  function  behaves as above,
+       excepts that it does not store the converted wide  char-
+       acter in memory.
+
+       A  third case is when s is NULL. In this case, pwc and n
+       are ignored. The mbtowc function resets the shift state,
+       only  known  to this function, to the initial state, and
+       returns non-zero if the encoding has  non-trivial  shift
+       state, or zero if the encoding is stateless.
+
+RETURN VALUE
+       If s is not NULL, the mbtowc function returns the number
+       of consumed bytes starting at s, or 0 if s points  to  a
+       null byte, or -1 upon failure.
+
+       If  s  is  NULL, the mbtowc function returns non-zero if
+       the encoding has non-trivial shift state, or zero if the
+       encoding is stateless.
+
+CONFORMING TO
+       ISO/ANSI C, UNIX98
+
+SEE ALSO
+       mbrtowc(3), mbstowcs(3), MB_CUR_MAX(3)
+
+NOTES
+       The behaviour of mbtowc depends on the LC_CTYPE category
+       of the current locale.
+
+       This function is not  multi-thread  safe.  The  function
+       mbrtowc  provides  a  better interface to the same func-
+       tionality.
+
+
+
+GNU                      July 25, 1999                MBTOWC(3)

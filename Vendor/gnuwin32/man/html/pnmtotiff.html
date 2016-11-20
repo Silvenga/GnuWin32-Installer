@@ -1,0 +1,376 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pnmtotiff User Manual</TITLE></HEAD>
+<BODY>
+<H1>pnmtotiff</H1>
+Updated: 27 March 2005
+<BR>
+<A HREF="pnmtotiff.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pnmtotiff - convert a PNM image to a TIFF file
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pnmtotiff</B>
+
+[<B>-none</B> | <B>-packbits</B> | <B>-lzw</B> | <B>-g3</B> | <B>-g4</B>
+| <B>-flate</B> | <B>-adobeflate</B>]
+
+[<B>-2d</B>]
+
+[<B>-fill</B>]
+
+[<B>-predictor=</B><I>n</I>]
+
+[<B>-msb2lsb</B>|<B>-lsb2msb</B>]
+
+[<B>-rowsperstrip=</B><I>n</I>]
+
+[<B>-minisblack</B>|<B>-miniswhite</B>|<B>mb</B>|<b>mw</b>]
+
+[<B>-truecolor</B>]
+
+[<B>-color</B>]
+
+[<B>-indexbits=</B><I>bitwidthlist</I>]
+
+[<B>-xresolution=</b><i>xres</i>]
+
+[<B>-yresolution=</b><i>yres</i>]
+
+[<B>-resolutionunit=</b>{<b>inch</b> | <b>centimeter</b> | <b>none</b> |
+<b>in</b> | <b>cm</b> | <b>no</b>}]
+
+[<B>-indexbits=</b>[<b>1</b>[<b>2</b>[<b>4</b>[<b>8</b>]]]]]
+
+[<b>-append</b>]
+
+[<I>pnmfile</I>]
+
+<P>You can use the minimum unique abbreviation of the options.  You
+can use two hyphens instead of one.  You can separate an option name
+from its value with white space instead of an equals sign.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pnmtotiff</b> reads a PNM image as input and produces a TIFF file
+as output.
+
+<p>Actually, it handles multi-image PNM streams, producing multi-image
+TIFF streams (i.e. a TIFF stream with multiple
+&quot;directories&quot;).  But before Netpbm 10.27 (March 2005), it
+ignored all but the first PNM image in the input stream.
+
+<h3>The Output File</h3>
+
+<P>The output goes to Standard Output.  <b>pnmtotiff</b> approaches
+this output file differently from Unix and Netpbm convention.  This is
+entirely due to <b>pnmtotiff</b>'s use of the TIFF library to do all
+TIFF output.
+
+<ul>
+<li>The output file must be seekable.  <b>pnmtotiff</b> does not
+write it sequentially.  Therefore, you can't use a pipe; you can't
+pipe the output of <b>pnmtotiff</b> to some other program.  But any
+regular file should work.
+
+<li>If the output file descriptor is readable, you must either specify
+<b>-append</b> so as to add to the existing file, or make sure the
+file is empty.  Otherwise, <b>pnmtotiff</b> will fail with an
+unhelpful message telling you that a TIFF library function failed to
+open the TIFF output stream.
+
+<li>If you are converting multiple images (your input stream contains
+multiple images), the output file must be both readable and writable.
+
+</ul>
+
+<p>If you're using a Unix command shell to run <b>pnmtotiff</b>, you
+use facilities of your shell to set up Standard Output.  In Bash,
+for example, you would set up a write-only Standard Output to the
+file /tmp/myimage.tiff like this:
+
+<pre>
+<tt>
+    $ pnmtotiff myimage.pnm &gt;/tmp/myimage.tiff
+</tt>
+</pre>
+
+In Bash, you would set up a read/write Standard Output to the file
+/tmp/myimage.tiff like this:
+
+<pre>
+<tt>
+    $ pnmtotiff myimage.pnm 1&lt;&gt;/tmp/myimage.tiff
+</tt>
+</pre>
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<h3>Compression</h3>
+
+<P>By default, <B>pnmtotiff</B> creates a TIFF file with no
+compression.  This is your best bet most of the time.  If you want to
+try another compression scheme or tweak some of the other even more
+obscure output options, there are a number of flags to play with.
+
+<p>Before Netpbm 8.4 (April 2000), the default was to use LZW compression.
+But then new releases of the TIFF library started omitting the LZW
+compression capability due to concern about patents on LZW.  So
+since then, the default has been no compression.  The LZW patents have
+now expired and new TIFF libraries do LZW, but the <b>pnmtotiff</b>
+behavior remains the same for compatibility with older TIFF libraries
+and applications of <b>pnmtotiff</b>.
+
+<P>The <B>-none</B>, <B>-packbits</B>, <B>-lzw</B>, <B>-g3</B>,
+<B>-g4</B>, <B>-flate</B>, and <B>-adobeflate</B> options are used to
+override the default and set the compression scheme used in creating
+the output file.  The CCITT Group 3 and Group 4 compression algorithms
+can be used only with bilevel data.  The <B>-2d</B> and <B>-fill</B>
+options are meaningful only with Group 3 compression: <B>-2d</B>
+requests 2-dimensional encoding, while <B>-fill</B> requests that each
+encoded scanline be zero-filled to a byte boundary.  The
+<B>-predictor</B> option is meaningful only with LZW compression: a
+predictor value of 2 causes each scanline of the output image to
+undergo horizontal differencing before it is encoded; a value of 1
+forces each scanline to be encoded without differencing.  By default,
+<B>pnmtotiff</B> creates a TIFF file with msb-to-lsb fill order.  The
+<B>-msb2lsb</B> and <B>-lsb2msb</B> options are used to override the
+default and set the fill order used in creating the file.
+
+<P>With some older TIFF libraries, <B>-lzw</B> doesn't work because
+the TIFF library doesn't do LZW compression.  This is because of
+concerns about Unisys's patent on LZW which was then in force.
+Actually, with very old TIFF libraries, <b>-lzw</b> works because no
+distributors of the TIFF library were sensitive yet to the patent
+issue.
+
+<p><b>-flate</b> chooses &quot;flate&quot; compression, which is the
+patent-free compression common in the Unix world implemented by the 
+&quot;Z&quot; library.  It is what the PNG format uses.
+
+
+<h3>Fill Order</h3>
+<p>The <b>-msb2lsb</b> and <b>lsb2msb</b> options controll the fill order.
+
+<P>The fill order is the order in which pixels are packed into a byte in
+the Tiff raster, in the case that there are multiple pixels per byte.
+msb-to-lsb means that the leftmost columns go into the most
+significant bits of the byte in the Tiff image.  However, there is
+considerable confusion about the meaning of fill order.  Some believe
+it means whether 16 bit sample values in the Tiff image are
+little-endian or big-endian.  This is totally erroneous (The
+endianness of integers in a Tiff image is designated by the image's
+magic number).  However, ImageMagick and older Netpbm both have been known
+to implement that interpretation.  2001.09.06.
+
+<P>If the image does not have sub-byte pixels, these options have no
+effect other than to set the value of the FILLORDER tag in the Tiff
+image (which may be useful for those programs that misinterpret the
+tag with reference to 16 bit samples).
+
+<h3>Color Space</h3>
+
+<P><B>-color</B> tells <B>pnmtotiff</B> to produce a color, as
+opposed to grayscale, TIFF image if the input is PPM, even if it
+contains only shades of gray.  Without this option, <B>pnmtotiff</B>
+produces a grayscale TIFF image if the input is PPM and contains only
+shades of gray, and at most 256 shades.  Otherwise, it produces a
+color TIFF output.  For PBM and PGM input, <B>pnmtotiff</B> always
+produces grayscale TIFF output and this option has no effect.
+
+<P>The <B>-color</B> option can prevent <B>pnmtotiff</B> from making
+two passes through the input file, thus improving speed and memory
+usage.  See <a href="pnmtotiff.html#multipass">Multiple Passes</a>.
+
+<P><B>-truecolor</B> tells <B>pnmtotiff</B> to produce the 24-bit RGB
+form of TIFF output if it is producing a color TIFF image.  Without
+this option, <B>pnmtotiff</B> produces a colormapped (paletted) TIFF
+image unless there are more than 256 colors (and in the latter case,
+issues a warning).
+
+<P>The <B>-truecolor</B> option can prevent <B>pnmtotiff</B> from
+making two passes through the input file, thus improving speed and
+memory usage.  See <a href="pnmtotiff.html#multipass">Multiple Passes</a>.
+
+<P>The <B>-color</b> and <b>-truecolor</b> options did not exist
+before Netpbm 9.21 (December 2001).
+
+<P>If <B>pnmtotiff</B> produces a grayscale TIFF image, this option
+has no effect.
+
+<P>The <B>-minisblack</B> and <B>-miniswhite</B> options force the
+output image to have a &quot;minimum is black&quot; or &quot;minimum
+is white&quot; photometric, respectively.  If you don't specify
+either, <B>pnmtotiff</b> uses minimum is black except when using Group
+3 or Group 4 compression, in which case <B>pnmtotiff</B> follows CCITT
+fax standards and uses &quot;minimum is white.&quot; This usually
+results in better compression and is generally preferred for bilevel
+coding.
+
+<P>Before February 2001, <B>pnmtotiff</B> always produced
+&quot;minimum is black,&quot; due to a bug.  In either case,
+<B>pnmtotiff</B> sets the photometric interpretation tag in the TIFF
+output according to which photometric is actually used.
+
+<P>The <B>-indexbits</B> option is meaningful only for a colormapped
+(paletted) image.  In this kind of image, the raster contains values
+which are indexes into a table of colors, with the indexes normally
+taking less space that the color description in the table.
+<B>pnmtotiff</B> can generate indexes of 1, 2, 4, or 8 bits.  By
+default, it will use 8, because many programs that interpret TIFF
+images can't handle any other width.
+
+<P>But if you have a small number of colors, you can make your image
+considerably smaller by allowing fewer than 8 bits per index, using the
+<B>-indexbits</B> option.  The value is a comma-separated list of the
+bit widths you allow.  <B>pnmtotiff</B> chooses the smallest width you allow
+that allows it to index the entire color table.  If you don't allow any
+such width, <B>pnmtotiff</B> fails.  Normally, the only useful value for
+this option is <B>1,2,4,8</B>, because a program either understands the 8
+bit width (default) or understands them all.
+
+<P>In a Baseline TIFF image, according to the 1992 TIFF 6.0
+specification, 4 and 8 are the only valid widths.  There are no formal
+standards that allow any other values.
+
+<P>This option was added in June 2002.  Before that, only 8 bit indices were
+possible.
+
+<h3>Resolution</h3>
+<p>A Tiff image may contain information about the resolution of the image,
+which means how big in real dimensions (centimeters, etc.) each pixel in the
+raster is.  You control that with the <b>-xresolution</b>, <b>-yresolution</b>,
+and <b>-resolutionunit</b> options.
+
+<p>These options do not control how many pixels <b>pnmtotiff</b> generates or
+how much information is in the pixels.  They control only the value of tags
+that may or may not be used by whatever reads the image.
+
+<p>The value of the <b>-xresolution</b> option is a floating point
+decimal number that tells how many pixels there are per unit of
+distance in the horizontal direction.  <b>-yresolution</b> is
+analogous for the vertical direction.
+
+<p>The unit of distance is given by the value of the
+<b>-resolutionunit</b> option.  That value is either <b>inch</B>,
+<b>centimeter</b> or <b>none</b> (or abbreviations <b>in</b>,
+<b>cm</b>, or <b>no</b>).  <b>none</b> means the unit is arbitrary or
+unspecified.  This could mean that the creator and user of the image
+have a separate agreement as to what the unit is.  But usually, it
+just means that the horizontal and vertical resolution values cannot
+be used for anything except to determine aspect ratio (because even
+though the unit is arbitrary or unspecified, it has to be the same for both
+resolution numbers).
+
+<p>If you don't specify <b>-xresolution</b>, the Tiff image does not contain
+horizontal resolution information.  Likewise for <b>-yresolution</b>.  If
+you don't specify <b>-resolutionunit</b>, the default is inches.
+
+<p>Before Netpbm 10.16 (June 2003), <B>-resolutionunit</b> did not exist and
+the resolution unit was always inches.
+
+<h3>Other</h3>
+
+<P>You can use the <B>-rowsperstrip</B> option to set the number of
+rows (scanlines) in each strip of data in the output file.  By
+default, the output file has the number of rows per strip set to a
+value that will ensure each strip is no more than 8 kilobytes long.
+
+<p>The <b>-append</b> option tells <b>pnmtotiff</b> to add images to
+the existing output file (a TIFF file may contain multiple images)
+instead of the default, which is to replace the output file.
+
+<p><b>-append</b> was new in Netpbm 10.27 (March 2005).
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>NOTES</H2>
+
+<P>There are myriad variations of the TIFF format, and this program
+generates only a few of them.  <B>pnmtotiff</B> creates a grayscale
+TIFF file if its input is a PBM (monochrome) or PGM (grayscale) file.
+<B>pnmtotiff</B> also creates a grayscale file if it input is PPM
+(color), but there is only one color in the image.  If the input is a
+PPM (color) file and there are 256 colors or fewer, but more than 1,
+<B>pnmtotiff</B> generates a color palette TIFF file.  If there are
+more colors than that, <B>pnmtotiff</B> generates an RGB (not RGBA)
+single plane TIFF file.  Use <B>pnmtotiffcmyk</B> to generate the
+cyan-magenta-yellow-black ink color separation TIFF format.
+
+<P>The number of bits per sample in the TIFF output is determined by
+the maxval of the PNM input.  If the maxval is less than 256, the bits
+per sample in the output is the smallest number that can encode the
+maxval.  If the maxval is greater than or equal to 256, there are 16
+bits per sample in the output.
+
+<A NAME="multipass">&nbsp;</A>
+<H3>Multiple Passes</H3>
+
+<P><B>pnmtotiff</B> reads the input image once if it can, and
+otherwise twice.  It needs that second pass (which happens before the
+main pass, of course) to analyze the colors in the image and generate
+a color map (palette) and determine if the image is grayscale.  So the
+second pass happens only when the input is PPM.  And you can avoid it
+then by specifying both the <B>-truecolor</B> and <B>-color</B>
+options.
+
+<P> If the input image is small enough to fit in your system's file
+cache, the second pass is very fast.  If not, it requires reading from
+disk twice, which can be slow.
+
+<P>When the input is from a file that cannot be rewound and reread,
+<B>pnmtotiff</B> reads the entire input image into a temporary file
+which can, and works from that.  Even if it needs only one pass.
+
+<P>Before Netpbm 9.21 (December 2001), <b>pnmtotiff</b> always read
+the entire image into virtual memory and then did one, two, or three
+passes through the memory copy.  The <b>-truecolor</b> and
+<b>-color</b> options did not exist.  The passes through memory would
+involve page faults if the entire image did not fit into real memory.
+The image in memory required considerably more memory (12 bytes per
+pixel) than the cached file version of the image would.
+
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="tifftopnm.html">tifftopnm</A></B>,
+
+<B><A HREF="pnmtotiffcmyk.html">pnmtotiffcmyk</A></B>,
+
+<B><A HREF="pnmdepth.html">pnmdepth</A></B>,
+
+<B><A HREF="pnm.html">pnm</A></B>
+
+<A NAME="lbAI">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Derived by Jef Poskanzer from ras2tiff.c, which is
+Copyright (c) 1990 by Sun Microsystems, Inc.
+Author: Patrick J. Naughton (<A HREF="mailto:naughton@wind.sun.com">naughton@wind.sun.com</A>).
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pnmtotiff.html#lbAB">NAME</A>
+<LI><A HREF="pnmtotiff.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pnmtotiff.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pnmtotiff.html#lbAE">OPTIONS</A>
+<LI><A HREF="pnmtotiff.html#lbAF">NOTES</A>
+<UL>
+<LI><A HREF="pnmtotiff.html#multipass">Multiple Passes</A>
+</UL>
+<LI><A HREF="pnmtotiff.html#lbAH">SEE ALSO</A>
+<LI><A HREF="pnmtotiff.html#lbAI">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

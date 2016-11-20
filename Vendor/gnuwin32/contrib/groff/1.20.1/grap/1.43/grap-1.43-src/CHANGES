@@ -1,0 +1,590 @@
+Change log
+
+1.43
+
+Bruce Lilly pointed out that g++ 4.3.1 was emitting all sorts of dire
+warnings about the hash_map data structure and associated support being
+pulled from g++ in the future.  SuSe seems to ship with this and there's
+no point scaring people (or letting a time bomb tick).  Grap now detects
+and uses unordered_map if it's present on your system, which stops the
+wailing and gnashing of teeth from g++ 4.3.1 .  That g++ version also
+requires a compiler option to support that include file, which we also
+autodetect and use.  (This is essentially autodetecting the flags described in
+the changes to grap 1.41 below, along with some code changes to make that
+actually function correctly.)
+
+A fellow named Fergus had a Cygwin compilation problem as well.  His
+system apparently had rand but not random (a very rare configuration
+these days).  This led me to find a corner of the autoconf code that I
+apparently hadn't checked sufficiently.  If rand was found and a
+declaration made in the system files, the grap config stuff failed to
+note the declaration and made its own incompatible one.  This should be
+gone now.
+
+Fergus's system also seemed to be lacking snprintf - which again is very
+odd.  I hadn't reflected the change to grap sprintf in version 1.23 into
+the code that emulates snprintf on systems without it.  That code has
+been added.
+
+Changed the examples to include a brief tutorial on string matching in
+grap.  Suggested by John Heidemann.
+
+1.42
+
+There's been a long standing bug with how different versions of pic
+interpret the "line from (x,y) then down 5" construct.  There was once a
+bug report at
+http://lists.gnu.org/archive/html/groff/2008-03/msg00003.html
+about this.  As of version 1.42 grap no longer outputs this pic construct.
+
+Dan Lasley pointed out that the key was incomplete for the bar graph example.
+His fix to restore the key is included.
+
+John Heidemann points out that bars in coordinate systems other than the
+default just didn't work.  This was a bug in my yacc grammer - for
+heaven's sake.  It's corrected to match the manual page.
+
+For loops were strange in that 
+
+.G1
+for xx  from  15 to 13  do  { print "YYY" }
+print "ZZZZ"
+.G2
+
+would loop infinitely.  xx never passes 13.  Added a test to make that a
+null loop as well as making 
+
+.G1
+for xx  from  13 to 13  do  { print "YYY" }
+print "ZZZZ"
+.G2
+
+print one "YYY".  You can still confuse loops, using strange by clauses
+- for example "by 0" or "by * -1" but common cases should be covered.
+
+Spotted by a fellow named Yuval.
+
+Found a lurking initializer bug while fixing the for loop thing.
+
+I added references to standard plot strings in a couple places to make
+them somewhat easier to find.
+
+1.41
+
+Small changes to compile without warnings under g++ 4.2.0 and to find and
+use ext/hash_map under g++ versions that include it.
+
+Incorporated Tobias Toedter's patch to the grap.spec.  I'd found another
+place to misspell "Kernighan" and Tobias fixed it.
+
+Got rid of an ambiguous else construct in grap_pic.cc
+
+Support g++4.3.0 by either compiling under compatibility headers (with a
+warning) or using the c++0x standard header <unordered_map> if you set
+CXXFLAGS=-std=c++0x CPPFLAGS=-std=c++0x in the environment (during configure
+and compile).  Using unordered_set avoids the warnings, but is experimental.
+
+1.40
+
+Man, here's a weird one, care of Bruce Lilly: in previous versions doing
+something like this:
+
+	coord temp x -2,2 y 3,4
+	ticks left out from temp -1 to 1
+
+would interpret the ticks as starting from the value of the
+uninitialized variable temp with one subtracted from it to 1 in the
+default coordinate space rather than (correctly) interpreting that as
+ticks from -1 to 1 in the temp coordinate space.  This is a two
+character fix to a regular expression, but a weird bug.  I believe it's
+fixed.
+
+Bruce also discovered that the changes I put into version 1.38 to
+address issues raised by Hartmut Henkel affected large number
+comparisions in unpleasently non-intuitive ways.  Specifically doing
+this:
+
+	coord pressure x -2.400000, 27.000000 y 1035.124000, 1039.000000
+	ticks right in left 0.6 from pressure 1035.200 to 1039.000000 by 0.200
+
+Results in the top tick - the one at 1039 - being clipped because the 19
+additions in the tick loop introduce enough floating point error that
+the limit (1039) and the index (1039+epsilon) differ by a large enough
+value that the loop terminates one iteration early.  Essentially the <=
+at the top of the tick loop fails because the error induced by the 19
+additions accumulates to be detectable.
+
+I've reverted the default comparison thresholds back to their pre-1.38
+levels; numbers must differ by more than 1e-6 to be considered different
+by grap.  For people who explicitly want to work with very small
+quantities directly - a decision I still disagree with - the -r flag has
+been added to make grap use the system's idea of what the smallest
+comparable numbers are (the 1.38 and 1.39 behavior).  The output of -v
+or -h lists these two values and the manual page documents the flags.
+
+I've updated the grap.spec to one donated by John Heidemann.  Linux guys
+should have it easier.
+
+1.39
+
+Martin Michlmayr noticed a typo that upsets gcc 4.1, though earlier
+versions don't even generate a warning (Grrrr).  (Original report at
+<http://bugs.debian.org/357184>.) This is fixed.  I didn't issue a new
+FreeBSD port, because it doesn't change anything functionally.  I also
+cleaned up the man page a bit, and Tobias Toedter fixed a couple typos in the
+man page and the README file.  Always troubling to misspell the inventor's
+name.
+
+1.38
+
+Michail Vidiassov suggests that a DESTDIR variable be added to the
+Makefile to allow staged installs or temporary installs or other stuff.
+Setting DESTDIR when making install or deinstall will create a tree
+under DESTDIR that contains the full grap install.  E.g., 
+
+make DESTDIR=/usr/tmp install
+
+Does something like:
+
+/usr/bin/install -c -d /usr/tmp/usr/local/share/doc/grap || true
+/usr/bin/install -c -m 644 README CHANGES COPYRIGHT grap.man
+/usr/tmp/usr/local/share/doc/grap
+strip grap || true
+/usr/bin/install -c -d /usr/tmp/usr/local/bin || true
+/usr/bin/install -c -d /usr/tmp/usr/local/man/man1 || true
+/usr/bin/install -c -d /usr/tmp/usr/local/share/grap || true
+/usr/bin/install -c -d /usr/tmp/usr/local/share/examples/grap || true
+/usr/bin/install -c grap /usr/tmp/usr/local/bin
+/usr/bin/install -c -m 644 grap.1 /usr/tmp/usr/local/man/man1
+/usr/bin/install -c -m 644 grap*.defines /usr/tmp/usr/local/share/grap
+/usr/bin/install -c -m 644 examples/*.d examples/example.ms \
+	examples/*.result examples/Makefile \
+	/usr/tmp/usr/local/share/examples/grap
+
+There is a possibility of munging the manpage by doing this, but that's
+actually pretty difficult, and the modifications below to print install
+locations will still print the original (that is DESTDIR-free) install
+locations.
+
+Warner Lemberg found a bunch of bad typesetting in the examples, and I
+hope much of that is fixed.  He also pointed out that configure should
+allow installers to place documentation and examples where their system
+likes them.  I've altered the configuration script to accept these
+locations as --with arguments (--help lists them).  grap -v or grap -h
+(or the long versions: grap --version/grap --help) prints out the
+examples/documentation locations and that new behavior is documented in
+the manual page.  (The locations aren't directly given in the man page,
+because the ASCII and postscript versions of the manual are created
+before the source tar file is so that grap man pages can be installed
+places that don't have doc manual pages).
+
+Fixed a bug where lines acquired the lindescription of the last drawn line.
+This was a typo level error that just never got exercised.  Thanks to  Steve
+Blinkhorn for finding it.  Steve also points out that thickness
+attributes on frames were being ignored.  They're not anymore, but
+they're of limited usefulness and they don't thicken the ticks.  The
+easiest way to draw a thick frame with thick ticks is:
+
+.G1
+pic linethick=5
+frame
+.\" ticks statement here
+pic linethick=1
+draw solid bullet
+next at 1,2
+next at 3,4
+.G2
+
+That draws a thick frame and thin line.
+
+I integrated some changes suggested by Hartmut Henkel to better handle graphing
+small numbers.  I didn't include his patch exactly, but I think that most of
+the functionality has been added.  His test cases look the same.  If you're
+graphing things in the 1e-30 range, you should see autoscaling and not have
+your graph stop at 1e-6, assuming that your compiler has <limits>.  I really
+think it's a bad idea to graph in that domain, as the math with numbers that
+small can be really hairy, and grap isn't exactly tuned for numerical analysis.
+But I think we do better now.
+
+1.37
+
+Fixed an error handling bug where an error at end of file/line could cause a
+core dump.  Yuk.
+
+1.36
+
+Joel M. Cook pointed out that
+
+plot "\(bu" at 0, -306
+
+didn't work.  grap was requiring a numeric expression before the format
+string.  I think I've had that discussion before, but I decided to
+support the behavior this time.  Now both the expression and the format
+string are optional.  plot at x,y will plot a 0 at x,y. plot "x" at x,y
+is exactly equivalent to "x" at x,y in output, but slightly slower. 
+plot 3 at x,y works as before as does plot 2 "%g of clubs" at x,y
+
+I also modified the grammar to accept the base and wid paramaters to bar
+in any order.
+
+1.35
+
+Changes to lex code to compiler under newer versions of lex and
+configure code to activate them.  Several people pointed out the problem
+and I like Bruce Lilly's solution best.  Configure bugs are all mine.
+
+Bruce Lilly also noticed that copy statements with a macro and neither an
+until nor a filename didn't work as they should.  He provided the fix
+for that.
+
+Bill Ward pointed out that grap should support gpic's "thickness" just
+like the color attributes.  So now it does.
+
+And an apology to R. Clayton who sent patches for this very thing that I
+lost until after I'd implemented.
+
+1.32: Whoops.  Color modifiers were mis parsed in implicit plot statements.
+Now things like :
+
+bullet color "blue" at 1, 3
+
+work.
+
+Minor code tweaks to make grap compile under g++ 3.4.2
+
+1.31: In compatibility mode grap will no longer add whitespace around graphs.
+I like it, but Yuval Tamir rightly complained.
+
+1.30: Made the undocumented color commands support GNU pic color commands.  In
+other words added color to grap.  Probably the easiest place to see the syntax
+is the new example added to the examples file.  The changes are on the manual
+page, too, but the example sets basically everything that can be set, so it's a
+good example.
+
+1.27: A couple compilation bugs reported under later g++ versions by a couple
+people have been fixed.  Brian Mays caught a clipping bug, and Bruce Lilly also
+caught a couple compiler dependencies.
+
+1.26: .lf was appearing outside the PS/PE pairs, so I disabled generation of
+those lines.
+
+1.25: Fixed a bug parsing draw/new with no line descriptions.  Thanks to
+Robert W. Numrich for spotting it.
+
+Cygwin seems to need errno.h to declare errno in grap_lex.l. I added the
+machinery to look for it and use it if it's there.  I also added a couple
+missing semi-colons to grap.y to shut bison up.
+
+Added the clipped and unclipped attributes to allow plot statements to place
+strings outside the frame.
+
+Tuned the makefile so you can use pmake in parallel.
+
+1.23: made it possible to disable sprintf and other calls to sprintf(3)
+with a user given format string, which is a potential security hole.
+
+Fixed a plot bug I found while disabling that.
+
+1.22: John Heidemann caught a bug with respect to large sizes and size
+changes in titles.  Those large size changes are now supported.  Generally
+the groff [] syntax is now used for the embedded \s commans that size
+generates.  This can be turned off by using -C.
+
+John also wanted to be able to specify string modifiers like size, etc.
+on ticks.  Now ticks, grids, and plot strings (e.g. in a new or draw
+statement) all take string modifiers.  grap.defines has been changed to
+support and encourage this usage.
+
+A bug where a null graph was output when only a draw statement was given
+has been corrected.
+
+sprintf processing has been revamped to more directly follow sprintf
+syntax.  As a result, a limitation on the number of parameters (10) has
+been introduced.
+
+As a result of using string attributes on plotting strings, the name of
+the default line has become user-visible.  Changing
+grap_internal_default via new will change the default lines for the rest
+of the graph.  It's not encouraged.
+
+1.21: Allow redefinition of keywords as macros.  In the process, I
+added an undefine keyword to do the obvious: remove a macro.
+
+Added xy_gg macros, too.
+
+Fixed a bug where giving a coordinate name before a parenthesized point
+caused a syntax error.  Thanks to Kees Zeelenberg for spotting this.
+
+Added an srand function to seed the random number generator, though
+there's none documented in Kernighan and Bentley's grap, and a getpid
+function to get a (sort of) random number.  Don't use this for key
+generation.  W. Robert Daasc caught this omission.
+
+While I was in there, I discovered that rand was not returning its
+full range from [0,1).  It does now.
+
+Some keywords that accept strings weren't accepting sprintf, some of
+them have been fixed.
+
+Lee Ji Hwan found a bug with large files being read thru macros
+causing a core dump.  That has been fixed.  It was a really
+embarrassing coding style error, too...
+
+John Aycock discovered a bug where a line style was ignored on the first
+line command executed.  It's not ignored anymore.
+
+I also found a bug in the execution order of copy through macros,
+although I'm uncertain if a version was ever released with the bug
+intact.  I think this may have been related to Lee Ji Hwan's bug,
+which means it probably hasn't seen the light of day.
+
+-h prints a usage summary.  --help is a synonym for -h and --version is a
+synonym for -v.
+
+1.20: The big jump reflects both internal changes and visible feature
+changes.  The class structure in the code has been substantially
+revamped, and the code brought into better conformance with the
+current state of the C++ world.  As of version 1.20, grap no longer
+attempts to compile under g++ 2.7.2.  grap 1.11 source will remain
+available from http://www.lunabase.org/~faber/Vault/software/grap for
+those who need it.
+
+One feature change is that troff and pic commands are now placed
+correctly in their relative order rather than being collected before
+and after the graph.  This required specifying more carefully where
+the frame generation is placed.  Frames are output either immediately
+before the first plotted object or after the frame statement, if any.
+This change motivated much of the class changes and actually cleaned
+them up somewhat.
+
+grap is now *much* more tolerant of variables with the keword names.
+Things like
+
+from=1; to = 10 
+for i from from to to do { ... }
+
+now work.  This is due to a sizable rewrite of the tokenizer.  In
+fact, variables and coordinate spaces can share names.  Things like:
+
+for next = 0 to 10 do {
+	next at next next, next
+}
+
+now work (you have to add a couple ticks statements to really see that
+example). I'd say we're to the point where obfuscated grap programs
+are a possibility.
+
+The only change this necessitated was that if you specify a coordinate
+system in an automatic ticks statement, you have to use the on or auto
+keyword.  See the examples document for an example.
+
+I recoded macros to remove an antiquated construct that was confusing
+some non-g++ compilers.  A static array was recoded as an STL vector,
+with the result that an artificial constraint on the number of
+arguments in a macro went away.
+
+Part of the recoding of the tokenizer encoded a large data structure
+in a file called grap_tokenizer.cc.  The code is striaght-ahead
+initialization, but it drives the g++ optimizer stone crazy.
+(Optimizing this function is very memory intensive.)  By default,
+optimization is specifically disabled under g++.  You can override
+that behavior by specifying --enable-optimize-grap_tokenizer to
+./configure.  On the machines I use, optimizing this module has
+absolutely no effect on performance, and I suggest you don't bother
+spending the time optimizing it.
+
+The autoconf and make stuff has been revamped to use GNU make's
+automatic makefile generation or BSD pmake's automatic .depend
+inclusion, as well as simplifying the distribution creation and
+caching all configuration values.
+
+Added some GNU standard Makefile targets to the Makefile.
+
+Fixed some bugs in the manual page.
+
+Ran spell again on the examples.  Misspelling Brian Kernighan's name
+is bad.
+
+Many additional compatibility changes suggested by Bruce Lilly.
+
+1.11: Strings are now clipped, thanks to John Heidemann for finding the error.
+
+1.10: Cleaned up the automatic tick generation and fixed a bug in
+there, too.  
+
+Allow reassignment of coordinate system parameters, e.g.,
+.G1
+coord test
+copy "examples/cy_fatal.d"
+coord test x 1980,2000
+.G2
+
+Default line format now uses the bullet macro if it's defined.  The
+coord statement now will accept multiple log scale modifiers.  The
+statement
+
+coord x 1,1000 log x log y
+
+is now legal.  x and y are now legal variable names.  They used to be
+language tokens, and in fact still are, although their scope as tokens
+is now limited to coord statements.
+
+Tried to streamline the use of for_each and functors by removing
+trivial calls to for_each.  Still trying to move code out of grap.y to
+make it shorter to compile.
+
+Simplified expression grammar by disallowing logical expressions
+outside if statements.  I also caught another memory leak here.
+
+Signifying a line break by using new (or draw) now works.  So code like
+.G1
+draw solid
+next at 2,4
+next at 3,5
+new
+next at 4,6
+next at 5,7
+.G2
+produces 2 solid line segments.  This forced a little rethinking of
+the syntax for changing the properties of a line using new/draw.  The
+implementation is on the man page.  If it breaks existing grap
+scripts, I'd love to hear about it.
+
+Grids support similar syntax to that of ticks for explicitly
+requesting automatic grid generation.
+
+Automatic tock or grid generation can now be requested relative to a
+named coordinate system, formerly automatic ticks/grid lines were only
+generated for the default coordinate system.
+
+Added the ln function.  Why did that take me so long?
+
+Revised and (finally) spell-checked the man page.  I also stopped
+including the auto-generated manual page in an macros.  A text version
+of the man page is now installed, but the manual uses the doc macros
+exclusively.
+
+Line clipping was added in here, too.
+
+1.06: Added an anonymous donor's TeX defines.  Also added the -C
+compatibility option for groff and fixed some manpage formatting bugs.
+
+1.05: kromJx@crosswinds.net noticed that numbers like 1. weren't
+accepted.  They are now.  While I was fixing that I noticed that copy
+until commands without a macro weren't supported.  They are now.  Made
+a minor change to the examples to test the fixes.
+
+1.03: Added the -M path option to make groff handle grap better.  I
+also added the GRAP_DEFINES environment variable to change the defines
+file.  I also added a new source file, grap_parse.cc in an attempt to
+break up the monolithic and gigantic grap.y.  I had some small
+success.  In the course of creating grap_parse.cc I think I caught
+some memory leaks, too.
+
+1.02: Bruce's error handling code produced a few inconsistencies
+(eating the last newline of a file, and adding one befor ethe file.  I
+think it no longer does that.  In addition I took care of a error
+placement bug when the error was in a line containing a macro
+expansion, and changed the error handling from using char * to using
+Strings, like the rest of grap.
+
+Got rid of an error on SunOS (and presumably other architectures) 
+where -0 labels were printed on auto-generated labels.
+
+Fixed bugs in sprintf when compiled using standard strings.
+
+Fixed a memory leak and general bug with the undocumented color
+commands. (There, that'll tell me if anyone reads this!)
+
+1.01: Fixed a compilation bug under RedHat 6.1.  Cleaned up autoconf
+and tweaked the makefile.
+
+1.0: Incorporated Bruce Lilly's error reporting code.  Cleaned up the
+documents (including a menton for Bruce in the man page) for v1.0
+release.  Cleared up a file reading bug.
+
+0.98b: Bruce Lilly reported some bugs and DWP incompatibilities,
+mainly with negative numbers in number lists and comma separations in
+them.  He also compiles in UWIN under NT, which broke autoconf in some
+weird ways.  The most important of these necessitated adding a check
+to ensure that install supports -d.
+
+His test case is in the example file now.  He also found some spelling
+errors.
+
+The README file now reflects the real state of the world, too.  More
+kudos to Bruce.
+
+While tinkering with those autoconf changes I found that grap didn't
+compile under g++ 2.7.2.1 any more.  Good thing that 0.97b wasn't
+really released.  All is well again.
+
+More fun from Bruce: he's given me patches to make cascding
+assignments work and to remove a bug with comments not acting as
+separators.
+
+I've also make the order of copy commands more flexible (the until can
+go before or after an inline macro, for example) and fixed a bug in
+the grammar that made it difficult to put general expressions in
+places like the frame size.  Expressions can go anywhere now, at the
+expense that string comparisons can only appear in if statements.
+Those bugs were also spotted by Bruce.
+
+0.97b: Finally have a copy of egcs, so grap will now compile under it
+using both the stl and the standard string class.  What do you know,
+compiling under egcs halves the run time.  This is roughly half due to
+better egcs compilation and half due to the better performance of the
+standard string class.
+
+Moved to a config.h-style grap.h.  Smoothed out the header files to
+confine as much conditional compilation as possible to grap.h.
+
+The code now uses hash_maps if they're available.
+
+0.95b: bug fix: deleting grap_buffer_state contents twice on error, allow 
+more than one shift description on ticks, grids, and labels.  Thanks to
+Anindo Banerjea at ISI for spotting my misimplementation.
+
+Another couple of Bannerjea catches: through is now recognized as a
+synonym for thru.  "For," "then" and "else" clauses were previously
+treated as macros but now have a terminating separator added to them.
+The result is that things like
+
+if (x == 3) { y = y + 1 }
+x = x + 1
+
+work now.  (If the { } is treated as a macro defined and expanded on
+the spot, the grap parser sees y = y + 1x = x + 1 and cannot parse the
+expression y+1x).  The new behavior is both more intuitive and more in
+line with previous grap implementations.
+
+More from Anindo: expansion of macro arguments assumed that the only
+possible character following a dollar sign was a single digit.  This
+caused problems both when a non-digit followed and the $ was literal,
+and when the intent was to access an argument with an index greater
+than 9.  Argument expansion now only expands when a $ is followed by 1
+or more digits, and includes all the digits in the index.
+
+The frame statement will now accept the default line style before or
+after the frame size.  I still don't accept things like frame ht 3
+solid wid 3 - the specifications of the size must be contiguous.
+
+0.92a: bug fix - string equality check.  Small change to Makefile.in
+to support default Solaris behavior.  Added -v for version info.  Some
+general internals fiddling (I'd like to call it cleanup, but I think
+that's generous).
+
+0.91a: small changes for the RPM
+
+0.9a: Added commands for making bars.  
+
+Error reporting is much closer to the correct line now.
+
+Generalized line descriptions for fillable objects.  
+
+Circles now take a line description.  Added new examples of fillable
+objects.
+
+Now using the BSD copyright notice instead of my own half-baked one.
+
+0.8a: alpha release

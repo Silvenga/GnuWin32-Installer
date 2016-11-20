@@ -1,0 +1,333 @@
+This file is an attempt to give some basic guidelines for those who
+wish to write new Netpbm programs.  The guidelines ensure:
+
+  A) Your program functions consistently with the rest of the package.
+
+  B) Your program works in myriad environments on which you can't test it.
+
+  C) You don't miss an important detail of the Netpbm formats.
+
+  D) Your program is immune to small changes in the Netpbm formats.
+
+The easiest way to write your own Netpbm program is to take an
+existing one, similar to the one you want to write, and to modify
+it.  This saves a lot of time, and ensures conformity with these rules.
+But pick a recent one (check the file modification date and the
+doc/HISTORY file), because many things you see in old programs are
+grandfathered in.  Pamtopnm is good example of a thoroughly modern
+Netpbm program.  Pamcut is another good one.
+
+
+COLLECTION PARAMETERS
+---------------------
+
+The philosophy that guides what goes into Netpbm and what doesn't is
+one of maximum distribution of function.  Contributions to Netpbm are
+refused very rarely, and usually because there is already some better
+way to do what the contribution attempts to do, so that the
+contribution would just make the package more confusing and thus
+harder to use.  The second most common reason for declining a
+contribution is that it falls well outside Netpbm's scope.  That too
+would make the package more confusing and thus harder to use.
+
+"Nobody will use that" is not a reason for leaving something out of
+Netpbm.
+
+"That's different from how other Netpbm programs work" is similarly 
+not an excuse for refusing distribution of a feature.  (But it's a
+good reason to accept a change to make a feature consistent!)
+
+The standard for adding something to Netpbm isn't that it be perfect,
+or even a net improvement.  The standard is that it not make Netpbm
+worse.  Poor quality additions are made all the time, because a
+program that doesn't work well is usually no worse than no program at
+all.
+
+
+CODING GUIDELINES
+-----------------
+
+The Netpbm maintainer accepts programs that do not meet these guidelines,
+so don't feel you need to hold back a contribution because you wrote it
+before you read these.
+
+* See the Netpbm library documentation to see what library functions
+  you should be using and how.  You can find it at:
+
+  http://netpbm.sourceforge.net/doc/libnetpbm.html
+
+* See the specifications of the Netpbm formats at:
+
+  http://netpbm.sourceforge.net/doc/pbm.html
+  http://netpbm.sourceforge.net/doc/pgm.html
+  http://netpbm.sourceforge.net/doc/ppm.html
+  http://netpbm.sourceforge.net/doc/pam.html
+
+  but don't depend very much on these; use the library functions
+  instead to read and write the image files.
+
+* Your new program must belong to one of the four Netpbm classes,
+  which are loosely based on the Netpbm formats.  They are defined as
+  follows:
+
+  pbm: These programs take PBM (bitmap - pixels are black or white)
+       files as input or output or both.  They never have PGM or PPM 
+       primary input or output.  They use the libpbm Netpbm
+       library.  They have "pbm" in their names.
+
+  pgm: These programs take PBM or PGM (grayscale) files as input, or
+       produce PGM files as output, or both.  They treat PBM input
+       as if it were the equivalent PGM input.  They never produce PBM
+       primary output and never have PPM primary input or output.
+       They use the libpbm and libpgm Netpbm libraries.  They have
+       "pgm" in their names.
+
+  ppm: These programs take PBM or PGM or PPM (color) files as input,
+       or produce PPM files as output, or both.  They treat PBM and
+       PGM input as if it were the equivalent PPM input.  They never
+       produce PBM or PGM primary output.  They use the libpbm,
+       libpgm, and libppm Netpbm libraries.  They have "ppm" in their
+       names.
+
+  pnm: These are the most general programs.  They handle all four
+       Netpbm formats (PBM, PGM, PPM, and PAM).  They use all Netpbm
+       formats as input or output or both.  They recognize the
+       difference between PBM, PGM, and PPM input, so a PBM input
+       might produce a different result than the equivalent PGM input.
+       These programs use the libpbm, libpgm, libppm, and libpnm
+       Netpbm libraries.  They have "pnm" or "pam" in their names.
+
+  Decide which one of these classes your program belongs to.  Your choice
+  determines the proper naming of the program and which set of library
+  subroutines you should use.
+
+* If your program involves transparency (alpha masks), follow the
+  example of Pngtopnm/Pnmtopng and Giftopnm/Pnmtogif command syntax,
+  etc.  And don't consider inventing a new Netpbm format that includes
+  transparency.  That's been carefully considered in the past and
+  determined to violate the simple building block principle of Netpbm.
+  In Netpbm, an alpha mask is represented as a separate PGM image.
+
+* Declare all your symbols except 'main' as static so that they won't
+  cause problems to other programs when you do a "merge build" of 
+  Netpbm.
+
+* Declare main() with return type 'int', not 'void'.  Some systems won't
+  compile void main().
+
+* Always start the code in main() with a call to p?m_init().
+
+* Use shhopt for option processing.  i.e. call optParseOptions3().
+  This is really easy if you just copy the parseCommandLine() function
+  and struct cmdlineInfo declaration from pamcut.c and adapt it to 
+  your program. 
+
+  When you do this, you get a command line syntax consistent with all the
+  other Netpbm programs, you save coding time and debugging time, and it
+  is trivial to add options later on.
+
+  Do not use shhopt's short option alternative unless you need to be
+  compatible with another program that has short options.  Short
+  options are traditional one-character Unix options, which can be
+  stacked up like "foo -cderx myfile", and they are far too unfriendly
+  to be accepted by the Netpbm philosophy.  Note that long options in
+  shhopt can always be abbreviated to the shortest unique prefix, even
+  one character.
+
+  In messages and examples in documentation, always refer to an option
+  by its full name, not the abbreviation you usually use.  E.g. if you have
+  a "-width" option which can be abbreviated "-w", don't use -w in 
+  documentation.  -width is far clearer.
+  
+* Use pm_error() and pm_message() for error messages and other messages.
+  Note that the universal -quiet option (processed by p?m_init()) causes
+  messages issued via pm_message() to be suppressed.  And that's what
+  Netpbm's architecture requires.
+
+* The argument to pm_error() and pm_message() is a string of text, not
+  a formatted message.  Don't put newlines or other formatting characters
+  in it.  These subroutines are designed to be flexible in how they issue
+  the messages.
+
+* Use MALLOCARRAY() to allocate space for an array and MALLOCVAR to allocate
+  space for a non-array variable.  In fact, you usually want to save some
+  programming tedium and use the NOFAIL versions of these (they never fail
+  because they abort the program if memory is not available).  These avoid
+  array bounds violations.
+
+* Use pm_tmpfile() to make a temporary file.  This avoids races that can
+  be used to compromise security.
+
+* Properly use maxvals.  As explained in the format specifications, every
+  sample value in an image must be interpreted relative to the image's
+  maxval.  For example, a pixel with value 24 in an image with maxval 24
+  is the same brightness as a pixel with value 255 in an image with a
+  maxval of 255.
+
+  255 is a popular maxval (use the PPM_MAXMAXVAL etc. macros) because it
+  makes samples fit in a single byte and at one time was the maximum 
+  possible maxval in the format.
+
+  Note that the Pnmdepth program converts an image from one maxval to
+  another.
+
+* Don't include extra function.  If you can already do something by 
+  piping the input or output of your program through another Netpbm
+  program, don't make an option on your program to do it.  That's the
+  Netpbm philosophy -- simple building blocks.
+
+  Similarly, if your program does two things which would be useful
+  separately, write two programs and advise users to pipe them
+  together.  Or add a third program that simply calls the first two.
+
+* Your program should, if appropriate, allow the user to use Standard
+  Input and Output for images.  This is because Netpbm users commonly
+  use pipes.
+
+* Don't forget to write a proper html documentation page.  Get an
+  example to use as a template from
+  <http://netpbm.sourceforge.net/doc/directory.html>.
+
+* No Netpbm source code may contain tab characters.  If you
+  generate such a file, the Netpbm maintainer will convert it to spaces
+  and possibly change all your indenting at the same time.  Tabs are not
+  appropriate for code that multiple people must edit because they don't
+  necessarily look the same in every editing environment, and in most
+  editing environments, you can't even tell which spaces are actually in
+  the file and which came from the editor, expanding tabs.  Spaces, on
+  the other hand, look the same for everyone.  Modern editors let you
+  compose code just as easily with spaces as with tabs.
+
+
+
+
+DISCONTINUED CODING GUIDELINES
+------------------------------
+
+Here are some things you will see in old Netpbm programs, but they are
+obsolete and you shouldn't propagate them into a new program:
+
+* Tolerating non-standard C libraries.  You may assume all users have
+  ANSI and POSIX compliant C libraries.  E.g. use strrchr() and forget
+  about rindex().
+
+* pm_keymatch() for option processing.  Use shhopt instead, as described
+  above.
+
+* optParseOptions() and optParseOptions2().  These are obsoleted
+  by optParseOptions3(), which is easier to use and more powerful.
+
+* K&R C function declarations.  Always use ANSI function declarations
+  exclusively (e.g. use 
+
+      void foo(int arg1){} 
+
+  instead of 
+
+       void foo(arg1)
+           int arg1;
+           {}
+
+* for (col=0, xP = row; col < cols; col++, xP++)
+      foo(*xP);
+
+  This was done in the days before optimizing compilers because it ran faster
+  than the more readable:
+
+    for (col=0; col < cols; col++)
+        foo(row[col]);
+
+  Now, just use the latter.
+
+
+CODING STYLE
+------------
+
+We do not generally mandate any basic coding style in these
+guidelines.  Where you put your braces is a matter of personal style
+and other people working with your code will just have to live with
+it.  However, people working with your code might just recode it into
+another style if it makes it easier for them to read the code and
+have confidence in their changes.
+
+But if you have no preference, the following is what the Netpbm
+maintainer currently prefers.  Essentially, it is clean, elegant
+computer science-type code rather than brute force engineering-type
+code.  Modular and structured above all.
+
+* No gotos.  This includes all variations of goto:  break, continue, leave,
+  mid-function return.  An exception: aborting the entire program in the 
+  middle of something is allowed.
+
+* No functions with side effects.  This is a tough one, since
+  functions with side effects is highly traditional C.  In fact, the
+  creators of C didn't even have a concept of a subroutine.  However,
+  the average human brain, especially one trained in math, cannot
+  easily follow code where a function both computes a value and does
+  other stuff.
+  
+  For the purpose of this discussion, we say that a C function whose return
+  type is void is not a "function," but a "subroutine."
+
+  So a function should never change anything in the program.  All it does
+  is compute a value.
+
+  Where you have to call an external function that has side effects (virtually
+  anything in the standard C library, for example), put it in a simple
+  assignment function that captures its return value and otherwise consider
+  it a subroutine:
+
+    rc = fopen(...)
+    if (rc ...)
+
+* No reuse of variables.  Most variables should be set at most once.
+  Don't say "A is 5" and then later on, "no, A is 6."  A reader
+  should be able to take that first "A is 5" as a statement of fact
+  and not hunt for all the places it might be contradicted.  A
+  variable that represents the state of execution of an algorithm is an
+  obvious exception.
+
+  Use "const" everywhere you possibly can.
+
+  Especially never modify the argument of a function.  All function arguments
+  should be "const".
+
+  Don't use initializers except for constants.  If you're going to set 
+  a variable twice, do it out in the open; don't hide one in the declaration
+  of the variable.
+
+* Avoid global variables.  Sometimes, a value is truly global and
+  passing it as a parameter just muddies the code.  But most of the
+  time, any external value to which a function refers should be one of
+  its arguments.  
+
+  Declare a variable in the most local scope possible.
+
+* Keep subroutines small.  Generally under 50 lines.  But if the
+  routine is a long sequence of simple, similar things, it's OK for it
+  run on ad infinitem.
+
+* Use the type "bool" for boolean variables.  "bool" is defined in Netpbm
+  headers.  Use TRUE and FALSE as its values.
+
+* Do not say "if (a)" when you mean "if (a != 0)".  Use "if (a)" only if
+  a is a boolean variable.  Or where it's defined so that a zero value 
+  means ("doesn't exist").
+
+* Do multiword variable names like this:  "multiWordName".  Underscores waste
+  valuable screen real estate.
+
+* If a variable's value is the address of something (a pointer to something),
+  it's name should reflect that, as opposed to lying and saying the value is
+  the thing pointed to.  A "P" on the end is the conventional way to say
+  "address of."  E.g. if a variable's value is the address of a color value,
+  name it "colorP", not "color".
+
+* Put "const" as close as possible to the thing that is constant.
+  "int const width", not "const int width".  When pointers to
+  constants are involved, it makes it much easier to read.
+
+* Free something in the same subroutine that allocates it.  Have exactly 
+  one free per allocate (this comes naturally if you eliminate gotos).
+
+

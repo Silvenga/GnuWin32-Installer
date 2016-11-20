@@ -1,0 +1,137 @@
+scalbln(P)                                           scalbln(P)
+
+
+
+
+
+NAME
+       scalbln,  scalblnf, scalblnl, scalbn, scalbnf, scalbnl -
+       compute exponent using FLT_RADIX
+
+SYNOPSIS
+       #include <math.h>
+
+       double scalbln(double x, long n);
+       float scalblnf(float x, long n);
+       long double scalblnl(long double x, long n);
+       double scalbn(double x, int n);
+       float scalbnf(float x, int n);
+       long double scalbnl(long double x, int n);
+
+
+DESCRIPTION
+       The functionality described on this  reference  page  is
+       aligned  with  the  ISO C standard. Any conflict between
+       the requirements described here and the  ISO C  standard
+       is  unintentional.   This volume of IEEE Std 1003.1-2001
+       defers to the ISO C standard.
+
+       These functions  shall  compute  x * FLT_RADIX**n  effi-
+       ciently,  not normally by computing FLT_RADIX**n explic-
+       itly.
+
+       An application wishing to  check  for  error  situations
+       should   set   errno   to   zero   and  call  feclearex-
+       cept(FE_ALL_EXCEPT) before calling these functions.   On
+       return,  if errno is non-zero or fetestexcept(FE_INVALID
+       | FE_DIVBYZERO | FE_OVERFLOW  |  FE_UNDERFLOW)  is  non-
+       zero, an error has occurred.
+
+RETURN VALUE
+       Upon successful completion, these functions shall return
+       x * FLT_RADIX**n.
+
+       If the result would cause overflow, a range error  shall
+       occur  and  these  functions  shall  return  +-HUGE_VAL,
+       +-HUGE_VALF, and +-HUGE_VALL (according to the  sign  of
+       x) as appropriate for the return type of the function.
+
+       If  the  correct value would cause underflow, and is not
+       representable, a range error may  occur,  and     either
+       0.0 (if supported), or   an implementation-defined value
+       shall be returned.
+
+       If x is NaN, a NaN shall be returned.
+
+       If x is +-0 or +-Inf, x shall be returned.
+
+       If n is 0, x shall be returned.
+
+       If the correct value would cause underflow, and is  rep-
+       resentable,  a  range  error  may  occur and the correct
+       value shall be returned.
+
+ERRORS
+       These functions shall fail if:
+
+       Range Error
+              The result overflows.
+
+       If   the   integer   expression   (math_errhandling    &
+       MATH_ERRNO)  is  non-zero,  then  errno  shall be set to
+       [ERANGE]. If the integer expression (math_errhandling  &
+       MATH_ERREXCEPT) is non-zero, then the overflow floating-
+       point exception shall be raised.
+
+
+       These functions may fail if:
+
+       Range Error
+              The result underflows.
+
+       If   the   integer   expression   (math_errhandling    &
+       MATH_ERRNO)  is  non-zero,  then  errno  shall be set to
+       [ERANGE]. If the integer expression (math_errhandling  &
+       MATH_ERREXCEPT)  is  non-zero, then the underflow float-
+       ing-point exception shall be raised.
+
+
+       The following sections are informative.
+
+EXAMPLES
+       None.
+
+APPLICATION USAGE
+       On   error,   the   expressions   (math_errhandling    &
+       MATH_ERRNO)  and (math_errhandling & MATH_ERREXCEPT) are
+       independent of each other, but at least one of them must
+       be non-zero.
+
+RATIONALE
+       These  functions  are  named  so as to avoid conflicting
+       with the historical definition of the  scalb()  function
+       from  the  Single UNIX Specification.  The difference is
+       that the scalb() function has a second argument of  dou-
+       ble  instead of int. The scalb() function is not part of
+       the ISO C standard. The  three  functions  whose  second
+       type is long are provided because the factor required to
+       scale from the smallest positive floating-point value to
+       the  largest finite one, on many implementations, is too
+       large to represent in the minimum-width int format.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       feclearexcept() , fetestexcept() , scalb()  ,  the  Base
+       Definitions   volume  of  IEEE Std 1003.1-2001,  Section
+       4.18, Treatment of  Error  Conditions  for  Mathematical
+       Functions, <math.h>
+
+COPYRIGHT
+       Portions  of  this  text are reprinted and reproduced in
+       electronic form from  IEEE  Std  1003.1,  2003  Edition,
+       Standard  for Information Technology -- Portable Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute of Electrical and Electronics  Engineers,  Inc  and
+       The  Open Group. In the event of any discrepancy between
+       this version and the original IEEE and  The  Open  Group
+       Standard,  the original IEEE and The Open Group Standard
+       is the referee document. The original  Standard  can  be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                   scalbln(P)

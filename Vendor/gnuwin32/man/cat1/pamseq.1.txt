@@ -1,0 +1,77 @@
+Pamseq User Manual(0)                     Pamseq User Manual(0)
+
+
+
+Table Of Contents
+
+NAME
+       pamseq  -  generate PAM image of all possible tuple val-
+       ues, in sequence
+
+
+SYNOPSIS
+       pamseq [-tupletype tupletype] depth maxval
+
+       All options can be abbreviated to their shortest  unique
+       prefix.   You may use two hyphens instead of one to des-
+       ignate an option.  You may use either white space or  an
+       equals sign between an option name and its value.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       pamseq  generates  a  PAM image of a specified depth and
+       specified maxval that consists of a single row.  The row
+       consists of one tuple of every possible value, in order.
+
+       For a depth of one, the order is simple: From 0 to  max-
+       val,  going  from left to right.  For higher depths, the
+       highest numbered plane goes from 0 to maxval (going left
+       to right) while all the other planes have value 0.  Then
+       the sequence repeats except with the next highest  plane
+       set to a value of 1, then 2, etc.
+
+
+OPTIONS
+       -tupletype
+              This  is  the value of the "tuple_type" attribute
+              of the created PAM image.  It can be  any  string
+              up to 255 characters.
+
+
+
+
+USAGE
+       To  create a simple ramp of the values 0..255, for input
+       to various matrix calculations, try
+         pamseq 1 255
+       (Before pamseq existed, pgmramp was often  pressed  into
+       service for this).
+
+       To  create  a  PPM  color map of all the possible colors
+       representable with a maxval of 5, do
+         pamseq 3 5 -tupletype=RGB | pamtopnm
+
+       Again,  with  a  modern  program  based  on  the  Netpbm
+       library,  you  don't need the pamtopnm because a PAM RGB
+       image is equivalent to a PPM image.
+
+       You can use such a  color  map  with  pnmremap(1)toquan-
+       tizethecolorsinan  image.  With the maxval of 5 given in
+       the example, you get a color map  of  the  set  of  "web
+       safe"  colors as defined by Netscape.  Most web browsers
+       guarantee that they can produce at least these 216  col-
+       ors (215 plus black).
+
+
+SEE ALSO
+       pnmremap(1), pamtopnm(1), pam(1)
+
+
+HISTORY
+       pamseq was added to Netpbm in June 2002.
+
+
+
+netpbm documentation       8 May 2002     Pamseq User Manual(0)

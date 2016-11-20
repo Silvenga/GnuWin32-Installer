@@ -1,0 +1,101 @@
+RLETORLA(1)                                         RLETORLA(1)
+
+
+
+
+
+NAME
+       rletorla  -  convert  a Utah RLE image file into a Wave-
+       front "rla" or "rlb" image file.
+
+SYNOPSIS
+       rletorla [ -b ] [ -h ] [ -v ] [ -o outfile ] [ infile ]
+
+DESCRIPTION
+       This program converts Utah RLE(5) image files into Wave-
+       front  "rla" or "rlb" image files.  Rletorla will handle
+       four types of RLE files: Grayscale (8 bit data, no color
+       map),  Pseudocolor  (8 bit data with a color map), True-
+       color (24 bit data with color map), and Directcolor  (24
+       bit  data,  no  color  map).  In each case the resulting
+       Wavefront image file will contain RGB data as well as  a
+       matte  channel.  If no alpha channel is found in the RLE
+       file, the Wavefront matte channel will be computed using
+       the  RGB  or  mapped data.  The entire area of the Wave-
+       front image will be run length encoded.  The size of the
+       Wavefront  "bounding  box" data structure will be set to
+       that of the total image area.
+
+       NOTE:  Even though images of any size can be  converted,
+       Wavefront  is  very  fussy about image dimensions.  Nor-
+       mally, the converted image must be one of the  following
+       sizes  or  Wavefront  will  complain with "ERROR, cannot
+       open image file filename, error -8":
+
+       646x485 (0-645x0-484) ntsc_4d
+       720x486 (0-719x0-485) qtl_ntsc
+       636x484 (0-635x0-483) iris_ntsc
+       1024x1024 (0-1023x0-1023) 1k_square
+
+       To get around this problem, the aspect  ratio  field  in
+       the  Wavefront "rla" file will be "faked" with "ntsc_4d"
+       for all formats that do not match  one  of  those  shown
+       above.   This  way,  Wavefront  will find a valid format
+       string, and any image  size  will  be  readable.   "rlb"
+       image file do not have this limitation.
+
+OPTIONS
+       -b     This option will cause rletorla to create a Wave-
+              front "rlb"  image  file  instead  of  using  the
+              default "rla" conversion.
+
+       -v     This  option  will  cause  rletorla to operate in
+              verbose mode.  Header information is  printed  to
+              "stderr".
+
+       -h     This  option allows the header of the RLE file to
+              be dumped  to  "stderr"  without  converting  the
+              file.   It  is  equivalent to using the -v option
+              except that no file conversion takes place.
+
+       -o outfile
+              This option allows the name of the output file to
+              be specified.  Re-directing standard output as is
+              done with most all other toolkit utilities is not
+              permitted  here  because  the  resulting "rla" or
+              "rlb" file is not written sequentially.
+
+       infile The name of the RLE image data file  to  be  con-
+              verted.  The name of the resulting Wavefront file
+              will be derived from the name of the  input  file
+              (unless  the  -o option is used) -- the extension
+              will be changed from "rle"  to  "rla"  or  "rlb".
+              (Note:  if  you use the extended input file names
+              described in urt(1), this will result in  a  very
+              strange filename for the Wavefront file.)
+
+EXAMPLES
+       rletorla -v lenna.rle
+              While  running in verbose mode, convert lenna.rle
+              to Wavefront rla format and store resulting  data
+              in lenna.rla.
+
+       rletorla -h test.0001.rle
+              Dump  the  header  information  of  the  RLE file
+              called test.0001.rle.
+
+       rletorla -b -o junk.rlb test.rle
+              Convert test.rle  into  a  Wavefront  "rlb"  file
+              called junk.rlb.
+
+SEE ALSO
+       rlatorle(1), urt(1), RLE(5).
+
+AUTHOR
+       Wesley C. Barris
+       Army High Performance Computing Research Center (AHPCRC)
+       Minnesota Supercomputer Center, Inc.
+
+
+
+1                         May 30, 1990              RLETORLA(1)

@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pamgauss User Manual</TITLE></HEAD>
+<BODY>
+<H1>pamgauss</H1>
+Updated: 8 May 2004
+<BR>
+<A HREF="pamgauss.html#index">Table Of Contents</A>
+
+<A NAME="name">&nbsp;</A>
+<H2>NAME</H2>
+
+pamgauss - create a two dimensional gaussian function as a PAM image
+
+<A NAME="synopsis">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pamgauss</B>
+<i>-width</i> <i>-height</i>
+<b>-sigma=</b><i>number</i>
+[<b>-maxval=</b><i>number</i>]
+[<b>-tupletype=</b><i>string</i>]
+
+
+<p>Minimum unique abbreviation of option is acceptable.  You may use double
+hyphens instead of single hyphen to denote options.  You may use white
+space in place of the equals sign to separate an option name from its value.
+
+
+
+<A NAME="examples">&nbsp;</A>
+<H2>EXAMPLES</H2>
+
+<pre>
+     pamgauss 3 3 -sigma=.5 -tupletype=GRAYSCALE | pamtopnm &gt;gauss.pgm
+     pnmconvol -nooffset gauss.pgm myimage.ppm &gt;blurred.ppm
+</pre>
+
+<A NAME="description">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pamgauss</b> generates a one-plane PAM image whose samples are a
+gaussian function of their distance from the center of the image.  I.e.
+the sample value is highest in the center and goes down, in a bell curve
+shape, as you move away from the center.
+
+<p>The values are scaled so that the area under the surface of the
+two-dimensional Gaussian function is the maxval of the image.
+
+<p>You can use this image, converted to PGM, as a convolution kernel
+with <b>pnmconvol</b> to blur an image.  (This technique is known as
+Gaussian blurring).
+
+<i>width</i> and <i>height</i> are the dimensions of the image that
+<b>pamgauss</b> generates.  Mathematically speaking, they are the domain
+of the two dimensional gaussian function.
+
+<p>The sum of all the samples is equal to the image's maxval (within
+rounding error).  This is true even if you clip the Gaussian function
+by making the image too small.  If you want to be sure you get a whole
+Gaussian function, make sure that you choose a sigma and image
+dimensions so that if you made it any larger, the sample values at the
+edges would be zero.
+
+<p>The output image is PAM.  To turn it into a PGM that you can use
+with <b>pnmconvol</b>, specify <b>-tupletype=GRAYSCALE</b> and pass
+the output through <b>pamtopnm</b>.  You must use the <b>-nooffset</b>
+option on <b>pnmconvol</b> because zero means zero in the PAM that
+<b>pamgauss</b> generates.
+
+<A NAME="options">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<dl>
+<dt><b>-sigma=</b><i>number</i>
+
+<dd>This is the sigma parameter of the Gaussian function (if it were a 
+Gaussian probability function, this would be its the standard deviation).
+The higher the number, the more spread out the function is.  Normally, you
+want to make this number low enough that the function reaches zero value
+before the edge of your image.
+
+<p><i>number</i> is in units of pixels.
+
+<p>This option is required.  There is no default.
+
+<dt><b>-maxval=</b><i>number</i>
+<dd>This is the maxval for the output image.  It defaults to 255.
+
+<dt><b>-tupletype=</b><i>string</i>
+<dd>
+This is the value of the "tuple_type" attribute of the created PAM image.
+It can be any string up to 255 characters.  If you don't specify this,
+<b>pamgauss</b> generates a PAM with unspecified tuple type.
+
+</dl>
+
+<A NAME="seealso">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pnmconvol.html">pnmconvol</A></B>,
+<B><A HREF="pamtopnm.html">pamtopnm</A></B>,
+<B><A HREF="pgmkernel.html">pgmkernel</A></B>,
+<B><A HREF="pamseq.html">pamseq</A></B>,
+<B><A HREF="pam.html">pam</A></B>
+
+<A NAME="history">&nbsp;</A>
+<H2>HISTORY</H2>
+
+<p><b>pamgauss</b> was new in Netpbm 10.23 (July 2004).
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pamgauss.html#name">NAME</A>
+<LI><A HREF="pamgauss.html#synopsis">SYNOPSIS</A>
+<LI><A HREF="pamgauss.html#examples">SYNOPSIS</A>
+<LI><A HREF="pamgauss.html#description">DESCRIPTION</A>
+<LI><A HREF="pamgauss.html#seealso">SEE ALSO</A>
+<LI><A HREF="pamgauss.html#history">AUTHORS</A>
+</UL>
+</BODY>
+</HTML>

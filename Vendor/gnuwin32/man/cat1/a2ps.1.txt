@@ -1,0 +1,299 @@
+A2PS(1)                               FSF                              A2PS(1)
+
+
+
+NAME
+       a2ps - format files for printing on a PostScript printer
+
+SYNOPSIS
+       a2ps [OPTION]... [FILE]...
+
+DESCRIPTION
+       Convert FILE(s) or standard  input  to  PostScript.   By
+       default,  the output is sent to the default printer.  An
+       output file may be specified with -o.
+
+       Mandatory arguments to long options  are  mandatory  for
+       short options too.  Long options marked with * require a
+       yes/no argument, corresponding short options  stand  for
+       `yes'.
+
+   Tasks:
+       --version
+              display version
+
+       --help display this help
+
+       --guess
+              report guessed types of FILES
+
+       --which
+              report the full path of library files named FILES
+
+       --glob report the full path of  library  files  matching
+              FILES
+
+       --list=defaults
+              display default settings and parameters
+
+       --list=TOPIC
+              detailed  list  on TOPIC (delegations, encodings,
+              features, variables, media, ppd,  printers,  pro-
+              logues, style-sheets, user-options)
+
+       After  having  performed  the  task,  exit successfully.
+       Detailed lists may provide additional help  on  specific
+       features.
+
+   Global:
+       -q, --quiet, --silent
+              be really quiet
+
+       -v, --verbose[=LEVEL]
+              set verbosity on, or to LEVEL
+
+       -=, --user-option=OPTION
+              use the user defined shortcut OPTION
+
+       --debug
+              enable debugging features
+
+       -D, --define=KEY[:VALUE]
+              unset variable KEY or set to VALUE
+
+   Sheets:
+       -M, --medium=NAME
+              use output medium NAME
+
+       -r, --landscape
+              print in landscape mode
+
+       -R, --portrait
+              print in portrait mode
+
+       --columns=NUM
+              number of columns per sheet
+
+       --rows=NUM
+              number of rows per sheet
+
+       --major=DIRECTION
+              first fill (DIRECTION=) rows, or columns
+
+       -1, -2, ..., -9
+              predefined  font sizes and layouts for 1.. 9 vir-
+              tuals
+
+       -A, --file-align=MODE
+              align separate files  according  to  MODE  (fill,
+              rank page, sheet, or a number)
+
+       -j, --borders*
+              print borders around columns
+
+       --margin[=NUM]
+              define an interior margin of size NUM
+
+       The  options -1.. -9 affect several primitive parameters
+       to set up predefined layouts with 80 columns.  Therefore
+       the  order  matters: `-R -f40 -2' is equivalent to `-2'.
+       To modify the layout, use `-2Rf40', or compose primitive
+       options (`--columns', `--font-size' etc.).
+
+   Virtual pages:
+       --line-numbers=NUM
+              precede each NUM lines with its line number
+
+       -C     alias for --line-numbers=5
+
+       -f, --font-size=SIZE
+              use font SIZE (float) for the body text
+
+       -L, --lines-per-page=NUM
+              scale the font to print NUM lines per virtual
+
+       -l, --chars-per-line=NUM
+              scale the font to print NUM columns per virtual
+
+       -m, --catman
+              process FILE as a man page (same as -L66)
+
+       -T, --tabsize=NUM
+              set tabulator size to NUM
+
+       --non-printable-format=FMT   specify  how  non-printable
+              chars are printed
+
+   Headings:
+       -B, --no-header
+              no page headers at all
+
+       -b, --header[=TEXT]
+              set page header
+
+       -u, --underlay[=TEXT]
+              print TEXT under every page
+
+       --center-title[=TEXT]
+              set page title to TITLE
+
+       --left-title[=TEXT]
+              set left and right page title to TEXT
+
+       --right-title[=TEXT]
+
+       --left-footer[=TEXT]
+              set sheet footers to TEXT
+
+       --footer[=TEXT]
+
+       --right-footer[=TEXT]
+
+       The TEXTs may use special escapes.
+
+   Input:
+       -a, --pages[=RANGE]
+              select the pages to print
+
+       -c, --truncate-lines*
+              cut long lines
+
+       -i, --interpret*
+              interpret tab, bs and ff chars
+
+       --end-of-line=TYPE
+              specify the eol char (TYPE: r, n, nr, rn, any)
+
+       -X, --encoding=NAME
+              use input encoding NAME
+
+       -t, --title=NAME
+              set the name of the job
+
+       --stdin=NAME
+              set the name of the input file stdin
+
+       --print-anyway*
+              force binary printing
+
+       -Z, --delegate*
+              delegate files to another application
+
+       --toc[=TEXT]
+              generate a table of content
+
+       When delegations are enabled, a2ps may use other  appli-
+       cations  to  handle  the processing of files that should
+       not  be  printed  as   raw   information,   e.g.,   HTML
+       PostScript, PDF etc.
+
+   Pretty-printing:
+       -E, --pretty-print[=LANG]
+              enable pretty-printing (set style to LANG)
+
+       --highlight-level=LEVEL
+              set  pretty printing highlight LEVEL LEVEL can be
+              none, normal or heavy
+
+       -g     alias for --highlight-level=heavy
+
+       --strip-level=NUM
+              level of comments stripping
+
+   Output:
+       -o, --output=FILE
+              leave output to file FILE.  If FILE is `-', leave
+              output to stdout.
+
+       --version-control=WORD
+              override the usual version control
+
+       --suffix=SUFFIX
+              override the usual backup suffix
+
+       -P, --printer=NAME
+              send output to printer NAME
+
+       -d     send  output  to the default printer (this is the
+              default behavior)
+
+   PostScript:
+       --prologue=FILE
+              include FILE.pro as PostScript prologue
+
+       --ppd[=KEY]
+              automatic PPD selection or set to KEY
+
+       -n, --copies=NUM
+              print NUM copies of each page
+
+       -s, --sides=MODE
+              set the duplex MODE (`1'  or  `simplex',  `2'  or
+              `duplex', `tumble')
+
+       -S, --setpagedevice=K[:V]
+              pass a page device definition to output
+
+       --statusdict=K[:[:]V]
+              pass a statusdict definition to the output
+
+       -k, --page-prefeed
+              enable page prefeed
+
+       -K, --no-page-prefeed
+              disable page prefeed
+
+       By  default  a2ps  is  tuned  to do what you want to, so
+       trust it.  To pretty print  the  content  of  the  `src'
+       directory and a table of content, and send the result to
+       the printer `lw',
+
+              $ a2ps -P lw --toc src/*
+
+       To process the files `sample.ps' and  `sample.html'  and
+       display the result,
+
+              $ a2ps -P display sample.ps sample.html
+
+       To process a mailbox in 4 up,
+
+              $ a2ps -=mail -4 mailbox
+
+       To  print  as a booklet on the default printer, which is
+       Duplex capable,
+
+              $ a2ps -=book paper.dvi.gz -d
+
+       News,     updates     and      documentation:      visit
+       http://www.gnu.org/software/a2ps/.
+
+AUTHOR
+       Written by Akim Demaille, Miguel Santana.
+
+REPORTING BUGS
+       Report bugs to <bug-a2ps@gnu.org>.
+
+COPYRIGHT
+       Copyright © 1988-1993 Miguel Santana
+       Copyright © 1995-2000 Akim Demaille, Miguel Santana
+       Copyright  ©  2007-  Akim  Demaille,  Miguel Santana and
+       Masayuki Hatta
+       This is free software; see the source for copying condi-
+       tions.  There is NO warranty; not even for MERCHANTABIL-
+       ITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+       a2ps(1),   card(1),   fixps(1),   pdiff(1),    psset(1),
+       texi2dvi4a2ps(1).
+
+       The  full documentation for a2ps is maintained as a Tex-
+       info manual.  If the info and a2ps programs are properly
+       installed at your site, the command
+
+              info a2ps
+
+       should give you access to the complete manual.
+
+
+
+GNU a2ps 4.14                    December 2007                         A2PS(1)

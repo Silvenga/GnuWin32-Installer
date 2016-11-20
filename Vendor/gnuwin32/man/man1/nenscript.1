@@ -1,0 +1,242 @@
+.TH NENSCRIPT 1 "28 October 1997"
+.SH NAME
+nenscript \- format an ASCII file and convert to PostScript
+.SH SYNOPSIS
+.B nenscript
+[
+.B \-?12BdGghlNnRrsVWwZ
+] [ 
+.BI \-f font
+] [
+.BI \-F titlefont
+] [
+.BI \-b header
+] [
+.BI \-i filetitle
+] [
+.BI \-L lines
+] [
+.BI \-p filename
+] [
+.BI \-P printer
+] [
+.BI \-S classification
+] [
+.BI \-U 1st_page_classification
+] [
+.BI \-T papertype
+] [
+.BI \-t tabstops
+] [
+.BI \-# copies
+] [
+.I file...
+]
+.SH DESCRIPTION
+Formats the specified ASCII files and produces PostScript output conforming to the Adobe Structuring Conventions.
+The output pages may be in landscape or portrait mode, with one or two columns, with or without headers.
+
+If no input files are specified, then input is accepted from stdin.
+
+Tabs in the input stream are expanded (by default) to eight character positions.
+
+Formfeed (control-L) characters in the input stream cause a new page or column to be started. Form feed characters must
+be at the start start of a line, or preceded only by whitespace. To make
+formfeeds work at any point in the line use the \-d option.
+
+PostScript output is directed to a printer using
+.B lpr
+unless otherwise specified using the \-p option. The printer to use is set by the PRINTER environment variable.
+If this is not set, then the printer "Postscript" ("prn" for MSDOS) will be used.
+
+Font specifications are formed from the font name and the font size, i.e. 
+.B Courier10
+specifies a 10 point Courier font, and Courier-Bold12 specifies a bold, 12 point Courier font. Sizes can also be given with a decimal point, i.e.
+.B Courier7.5
+specifies a 7.5 point font, this might however result in a marginal error in 
+the size calculations, since a linear approximation of the character width
+is done.
+
+The NENSCRIPT environment variable may be used to set default values for most
+configurable attributes. Values set in this way will be overridden by any
+options specified on the commands line.
+
+The current version of nenscript is 1.13.
+
+.SH OPTIONS
+.TP
+.B \-? 
+.B \-h
+Print usage message.
+
+.TP
+.B \-1
+Specifies single column output (default).
+
+.TP
+.B \-2
+Specifies two column output.
+
+.TP
+.B \-B
+Turns off page titles.
+
+.TP
+.BI \-b header
+Print the text specified by
+.I header
+as the title on each page, rather than the default header which is composed of the name of
+the source file, the current time and date and the page number. If in gaudy mode, the title
+is displayed in the blank area just above the file title.
+
+.TP
+.B \-d
+Handles formfeeds in the same way that a dot-matrix printer handles
+them.  Thus a line with a formfeed in the middle prints the first part,
+starts a new page and then prints the rest of the same line on the first
+line of the page. In fact using this mode to get anything to print on the top
+line, it must be on the same line as the formfeed in the file.
+
+.TP
+.BI \-f font
+Use 
+.I font
+for printing text. Only Courier in sizes 5 to 30 can be used for printing text. The default font is Courier10, unless two column landscape mode is specified in which case the default font is Courier7.
+
+.TP
+.BI \-F titlefont
+Use 
+.I titlefont
+for printing titles. Any font in any point size can be used for printing titles.The default font is Courier-Bold10.
+
+.TP
+.B \-G
+Enable gaudy mode.
+
+.TP
+.B \-g
+Disable gaudy mode (default).
+
+.TP
+.BI \-i filetitle
+Use the specified string as the displayed filename. Useful when inputting from stdin.
+
+.TP
+.BI \-L lines
+Set the maximum number of lines which will be printed per page or column. The actual
+number of lines which appear may be less depending upon the font and paper size.
+
+.TP
+.B \-l
+Do not set a limit on on the maximum number of lines per page, i.e. the 
+number of lines is determined by the font size and the paper size (default).
+
+.TP
+.B \-N
+Precede each line with it's line number relative to the start of the file.
+
+.TP
+.B \-n
+Disable line numbering (default).
+
+.TP
+.BI \-p filename
+Direct the PostScript to 
+.I filename
+rather than the default printer. If '-' is specified as the filename, then the
+PostScript is sent to stdout.
+
+.TP
+.BI \-P printer
+Overrides the PRINTER environment variable in determining the printer to spool output to. Ignored if \-p is used.
+
+.TP 
+.B \-R
+Don't rotate the page, i.e. output in portrait mode (default).
+
+.TP
+.B \-r
+Rotate the page, i.e. output in landscape mode.
+
+.TP
+.BI \-S classification
+Prints the string argument in Helvetica-Bold28 at the top and bottom of the page in conformance to regulations for printing classified material.
+
+.TP
+.BI \-U 1st_page_classification
+Print a different classification header for the first page.  Useful
+for marking banner sheets that need to be marked with a higher level of
+classification until the document can be reviewed and declassified.
+
+.TP
+.B \-s
+Disable a previous heading specified with the \-S option.
+
+.TP
+.BI \-T papertype
+Sets the output paper type as per the argument. At the moment, only two paper types are supported: A4 and US. The
+default paper size will be A4, unless the US_VERSION define is specified at compilation time.
+
+.TP
+.BI \-t tabsize
+Sets the number of columns to which tabs are expanded. The default is eight columns.
+
+.TP
+.B \-V
+Display information identifying the version of
+.B nenscript. Nothing will be printed regardless of the other arguments.
+
+.TP
+.B \-W
+Truncate lines which are wide for the page.
+
+.TP
+.B \-w
+Wrap lines which are too wide for the page onto successive lines (default).
+Continuation lines are marked with + character before the left margin.
+
+.TP
+.B \-Z
+Check the first two characters of the input for the character string %!. If a match is found,
+the input is copied directly to the output with no processing. 
+
+.TP
+.BI \-# copies
+Print each page
+.I copies
+times.
+
+.SH ENVIRONMENT
+.TP 15
+.SB PRINTER
+Specifies the name of the printer to direct PostScript output to. If not set, the default is a printer named "PostScript".
+
+.TP 15
+.SB NENSCRIPT
+If defined, this string is searched for valid options before the command line supplied by the user.
+
+.SH BUGS
+
+As 
+.B nenscript
+does not have access to complete PostScript font tables, it must use some other technique for
+calculating the number of characters that fit across the page. The solution was to use a fixed table
+for the Courier font in a range of sizes. If this table was extended, other fonts and sizes could be
+used for printing text. Alternatively, if the text processing was done on the printer, then there
+would be no need to know anything about the font sizes...
+
+No checking is performed on font names, other than checking that only Courier can be specified for the
+text font. If a font is specified that is not available on the final printer, the result is undetermined.
+
+No checking is performed on the input file to detect accidental printing of garbage files. Caveat emptor!
+
+No mapping of the input characters is performed, so output may vary depending upon the vagaries of 
+downstream software and hardware.
+
+No support for manual feed, page prefeed, mail upon completion or any of the other rarely used options
+of 
+.B enscript.
+
+No messages are displayed whilst processing.
+
+Input line lengths are limited to 8192 characters after expansion of tabs.

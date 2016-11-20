@@ -1,0 +1,202 @@
+gengetopt -- History of visible changes.
+
+Copyright (C) 1999-2007  Free Software Foundation
+
+Please send gengetopt bug reports to bug-gengetopt at gnu.org
+
+For details about the new features, you can take a look at:
+http://tronprog.blogspot.com/search/label/gengetopt
+
+Version 2.20
+
+   * if --include-getopt is specified the generated parser is actually
+     independent of getopt.h (bug fixed thanks to Tiago Menezes)
+   * in help output do not generated a section if all its options are hidden
+     (thanks to Edsko de Vries)
+   * --default-optional permits specifying that all options are by default
+     optional (unless explicitely specified)
+   * fixed a bug when generating --full-help handling in case
+     --no-handle-help is specified (thanks to Thomas Boehne)
+   * fixed a bug in the included getopt code when --include-getopt is specified
+   * fixed a bug when using args entry in the .ggo file 
+     (thanks to Christian Gagneraud)
+
+Version 2.19.1
+
+   * fixed compilation problem that can make 'make check' fail on some systems
+     lacking getopt_long.
+   * fixed a test problem when not using GNU sed
+   * in strings # comments are not considered (thanks to Matthew K. Junker)
+
+Version 2.19
+
+   * strings can spawn more than one line and contain escaped "
+   * usage string can be specified (instead of being generated automatically).
+   * description string can be specified that will be printed after the
+     usage string.
+   * automatically created usage strings are wrapped.
+   * with --long-help the optional options are correctly printed between []
+   * --show-required, to explicitly print in the help output whether an
+     option is mandatory
+   * configuration files can include other configuration files
+     (thanks to David Bird)
+   * --no-handle-help handles also --full-help (thanks to Gyozo Papp) 
+
+Version 2.18
+
+   * default values for enumerated options with optional arguments are
+     correctly handled.
+   * sections are printed in the help output before group specifications
+   * can insert text in the output of --help
+   * can specify gengetopt command line options in the input file itself
+     with "args" specification
+   * fixed bug in parsing of multiple option dimensions
+   * fixed bug in generation of long help string
+
+Version 2.17
+
+   * fixed bug in generating parser where no multiple option is of
+     type string (reported by Dave Swegen)
+   * fixed bug: the passed header file extension is used when including the
+     header file name in the generated C source
+   * range of occurrences for multiple options
+   * help and usage strings are generated and accessible (the same that are
+     printed by --help)
+   * reduced size for multiple option parsers
+   * fixed a problem with the internal variable optind with non glibc
+     version of getopt. (thanks to Gyozo Papp)
+   * --output-dir command line option (suggested by Gyozo Papp)
+   * --string-parser generate a parser that interprets a passed string
+     as command line arguments (suggested by Andre Noll)
+
+Version 2.16
+
+   * a --full-help option is generated that shows also hidden options
+     (in case there are some, as suggested by Paul Biggar)
+   * multiple parsers can be linked into the same executable (even
+     when using configuration files, thanks to Andre Noll)
+   * when invoking getopt_long, discard any pointers to previously
+     scanned command lines (thanks to Andre Noll)
+   * fixed a bug in generation of help strings that might cause
+     a seg fault (reported by Paul Biggar)
+
+Version 2.15
+
+   * option parts can be specified in any order
+   * options can be hidden (not shown in the --help output)
+   * an option can depend on another option
+   * when converting a numeric string check for the result
+   * when enumerated options are used, the value stored in the _arg field
+     is an actual value specified in the list, and not the one specified
+     at the command line (which can be abbreviated)
+
+Version 2.14
+
+   * required group options are not checked when the flag
+     "check_required" is not specified.
+   * generate a function to save the command line options into a file.
+   * use dynamic memory for dealing with a configuration file.
+   * -h,--help and -V,--version can be overridden
+   * fixed another memory leak when invoking with --help and
+     --version
+   * fixed infinite loops with texts ending with newlines.
+   * list of acceptable values variable have names that are
+     prefixed with the parser name
+
+Version 2.13
+
+   * texinfo documentation
+   * fixed some warnings (thanks to Gyozo Papp)
+   * fixed other problems with option manipulation in config files
+     (thanks to Gyozo Papp)
+   * list of acceptable values for options
+   * function to explicitly check whether a required option has
+     been provided
+   * group options can be multiple, and can have an
+     optional argument
+   * further memory leaks in the generated code have been removed
+     (thanks to Michael Hagemann)
+   * section definition can be multiline too
+     (thanks to Gyozo Papp)
+
+Version 2.12.2
+
+   * removed segfaults in multiple option handling (thanks to Gyozo Papp)
+   * sections can be associated a more detailed description that
+     will be printed in the --help (suggested by Gyozo Papp)
+   * options and arguments in config files can be separated by '='
+     (with help from Gyozo Papp)
+   * wrapping is applied to all description strings (with help from Gyozo Papp)
+   * better check for "strings" well-formedness in configuration files
+     (with help from Gyozo Papp)
+
+Version 2.12.1
+
+   * the generated source include config.h before any other header:
+     otherwise some problems may come up in some circumstances
+     (reported by Heinz Salzmann)
+   * options can have optional arguments (as suggested by
+     Guillaume Chazarain)
+   * a _free function is generated for deallocating dynamic memory
+     allocated for the option arguments by the parser
+     and memory leaks in the generated files are removed
+     (thanks to Michael Hagemann)
+   * an _init function is generated that is called instead of clear_args
+     and a initialize parameter has to be passed to the config file parser
+     stating whether the args_info struct has to be initialized
+     (Richard Zidlicky reported problems if the config file parser is
+     called before the standard command line parser)
+   * a second parser function is generated that allows to specify the
+     override and initialize parameters that should be used together with
+     the config file parser.  You can also specify whether the
+     check for required option must be performed.
+   * --arg-struct-name option for specifying the name of the generated
+     struct for args info (suggested by Richard Zidlicky)
+   * --unamed-opts can be given an optional argument
+     describing the additional arguments without names, default is still
+     FILES (as suggested by Simon Josefsson)
+   * the config file parser generator was re-written in order to handle
+     multiple options and other standard command line options
+   * multiple options are allowed not to have arguments
+     (suggested by Simon Josefsson)
+   * multiple option arguments can be given separated by commas
+     (thanks to Gyozo Papp)
+   * default values can contain % without generating compiler errors
+     in the generated code (thanks to Franck Lombardi)
+   * Added --c-extension and --header-extension for specifying the
+     extensions of generated files.
+
+Version 2.11
+
+   * fixed a small bug in the generated config file parser
+     (reported by Karsten Reincke)
+   * default values work for multiple options
+     (reported by Christian Richter)
+   * multiple options can be specified also without a short form
+   * output of --help is wrapped (thanks to Michael Hagemann)
+   * "typestr" allows to specify what a type of an option represents
+     (e.g., FILENAME instead of STRING) (thanks to Michael Hagemann)
+   * added sections for options
+
+Version 2.10
+
+   * correctly refer to the provided strdup if it is not in the
+     standard library (thanks to Bert Deknuydt)
+   * handle spaces in group names (reported by Matthew K. Junker)
+   * package and version defined in a .ggo file have the precedence
+     over PACKAGE and VERSION (reported by Kat Manton)
+   * handle missing long long feature
+   * correctly cast results of malloc in generated code
+   * in the generated parser the generated version of strdup is
+     always used (to improve portability)
+   * generated conf file parser handles quoted strings
+     (reported by Karsten Reincke)
+   * fixed many compilation/portability problems in several
+     architectures (thanks to Nelson H. F. Beebe)
+
+
+-------------------------------------------------------
+Copying information:
+
+This file is licensed to you under the license specified in the included file
+`LICENSE'. Look there for further details.

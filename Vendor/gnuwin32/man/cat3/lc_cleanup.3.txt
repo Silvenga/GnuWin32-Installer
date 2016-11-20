@@ -1,0 +1,78 @@
+LC_GETERRNO(3)                                   LC_GETERRNO(3)
+
+
+
+
+
+NAME
+       lc_cleanup - Clean up internal structures after process-
+       ing data.
+
+
+SYNOPSIS
+       #include <libconfig.h>
+
+       void lc_cleanup(void);
+
+
+DESCRIPTION
+       The lc_cleanup(3) function cleans up the internal struc-
+       tures created by calling lc_register_var(3) or lc_regis-
+       ter_callback(3) and returns the memory to  the  applica-
+       tion.   It is not strictly required, however memory con-
+       cious programmers will still want  to  call  this  after
+       finishing processing configuration files.
+
+       After  you  call  lc_cleanup(3) calling lc_process(3) or
+       lc_process_file(3) will generally cause errors since the
+       registered  variables  and  callbacks have been unregis-
+       tered.
+
+
+EXAMPLE
+       #include <libconfig.h>
+       #include <stdlib.h>
+       #include <stdio.h>
+
+       int main(int argc, char **argv) {
+            int lc_p_ret, lc_rv_ret;
+            char *filename = NULL;
+
+            lc_rv_ret = lc_register_var("File", LC_VAR_STRING,
+                                        &filename, 'f');
+
+            if (lc_rv_ret != 0) {
+                 fprintf(stderr, "Error registering variable: %i.\n",
+                         lc_geterrno());
+                 return(EXIT_FAILURE);
+            }
+
+            lc_p_ret = lc_process(argc, argv, "example", LC_CONF_APACHE,
+                                  NULL);
+
+            lc_cleanup();
+
+            if (lc_p_ret != 0) {
+                 fprintf(stderr, "Error processing configuration: \
+                         %s\n", lc_geterrstr());
+                 return(EXIT_FAILURE);
+            }
+
+            if (filename != NULL) {
+                 printf("File specified was: %s\n", filename);
+            } else {
+                 printf("No filename specified.\n");
+            }
+
+            return(EXIT_SUCCESS);
+       }
+
+
+SEE ALSO
+       lc_register_var(3),             lc_register_callback(3),
+       lc_geterrstr(3),   lc_geterrno(3),   lc_process_file(3),
+       lc_process(3)
+
+
+
+libconfig 0.1.16           25 Oct 04             LC_GETERRNO(3)

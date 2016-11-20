@@ -1,0 +1,144 @@
+THESE ARE THE MANUAL INSTALLATION INSTRUCTIONS FOR NETPBM
+
+Most people install using the interactive install program 'installnetpbm'
+that is in the top level directory of the Netpbm source tree.  But it 
+isn't right for everyone.  If it doesn't do what you need, you can use
+these instructions instead.
+
+
+Once you have built and packaged Netpbm, installing is pretty
+straighforward.  If you browse the package directory, you can probably
+figure it out without reading any further.
+
+
+The parts to be installed are:
+
+  Executables 
+
+    These are the basic Netpbm programs, such as 'jpegtopnm'.
+    You will find these in the 'bin' subdirectory of the package directory.
+
+    You normally want to copy all of these into a directory that is in your
+    default program search path (which is controlled by your PATH 
+    environment variable).  Typical directories for this are /bin, /usr/bin,
+    and /usr/local/bin.
+
+  Shared Library
+         
+    This is the library that all Netpbm programs need to load and link
+    to at run time.  It is in the 'lib' subdirectory of the package
+    directory.  Building a shared library is optional; if you didn't
+    do it (which means you built executables that don't require it),
+    you don't have a 'lib' subdirectory.  Shared libraries are also
+    known as dynamic libraries and DLLs.
+
+    You normally want to copy the shared library to a directory that
+    is in your system's default shared library search path.  On
+    systems that have an 'ldconfig' program, that program controls the
+    shared library search path, and you must run it after copying the
+    Netpbm shared library to its directory.  Often, simply rebooting
+    will cause it to run cleanly.
+
+    Typical directories for this are /lib, /usr/lib, and /usr/local/lib.
+
+    On Windows, the DLLs are treated like executables, so you should
+    find the 'lib' directory empty and you should find the Netpbm DLL
+    in the 'bin' directory.  You'll probably want to install the DLL
+    and the executables in the same directory, because the shared
+    library and executable search paths are the same.
+
+  Link Library
+
+    This is a static link library.  You don't need it to run Netpbm.  You
+    need it only if you want to build your own programs that use the Netpbm
+    library.  It is in the 'link' subdirectory of the package directory.
+
+    You normally want to copy the link library into a directory that is
+    in the default search path of your linker.  Typical directories for 
+    this are /usr/lib and /usr/local/lib.
+
+  Interface Headers
+
+    These are the files that declare the interface to the Netpbm 
+    programming library.  You don't need them to run Netpbm.  You need
+    them only if you want to build your own programs that use the
+    Netpbm library.  They are in the 'include' subdirectory of the 
+    package directory.
+
+    You normally want to copy the interface header files into a directory
+    that is in the default search path of your compiler.  Typical
+    directories for this are /usr/include and /usr/local/include.
+
+  Data Files
+
+    These are files that you can use for various purposes as input to
+    Netpbm programs.  People rarely have uses for them, actually.  They
+    are in the 'data' subdirectory of the package directory.
+   
+    Put these somewhere that users will be able to find them.
+    /usr/lib/netpbm and /usr/share/netpbm are typical choices.
+
+  Man Pages
+
+    Netpbm does not have the typical Unix form of documentation.  The
+    documentation is not in files that you can read with the common
+    'man' program.  Instead, it is in HTML form, and it is not in the
+    package directory at all.  You must install it separately.
+
+    But so that a user who is not familiar with Netpbm documentation
+    doesn't find himself out in the cold with no access to
+    documentation, the package directory contains traditional man
+    pages that do nothing but tell you where to get the real
+    documentation.  (Exactly where that is depends on the options with
+    which you built and packaged Netpbm).  We call these "pointer man
+    pages."  You will find these man pages in the 'man' subdirectory
+    of the package directory.
+
+    You should copy the contents of this directory wherever your 'man'
+    program looks for man pages.  Typically, this is /usr/man, which
+    has subdirectories equivalent to those in the package directory's
+    'man' subdirectory.
+
+
+    One of the Netpbm programs is Manweb, which is designed to be a
+    replacement for the classic Man program that can access both
+    traditional man pages and worldwide web documentation in the
+    Netpbm style with the familiar 'man jpegtopnm' kind of command.
+    To set up your system for this, you will have to be sure to create
+    the /usr/man/web directory, with 'netpbm.url' in it.  Also, If you
+    install Manweb as 'man', there is no point to installing the
+    pointer man pages -- they will never be used.
+    
+
+
+The instructions above suggest putting the Netpbm parts in common
+directories such as /usr/bin, mingled with other packages.  This is
+usually the easiest way to get Netpbm working.  But also consider
+putting all Netpbm parts in separate Netpbm directories, such as
+/usr/bin/netpbm/ and /usr/link/netpbm.  In fact, you can just copy the
+entire package directory in one piece to some place such as
+/usr/local/netpbm.  You'll have to take care to set up search paths
+and such to make this kind of configuration work.  The advantage of
+keeping Netpbm separate is that it makes it easy to wipe out the
+entire installation when you don't want it anymore, and to keep
+multiple versions around.
+
+
+netpbm.config
+-------------
+
+You should create a shell script named 'netpbm.config' out of the
+template file 'config_template' in the package directory, and install
+netpbm.config in your executable search path.  Programs that want to
+find out where you installed some part of Netpbm can invoke
+netpbm.config and it will tell them.  For example, a make file for a
+program that uses the Netpbm programming library might use
+netpbm.config to generate the necessary compiler and linker options to
+access that library.
+
+Using netpbm.config, it's possible to have a viable Netpbm
+installation where netpbm.config is the only file in any default
+search path.
+
+The xxx.config file concept is a relatively new but growing convention,
+seen mostly in software related to the X Window System.

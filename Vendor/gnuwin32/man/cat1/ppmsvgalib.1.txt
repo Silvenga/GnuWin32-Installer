@@ -1,0 +1,122 @@
+Ppmsvgalib User Manual(0)             Ppmsvgalib User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       ppmsvgalib  -  display  PPM image on Linux console using
+       Svgalib
+
+
+SYNOPSIS
+       ppmsvgalib
+
+       [-mode=mode]
+
+       All options can be abbreviated to their shortest  unique
+       prefix.   You may use two hyphens instead of one to des-
+       ignate an option.  You may use either white space or  an
+       equals sign between an option name and its value.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       ppmsvgalib  displays a PPM image on a Linux virtual con-
+       sole using the Svgalib facility.  Svgalib is  a  popular
+       means of displaying Graphics in Linux without the use of
+       the X Window System.
+
+       If you run ppmsvgalib with a version of Svgalib  earlier
+       than  1.9, you must run it with CAP_SYS_RAWIO capability
+       (on most Linux systems, that means you run it  as  supe-
+       ruser), because Svgalib uses the ioperm() system call to
+       access the console hardware.  Newer Svgalib has its  own
+       device  driver, so you need only properly permissions on
+       a device special file to access the console.
+
+       ppmsvgalib is not capable of using  color  mapped  video
+       modes.   These  are the old video modes that are usually
+       called '8 bit' color modes.
+
+       ppmsvgalib is a bare displayer.  It won't do any manipu-
+       lation  of  the image and is not interactive in any way.
+       If you want a regular interactive graphics  viewer  that
+       uses Svgalib, try zgv (not part of Netpbm).
+
+       To  exit  ppmsvgalib  while it is displaying your image,
+       send it a SIGINTR signal (normally, this means 'hit con-
+       trol C').
+
+       ppmsvgalib  draws a white border around the edges of the
+       screen.  It does  this  to  help  you  isolate  problems
+       between  the  image you're displaying and the facilities
+       you're using to display it.
+
+       (Note: if the image you're displaying reaches the  edges
+       of the screen, it will replace the white border).
+
+       ppmsvgalib places the image in the center of the screen.
+
+       If your image is too big to display in  the  video  mode
+       you  selected,  ppmsvgalib fails.  You can use pamcut to
+       cut out a part of the image to display or  use  pamscale
+       to shrink the image to fit.
+
+       If  you  want  to play with ppmsvgalib, ppmcie is a good
+       way to generate a test image.
+
+       To be pedantic, we must observe that ppmsvgalib displays
+       a  PPM  image  in the correct colors only if the display
+       has a transfer function which is the  exact  inverse  of
+       the gamma function that is specified in the PPM specifi-
+       cation.  Happily, most CRT displays are pretty close.
+
+       Running the PPM image through pnmgamma  can  help  cause
+       ppmsvgalib to display the correct colors.
+
+
+OPTIONS
+       -mode=mode
+              This  tells  ppmsvgalib  what  video mode to use.
+              mode is the Svgalib video mode number.   You  can
+              get  a  list  of  all  the  video modes and their
+              Svgalib video mode numbers with the program vgat-
+              est  that  is  packaged  with Svgalib.  (Unfortu-
+              nately, the various interesting programs that are
+              packaged with Svgalib are typically not installed
+              on  systems  that  have   the   Svgalib   library
+              installed).
+
+              In  practice,  there  are probably only two modes
+              you'll ever care about: 25 is the  standard  SVGA
+              direct  color  mode, which is 1024 columns by 768
+              rows with 8 bit red, green, and  blue  components
+              for  each  pixel and no fancy options.  28 is the
+              same, but with the popular higher  resolution  of
+              1280 x 1024.
+
+              But  if  you have an older video controller (with
+              less than 4MB  of  memory),  those  modes  aren't
+              available  and  you  might like mode 19, which is
+              640 x 480 and takes less than a megabyte of video
+              memory.  This is a standard VGA video mode.
+
+
+
+
+SEE ALSO
+       pamcut(1), pamscale(1), ppmcie(1), ppm(1), zgv, Svgalib,
+       vgatest
+
+
+AUTHOR
+       By Bryan Henderson, January 2002.
+
+       Contributed to the public domain.
+
+
+
+netpbm documentation      11 May 2005 Ppmsvgalib User Manual(0)

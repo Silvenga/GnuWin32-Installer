@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>Libnetpbm manual</TITLE>
+<META NAME="manual_section" CONTENT="3">
+</HEAD>
+<BODY>
+<H1>libnetpbm</H1>
+Updated: December 2003
+<BR>
+<?makeman .SH NAME ?>
+<?makeman libnetpbm \- general introduction to the netpbm library ?>
+<?makeman .SH DESCRIPTION ?>
+
+<p><b>libnetpbm</b> is a C programming library for reading, writing, and
+manipulating Netpbm images.  It also contains a few general graphics
+manipulation tools, but it is not intended to be a graphics tools
+library.  For graphics tools, Netpbm expects you to run the Netpbm
+programs.  From a C program, the <b>libnetpbm</b> function
+<b>pm_system()</b> makes this easy.  However, since it creates a
+process and execs a program, this may be too heavyweight for some
+applications.
+
+<p>To use <b>libnetpbm</b> services in your C program, #include the
+<b>pam.h</b> interface header file.  For historical reasons, you can
+also get by in some cases with <b>pbm.h</b>, <b>pgm.h</b>,
+<b>ppm.h</b>, or <b>pnm.h</b>, but there's really no point to that
+anymore.
+
+<p>The <b>libnetpbm</b> functions are divided into these categories:
+<ul>
+<li>PBM functions.  These have names that start with <b>pbm</b> and work
+only on PBM images.
+<li>PGM functions.  These have names that start with <b>pgm</b> and work
+only on PGM images.
+<li>PPM functions.  These have names that start with <b>ppm</b> and work
+only on PPM images.
+<li>PNM functions.  These have names that start with <b>pnm</b> and work on
+PBM, PGM, and PPM images.
+<li>PAM functions.  These also have names that start with <b>pnm</b> and 
+work on all the Netpbm image types.
+<li>PM functions.  These are utility functions that aren't specific to any
+particular image format.
+</ul>
+
+<p>For new programming, you rarely need to concern yourself with the
+PBM, PGM, PPM, and PNM functions, because the newer PAM functions do
+the same thing and are easier to use.  For certain processing of
+bi-level images, the PBM functions are significantly more efficient,
+though.
+
+<p><b>libnetpbm</b> has a backward compatibility feature that means a
+function designed to read one format can read some others too,
+converting on the fly.  In particular, a function that reads a PGM
+image will also read a PBM image, but converts it as it reads it so
+that for programming purposes, it is a PGM image.  Similarly, a
+function that reads PPM can read PBM and PGM as well.  And a function
+that reads PBM, PGM, or PPM can read a PAM that has an equivalent
+tuple type.
+
+<p>For each of the five classes of <b>libnetpbm</b> image processing
+functions, <b>libnetpbm</b> has in in-memory representation for a
+pixel, a row, and a whole image.  Do not confuse this format with the
+actual image format, as you would see in a file.  The <b>libnetpbm</b>
+in-memory format is designed to make programming very easy.  It is
+sometimes extremely inefficient, even more than the actual image
+format.  For example, a pixel that a PPM image represents with 3
+bytes, <b>libnetpbm</b>'s PAM functions represent with 16 bytes.  A
+pixel in a PBM image is represented by a single bit, but the PNM
+functions represent that pixel in memory with 96 bits.
+
+<p>See <a href="libnetpbm_ug.html">Libnetpbm User's Manual</a> for the
+basics on using <b>libnetpbm</b> in a program.
+
+<p>You can look up the reference information for a particular function
+in <a href="libnetpbm_dir.html">The libnetpbm Directory</a>.
+
+<P>Before Netpbm release 10 (June 2002), this library was split into
+four: libpbm, libpgm, libppm, and libpnm.  That's largely the reason
+for the multiple sets of functions and scattered documentation.
+
+</BODY>
+</HTML>

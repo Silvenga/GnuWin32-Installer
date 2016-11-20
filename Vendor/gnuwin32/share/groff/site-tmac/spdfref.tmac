@@ -1,0 +1,118 @@
+.\" spdfref                                          ms-macros for making pdf references
+.mso pdfref.tmac
+.de inireg
+.if !r\\$1 .nr \\$1 0 1
+..
+.de negreg
+.nr \\$1 (-1)*\\n[\\$1]
+..
+.nr H0 0 1
+.nr NHclosed 2
+.nr pdf*NHset 0
+.nr SHinNH 0
+.nr pdf*level 0
+.nr SH 0 1
+.ds SN
+.rn @NH pdf*NH
+.rm NH
+.de @NH
+.if \\n[pdf*NHset] .pdf*pdfbookmark
+.nr pdf*level \\$1-1
+.nr SHinNH 1
+.pdf*NH \\$@
+..
+.am @SH
+.if \\n[pdf*NHset] .pdf*pdfbookmark
+.nr pdf*NHset 1
+.ie \\n(.$ \{\
+.ds pdf*BMt \\$*
+.\}
+.el \{\
+.ds pdf*BMt \\\\*[pdf*NHt]
+.\}
+.ds pdf*NHt \\
+..
+.am pdf*NH
+.as pdf*NHt "  \\
+..
+.als NH @NH
+.de BOOKMARK
+.inireg count.section.\\$4
+.nr count.section.\\$4 +1
+..
+.de pdf*pwbookmark
+.pdfbookmark "\\$1" "\\$2" "\\$3"
+.write pdf*FNout .BOOKMARK \\$@
+..
+.de pdf*mklevelstr
+.nr ni 0
+.ds \\$1
+.while \\n[ni]<=\\$2 \{\
+.if r nh*AP\\n[ni] .if \\n[nh*AP\\n[ni]] .as \\$1 A
+.inireg H\\n[ni]
+.as \\$1 \\n[H\\n[ni]].
+.nr ni +1
+.\}
+..
+.de BMNH
+.if \\n[pdf*nrinit] .pdf*init
+.nr SHinNH 1
+.inireg H\\$2
+.nr H\\$2 +1
+.BMH \\$@
+.nr SHinNH 0
+..
+.de BMH
+.nr SH +1
+.pdf*mklevelstr cntsecstr \\$2
+.nr BMH*level \\$2-1
+.if \\n[.$]>2 .nr BMH*level \\$3
+.pdf*mklevelstr pdf*levelstr \\n[BMH*level]
+.inireg count.section.\\*[cntsecstr]
+.if \\$2>=\\n[NHclosed] .negreg count.section.\\*[cntsecstr]
+.pdf*pwbookmark \\n[count.section.\\*[cntsecstr]] section.\\*[cntsecstr]\\n(SH. "\\$1" "\\*[pdf*levelstr]"
+..
+.de pdf*pdfbookmark
+.br
+.if !'\\*[pdf*NHt]'' \\*[pdf*NHt]
+.br
+.rs
+.nr pdf*NHset 0
+.ie \\n[SHinNH] \{\
+.nr pdf*level \\n[nh*hl] 
+.\}
+.el \{\
+.nr pdf*level \\n[nh*hl]+1
+.\}
+.BMH "\\*[pdf*BMt]" \\n[pdf*level]
+.nr SHinNH 0
+..
+.nr pdf*nrinit 1
+.de pdf*init
+.ds pdf*outfilename \\n(.F.out
+
+.so \\*[pdf*outfilename]
+.open pdf*FNout \\*[pdf*outfilename]
+.nr pdf*nrinit 0
+..
+.am pg@end-text
+.close pdf*FNout
+..
+.rn par*start pdf*par*start
+.de par*start
+.if \\n[pdf*nrinit] .pdf*init
+.if \\n[pdf*NHset] .pdf*pdfbookmark
+.pdf*par*start \\$@
+..
+.nr BM 0 1
+.de BM
+.nr pdf*BMcount 0\\$2
+.pdfbookmark \\n[pdf*BMcount] bookmark.\\n+(BM "\\$1"
+..
+.de BML
+.nr \\n[H\\n[nh*hl]] +1
+.nr nh*hl \\$1
+..
+.pdfuseoutlines
+.pdfdate D:\*[year]\*[mon]\*[mday]\*[hours]\*[minutes]\*[seconds]\*[offsetsign]\*[gmtoffhh]'\*[gmtoffmm]'
+.pdfcreator "Groff \n[.x].\n[.y].\n[.Y] with PdfRef macros"

@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pbmtext User Manual</TITLE></HEAD>
+<BODY>
+<H1>pbmtext</H1>
+Updated: 14 April 2005
+<BR>
+<A HREF="pbmtext.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pbmtext - render text into a PBM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pbmtext</B>
+[<B>-font</B> <I>fontfile</I>]
+[<B>-builtin</B> <I>fontname</I>]
+[<B>-space</B> <I>pixels</I>]
+[<B>-lspace</B> <I>pixels</I>]
+[<B>-nomargins</B>]
+[<B>-width</B> <i>pixels</i>]
+[<I>text</I>]
+
+<p>Minimum unique abbreviation of option is acceptable.  You may use double
+hyphens instead of single hyphen to denote options.  You may use white
+space in place of the equals sign to separate an option name from its value.
+
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<P><b>pbmtext</b> takes the specified text, either a single line from
+the command line or multiple lines from standard input, and renders it
+into a PBM graphical image.
+
+<P>In the image, each line of input is a line of output.  Formatting
+characters such as newline have no effect on the formatting; like any
+unprintable character, they turn into spaces.
+
+<P>The image is just wide enough for the longest line of text, plus
+margins, and just high enough to contain the lines of text, plus
+margins.
+
+<P>The left and right margins are twice the width of the widest
+character in the font; the top and bottom margins are the height of
+the tallest character in the font.  But if the text is only one line,
+all the margins are half of this.  You can use the <b>-nomargins</b> option
+to eliminate the margins.
+
+<p><b>pbmtextps</b> does the same thing as <b>pbmtext</b>, but uses
+Ghostscript to generate the characters, which means it's a lot more
+sophisticated and you can use Postscript fonts.  But it also means you
+have to have Ghostscript installed and it isn't as fast.
+
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+
+<DT><B>-font</B>
+<DT><B>-builtin</B>
+
+<DD>
+
+<b>-builtin</b> selects a font among those built into Netpbm.
+
+<b>-font</b> selects a font that you supply yourself either as an
+X Window System BDF file or as a PBM file in a special form.
+
+<p>The default is the built in font &quot;bdf.&quot;
+
+<p>&quot;bdf&quot; is Times-Roman 15 pixels high.  (That's about 14
+point type printed at 75 dpi).
+
+<p>&quot;fixed&quot; is a built in fixed with font.
+
+<p>To create a font as a PBM file (to use with the <b>-font</b>
+option), do this: In your window system of choice, display the
+following text in the desired (fixed-width) font:
+
+<PRE>
+
+    M &quot;,/^_[`jpqy| M
+
+    /  !&quot;#$%&amp;'()*+ /
+    &lt; ,-./01234567 &lt;
+    &gt; 89:;&lt;=&gt;?@ABC &gt;
+    @ DEFGHIJKLMNO @
+    _ PQRSTUVWXYZ[ _
+    { \]^_`abcdefg {
+    } hijklmnopqrs }
+    ~ tuvwxyz{|}~  ~
+
+    M &quot;,/^_[`jpqy| M
+
+</PRE>
+
+Do a screen grab or window dump of that text, using for instance
+<B>xwd</B>, <B>xgrabsc</B>, or <B>screendump</B>.  Convert the result
+into a pbm file.  If necessary, use <B>pamcut</B> to remove everything
+except the text.  Finally, run it through <B>pnmcrop</B>.  to make
+sure the edges are right up against the text.  <B>pbmtext</B>
+can figure out the sizes and spacings from that.
+
+<DT><B>-space</B> <I>pixels</I>
+
+<DD> Add <I>pixels</I> pixels of space between characters.  This is in
+addition to whatever space surrounding characters is built into the
+font, which is usually enough to produce a reasonable string of text.
+
+<P><I>pixels</I> may be fractional, in which case the number of
+pixels added varies so as to achieve the specified average.  For
+example <B>-space=1.5</B> causes half the spaces to be 1 pixel and
+half to be 2 pixels.
+
+<P><I>pixels</I> may be negative to crowd text together, but the
+author has not put much thought or testing into how this works in
+every possible case, so it might cause disastrous results.
+
+<DT><B>-lspace</B> <I>pixels</I>
+
+<DD> Add <I>pixels</I> pixels of space between lines.  This is in
+addition to whatever space above and below characters is built into
+the font, which is usually enough to produce a reasonable line
+spacing.
+
+<P><I>pixels</I> must be a whole number.
+
+<P><I>pixels</I> may be negative to crowd lines together, but the
+author has not put much thought or testing into how this works in
+every possible case, so it might cause disastrous results.
+
+<DT><b>-nomargins</b>
+
+<DD>By default, <b>pbmtext</b> adds margins all around the image as
+described above.  This option causes <b>pbmtext</b> not to add any
+margins.
+
+<p>Note that there may still be space beyond the edges of the type
+because a character itself may include space at its edges.  To eliminate
+all surrounding background, so the type touches all four edges of the
+image, use <b>pnmcrop</b>.
+
+<DT><b>-width</b> <i>pixels</i>
+
+<DD>This specifies how much horizontal space the text is supposed to fit
+into.  
+
+<p>If the input is one line, <b>pbmtext</b> breaks it into multiple
+lines as needed to fit the specified width.  It breaks it between
+characters, but does not pay attention to white space; it may break in
+the middle of a word and a line may begin or end with white space.
+
+<p>If the input is multiple lines, <b>pbmtext</b> assumes you already
+have line breaks where they make sense, and <b>pbmtext</b> simply
+truncates each line as needed to fit the specified width.
+
+</DL>
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>USAGE</H2>
+
+<P>Often, you want to place text over another image.  One way to do
+this is with <B>ppmlabel</B>.  <B>ppmlabel</B> does not give you the
+font options that <B>pbmtext</B> does, though.
+
+<P>Another way is to use <B>pbmtext</B> to create an image containing
+the text, then use <B>pamcomp</B> to overlay the text image onto your
+base image.  To make only the text (and not the entire rectangle
+containing it) cover the base image, you will need to give
+<B>pamcomp</B> a mask, via its <B>-alpha</B> option.  You can just use
+the text image itself as the mask, as long as you also specify the
+<B>-invert</B> option to <B>pamcomp</B>.
+
+<P>If you want to overlay colored text instead of black, just use
+<B>ppmchange</B> to change all black pixels to the color of your
+choice before overlaying the text image.  But still use the original
+black and white image for the alpha mask.
+
+<P>If you want the text at an angle, use <B>pnmrotate</B> on the text
+image (and alpha mask) before overlaying.
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pbmtextps.html">pbmtextps</A></B>,
+<B><A HREF="pamcut.html">pamcut</A></B>,
+<B><A HREF="pnmcrop.html">pnmcrop</A></B>,
+<B><A HREF="pamcomp.html">pamcomp</A></B>,
+<B><A HREF="ppmchange.html">ppmchange</A></B>,
+<B><A HREF="pnmrotate.html">pnmrotate</A></B>,
+<B><A HREF="ppmlabel.html">ppmlabel</A></B>,
+<B><A HREF="pstopnm.html">pstopnm</A></B>,
+<B><A HREF="pbm.html">pbm</A></B>
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1993 by Jef Poskanzer and George Phillips
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pbmtext.html#lbAB">NAME</A>
+<LI><A HREF="pbmtext.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pbmtext.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pbmtext.html#lbAE">OPTIONS</A>
+<LI><A HREF="pbmtext.html#lbAF">USAGE</A>
+<LI><A HREF="pbmtext.html#lbAG">SEE ALSO</A>
+<LI><A HREF="pbmtext.html#lbAH">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

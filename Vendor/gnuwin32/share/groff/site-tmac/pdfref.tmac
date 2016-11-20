@@ -1,0 +1,95 @@
+.\" pdfref                                        general macros for making pdf references
+.nr pdf 1
+.\"nr pdfref*horpos 0
+.de specialps0
+\\kx
+.mk pdfref*vertpos
+.\"nr pdfref*horzpos \\n(.k
+\\X'ps \\$*'\c
+.\"nr pdfref*horzpos -\\n(.k
+.\"\\h'\\n[pdfref*horzpos]u'
+\\h'|\\nxu'
+.sp |\\n[pdfref*vertpos]u
+..
+.de specialps
+\\X'ps \\$*'\c
+..
+.de pdfmark
+.specialps exec [\\$1 pdfmark
+..
+.de pdffrontmatter
+.pdfmark "/\\$1 (\\$2) /DOCINFO"
+..
+.de pdfauthor
+.pdffrontmatter Author "\\$1"
+..
+.de pdftitle
+.pdffrontmatter Title "\\$1"
+..
+.de pdfsubject
+.pdffrontmatter Subject "\\$1"
+..
+.de pdfkeywords
+.pdffrontmatter Keywords "\\$1"
+..
+.de pdfcreator
+.pdffrontmatter Creator "\\$1"
+..
+.de pdfproducer
+.pdffrontmatter Producer "\\$1"
+..
+.de pdfmoddate
+.pdffrontmatter ModDate "\\$1"
+..
+.de pdfcreationdate
+.pdffrontmatter CreationDate "\\$1"
+..
+.de pdfdate
+.pdfcreationdate "\\$1"
+.pdfmoddate "\\$1"
+..
+.de pdfpagemode
+.pdfmark "/PageMode /\\$1 /View [/XYZ 0 PL 0] /DOCVIEW "
+..
+.de pdfuseoutlines
+.pdfpagemode UseOutlines
+..
+.de pdfsetbookmark
+.pdfmark "/Count \\$1 /Dest /\\$2 /Title (\\$3) /OUT"
+..
+.de pdflink
+.pdfmark "/Dest /\\$1 /View [/XYZ -5 PL null] /DEST"
+..
+.de pdfbookmark
+.pdfsetbookmark \\$@
+.pdflink \\$2
+..
+.de pdfurl     \" location of rectangle still to compute !!!!!!!!!!!!!!!
+.pdfmark /Rect [10 10 100 100] /Color [1 1 0] /Border [1 1 1] /Subtype /Link /Action << /S /URI /URI (\\$1) >> /ANN
+\\$1
+..
+.de mkdtstr
+.if !r\\$2 .nr \\$2 0
+.ds \\$1 \\n[\\$2]
+.if \\n[\\$2]<10 .ds \\$1 0\\n[\\$2]
+..
+.mkdtstr mday dy
+.mkdtstr mon mo
+.mkdtstr year year
+.mkdtstr hours hours
+.mkdtstr minutes minutes
+.mkdtstr seconds seconds
+.mkdtstr gmtoffset gmtoffset
+.if !rgmtoffset .nr \n[gmtoffset] 0
+.ie !\n[gmtoffset] \{\
+.ds offsetsign -
+.nr gmtoffset (-1)*\n[gmtoffset]
+.\}
+.el .ds offsetsign +
+.nr gmtoffhh \n[gmtoffset]/3600
+.mkdtstr gmtoffhh gmtoffhh
+.nr gmtoffmm \n[gmtoffset]%3600/60
+.mkdtstr gmtoffmm gmtoffmm
+.ds gmtoffset \*[offsetsign]\*[gmtoffhh]:\*[gmtoffmm]
+.ds date \*[mday]-\*[mon]-\*[year]
+.ds time \*[hours]:\*[minutes]:\*[seconds] GMT\*[gmtoffset]

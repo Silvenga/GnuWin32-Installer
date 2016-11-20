@@ -1,0 +1,438 @@
+#! /bin/sh
+#
+#  Generated automatically from moon.in by configure.
+#
+#  $Id: moon.in 0.09 2000/03/24 00:00:09 tom Exp $
+#
+#  moon.in:  Displays the dates at which the next Full Moon and New Moon
+#              phases take place, plus some additionally information
+#              about today's date.
+#
+#            Usage: moon --help | version
+#            Usage: moon [--debug] [--mail[=ADDRESS]] [more Gcal options...]
+#
+#            `--debug':          Turn on shell debugging.
+#            `--mail[=ADDRESS]': EMail the result to the specified ADDRESS.
+#                                  If no ADDRESS is given, eMail it to
+#                                  $MAILTO, $USER or $LOGNAME.
+#
+#  UN*X solution.
+#
+#  Needs `rm', `cat', `set', `sed', `test', `echo', `eval', `expr', `grep',
+#  `date', `mail', `gcal' and `perl' or `awk' for processing!
+#
+#  Returns 0 if processing was successfully.
+#  Returns 1 in case an error occured while processing.
+#
+#  Copyright (c) 2000  Thomas Esken      <esken@uni-muenster.de>
+#                      Im Hagenfeld 84
+#                      D-48147 M"unster
+#                      GERMANY
+#
+#  This software doesn't claim completeness, correctness or usability.
+#  On principle I will not be liable for ANY damages or losses (implicit
+#  or explicit), which result from using or handling my software.
+#  If you use this software, you agree without any exception to this
+#  agreement, which binds you LEGALLY !!
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the `GNU General Public License' as published by
+#  the `Free Software Foundation'; either version 2, or (at your option)
+#  any later version.
+#
+#  You should have received a copy of the `GNU General Public License'
+#  along with this program; if not, write to the:
+#
+#    Free Software Foundation, Inc.
+#    59 Temple Place - Suite 330
+#    Boston, MA 02111-1307,  USA
+#
+#
+
+#
+# Basically used programs.
+#
+Rm=rm
+Cat=cat
+Sed=sed
+Set=set
+Echo=echo
+Expr=expr
+Grep=grep
+Test=test
+
+#
+# Basically used texts.
+#
+PACKAGE=gcal
+VERSION=3.01
+transform=s,$$,,; s,^,,; s/i386-pc-mingw32//
+#
+mydefaultname=moon
+#
+myname=`$Echo "$0" | $Sed -e 's,.*/,,' -e "$transform"`
+myversion=0.09
+myinternalname="$myname ($PACKAGE $VERSION) $myversion"
+#
+info1="$myname: Displays the dates at which the next Full Moon and"
+info2="$myname: New Moon phases take place, plus some additionally"
+info3="$myname: information about today's date."
+info4="$myname:"
+usage1="usage: $myname  --help | --version"
+usage2="usage: $myname  [--debug] [--mail[=ADDRESS]] [more Gcal options..]"
+
+#
+# Some constant values
+#
+EXIT_SUCCESS=0
+EXIT_FAILURE=1
+
+#
+# The used main programs.
+#
+Eval=eval
+Date=date
+ThisMail=mail
+ThisGcal=`$Echo "$PACKAGE" | $Sed "$transform"`
+#
+Awk=gawk
+Perl=perl
+
+#
+# Set the temporary base filename.
+#
+tmpdir=/tmp
+#
+# Respect a $TMPDIR or a $TMP environment variable.
+#
+if $Test -n "$TMPDIR";
+then
+  tmpdir="$TMPDIR"
+else
+  if $Test -n "$TMP";
+  then
+    tmpdir="$TMP"
+  fi
+fi
+#
+tmpdir=`$Echo "$tmpdir" | $Sed -e 's,/\$,,'`
+#
+tmpfile1="$tmpdir"/1-"$$"-
+tmpfile2="$tmpdir"/2-"$$"-
+tmpfile3="$tmpdir"/3-"$$"
+mailfile="$tmpdir"/m-"$$"
+
+#
+# Let's check for command line arguments.
+#
+debug=no
+mail=no
+opt_mail=""
+previous=""
+for option in $*
+do
+  #
+  # If the previous option needs an argument, assign it.
+  #
+  if $Test -n "$previous";
+  then
+    $Eval "$previous=\$option"
+    previous=""
+    continue
+  fi
+
+  case "$option" in
+    -*=)  optarg="###error###" ;;
+    -*=*) optarg=`$Echo "$option" | $Sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *)    optarg="" ;;
+  esac
+
+  #
+  # Manage the options.
+  #
+  case "$option" in
+    -help=* | -hel=* | -he=* | -h=* | -help | -hel | -he | -h | \
+    --help=* | --hel=* | --he=* | --h=* | --help | --hel | --he | --h)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$info1"
+      $Echo "$info2"
+      $Echo "$info3"
+      $Echo "$info4"
+      $Echo "$usage1"
+      $Echo "$usage2"
+      exit $EXIT_SUCCESS ;;
+
+    -version=* | -versio=* | -versi=* | -vers=* | -ver=* | -ve=* | -v=* | \
+    -version | -versio | -versi | -vers | -ver | -ve | -v | \
+    --version=* | --versio=* | --versi=* | --vers=* | --ver=* | --ve=* | --v=* | \
+    --version | --versio | --versi | --vers | --ver | --ve | --v)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$myinternalname"
+      exit $EXIT_SUCCESS ;;
+
+    -debug=* | -debu=* | -deb=* | -de=* | -d=* | \
+    -debug | -debu | -deb | -de | -d | \
+    --debug=* | --debu=* | --deb=* | --de=* | --d=* | \
+    --debug | --debu | --deb | --de | --d)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      debug=yes
+      shift ;;
+
+    -mail=* | -mai=* | -ma=* | -m=* | -mail | -mai | -ma | -m | \
+    --mail=* | --mai=* | --ma=* | --m=* | --mail | --mai | --ma | --m)
+      if $Test "$optarg" = "###error###";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=//g'`' requires an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      opt_mail="$optarg"
+      mail=yes
+      shift ;;
+  esac
+done
+
+if $Test "$debug" = yes;
+then
+  #
+  # Enable tracing.
+  #
+  $Set -x
+else
+  trap "$Rm -f $tmpfile1""* $tmpfile2""* $tmpfile3 $mailfile;exit $EXIT_FAILURE" 1 2 15
+fi
+
+
+
+#
+# Let's start processing now.
+#
+
+
+
+#
+# Prints some information about today's date and the Moon phase.
+#
+if $Test "$mail" = yes;
+then
+  $ThisGcal $* -f/dev/null -Hno -c-QUx \
+    '-#0@t %-\_ : Today is %K , %1%n%2 (J.D. %3%j%4, DOY %3%N %4, CW %1%k %2).' \
+    '-#0@t %-\_ : The Moon phase is %1%O %2.' > $mailfile
+else
+  $ThisGcal $* -f/dev/null -c-QUx \
+    '-#0@t %-\_ : Today is %K , %1%n%2 (J.D. %3%j%4, DOY %3%N %4, CW %1%k %2).' \
+    '-#0@t %-\_ : The Moon phase is %1%O %2.'
+fi
+#
+# Prints the date of the next Full Moon and of the next New Moon phase.
+#
+if $Test -n "$Awk" || $Test -n "$Perl";
+then
+  #
+  # Set some constant values.
+  #
+  level=0
+  #
+  moon_marker=@
+  moon_text=Full
+  #
+  # And perform the processing.
+  #
+  while $Test "$level" -ne 2;
+  do
+    if $Test "$level" -eq 1;
+    then
+      moon_marker=!
+      moon_text=New
+    fi
+    #
+    # Check whether today is Full Moon resp., New Moon.
+    #
+    $ThisGcal $* -f/dev/null -#0_%O -QUx -I"$moon_marker" > /dev/null
+    if $Test "$?" -eq 0;
+    then
+      $ThisGcal $* -f/dev/null -QUx "-#0@t %-\_ : Today (%n) is "$moon_text" Moon."
+    fi
+    #
+    # Check if Full Moon/New Moon is up to the end of current month.
+    #
+    $ThisGcal $* -f/dev/null -#0*d1#999_%O -QUxm+ > $tmpfile1""$level
+    $Grep $moon_marker $tmpfile1""$level > /dev/null
+    if $Test "$?" -eq 0;
+    then
+      #
+      # We prefer the use of Perl.
+      #
+      if $Test -n "$Perl";
+      then
+        #
+        # Full Moon/New Moon is up to the end of current month.
+        #
+        $Perl -e "\$found=0;\$moon_match=0;" \
+              -e "while(<>){chop;if(\$_=~/$moon_marker/){if(\$found==0)" \
+              -e "{\$moon_match=(\$.-\$FNRbase);\$found=1;}}}" \
+              -e "print \$moon_match;" $tmpfile1""$level > $tmpfile2""$level
+      else
+        #
+        # Full Moon/New Moon is up to the end of current month.
+        #
+        $Awk "BEGIN{found=0;moon_match=0} \
+              {if(\$0~/"$moon_marker"/){if(found==0){moon_match=FNR;found=1}}} \
+              END{print moon_match}" $tmpfile1""$level > $tmpfile2""$level
+      fi
+    else
+      #
+      # Set the date to succeeding month.
+      #
+      month=`$ThisGcal $* -f/dev/null -QUx -#0_%M`
+      MONTH=`$Expr $month + 1`
+      if $Test "$MONTH" -eq 13;
+      then
+        year=`$ThisGcal $* -f/dev/null -QUx -#0_%Y`
+        YEAR=`$Expr $year + 1`
+        year=`$ThisGcal $* -f/dev/null -QUx -r\\$y=$YEAR -#'0 \$>04#y'`
+        month=01
+      else
+        year=0000
+        month=`$ThisGcal $* -f/dev/null -QUx -r\\$m=$MONTH -#'0 \$>02#m'`
+      fi
+      #
+      # Full Moon/New Moon is in succeeding month.
+      #
+      $ThisGcal $* -f/dev/null -#0*d1#999_%O -QUxm %"$year""$month"01 >> $tmpfile1""$level
+      #
+      # We prefer the use of Perl.
+      #
+      if $Test -n "$Perl";
+      then
+        $Perl -e "\$found=0;\$moon_match=0;" \
+              -e "while(<>){chop;if(\$_=~/$moon_marker/){if(\$found==0)" \
+              -e "{\$moon_match=(\$.-\$FNRbase);\$found=1;}}}" \
+              -e "print \$moon_match;" $tmpfile1""$level > $tmpfile2""$level
+      else
+        $Awk "BEGIN{found=0;moon_match=0} \
+              {if(\$0~/"$moon_marker"/){if(found==0){moon_match=FNR;found=1}}} \
+              END{print moon_match}" $tmpfile1""$level > $tmpfile2""$level
+      fi
+    fi
+    #
+    # Get the number of days the next Full Moon/New Moon phase is off
+    #   from today's date.
+    #
+    moon_date=`$Cat $tmpfile2""$level`
+    tvar="\$f=in `$Echo $moon_date` day"
+    if $Test "$moon_date" -ne 1;
+    then
+      tvar="$tvar""s"
+    fi
+    #
+    # And print the result.
+    #
+    if $Test "$mail" = yes;
+    then
+      $ThisGcal $* -f/dev/null -Hno -QUx -r "$tvar" \
+        "-#0@t %-\_ : Next "$moon_text" Moon is on %1%n+"$moon_date"%2 (%3"\$f"%4)." >> $mailfile
+    else
+      $ThisGcal $* -f/dev/null -QUx -r "$tvar" \
+        "-#0@t %-\_ : Next "$moon_text" Moon is on %1%n+"$moon_date"%2 (%3"\$f"%4)."
+    fi
+    #
+    # Remove temporary files.
+    #
+    if $Test "$debug" = no;
+    then
+      $Rm -f $tmpfile1""$level $tmpfile2""$level
+    fi
+    #
+    # Increase the level.
+    #
+    level=`$Expr $level + 1`
+  done
+else
+  $Echo "$myname: cannot compute next Moon phases, neither \`perl' nor \`awk' available" 1>&2
+fi
+#
+# Prints the number of days until New Year's Day of next year.
+#
+$ThisGcal $* -f/dev/null -QUxy -# '00001231 $d=%d' > $tmpfile3
+$Echo '$d++' >> $tmpfile3
+$Echo '0 %-_ : Only %1$d%2 days remaining until %3%n+$d%4 (J.D. %3%j+$d%4).' >> $tmpfile3
+if $Test "$mail" = yes;
+then
+  $ThisGcal $* -f $tmpfile3 -Hno -QUx >> $mailfile
+else
+  $ThisGcal $* -f $tmpfile3 -QUx
+fi
+if $Test "$debug" = no;
+then
+  $Rm -f $tmpfile3
+fi
+#
+# Prints the number of days until New Year's Day 3000.
+#
+if $Test "$mail" = yes;
+then
+  $ThisGcal $* -f/dev/null -Hno -QUx -u \
+    '-#30000101 %-\_ : Only %1%d%2 days remaining until %3%n%4 (J.D. %3%j%4).' \
+    1 3000 >> $mailfile
+  #
+  # Detect the proper eMail address.
+  #
+  if $Test -n "$opt_mail";
+  then
+    MailAddr="$opt_mail"
+  else
+    if $Test -n "$MAILTO";
+    then
+      MailAddr="$MAILTO"
+    else
+      if $Test -n "$USER";
+      then
+        MailAddr="$USER"
+      else
+        if $Test -n "$LOGNAME";
+        then
+          MailAddr="$LOGNAME"
+        else
+          $Echo "$myname: warning: cannot send mail, address unknown" 1>&2
+          $Cat $mailfile
+          if $Test "$debug" = no;
+          then
+            $Rm -f $mailfile
+          fi
+          exit $EXIT_FAILURE
+        fi
+      fi
+    fi
+  fi
+  #
+  # EMail the result.
+  #
+  if $Test -n "$MAILPROG";
+  then
+    ThisMail="$MAILPROG"
+  fi
+  if $Test "$debug" = no;
+  then
+    $ThisMail -s "Mail from \`$myname' (`$Date`)" $MailAddr < $mailfile
+    $Rm -f $mailfile
+  fi
+  $Echo "$myname: result sent by $ThisMail to \`$MailAddr'"
+else
+  $ThisGcal $* -f/dev/null -QUx -u \
+    '-#30000101 %-\_ : Only %1%d%2 days remaining until %3%n%4 (J.D. %3%j%4).' \
+    1 3000
+fi
+
+exit $EXIT_SUCCESS

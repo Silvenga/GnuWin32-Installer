@@ -1,0 +1,206 @@
+.\" (c) 1993 by Thomas Koenig (ig25@rz.uni-karlsruhe.de)
+.\" and 1999 by Bruno Haible (haible@clisp.cons.org)
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not
+.\" have taken the same level of care in the production of this manual,
+.\" which is licensed free of charge, as they might when working
+.\" professionally.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by
+.\" the source, must acknowledge the copyright and authors of this work.
+.\" License.
+.\" Modified Sat Jul 24 18:20:12 1993 by Rik Faith (faith@cs.unc.edu)
+.\" Modified Tue Jul 15 16:49:10 1997 by Andries Brouwer (aeb@cwi.nl)
+.\" Modified Sun Jul  4 14:52:16 1999 by Bruno Haible (haible@clisp.cons.org)
+.TH SETLOCALE 3  "July 4, 1999" "GNU" "Linux Programmer's Manual"
+.SH NAME
+setlocale \- set the current locale.
+.SH SYNOPSIS
+.nf
+.B #include <locale.h>
+.sp
+.BI "char *setlocale(int " category ", const char * " locale ");"
+.fi
+.SH DESCRIPTION
+The 
+.B setlocale()
+function is used to set or query the program's current locale.
+.PP
+If
+.I locale
+is not
+.BR NULL ,
+the program's current locale is modified according to the arguments.
+The argument
+.I category
+determines which parts of the program's current locale should be modified.
+.TP
+.B LC_ALL
+for all of the locale.
+.TP
+.B LC_COLLATE
+for string collation. Affected functions:
+.BR strcoll() ", " strxfrm() ", " wstrcoll() ", " wstrxfrm() .
+.TP
+.B LC_CTYPE
+for character classification, conversion, case-sensitive comparison, and
+regular expression matching. Affected functions:
+.BR isalnum() ", " isalpha() ", " isblank() ", " iscntrl() ", " isdigit() ,
+.BR isgraph() ", " islower() ", " isprint() ", " ispunct() ", " isspace() ,
+.BR isupper() ", " isxdigit() ", " tolower() ", " toupper() ,
+.BR strcasecmp() ", " strncasecmp() ,
+.BR iswalnum() ", " iswalpha() ", " iswblank() ", " iswcntrl() ", " iswdigit() ,
+.BR iswgraph() ", " iswlower() ", " iswprint() ", " iswpunct() ", " iswspace() ,
+.BR iswupper() ", " iswxdigit() ", " iswctype() ,
+.BR towlower() ", " towupper() ", " towctrans() ,
+.BR wcscasecmp() ", " wcsncasecmp() ,
+.BR wcwidth() ", " wcswidth() ", " regcomp ", " regexec() .
+.TP
+.B LC_MESSAGES
+for localizable natural-language messages. Affected functions:
+.BR gettext() ", " dgettext() .
+.TP
+.B LC_MONETARY
+for monetary formatting. Affected: the function
+.BR localeconv() .
+.TP
+.B LC_NUMERIC
+for number formatting (such as the decimal point and the thousands separator).
+Affected: the function
+.BR localeconv() .
+.TP
+.B LC_TIME
+for time and date formatting. Affected: the function
+.BR strftime() .
+.PP
+If
+.I locale
+is
+.BR """""" ,
+each part of the locale that should be modified is set according to the
+environment variables. The following environment variables are inspected,
+in order of precedence. If an environment variable is not set or if its value
+is empty, it is ignored.
+.TP
+.B LC_COLLATE
+.BR """LC_ALL""" ", " """LC_COLLATE""" ", " """LANG""" .
+.TP
+.B LC_CTYPE
+.BR """LC_ALL""" ", " """LC_CTYPE""" ", " """LANG""" .
+.TP
+.B LC_MESSAGES
+.B """LANGUAGE"""
+(may contain several, colon-separated, locale names),
+.BR """LC_ALL""" ", " """LC_MESSAGES""" ", " """LANG""" .
+.TP
+.B LC_MONETARY
+.BR """LC_ALL""" ", " """LC_MONETARY""" ", " """LANG""" .
+.TP
+.B LC_NUMERIC
+.BR """LC_ALL""" ", " """LC_NUMERIC""" ", " """LANG""" .
+.TP
+.B LC_TIME
+.BR """LC_ALL""" ", " """LC_TIME""" ", " """LANG""" .
+.PP
+The locale
+.B """C"""
+or
+.B """POSIX"""
+is a portable locale; its LC_CTYPE part corresponds to the 7-bit ASCII
+character set.
+.PP
+A locale name is typically of the form
+.IR language "[_" territory "][." codeset "][@" modifier "],"
+where
+.I language
+is an ISO 639 language code,
+.I territory
+is an ISO 3166 country code, and
+.I codeset
+is a character set or encoding identifier like
+.B "ISO-8859-1"
+or
+.BR "UTF-8" .
+.PP
+If
+.I locale
+is
+.BR NULL ,
+the current locale is only queried, not modified.
+.PP
+On startup of the main program, the portable
+.B """C"""
+locale is selected as default.
+A program may be made portable to all locales by calling
+.B setlocale(LC_ALL, """""")
+after program  initialization, by using the values returned
+from a
+.B localeconv()
+call
+for locale \- dependent information, by using the multi-byte and wide
+character functions for text processing if
+.BR "MB_CUR_MAX > 1" ,
+and by using
+.BR strcoll() ", " wstrcoll()
+or 
+.BR strxfrm() ", " wstrxfrm()
+to compare strings.
+.SH "RETURN VALUE"
+A successful call to
+.B setlocale()
+returns a string that corresponds to the locale set.
+This string may be allocated in static storage.
+The string returned is such that a subsequent call with that string
+and its associated category will restore that part of the process's
+locale. The return value is
+.B NULL
+if the request cannot be honored.
+.SH "CONFORMING TO"
+ANSI C, POSIX.1
+.SH NOTES
+Linux (that is, GNU libc) supports the portable locales
+.BR """C""" " and " """POSIX""" .
+In the good old days there used to be support for
+the European Latin-1 
+.B """ISO-8859-1"""
+locale (e.g. in libc-4.5.21 and libc-4.6.27), and the Russian
+.B """KOI-8"""
+(more precisely, "koi-8r") locale (e.g. in libc-4.6.27),
+so that having an environment variable LC_CTYPE=ISO-8859-1
+sufficed to make isprint() return the right answer.
+These days non-English speaking Europeans have to work a bit harder,
+and must install actual locale files.
+.PP
+The
+.B printf()
+and
+.B scanf()
+families of functions are affected by the current locale: The decimal dot
+depends on the
+.B LC_NUMERIC
+part of the locale, and the tokenization uses
+.B isspace()
+and thus depends on the
+.B LC_CTYPE
+part of the locale.
+.SH "SEE ALSO"
+.BR locale (1),
+.BR localedef (1),
+.BR strcoll (3),
+.BR isalpha (3),
+.BR localeconv (3),
+.BR strftime (3),
+.BR charsets (4),
+.BR locale (7)

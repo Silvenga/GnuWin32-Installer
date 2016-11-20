@@ -1,0 +1,441 @@
+#! /bin/sh
+#
+#  Generated automatically from mrms.in by configure.
+#
+#  $Id: mrms.in 0.02 2000/03/24 00:00:02 tom Exp $
+#
+#  mrms.in:  Uses `mrms[.awk|.pl]' for processing the Gcal `mrms.rc' resource
+#              file to display the times at which moonrise/moonset has happened
+#              in the past respectively will happen in the future, based on
+#              the actual local time.  If a Gcal resource file is specified
+#              as program option, this resource file is used instead of the
+#              default resource file `mrms.rc'.
+#
+#              Usage: mrms --help | --version
+#              Usage: mrms [--debug] [--mail[=ADDRESS]]
+#                          [--no-pager] [--mode=rise|set] [--sort=abs|rel]
+#                          [RESOURCE-FILE] [more Gcal options...]
+#
+#              `--debug':          Turn on shell debugging.
+#              `--mail[=ADDRESS]': EMail the result to the specified ADDRESS.
+#                                    If no ADDRESS is given, eMail it to
+#                                    $MAILTO, $USER or $LOGNAME.
+#              `--no-pager':       Disable the use of a pager program.
+#              `--mode=rise':      Display the moonrise local times of the
+#                                    locations.
+#              `--mode=set':       Display the moonset local times of the
+#                                    locations.  If this option is not given,
+#                                    `--mode=rise' is used by default.
+#              `--sort=abs':       The sort order of the past times (indicated
+#                                    by a `-' sign) respectively future times
+#                                    (indicated by a `+' sign) is absolute.
+#              `--sort=rel':       The sort order of the past times (indicated
+#                                    by a `-' sign) respectively future times
+#                                    (indicated by a `+' sign) is relative.
+#                                    If this option is not given, `--mode=abs'
+#                                    is used by default.
+#
+#  UN*X solution.
+#
+#  Needs `test', `echo', `eval', `set', `sed', `date', `mail', `sort',
+#  `gcal' and `perl' or `awk' for processing!
+#
+#  Returns 0 if any fixed dates are created (returned by AWK/Perl script
+#            if neither `--help' nor `--version' option was specified).
+#  Returns 1 in case no fixed dates are created (returned by AWK/Perl script).
+#  Returns 2 if neither Perl nor AWK are present for further processing.
+#
+#  Copyright (c) 2000  Thomas Esken      <esken@uni-muenster.de>
+#                      Im Hagenfeld 84
+#                      D-48147 M"unster
+#                      GERMANY
+#
+#  This software doesn't claim completeness, correctness or usability.
+#  On principle I will not be liable for ANY damages or losses (implicit
+#  or explicit), which result from using or handling my software.
+#  If you use this software, you agree without any exception to this
+#  agreement, which binds you LEGALLY !!
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the `GNU General Public License' as published by
+#  the `Free Software Foundation'; either version 2, or (at your option)
+#  any later version.
+#
+#  You should have received a copy of the `GNU General Public License'
+#  along with this program; if not, write to the:
+#
+#    Free Software Foundation, Inc.
+#    59 Temple Place - Suite 330
+#    Boston, MA 02111-1307,  USA
+#
+#
+
+#
+# Basically used programs.
+#
+Sed=sed
+Set=set
+Test=test
+Echo=echo
+Sort=sort
+
+#
+# Basically used texts.
+#
+packagedatamiscdir=c:/progra~1/Gcal/share/gcal/misc/mrms
+#
+PACKAGE=gcal
+VERSION=3.01
+transform=s,$$,,; s,^,,; s/i386-pc-mingw32//
+#
+mydefaultname=mrms
+#
+myname=`$Echo "$0" | $Sed -e 's,.*/,,' -e "$transform"`
+myversion=0.01
+myinternalname="$myname ($PACKAGE $VERSION) $myversion"
+#
+param1=rise
+param2=set
+param3=abs
+param4=rel
+#
+gcal_resource_file_suffix=.rc
+gcal_resource_file=$mydefaultname""$gcal_resource_file_suffix
+#
+info1="$myname: Displays the times at which moon""$param1/moon""$param2 has happened in the"
+info2="$myname: past respectively will happen in the future, based on the actual"
+info3="$myname: local time for several geographic locations around the world."
+info4="$myname:"
+usage1="usage: $myname  --help | --version"
+usage2="usage: $myname  [--debug] [--mail[=ADDRESS]] [--no-pager] [--mode=$param1|$param2]"
+usage3="usage:            [--sort=$param3|$param4] [RESOURCE-FILE] [more Gcal options...]"
+usage4="usage: $myname  without \`--mode=$param1|$param2' option uses \`--mode=$param1' by default"
+usage5="usage: $myname  without \`--sort=$param3|$param4'  option uses \`--sort=$param3'  by default"
+usage6="usage: $myname  without RESOURCE-FILE uses file "\
+"\`$packagedatamiscdir/$gcal_resource_file' by default"
+
+#
+# Some constant values.
+#
+EXIT_SUCCESS=0
+EXIT_FAILURE=1
+EXIT_FATAL=2
+
+#
+# The used programs.
+#
+Eval=eval
+Date=date
+ThisMail=mail
+ThisGcal=`$Echo "$PACKAGE" | $Sed "$transform"`
+Pager1=less
+Pager2=
+Pager3=
+#
+Awk=gawk
+Awk_script=$mydefaultname"".awk
+#
+Perl=perl
+Perl_script=$mydefaultname"".pl
+
+#
+# Let's check for command line arguments.
+#
+debug=no
+pager=yes
+mail=no
+opt_mail=""
+opt_mode=""
+opt_sort=""
+previous=""
+for option in $*
+do
+  #
+  # If the previous option needs an argument, assign it.
+  #
+  if $Test -n "$previous";
+  then
+    $Eval "$previous=\$option"
+    previous=""
+    continue
+  fi
+
+  case "$option" in
+    -*=)  optarg="###error###" ;;
+    -*=*) optarg=`$Echo "$option" | $Sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *)    optarg="" ;;
+  esac
+
+  #
+  # Manage the options.
+  #
+  case "$option" in
+    -help=* | -hel=* | -he=* | -h=* | -help | -hel |-he | -h | \
+    --help=* | --hel=* | --he=* | --h=* | --help | --hel | --he | --h)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$info1"
+      $Echo "$info2"
+      $Echo "$info3"
+      $Echo "$info4"
+      $Echo "$usage1"
+      $Echo "$usage2"
+      $Echo "$usage3"
+      $Echo "$usage4"
+      $Echo "$usage5"
+      $Echo "$usage6"
+      exit $EXIT_SUCCESS ;;
+
+    -version=* | -versio=* | -versi=* | -vers=* | -ver=* | -ve=* | -v=* | \
+    -version | -versio | -versi | -vers | -ver | -ve | -v | \
+    --version=* | --versio=* | --versi=* | --vers=* | --ver=* | --ve=* | --v=* | \
+    --version | --versio | --versi | --vers | --ver | --ve | --v)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$myinternalname"
+      exit $EXIT_SUCCESS ;;
+
+    -debug=* | -debu=* | -deb=* | -de=* | -d=* | \
+    -debug | -debu | -deb | -de | -d | \
+    --debug=* | --debu=* | --deb=* | --de=* | --d=* | \
+    --debug | --debu | --deb | --de | --d)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      debug=yes
+      shift ;;
+
+    -no-pager=* | -no-page | -no-pag=* | -no-pa=* | -no-p=* | -no-=* | -no=* | -n=* | \
+    -no-pager | -no-page | -no-pag | -no-pa | -no-p | -no- | -no | -n | \
+    --no-pager=* | --no-page=* | --no-pag=* | --no-pa=* | --no-p=* | --no-=* | --no=* | --n=* | \
+    --no-pager | --no-page | --no-pag | --no-pa | --no-p | --no- | --no | --n)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      pager=no
+      shift ;;
+
+    -mail | -mai | -ma | --mail | --mai | --ma | \
+    -mail=* | -mai=* | -ma=* | --mail=* | --mai=* | --ma=*)
+      if $Test "$optarg" = "###error###";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=//g'`' requires an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      opt_mail="$optarg"
+      mail=yes
+      shift ;;
+
+    -mode | -mod | -mo | --mode | --mod | --mo)
+      previous=mode ;;
+    -mode=* | -mod=* | -mo=* | --mode=* | --mod=* | --mo=*)
+      if $Test -z "$optarg" || $Test "$optarg" = "###error###";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=//g'`' requires an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      opt_mode="$optarg"
+      shift ;;
+
+    -sort | -sor | -so | -s | --sort | --sor | --so | --s)
+      previous=sort ;;
+    -sort=* | -sor=* | -so=* | -s=* | --sort=* | --sor=* | --so=* | --s=*)
+      if $Test -z "$optarg" || $Test "$optarg" = "###error###";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=//g'`' requires an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      opt_sort="$optarg"
+      shift ;;
+  esac
+done
+
+if $Test -n "$previous";
+then
+  $Echo "$myname: error: missing argument to --$previous" 1>&2
+  exit $EXIT_FAILURE
+fi
+
+#
+# Enable tracing.
+#
+if $Test "$debug" = yes;
+then
+  $Set -x
+fi
+
+#
+# Let's start processing now.
+#
+if $Test -n "$Awk" || $Test -n "$Perl";
+then
+  SCRIPT_ARGS=""
+  if $Test -n "$opt_mode";
+  then
+    arg=`$Echo "$opt_mode" | $Sed -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
+    if $Test "$arg" = "$param1" || $Test "$arg" = "$param2";
+    then
+      SCRIPT_ARGS="-a""$arg"
+    else
+      $Echo "$myname: error: invalid option argument \`$opt_mode' specified" 1>&2
+      $Echo "$myname: use --help to show usage" 1>&2
+      exit $EXIT_FAILURE
+    fi
+  fi
+  if $Test -n "$opt_sort";
+  then
+    arg=`$Echo "$opt_sort" | $Sed -e 'y/ABCDEFGHIJKLMNOPQRSTUVWXYZ/abcdefghijklmnopqrstuvwxyz/'`
+    if $Test "$arg" = "$param3" || $Test "$arg" = "$param4";
+    then
+      SCRIPT_ARGS="$SCRIPT_ARGS -b""$arg"
+    else
+      $Echo "$myname: error: invalid option argument \`$opt_sort' specified" 1>&2
+      $Echo "$myname: use --help to show usage" 1>&2
+      exit $EXIT_FAILURE
+    fi
+  fi
+  ARGS=""
+  CMDS=""
+  FILS=""
+  for arg in $*
+  do
+    case "$arg" in
+      -*) ARGS="$ARGS $arg" ;;
+      /*) ARGS="$ARGS $arg" ;;
+      @*) ARGS="$ARGS $arg" ;;
+      %*) ARGS="$ARGS $arg" ;;
+      [0-9*]*) CMDS="$CMDS $arg" ;;
+      *) if $Test -z "$FILS";
+         then
+           FILS="$arg"
+         else
+           FILS="$FILS+$arg"
+         fi
+    esac
+  done
+  if $Test -z "$FILS";
+  then
+    FILS=$packagedatamiscdir/$gcal_resource_file
+  fi
+  if $Test "$mail" = no;
+  then
+    ARGS="$ARGS -Hyes"
+  fi
+  #
+  # We prefer the use of Perl.
+  #
+  if $Test -n "$Perl";
+  then
+    result=`$ThisGcal $ARGS -QUx -f $FILS $CMDS | \
+            $Perl -- $packagedatamiscdir/$Perl_script $SCRIPT_ARGS`
+  else
+    result=`$ThisGcal $ARGS -QUx -f $FILS $CMDS | \
+            $Awk -f $packagedatamiscdir/$Awk_script $SCRIPT_ARGS`
+  fi
+  status=$?
+  if $Test "$status" -eq "$EXIT_SUCCESS";
+  then
+    if $Test "$mail" = yes;
+    then
+      #
+      # Detect the proper eMail address.
+      #
+      if $Test -n "$opt_mail";
+      then
+        MailAddr="$opt_mail"
+      else
+        if $Test -n "$MAILTO";
+        then
+          MailAddr="$MAILTO"
+        else
+          if $Test -n "$USER";
+          then
+            MailAddr="$USER"
+          else
+            if $Test -n "$LOGNAME";
+            then
+              MailAddr="$LOGNAME"
+            else
+              $Echo "$myname: warning: cannot send mail, address unknown" 1>&2
+              $Echo "$result" | $Sort | $Sed -e 's/^\(.......\)//' 1>&2
+              exit $EXIT_FAILURE
+            fi
+          fi
+        fi
+      fi
+      #
+      # EMail the result.
+      #
+      if $Test -n "$MAILPROG";
+      then
+        ThisMail="$MAILPROG"
+      fi
+      if $Test "$debug" = no;
+      then
+        $Echo "$result" | $Sort | $Sed -e 's/^\(.......\)//' | \
+          $ThisMail -s "Mail from \`$myname' (`$Date`)" $MailAddr
+      fi
+      $Echo "$myname: result sent by $ThisMail to \`$MailAddr'"
+    else
+      #
+      # Detect a proper pager.
+      #
+      ThisPager=""
+      if $Test "$pager" = yes;
+      then
+        if $Test -n "$Pager1";
+        then
+          ThisPager="$Pager1"
+        else
+          if $Test -n "$Pager2";
+          then
+            ThisPager="$Pager2"
+          else
+            if $Test -n "$Pager3";
+            then
+              ThisPager="$Pager3"
+            fi
+          fi
+        fi
+      fi
+      #
+      # Display the result.
+      #
+      if $Test -n "$ThisPager";
+      then
+        $Echo "$result" | $Sort | $Sed -e 's/^\(.......\)//' | $ThisPager
+      else
+        $Echo "$result" | $Sort | $Sed -e 's/^\(.......\)//'
+      fi
+    fi
+  else
+    if $Test "$status" -eq "$EXIT_FAILURE";
+    then
+      $Echo "$myname: error: no moonrise/moonset times found" 1>&2
+    else
+      if $Test "$status" -eq "$EXIT_FATAL";
+      then
+        if $Test -n "$Perl";
+        then
+          $Echo "$myinternalname: error: invalid option \`$SCRIPT_ARGS' to \`$Perl' given" 1>&2
+        else
+          $Echo "$myinternalname: error: invalid option \`$SCRIPT_ARGS' to \`$Awk' given" 1>&2
+        fi
+      fi
+    fi
+  fi
+  exit $status
+else
+  $Echo "$myinternalname: error: neither \`perl' nor \`awk' available" 1>&2
+  exit $EXIT_FATAL
+fi

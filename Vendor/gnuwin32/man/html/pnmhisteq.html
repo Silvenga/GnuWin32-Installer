@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pnmhisteq User Manual</TITLE></HEAD>
+<BODY>
+<H1>pnmhisteq</H1>
+Updated: 19 March 1995
+<BR>
+<A HREF="pnmhisteq.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pnmhisteq - histogram equalise a PNM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pnmhisteq</B>
+
+[<B>-gray</B>]
+
+[<B>-rmap</B> <I>pgmfile</I>]
+
+[<B>-wmap</B> <I>pgmfile</I>]
+
+[<B>-verbose</B>]
+
+[<I>pnmfile</I>]
+
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><B>pnmhisteq</B> increases the contrast of a portable graymap or
+pixmap through the technique of <I>histogram equalisation</I>[1].
+
+<p>A histogram of the luminance of pixels in the map is computed, from
+which a transfer function is calculated which spreads out intensity levels
+around histogram peaks and compresses them at troughs.  This has the
+effect of using the available levels of intensity more efficiently and
+thereby increases the detail visible in the image.
+
+<P>Mathematically, if <I>N[i]</I> is the number of pixels of
+luminosity <I>i</I> in the image and <I>T</I> is the total number of
+pixels, luminosity <I>j</I> is replaced by:
+
+<pre>
+
+      j
+     ---
+     \
+      &gt; N[i] / T
+     /
+     ---
+     i=0
+</pre>
+
+<P>If you're processing a related set of images, for example frames of
+an animation, it's generally best to apply the same intensity map to
+every frame, since otherwise you'll get distracting frame-to-frame
+changes in the brightness of objects.  <B>pnmhisteq</B>'s <B>-wmap</B>
+option allows you to save, as a portable graymap, the luminosity map
+computed from an image (usually a composite of the images you intend
+to process created with <B>pnmcat</B>).  Then, you can subsequently
+process each of the individual images using the luminosity map saved
+in the file, supplied with the <B>-rmap</B> option.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-gray</B>
+
+<DD>When processing a pixmap, only gray pixels (those with identical red,
+green, and blue values) are included in the histogram and modified
+in the output image.  This is a special purpose option intended
+for images where the actual data are gray scale, with
+color annotations you don't want modified.  Weather
+satellite images that show continent outlines in color are best
+processed using this option.  The option has no effect when the input
+is a graymap.
+
+<DT><B>-rmap</B> <I>mapfile</I>
+
+<DD>Process the image using the luminosity map specified by the
+PGM file <I>mapfile.</I>
+
+The PGM image, usually created by an earlier run of <B>pnmhisteq</B>
+with the <B>-wmap</B> option, contains a single row with number of
+columns equal to the maxval (greatest intensity value) of the image.  Each
+pixel in the image is transformed by looking up its luminosity in the
+corresponding column in the map file and changing it to the value
+given by that column.
+
+<DT><B>-wmap</B><I> mapfile</I>
+
+<DD>Creates a PGM file <I>mapfile</I>, containing the luminosity map
+computed from the histogram of the input image.  This map file can be
+read on subsequent runs of <B>pnmhisteq</B> with the <B>-rmap</B>
+option, allowing a group of images to be processed with an identical
+map.
+
+<DT><B>-verbose</B>
+
+<DD>Prints the histogram and luminosity map on standard error.
+
+</DL>
+
+<P>You can abbreviate any option to its shortest unique prefix.
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>LIMITATIONS</H2>
+
+<p>Histogram equalisation is effective for increasing the visible
+detail in scientific imagery and in some continuous-tone pictures.  It
+is often too drastic, however, for scanned halftone images, where it
+does an excellent job of making halftone artifacts apparent.  You
+might want to experiment with <B>pgnnorm</B>, <B>ppmnorm</B>, and
+<B>pnmgamma</B> for more subtle contrast enhancement.
+
+<P>The luminosity map file supplied by the <B>-rmap</B> option must
+have the same maxval as the input image.  This is always the case when
+the map file was created by the <B>-wmap</B> option of
+<B>pnmhisteq</B>.  If this restriction causes a problem, simply adjust
+the maxval of the map with <B>pnmdepth</B> to agree with the input
+image.
+
+<P>If the input is a PBM file (on which histogram equalisation is an
+identity operation), the only effect of passing the file through
+<B>pnmhisteq</B> will be the passage of time.
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pgmnorm.html">pgmnorm</A></B>,
+
+<B><A HREF="pnm.html">pnm</A></B>,
+
+<B><A HREF="pnmcat.html">pnmcat</A></B>,
+
+<B><A HREF="pnmdepth.html">pnmdepth</A></B>,
+
+<B><A HREF="pnmgamma.html">pnmgamma</A></B>,
+
+<B><A HREF="pnmnorm.html">pnmnorm</A></B>
+
+<DL COMPACT>
+<DT>[1]
+
+<DD>Russ, John C.  The Image Processing Handbook.  Boca Raton: CRC
+Press, 1992.  Pages 105-110.
+
+</DL>
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+<p>Copyright (C) 1995 by John Walker (<A
+HREF="mailto:kelvin@fourmilab.ch">kelvin@fourmilab.ch</A>).  WWW home
+page: <A HREF="http://www.fourmilab.ch/">http://www.fourmilab.ch/</A>
+
+<P>Permission to use, copy, modify, and distribute this software and
+its documentation for any purpose and without fee is hereby granted,
+without any conditions or restrictions.  This software is provided
+&quot;as is&quot; without express or implied warranty.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pnmhisteq.html#lbAB">NAME</A>
+<LI><A HREF="pnmhisteq.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pnmhisteq.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pnmhisteq.html#lbAE">OPTIONS</A>
+<LI><A HREF="pnmhisteq.html#lbAF">BUGS</A>
+<LI><A HREF="pnmhisteq.html#lbAG">SEE ALSO</A>
+<LI><A HREF="pnmhisteq.html#lbAH">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

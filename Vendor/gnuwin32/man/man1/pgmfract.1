@@ -1,0 +1,83 @@
+' e
+.EQ
+delim $$
+.EN
+.TH PGMFRACT 1 "September 26, 1999"
+.SH NAME \"{{{roff}}}\"{{{
+pgmfract \- generate fractal as PGM picture
+.\"}}}
+.SH SYNOPSIS \"{{{
+.ad l
+.B pgmfract
+.RB [ \-s
+.IR size ]
+.RB [ \-d
+.IR depth ]
+.RB [ \-p
+\fIxpos\fP\fB:\fP\fIypos\fP\fB:\fP\fIdistance\fP]
+.ad b
+.\"}}}
+.SH DESCRIPTION \"{{{
+pgmfract computes a fractal and outputs it to standard output as PGM file.
+Each $x, y$ pixel of the picture corresponds to the complex number $c = x + y i$ in the
+formula $z' = z sup 2 + c$.  The first iteration begins with $z = x + i y$,
+following iterations use the previously calculated value of $z'$.  As
+soon as the absolute value of $z$ becomes larger than 2, it is known that
+the iteration will converge against infinity and the pixel is coloured
+depending on the number of iterations.  Some values of $c$ never cause $z$
+to become larger than 2, so the iteration depth has to be limited.  If
+this limit is reached, the pixel will be black.  The Mandelbrot set is
+the set of values for $c$, which never cause $z$ to converge against
+infinity, so limiting the depth causes a small error.  Using a large enough
+depth minimizes this error.
+.\"}}}
+.SH OPTIONS \"{{{
+.IP "\fB\-s\fP \fIsize\fP"
+Change the picture size from the default of 600 pixel in each direction
+to \fIsize\fP pixels.
+.IP "\fB\-d\fP \fIdepth\fP"
+Change the maximum iteration depth from the default of 600 iterations
+to \fIdepth\fP iterations.
+.IP "\fB\-p\fP \fIxpos\fP\fB:\fP\fIypos\fP\fB:\fP\fIdistance\fP"
+Change the interval of the complex start values from \fB0.0:0.0:2.0\fP
+to the new center \fIxpos\fP an \fIypos\fP with an interval of \fIdistance\fP
+in each direction.
+.IP "\fB\-j\fP \fIcr\fP\fB:\fP\fIci\fP"
+Compute a julia set instead of a mandelbrot set by specifying a fixed value
+$c$ for iterations instead of a pixel dependent value $x + i y$.  Interesting
+subsections from the mandelbrot set yield interesting julia sets.
+.\"}}}
+.SH EXAMPLES \"{{{
+Beautiful sections are:
+.RS
+.nf
+.sp
+pgmfract -p -0.5:0.0:1.5 >fractal.pgm
+.br
+pgmfract -p -0.7660315:0.100861:0.0003 >fractal.pgm
+.br
+pgmfract -p -1.252758:0.342541:0.007629 >fractal.pgm
+.br
+pgmfract -p -0.368056:0.645833:0.097222 >fractal.pgm 
+.br
+pgmfract -p -0.17596915:1.08649105:0.0000004 >fractal.pgm 
+.br
+pgmfract -j -0.17596915:1.08649105 -p 0.0:0.0:0.01 >fractal.pgm 
+.br
+pgmfract -d 2000 -p -0.74567846:0.09998153:0.00012307 >fractal.pgm 
+.br
+pgmfract -d 2000 -j -0.74567846:0.09998153 -p 0.0:0.0:0.1 >fractal.pgm 
+.fi
+.RE
+.\"}}}
+.SH AUTHOR \"{{{
+Michael Haardt <michael@moria.de>.
+.\"}}}
+.SH HISTORY \"{{{
+The original version of this program has been written in 6502 Assembler
+for an Acorn Electron in 1985.  From there, it went to Small-C for the
+Z80 on a PCW8256 in 1986 to ANSI-C and Linux in 1998.
+.\"}}}
+.SH "SEE ALSO" \"{{{
+pgm(5)
+.\"}}}

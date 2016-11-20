@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>PGM Format Specification</TITLE>
+<META NAME="manual_section" CONTENT="5">
+</HEAD>
+<BODY>
+<H1>pgm</H1>
+Updated: 03 October 2003
+<BR>
+<A HREF="pgm.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pgm - Netpbm grayscale image format
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<P>The PGM format is a lowest common denominator grayscale file format.
+<A NAME="ixAAB"></A>
+It is designed to be extremely easy to learn and write programs for.
+(It's so simple that most people will simply reverse engineer it
+because it's easier than reading this specification).
+
+<P>A PGM image represents a grayscale graphic image.  There are many
+psueudo-PGM formats in use where everything is as specified herein except
+for the meaning of individual pixel values.  For most purposes, a PGM
+image can just be thought of an array of arbitrary integers, and all the
+programs in the world that think they're processing a grayscale image 
+can easily be tricked into processing something else.
+
+<P>The name "PGM" is an acronym derived from "Portable Gray Map."
+
+<P>One official variant of PGM is the transparency mask.  A transparency
+mask in Netpbm is represented by a PGM image, except that in place of 
+pixel intensities, there are opaqueness values.  See below.
+
+<P>The format definition is as follows.  You can use the <a
+href="libnetpbm.html">libnetpbm</a> C subroutine library to conveniently
+and accurately read and interpret the format.
+
+<P>A PGM file consists of a sequence of one or more PGM images. There are
+no data, delimiters, or padding before, after, or between images.
+
+<P>Each PGM image consists of the following:
+
+<OL>
+  
+<LI>A &quot;magic number&quot; for identifying the file type.
+A pgm image's magic number is the two characters &quot;P5&quot;.
+
+<LI>Whitespace (blanks, TABs, CRs, LFs).
+
+<LI>A width, formatted as ASCII characters in decimal.
+
+<LI>Whitespace.
+
+<LI>A height, again in ASCII decimal.
+
+<LI>Whitespace.
+
+<LI>The maximum gray value (Maxval), again in ASCII decimal.  Must be less
+than 65536, and more than zero.
+
+<LI>Newline or other single whitespace character.
+
+<LI>A raster of Height rows, in order from top to bottom.  Each row
+consists of Width gray values, in order from left to right.  Each gray
+value is a number from 0 through Maxval, with 0 being black and Maxval
+being white.  Each gray value is represented in pure binary by either
+1 or 2 bytes.  If the Maxval is less than 256, it is 1 byte.
+Otherwise, it is 2 bytes.  The most significant byte is first.
+
+<P>A row of an image is horizontal.  A column is vertical.  The pixels
+in the image are square and contiguous.
+
+<LI>Each gray value is a number proportional to the intensity of the
+pixel, adjusted by the CIE Rec. 709 gamma transfer function.  (That
+transfer function specifies a gamma number of 2.2 and has a linear
+section for small intensities).  A value of zero is therefore black.
+A value of Maxval represents CIE D65 white and the most intense value
+in the image and any other image to which the image might be compared.
+
+<LI>Note that a common variation on the PGM format is to have the
+gray value be &quot;linear,&quot; i.e. as specified above except
+without the gamma adjustment.  <B>pnmgamma</B> takes such a PGM
+variant as input and produces a true PGM as output.
+
+<LI>In the transparency mask variation on PGM, the value represents
+opaqueness.  It is proportional to the fraction of intensity of a
+pixel that would show in place of an underlying pixel.  So what
+normally means white represents total opaqueness and what normally
+means black represents total transparency.  In between, you would
+compute the intensity of a composite pixel of an &quot;under&quot; and
+&quot;over&quot; pixel as under * (1-(alpha/alpha_maxval)) + over *
+(alpha/alpha_maxval).  Note that there is no gamma transfer function
+in the transparency mask.
+
+<LI>Characters from a &quot;#&quot; to
+the next end-of-line, before the maxval line, are comments and are
+ignored.
+
+</OL> 
+
+<P>Note that you can use <B>pnmdepth</B> to convert between a the
+format with 1 byte per gray value and the one with 2 bytes per gray
+value.
+
+<P>
+
+There is actually another version of the PGM format that is fairly rare:
+&quot;plain&quot; PGM format.  The format above, which generally considered the 
+normal one, is known as the &quot;raw&quot; PGM format.  See 
+<B><A HREF="pbm.html">pbm</A></B>
+
+for some commentary on how plain and raw formats relate to one another.
+<P>
+
+The difference in the plain format is:
+<DL COMPACT>
+<DT>-<DD>
+There is exactly one image in a file.
+<DT>-<DD>
+The magic number is P2 instead of P5.
+<DT>-<DD>
+Each pixel in the raster is represented as an ASCII decimal number 
+(of arbitrary size).
+<DT>-<DD>
+Each pixel in the raster has white space before and after it.  There must
+be at least one character of white space between any two pixels, but there
+is no maximum.
+<DT>-<DD>
+No line should be longer than 70 characters.
+</DL>
+<P>
+
+Here is an example of a small image in the plain PGM format:
+<PRE>
+P2
+# feep.pgm
+24 7
+15
+0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+0  3  3  3  3  0  0  7  7  7  7  0  0 11 11 11 11  0  0 15 15 15 15  0
+0  3  0  0  0  0  0  7  0  0  0  0  0 11  0  0  0  0  0 15  0  0 15  0
+0  3  3  3  0  0  0  7  7  7  0  0  0 11 11 11  0  0  0 15 15 15 15  0
+0  3  0  0  0  0  0  7  0  0  0  0  0 11  0  0  0  0  0 15  0  0  0  0
+0  3  0  0  0  0  0  7  7  7  7  0  0 11 11 11 11  0  0 15  0  0  0  0
+0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+</PRE>
+
+<P>
+
+Programs that read this format should be as lenient as possible,
+accepting anything that looks remotely like a PGM.
+<P>
+<A NAME="lbAD">&nbsp;</A>
+<H2>COMPATIBILITY</H2>
+
+<P>
+Before April 2000, a raw format PGM file could not have a maxval greater
+than 255.  Hence, it could not have more than one byte per sample.  Old
+programs may depend on this.
+<P>
+Before July 2000, there could be at most one image in a PGM file.  As
+a result, most tools to process PGM files ignore (and don't read) any
+data after the first image.
+<P>
+<A NAME="lbAE">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<A HREF="pnm.html">pnm</A>,
+<A HREF="pbm.html">pbm</A>,
+<A HREF="ppm.html">ppm</A>,
+<A HREF="pam.html">pam</A>,
+<A HREF="libnetpbm.html">libnetpbm</A>,
+<A HREF="directory.html">programs that process PGM</A>,
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1989, 1991 by Jef Poskanzer.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pgm.html#lbAB">NAME</A>
+<LI><A HREF="pgm.html#lbAC">DESCRIPTION</A>
+<LI><A HREF="pgm.html#lbAD">COMPATIBILITY</A>
+<LI><A HREF="pgm.html#lbAE">SEE ALSO</A>
+<LI><A HREF="pgm.html#lbAF">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

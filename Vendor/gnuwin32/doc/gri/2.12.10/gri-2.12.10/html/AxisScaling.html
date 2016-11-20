@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: axis scaling</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile AxisScaling.html "Gri: axis scaling" "Getting more control" --> 
+
+<!-- @node   Axis Scaling, Log And Linear, Simple Example Revisited, Getting More Control -->
+<a name="AxisScaling" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="GettingMoreControl.html#GettingMoreControl" shape="rect" coords="516,2,532,24" href="GettingMoreControl.html#GettingMoreControl">
+<area alt="Gri: simple example revisited" shape="rect" coords="557,2,573,24" href="SimpleExampleRevisited.html">
+<area alt="Gri: log and linear axes" shape="rect" coords="581,2,599,24" href="LogAndLinearAxes.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: log and linear axes" shape="rect" coords="581,2,599,24" href="LogAndLinearAxes.html">
+</map>
+<h2>4.2: Axis scaling</h2>
+
+<!-- latex: \index{@code{..xlast..}, last drawn x value} -->
+<!-- latex: \index{@code{..ylast..}, last drawn y value} -->
+<!-- latex: \index{@code{..xmargin..}, left margin} -->
+<!-- latex: \index{@code{..ymargin..}, bottom margin} -->
+<!-- latex: \index{@code{..xsize..}, x-axis length} -->
+<!-- latex: \index{@code{..ysize..}, y-axis length} -->
+<!-- latex: \index{@code{..xleft..}, x value at left of plot} -->
+<!-- latex: \index{@code{..xright..}, x value at right of plot} -->
+<!-- latex: \index{@code{..xinc..}, x increment on axes} -->
+<!-- latex: \index{@code{..ybottom..}, y value at bottom of plot} -->
+<!-- latex: \index{@code{..ytop..}, y value at top of plot} -->
+<!-- latex: \index{@code{..yinc..}, y increment on axes} -->
+
+Gri normally assumes that you are plotting scientific graphs, and
+therefore whenever it sees a command like `<font color="#82140F"><code>draw curve</code></font>' or
+`<font color="#82140F"><code>draw symbol</code></font>', it draws an appropriate axis first.  You can turn
+this feature off, by using `<font color="#82140F"><code>draw axes none</code></font>' before the other
+`<font color="#82140F"><code>draw</code></font>' command.
+<p>
+Furthermore, Gri picks axis scales by itself, by scanning the (`<font color="#82140F"><code>x</code></font>',
+`<font color="#82140F"><code>y</code></font>') columns.  If you don't like the scales Gri picks, you can
+override them (see <a href="AxisRange.html#Range">Range</a>).
+<p>
+Gri normally draws axes labelled at left and bottom, and with an axis
+frame with tics all around.  If you don't like this default axis style
+you can specify other styles.  For example, if the commands 
+`<font color="#82140F"><code>draw x axis</code></font>' and `<font color="#82140F"><code>draw y axis</code></font>' are placed before the `<font color="#82140F"><code>draw curve</code></font>'
+command, Gri will realize you've already specified axes, and just draw
+them on the left and bottom sides of the box, without completing the
+axis frame.
+<p>
+For your general use, Gri stores the minimum and maximum x and y
+values of the <b>axes</b> in the variables `<font color="#82140F"><code>..xleft..</code></font>',
+`<font color="#82140F"><code>..xright..</code></font>', `<font color="#82140F"><code>..ybottom..</code></font>', and `<font color="#82140F"><code>..ytop..</code></font>'.  It also
+stores the increments used in labelling these axes in the
+`<font color="#82140F"><code>..xinc..</code></font>'  and `<font color="#82140F"><code>..yinc..</code></font>' variables.
+<p>
+To determine the minimum and maximum values of column data, you
+may use the built-in RPN functions `<font color="#82140F"><code>min</code></font>', `<font color="#82140F"><code>max</code></font>', and
+`<font color="82140F"><code>mean</code></font>' (see <a href="ManipulatingColumns.html#ManipulationofColumnsetc">Manipulation of Columns etc</a>).  
+<p>
+Gri stores the last (x,y) pair on a curve (whether data or axis) in the
+`<font color="#82140F"><code>..xlast..</code></font>' and `<font color="#82140F"><code>..ylast..</code></font>' variables
+<p>
+Gri stores the axis sizes in `<font color="#82140F"><code>..xsize..</code></font>' and `<font color="#82140F"><code>..ysize..</code></font>'.  It
+stores the space to the left of the plot in `<font color="#82140F"><code>..xmargin..</code></font>' and the
+space below the plot in `<font color="#82140F"><code>..ymargin..</code></font>'.
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

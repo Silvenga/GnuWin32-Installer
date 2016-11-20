@@ -1,0 +1,1230 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Enhanced Dynamic Linking for MS-Windows</title>
+  <meta name="description"
+ content="The reference manual of the EDLL library">
+  <meta name="author" content="Alexis Wilke">
+  <meta name="copyright" content="Copyright (c) 2005-2006 Alexis Wilke">
+</head>
+<body>
+<h1 style="text-align: center;"><a href="index.html"><img
+ alt="Go Back to the Home page" title="Home" src="images/home.gif"
+ style="width: 44px; height: 63px;" align="left" border="0"></a>Enhanced
+Dynamic Linking Library<br>
+for MinGW under MS-Windows</h1>
+<h3 style="text-align: center;">Reference Manual (Version @version@)<br>
+</h3>
+<br>
+<h3>Introduction<br>
+</h3>
+The <span style="font-weight: bold;">edll</span> is a C library with
+only a few functions you can use to load
+modules dynamically under MS-Windows. It requires you to have the BFD
+library for the final linking.<br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h3>Summary</h3>
+<blockquote> <a href="#license"> License</a><br>
+  <br>
+  <a href="#requirements">Requirements</a><br>
+  <br>
+  <a href="#version">Versioning your application and modules</a><br>
+  <br>
+#define's<br>
+  <blockquote> <a href="#addlib">EDLL_ADDLIB</a><br>
+    <a href="#addlib">EDLL_VERSION</a><br>
+  </blockquote>
+Typedef's<br>
+  <blockquote><a href="#edll_check_version">edll_check_version</a><br>
+    <a href="#edll_errno_t">edll_errno_t</a><br>
+    <a href="#edll_module">edll_module</a><br>
+    <a href="#edll_mutex_lock">edll_mutex_geterror</a><br>
+    <a href="#edll_mutex_lock">edll_mutex_lock</a><br>
+    <a href="#edll_mutex_lock">edll_mutex_seterror</a><br>
+    <a href="#edll_mutex_lock">edll_mutex_unlock</a><br>
+    <a href="#edll_ptr">edll_ptr</a> </blockquote>
+Functions
+  <blockquote><a href="#edll_alloc">edll_alloc</a><br>
+    <a href="#edll_callback_register">edll_callback_register</a><br>
+    <a href="#edll_open">edll_close</a><br>
+    <a href="#edll_init">edll_exit</a><br>
+    <a href="#edll_alloc">edll_free</a><br>
+    <a href="#edll_error">edll_geterror</a><br>
+    <a href="#edll_searchpath">edll_getsearchpath</a><br>
+    <a href="#edll_init">edll_getversion</a><br>
+    <a href="#edll_init">edll_init</a><br>
+    <a href="#edll_module_version">edll_module_version</a><br>
+    <a href="#edll_sym">edll_msym</a><br>
+    <a href="#edll_register">edll_mutex_register</a><br>
+    <a href="#edll_open">edll_open</a><br>
+    <a href="#edll_alloc">edll_realloc</a><br>
+    <a href="#edll_error">edll_seterror</a><br>
+    <a href="#edll_searchpath">edll_setsearchpath</a><br>
+    <a href="#edll_searchpath">edll_setunixsearchpath</a><br>
+    <a href="#edll_set_self_version">edll_set_self_version</a><br>
+    <a href="#edll_error">edll_strerror</a><br>
+    <a href="#edll_sym">edll_sym</a><br>
+  </blockquote>
+  <a href="#undefined_symbols">Undefined Symbols and Unresolved Symbols</a><br>
+  <br>
+  <a href="#known_bugs">Known Bugs &amp; Limitations</a>
+</blockquote>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h3><a name="license"></a>License</h3>
+This document is covered by the <a href="fdl.html">GNU
+documentation license</a>.<br>
+<blockquote><big> </big>
+  <p><big><code>Copyright (c) 2005-2006&nbsp; Alexis Wilke.<br>
+Permission is granted to copy, distribute and/or modify this document<br>
+under the terms of the GNU Free Documentation License, Version 1.1<br>
+or any later version published by the Free Software Foundation;<br>
+with the Invariant Sections being "Introduction" and "License",<br>
+with no Front-Cover Texts, and with no Back-Cover Texts.<br>
+A copy of the license is included in the section entitled "GNU<br>
+Free Documentation License".</code></big></p>
+</blockquote>
+<br>
+The <span style="font-weight: bold;">edll</span> library is covered by
+the LGPL plus the following paragraph:<br>
+<div style="margin-left: 40px; font-family: monospace;">
+<p><big>I hereby authorize anyone to use this library in closed source<br>
+software. However, if you make any modification to the library,<br>
+you must make these changes available to everyone (preferably<br>
+sent to me, but this is not a requirement.)</big></p>
+</div>
+<br>
+Different files included in this package are covered by
+different licenses as explained in the <a href="license.html">Project
+Licenses</a> page.<br>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h3><a name="requirements"></a>Requirements</h3>
+The following is what you need to use the <span
+ style="font-weight: bold;">edll</span> project.<br>
+<br>
+I added some version information. Older versions may still work with
+<span style="font-weight: bold;">edll</span>.
+<ul>
+  <li>MinGW 5.0.0 and MSYS 1.1</li>
+  <li>The gcc compiler (v3.4.2)</li>
+  <li>To try the C++ tests, the g++ compiler (v3.4.2)</li>
+  <li>The libbfd.a library (binutils 2.15.91)</li>
+  <li>32bits MS-Windows (but that's secondary)</li>
+  <li>And finally: a lot of time, patience and courage! (until version
+1.0, you know...)</li>
+</ul>
+Since version 0.3, <span style="font-weight: bold;">edll</span> uses
+a GNU Compatible configure script. For this reason, you will need the
+MSYS environment in order to create the library.<br>
+<br>
+A quick <i>How To Install MinGW and <span style="font-weight: bold;">edll</span></i><br>
+<ul>
+  <li>Install MSYS <i>somewhere</i> (i.e. "D:\Development\1.1")</li>
+  <li>Install MinGW 5.0.0 in the directory named <i>mingw</i> inside
+your newly installed MSYS and not where the installer suggests by
+default. (i.e. "D:\Development\1.1\mingw") Make sure the installer does
+not add a version at the end of your path (just erase if it does.)</li>
+  <li>Create your HOME directory (i.e. "D:\Development\1.1\home\alexis")</li>
+  <li>Setup the HOME variable to that new home directory in msys.bat
+(search for "start rxvt ..." and just before add: "set
+HOME=D:\Development\1.1\home\alexis")</li>
+  <li>Upload edll-@version@.tar.gz in your home directory</li>
+  <li>Start MSYS and type: <code>gunzip edll-@version@.tar.gz</code>
+(if it does not work, your installation did not quite work...)</li>
+  <br>
+NOTE: you cannot use tar xzf ... because pipes do not work under
+MS-Windows.<br>
+  <br>
+  <li><code>tar xvf edll-@version@.tar</code></li>
+  <li><code>cd edll-@version@</code></li>
+  <li>if you want to support the version feature, apply the <code>dev/version.patch</code>
+now<br>
+  </li>
+  <li><code>./configure [--&lt;options&gt;]<br>
+    </code></li>
+  <li><code>make</code></li>
+  <li><code>make install</code></li>
+</ul>
+<br>
+There is an ltdl.c/h set of files from some old binutils
+(binutils-2.13.90-20030111-1.tar.gz). It still compiles
+and works fine. If you have an application written in Unix which uses
+the
+ltdl to load modules, then you should not have to change anything to
+use <span style="font-weight: bold;">edll</span>. It is otherwise not
+required to use ltdl.<br>
+<br>
+See the README file for more information about the options available to
+the <span style="font-weight: bold;">edll</span> configure script.<br>
+<br>
+If you have any problems with some older versions of some of these
+tools, update them first. Note that newer versions may also break
+the library. It is very sensitive to the BFD library...<br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h3><a name="version">Versioning your application and modules</a></h3>
+<span style="color: rgb(255, 0, 0);">WARNING:</span> in order for the
+version feature to be available you have to make sure you configured
+the library with the --enable-versioncheck option; if not you will need
+to recompile it (you do not need to reconfigure, you can just edit the
+configuration file and change the #undef VERSION_CHECK by #define
+VERSION_CHECK 1)<br>
+<br>
+The <span style="font-weight: bold;">edll</span> library can now read
+the <span style="font-weight: bold;">.version</span> section of you
+executable and modules. For this feature to work, you need to have a <span
+ style="font-weight: bold;">.version</span> section. However, by
+default, your linker will remove the <span style="font-weight: bold;">.version</span>
+section since it does not know anything about and it will assume that
+once linked, the program does not need it.<br>
+<br>
+I offer two solutions to this problem.<br>
+<ol>
+  <li>The simplest one is to make a call to the <a
+ href="#edll_set_self_version">edll_set_self_version()</a> function.
+This function saves a version string for later use by the <span
+ style="font-weight: bold;">edll</span> library to check the modules.</li>
+  <li>The slightly more complicated solution is to modify the linker
+scripts. The GNU linker from the binutils uses a script to describe how
+the linker is supposed to handle the different sections. There are
+different scripts and it could be that you need to include that in
+different scripts. At this time, I tried and it worked by only changing
+the <code>i386pe.x</code> script. I include a patch in the edll
+package (<code>dev/version.patch</code>) that you can apply to that
+file. Though you can easilly fix any problems by reinstalling the
+binutils if something goes wrong, I suggest you make a copy of the file
+before you apply the patch.<br>
+  </li>
+</ol>
+The second solution is of course the neatest since you will have
+nothing more than to use EDLL_VERSION() in your source file to print
+the version in your application.<br>
+<br>
+The other problem with the versioning is that by default the library
+will compare versions with strcmp(). They need to be strictly equal for
+the module to be acceptable and thus loaded. If that fails, you will
+not be able to load that plugin. You can, however, create your own
+function to compare two versions. The function will be called each time
+a module is loaded. You define that function with a call to the <a
+ href="#edll_callback_register">edll_callback_register()</a> function.<br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="addlib"></a>LIBRARY</h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">EDLL_ADDLIB &#8212; add a library reference
+in a plug-in<br>
+EDLL_VERSION &#8212; define the version of a module
+</div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>#define EDLL_ADDLIB(name) ...<br>
+#define EDLL_VERSION(version) ...<br>
+</code></div>
+<h4>PARAMETERS</h4>
+<div style="margin-left: 40px;">name &#8212; the name of the library to load
+so the plug-in symbols can be resolved<br>
+version &#8212; a string representing the library version (i.e. "1.0")
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">EDLL_ADDLIB()</span>
+macro was created to enable the users to create a .load section with
+the names of the libraries and other plug-ins to load before this
+plug-in symbols can all be resolved. It is strongly recommended that
+only
+the libraries and other plug-ins which are required be included in this
+section. The <span style="font-weight: bold;">edll</span> always loads
+all of the dependencies defined in a
+.load section and it can use a lot of memory to specify too many
+entries here.<br>
+<br>
+The <span style="font-weight: bold;">EDLL_VERSION()</span> macro is a
+helper to define the version of a module. At this time, the macro
+creates a string that it saves in a section named <span
+ style="font-style: italic; font-weight: bold;">.version</span>. When
+an application or a module attempts to load a module and the versions
+do not match, then an error is generated and the loading fails.
+With <a href="#edll_callback_register">edll_callback_register</a>, the
+user can specify the comparison function if a strictly equal algorightm
+would be to stringent.<br>
+</div>
+<h4>NOTES</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">EDLL_ADDLIB()</span>
+will ultimatly be replaced by the use of the -l option on the linker
+command line as it would be expected. Also, at that time, the linker
+could test whether a library is used to resolve any symbol. If not, it
+could then be removed from the list of dependencies.<br>
+</div>
+<h4>RETURN VALUE</h4>
+<div style="margin-left: 40px;">These macros declare data. There is no
+returned value.<br>
+</div>
+<h4>BUGS</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">EDLL_VERSION()</span>
+macro works, but by default the linker will remove the <span
+ style="font-weight: bold;">.version</span> section when linking an
+executable. Thus your application can find itself without a
+version and in that case no comparison will take place. You have two
+ways to fix that problem: (a) you apply the dev/version.patch to your <span
+ style="font-style: italic;">ldscripts/i386pe.x</span> file. This will
+prevent the loader from losing the <span style="font-weight: bold;">.version</span>
+section and (b) you can use the <a href="#edll_set_self_version">edll_set_self_version()</a>
+function to define the version of the application.<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_open">edll_open</a>,
+<a href="#edll_check_version">edll_check_version</a>,
+<a href="#edll_callback_register">edll_callback_register</a>, <a
+ href="edll.html#edll_set_self_version">edll_set_self_version</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_module"></a>LIBRARY</h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_module &#8212; the edll module handle<br>
+</div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>typedef struct edll_module_struct
+edll_module;</code><br>
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">edll_module</span>
+type defines an <span style="font-weight: bold;">edll</span> module.
+The structure itself is
+private. You will only be able to use pointers to <span
+ style="font-weight: bold;">edll</span> modules.<br>
+<br>
+You get a new pointer whenever you call the <a href="#edll_open"><span
+ style="font-weight: bold;">edll_open()</span></a> function. You
+get rid of the pointer whenever you call the <a
+ style="font-weight: bold;" href="#edll_open">edll_close()</a> or
+<a style="font-weight: bold;" href="#edll_init">edll_exit()</a>
+functions.<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_open">edll_open</a>, <a
+ href="#edll_open">edll_close</a>, <a href="#edll_init">edll_exit</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_ptr">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_ptr &#8212; edll non-specific pointers<br>
+</div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>typedef void
+*edll_ptr;</code><br>
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">edll_ptr</span>
+type defines a non-specific data pointer.<br>
+<br>
+This type is used to return symbol address pointers. Also the different
+memory functions use it.<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_sym">edll_sym</a>, <a
+ href="#edll_sym">edll_msym</a>, <a href="#edll_alloc">edll_alloc</a>,
+<a href="#edll_alloc">edll_realloc</a>, <a href="#edll_alloc">edll_free</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_check_version">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_check_version &#8212; function used to
+compare two versions for validity<br>
+</div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>typedef int
+(*edll_check_version)(const char *self_version, const char
+*module_version);</code><br>
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">edll_check_version</span>
+type is used whenever a version is defined in a module being loaded.
+When
+this function is not defined, the system uses
+<span style="font-weight: bold;">strcmp()</span> and both versions
+need to be exactly equal. If you need a better test so as to allow
+older
+or newer versions too, then you will need to write your own.<br>
+<br>
+The function is called with two strings. The <i>self</i> version which
+represents the version of the application. And the <i>module</i>
+version
+which is the one version you want to validate.<br>
+<br>
+The function needs to return zero (0) if the versions do not match
+(i.e.
+you want to refuse this module) and return any other values to say that
+the version is valid (the loading of the module will proceed.)<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_callback_register">edll_callback_register</a>
+<br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_errno_t">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_errno_t &#8212; edll error type<br>
+</div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>typedef enum edll_errno_num { ...
+} edll_errno_t;</code><br>
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">edll_errno_t</span>
+type is used by the <span style="font-weight: bold;">edll</span>
+library to define error numbers.<br>
+<br>
+Whenever a function returns a value which represents an error (-1 when
+int is returned and NULL when a pointer is returned), an error is set
+in the <span style="font-weight: bold;">edll</span> library. The type
+of this error is always <span style="font-weight: bold;">edll_errno_t</span>.<br>
+<br>
+The errors are handled by the <span style="font-weight: bold;">edll_geterror()</span>,
+<span style="font-weight: bold;">edll_seterror()</span> and <span
+ style="font-weight: bold;">edll_strerror()</span> functions.<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_error">edll_geterror</a>,
+<a href="#edll_error">edll_seterror</a>,
+<a href="#edll_error">edll_strerror</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_mutex_lock">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_mutex_geterror &#8212; a function used
+to rerieve the last error set&nbsp; in the current thread <br>
+edll_mutex_lock &#8212; a function used to
+prevent multiple threads from using the library at the same time<br>
+edll_mutex_seterror &#8212; function used to change the error code in the
+current thread<br>
+edll_mutex_unlock &#8212; the function to undo a lock </div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>typedef void
+(*edll_mutex_lock)(edll_ptr userdata);<br>
+typedef void (*edll_mutex_seterror)(edll_ptr userdata, edll_errno_t
+err);<br>
+typedef void (*edll_mutex_unlock)(edll_ptr userdata);</code><br>
+</div>
+<h4>PARAMETERS</h4>
+<div style="margin-left: 40px;">userdata &#8212; a pointer to some data you
+specify to the registration function<br>
+err &#8212; the error number representing what just happened </div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">edll_mutex_lock</span>
+type defines a function used to protect areas of code in the library so
+multiple threads can use it safely. All the common data managed calling
+these functions. The way
+the lock itself is done it not specified in the <span
+ style="font-weight: bold;">edll</span> library.<br>
+<br>
+The <span style="font-weight: bold;">edll_mutex_unlock</span> type
+defines the function which undoes the lock created with the <span
+ style="font-weight: bold;">edll_mutex_lock</span>.<br>
+<br>
+The <span style="font-weight: bold;">edll_mutex_seterror</span> type
+defines a function used to save an error code specific to a thread.
+Note that you do not have to save the error code, you may use it right
+away. In that case you do not have to define an <span
+ style="font-weight: bold;">edll_mutex_geterror</span> since it would
+not be in sync anyway. The function receives the error code as its
+second parameter.<br>
+<br>
+The <span style="font-weight: bold;">edll_mutex_geterror</span> type
+defines a function used to retrieve an error previously saved calling
+the <span style="font-weight: bold;">edll_mutex_seterror</span>
+function. Note that the library doesn't test whether you set one or
+both of the error functions. It is suggested that you set either only
+the set or both. Defining only the get would not make sense.<br>
+<br>
+Note that all of these functions can't fail. The userdata is the same
+as the
+one passed to the registration function <a href="#edll_register">edll_mutex_register()</a>.<br>
+</div>
+<h4>EXAMPLE</h4>
+<div style="margin-left: 40px;">If you are using the pthread library,
+then the lock and unlock can be as simple as follow:<br>
+<pre style="margin-left: 40px;">my_mutex_lock(edll_ptr mutex)<br>{<br>	pthread_mutex_lock((pthread_mutex_t *) mutex);<br>}<br><br>my_mutex_unlock(edll_ptr mutex)<br>{<br>	pthread_mutex_unlock((pthread_mutex_t *) mutex);<br>}</pre>
+Note that this code assumes you register the lock &amp; unlock
+functions using
+the pthread mutex variable as the userdata pointer.<br>
+</div>
+<h4>RETURN VALUE</h4>
+<div style="margin-left: 40px;">Note that none of these functions can
+fail.<br>
+<br>
+Only the <span style="font-weight: bold;">edll_mutex_geterror</span>
+function returns a value which has to be the last error set with <span
+ style="font-weight: bold;">edll_mutex_seterror</span>.
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_register">edll_mutex_register</a>,
+<a href="#edll_errno_t">edll_errno_t</a>, <a href="#edll_ptr">edll_ptr</a>,
+<a href="#edll_error">edll_geterror</a>, <a href="#edll_error">edll_seterror</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_init">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_getversion &#8212; retrieve the library
+version<br>
+edll_init &#8212; the library initialization
+function<br>
+edll_exit &#8212; the library clean up function<br>
+</div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>extern const char
+*edll_getversion(void);<br>
+extern int edll_init(void);<br>
+extern int edll_exit(void);</code><br>
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">If you want to make sure that the
+proper version of the edll library is available at runtime, then call <span
+ style="font-weight: bold;">edll_getversion()</span> and test the
+returned string version. The latest version string is "@version@". (See
+the Internet version of this documentation for a valid version string
+here.)<br>
+<br>
+Before to use the <span style="font-weight: bold;">edll</span>
+library, you must call the <span style="font-weight: bold;">edll_init()</span>
+function. Some functions
+will fail if the library wasn't first initialized.<br>
+<br>
+Once you are finished with the <span style="font-weight: bold;">edll</span>
+library, call the <span style="font-weight: bold;">edll_exit()</span>
+to release all the resources used by the library. This function has the
+side effect of closing all the plug-ins. This means you need to make
+sure you won't use any of the plug-ins after this call and also that
+the function isn't being called from a plug-in.<br>
+<br>
+For your information, the initialization call will initialize the BFD
+library as well. Note that there are no function to clean up the BFD
+library. I do not know whether there is a need to clean up anything
+though.<br>
+<br>
+You can call the <span style="font-weight: bold;">edll_init()</span>
+multiple times. For each time you called the initialization function,
+you need to call the <span style="font-weight: bold;">edll_exit()</span>
+function. The last call to <span style="font-weight: bold;">edll_exit()</span>
+will release the plugins. The other calls merely decrement a reference
+counter.<br>
+</div>
+<h4>RETURN VALUE<br>
+</h4>
+<div style="margin-left: 40px;">edll_init returns 0 when the
+initialization succeeds<br>
+edll_exit returns 0 when it can properly close the library, -1
+otherwise; the function returns 0 even if the plugins are not removed
+(i.e. the reference counter didn't reach 0 yet)<br>
+edll_getversion returns a read-only string with the current version of
+the library<br>
+</div>
+<h4>BUGS</h4>
+<div style="margin-left: 40px;">You have to make sure that you do not
+use DLLs and plug-ins which have been loaded with the <span
+ style="font-weight: bold;">edll</span> library after you called the <span
+ style="font-weight: bold;">edll_exit()</span> function.<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_open">edll_close</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_alloc">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_alloc &#8212; allocate a block of memory<br>
+edll_realloc &#8212; reallocate a block of memory (usually to resize it)<br>
+edll_free &#8212; free a block of memory allocated with edll_alloc or
+edll_realloc </div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>extern </code><code>edll_ptr</code><code>
+edll_alloc(int size, int clear);</code><code><br>
+extern </code><code>edll_ptr</code><code> edll_realloc(edll_ptr rptr,
+int size, int oldsize);</code><code><br>
+extern void edll_free(edll_ptr ptr);<br>
+</code></div>
+<h4>PARAMETERS</h4>
+<div style="margin-left: 40px;">
+<h4><code></code></h4>
+size &#8212; the size in bytes of the block of memory to be allocated<br>
+clear &#8212; whether to clear the allocated buffer<br>
+rptr &#8212; the pointer to the buffer to resize<br>
+oldsize &#8212; the size of the buffer before this allocation happens<br>
+ptr &#8212; a memory buffer pointer to free
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">edll</span>
+library manages memory using the <span style="font-weight: bold;">edll</span>
+commands <span style="font-weight: bold;">edll_alloc()</span>, <span
+ style="font-weight: bold;">edll_realloc()</span> and <span
+ style="font-weight: bold;">edll_free()</span>.<br>
+<br>
+There is one exception: the memory used to load the section content
+directly calls the <span style="font-weight: bold;">VirtualAlloc()</span>.
+However, this shouldn't be a problem since you don't have direct access
+to section start pointers.<br>
+<br>
+All memory pointers allocated by the <span style="font-weight: bold;">edll</span>
+library and returned to you
+need to be freed using the <span style="font-weight: bold;">edll_free()</span>
+function.<br>
+<br>
+The <span style="font-weight: bold;">edll_alloc()</span> function
+allocates a buffer of at least size bytes. Whenever the parameter clear
+is true (non-zero), the buffer is cleared before the function returns.<br>
+<br>
+The <span style="font-weight: bold;">edll_realloc()</span> function is
+very similar to the <span style="font-weight: bold;">edll_alloc()</span>
+function. It will allocate a new buffer of memory if the <span
+ style="font-weight: bold;">rptr</span> parameter is zero. The new size
+is specified in the <span style="font-weight: bold;">size</span>
+parameter. If the new size is larger than the old size of the buffer
+(and the old size parameter is specified) then the memory area used to
+enlarge the buffer will be cleared. Use an old size of -1 to avoid this
+effect.<br>
+<br>
+The <span style="font-weight: bold;">edll_free()</span> function frees
+a buffer of memory which has been allocated with either of <span
+ style="font-weight: bold;">edll_alloc()</span> and <span
+ style="font-weight: bold;">edll_realloc()</span>.<br>
+</div>
+<h4>NOTES</h4>
+<div style="margin-left: 40px;">The memory management functions are
+currently available before you call the <span
+ style="font-weight: bold;">edll_init()</span> function. This may
+change in the future.<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a
+ href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/memory/base/virtualalloc.asp">VirtualAlloc</a>,
+<a
+ href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/memory/base/virtualprotect.asp">VirtualProtect</a>,
+<a href="#edll_searchpath">edll_getsearchpath</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_callback_register">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_callback_register &#8212; register a set
+of callbacks</div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>extern void
+edll_callback_register(edll_check_version check_version_func);<br>
+</code></div>
+<h4>PARAMETERS</h4>
+<div style="margin-left: 40px;">
+<h4><code></code></h4>
+check_version_func &#8212; the version function to call to compare versions
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">edll</span>
+supports some callbacks which are explained here.</div>
+<ul>
+  <li>Check Version function</li>
+</ul>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">edll</span>
+library can determine the version of your application and of each
+module that
+it loads.<br>
+<br>
+If the application has no version, then no version will ever be checked.<br>
+<br>
+By default, the <span style="font-weight: bold;">edll</span> will
+compare
+the version strings with strcmp() and if not strictly equal, it will
+fail
+the loading of the module.<br>
+<br>
+In order to make the comparison more complex, you can write your own
+function
+to, for instance, accept any older or any newer version of the module.<br>
+<br>
+Please, see the definition of the callback function
+<a href="#edll_check_version">edll_check_version</a> for more
+information
+on how you can define your own function.<br>
+</div>
+<h4>NOTES</h4>
+<div style="margin-left: 40px;">The version feature is optional. You
+have
+to make sure that your <span style="font-weight: bold;">edll</span>
+library was configured with the --enable-versioncheck option.
+You can look in the edll-config.h file and seach for
+<code>#undef&nbsp;VERSION_CHECK</code> (no version support) or
+<code>#define&nbsp;VERSION_CHECK&nbsp;1</code> (version support
+enabled).
+<br>
+</div>
+<h4>BUGS</h4>
+<div style="margin-left: 40px;">By default, the version of the
+application will not stick to your .exe file. This is because the
+linker removes the
+<span style="font-weight: bold;">.version</span> section when it
+creates the .exe file. You have two solutions to fix the problem: (a)
+you can call the
+<a href="#edll_set_self_version">edll_set_self_version()</a> function
+to define the version at run time or (b) apply dev/version.patch to
+your ldscripts/i386pe.x file.<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;">
+<a href="#edll_check_version">edll_check_version</a>,
+<a href="#edll_set_self_version">edll_set_self_version()</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_open">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_open &#8212; load a plug-in in memory
+and reallocate it<br>
+edll_close &#8212; close a module which has previously been opened with
+edll_open </div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>extern </code><code>edll_module *</code><code>edll_open(const
+char *filename);</code><code><br>
+extern int </code><code>edll_close(edll_module *module);</code><code><br>
+</code></div>
+<h4>PARAMETERS</h4>
+<div style="margin-left: 40px;">
+<h4><code></code></h4>
+filename &#8212; the name of the plug-in or DLL to load with <span
+ style="font-weight: bold;">edll</span><br>
+module &#8212; the module to be closed
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">
+The <span style="font-weight: bold;">edll</span> library loads modules
+with the <span style="font-weight: bold;">edll_open()</span> function.
+That function searches for the filename in the different directories as
+specified by the search path. The <span style="font-weight: bold;">edll_open()</span>
+function returns a module pointer. You should always call the <span
+ style="font-weight: bold;">edll_close()</span> with all the modules
+that you open with <span style="font-weight: bold;">edll_open()</span>.
+The close is automatically called whenever you exit the library (see <a
+ href="#edll_init">edll_exit()</a>)<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_searchpath">edll_setsearchpath</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_sym">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_sym &#8212; search for a symbol in the
+specified module<br>
+edll_msym &#8212; search for a symbol in all the module<br>
+</div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>extern </code><code>edll_ptr *</code><code>edll_sym(edll_module
+*module, const char *name);</code><code><br>
+extern edll_ptr *</code><code>edll_msym(edll_module **module_ptr, const
+char *name);</code><code><br>
+</code></div>
+<h4>PARAMETERS</h4>
+<div style="margin-left: 40px;">
+<h4><code></code></h4>
+name &#8212; the name of the symbol to search<span style="font-weight: bold;"></span><br>
+module &#8212; the module where the symbol is searched (dependency modules
+can't be reached from this variable); if NULL, search all the modules<br>
+module_ptr &#8212; a pointer to a module pointer; if NULL, does not return
+the pointer to the module found and search all the modules
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">
+The <span style="font-weight: bold;">edll</span> library loads all the
+modules in a list which is globally managed. When you need to find a
+symbol you can either specify the module in which you want to search or
+use NULL as the module pointer (i.e. search in all modules).<br>
+<br>
+Note that <span style="font-weight: bold;">edll</span> keeps a single
+list with all the symbols. This means is does a single binary search
+to find the symbol (the symbols are kept in alphabetical order.) Also,
+since we have that unique list, even when you request a search in a
+single module, it will still take the same amount of time to find the
+symbol (it can actually be slightly slower to search a single module.)<br>
+<br>
+The <span style="font-weight: bold;">edll_sym()</span> function
+searches for the specified symbol in the list of symbols of the
+specified module. Note that if the module is a DLL, the names are not
+currently being cached by the <span style="font-weight: bold;">edll</span>.<br>
+<br>
+The <span style="font-weight: bold;">edll_msym()</span> function (it
+could have been called: <span style="font-weight: bold;">edll_module_sym()</span>)
+uses a pointer to a module which is filled by the lower level search
+function. It specifies in which module the symbol can be found.<br>
+<br>
+Note that both functions can be used with the module pointer set to
+zero (0 or NULL). In that case, it will return a pointer to the symbol
+that it finds searching all the DLLs and plug-ins already loaded by
+the application.<br>
+</div>
+<h4>RETURN VALUE</h4>
+<div style="margin-left: 40px;">Both functions will return a NULL
+pointer
+when an error occurs (usually, symbol not found.)<br>
+</div>
+<h4>BUGS</h4>
+<div style="margin-left: 40px;">Symbols should be unique among all the
+modules compositing one application. The
+<span style="font-weight: bold;">edll</span> won't fail loading such
+applications, however, there is no guarantee that the same symbol will
+be returned by the <span style="font-weight: bold;">edll_sym()</span>
+and <span style="font-weight: bold;">edll_msym()</span> functions
+unless you force which module needs to be searched.<br>
+<br>
+There is a potential bug with symbols: their value can change without
+your knowledge. [if I think about it later, I will elaborate about
+this one...]<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_open">edll_open</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_error">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_seterror &#8212; set the current
+<span style="font-weight: bold;">edll</span> error<br>
+edll_geterror &#8212; get the current
+<span style="font-weight: bold;">edll</span> error<br>
+edll_strerror &#8212; get a string for the current
+<span style="font-weight: bold;">edll</span> error </div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>extern </code><code>edll_ptr *</code><code>edll_seterror(edll_errno_t
+err);</code><code><br>
+extern edll_errno_t *</code><code>edll_geterror(void);<br>
+extern const char *edll_strerror(void);<br>
+</code><code></code></div>
+<h4>PARAMETERS</h4>
+<div style="margin-left: 40px;">
+<h4><code></code></h4>
+err &#8212; a valid <span style="font-weight: bold;">edll</span> error
+number
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">
+The <span style="font-weight: bold;">edll</span> library maintains its
+own private error number variable.<br>
+<br>
+The error number can be set with <span style="font-weight: bold;">edll_seterror()</span>
+and checked out by the <span style="font-weight: bold;">edll_geterror()</span>.<br>
+<br>
+A string corresponding to the error number can also be queried for.
+This is done using the <span style="font-weight: bold;">edll_strerror()</span>
+function.<br>
+<br>
+In multi-thread application you need to specify a function to set
+errors and one to get errors (see <a href="#edll_register">edll_mutex_register()</a>
+for more information about how to define these functions.) You can
+either act immediately on errors when your set function is called, or
+save the error in a thread specific array of some sort. If you act
+immediately, you will certainly not need to have a get function.
+Otherwise, the get function needs to retrieve the error specific to the
+running thread.<br>
+</div>
+<h4>RETURN VALUE</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">edll_seterror()</span>
+function doesn't return anything.<br>
+The <span style="font-weight: bold;">edll_geterror()</span> function
+returns the current error number<br>
+The <span style="font-weight: bold;">edll_strerror()</span> function
+returns a static const string from<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_errno_t">edll_errno_t</a>,
+<a href="#edll_register">edll_mutex_register()</a>, <a
+ href="#edll_mutex_lock">edll_mutex_seterror</a>, <a
+ href="#edll_mutex_lock">edll_mutex_geterror</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_searchpath">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_setunixsearchpath &#8212; set a Unix
+like set of paths to use to find the specified modules<br>
+edll_setsearchpath &#8212; set a MS-Windows set of paths to use to find the
+specified modules<br>
+edll_getsearchpath &#8212; get a copy of the current search path </div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>extern int</code><code> </code><code>edll_setunixsearchpath(const
+char *unix_paths);</code><code><br>
+extern int </code><code>edll_setsearchpath(const char *paths);<br>
+extern char *edll_getsearchpath(void);<br>
+</code><code>
+</code></div>
+<h4>PARAMETERS</h4>
+<div style="margin-left: 40px;">
+<h4><code></code></h4>
+unix_paths &#8212; a list of paths separated by colons (:)<br>
+paths &#8212;<span style="font-weight: bold;"></span> a list of paths
+separated by semi-colons (;)<br>
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">
+The <span style="font-weight: bold;">edll</span> library accepts a
+search path that will be used to search for modules.<br>
+<br>
+By default the <span style="font-weight: bold;">edll</span> determine
+the search path as the current environment variable %PATH% with "."
+prepended as in:".;%PATH%".<br>
+</div>
+<h4>RETURN VALUE</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">edll_setunixpath()</span>
+function returns 0 on success<br>
+The <span style="font-weight: bold;">edll_setpath()</span> function
+returns 0 on success<br>
+The <span style="font-weight: bold;">edll_getsearchpath()</span>
+function returns a string pointer that you will need to free
+(<a href="#edll_alloc">edll_free</a>) once you're done<br>
+</div>
+<h4>BUGS</h4>
+<div style="margin-left: 40px;">The search path is unique on a per
+process basis. This means in a multi-threads environment changing it
+in one thread, changes it for all threads. It is strongly adviced that
+you set it once at the start and do not change it.<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_register">edll_mutex_register</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_set_self_version">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_set_self_version &#8212; set the
+version of the application (.exe file)</div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>extern void
+edll_set_self_version(const char *version);</code></div>
+<h4>PARAMETERS</h4>
+<div style="margin-left: 40px;">
+<h4><code></code></h4>
+version &#8212; the application version (i.e. "1.0", "0.3.1c", etc.)<br>
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">
+The <span style="font-weight: bold;">edll</span> library is now
+capable
+of retrieving a version in a module by reading the section named <span
+ style="font-weight: bold;">.version</span>.<br>
+<br>
+Because by default the <span style="font-weight: bold;">.version</span>
+section cannot be kept in the .exe file (i.e. the linker drops it,)
+<span style="font-weight: bold;">edll</span> has a function for your
+application version to be given to the lower level functions. Another
+solution is to patch the linker script (see the dev/version.patch file.)<br>
+<br>
+The version of the application is later checked against the version
+of any loaded modules. This is done with strcmp() by default. If you
+want, you can specify a callback so as to be able to write your
+own comparison function. See the
+<a href="#edll_callback_register">edll_callback_register</a> function
+to know how to register your version function and
+<a href="#edll_check_version">edll_check_version</a> typedef describes
+what your function declaration is expected to look like.
+</div>
+<h4>BUGS</h4>
+<div style="margin-left: 40px;">You MUST define the version of the
+application before you call any of the
+<span style="font-weight: bold;">edll</span> functions. It is a bug
+not to do so. At this time the library doesn't enforce it though.<br>
+<br>
+</div>
+<div style="margin-left: 40px;">The version defined on the very first
+call is the only one kept (also assuming no module was loaded before
+this call.)<br>
+<br>
+</div>
+<div style="margin-left: 40px;">The linker loses sections it does not
+know about when creating a .exe file. This is certainly the normal
+behavior for the linker. To circumvent that problem with the <span
+ style="font-weight: bold;">.version</span> section, you can apply the
+dev/version.patch to your ldscripts/i386pe.x file. You may want to edit
+the patch or your script file and do the pacthing by hand if you do not
+have the same version of ld.<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_callback_register">edll_callback_register</a>,
+<a href="#edll_check_version">edll_check_version</a>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_module_version">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_module_version &#8212; returns the
+version string of the specified module</div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>extern const char
+*edll_module_version(edll_module *module);
+</code></div>
+<h4>PARAMETERS</h4>
+<div style="margin-left: 40px;">
+<h4><code></code></h4>
+module &#8212; the module you want the version from or NULL for the self
+module version<br>
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">
+The <span style="font-weight: bold;">edll</span> library recognizes
+a section named <span style="font-weight: bold;">.version</span> which
+includes a null terminated version
+string.<br>
+<br>
+The library will automatically compare each module version against
+the version of the application. Once a module was loaded, you can
+further check the version string of a module by calling this
+function.<br>
+<br>
+Note that you get in return the actual string saved in the module.
+Do not change nor free that pointer. It will crash your application.<br>
+<br>
+Passing NULL as the module pointer returns the application version
+(also called self module.)<br>
+</div>
+<h4>RETURN VALUE</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">edll_module_version()</span>
+function returns 0 if the module has no version, a constant nul
+terminated
+C string otherwise<br>
+</div>
+<h4>BUGS</h4>
+<div style="margin-left: 40px;">The version of the application will not
+be loaded until you load that module or some other module. Querying for
+that version will return a NULL pointer until that happens. This may
+get fixed in later versions.<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;">
+<a href="#edll_set_self_version">edll_set_self_version</a>,
+<a href="#edll_check_version">edll_check_version</a>,
+<a href="#edll_callback_register">edll_callback_register</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="edll_register">LIBRARY</a></h4>
+<div style="margin-left: 40px;">edll<br>
+</div>
+<h4>NAME</h4>
+<div style="margin-left: 40px;">edll_mutex_register &#8212; register mutex
+information for multi-thread usage </div>
+<h4>SYNOPSIS</h4>
+<div style="margin-left: 40px;"><code>extern int</code><code> </code><code>edll_mutex_register(edll_mutex_lock
+lock_func,<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; edll_mutex_unlock unlock_func,</code><code><br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; edll_mutex_seterror seterror_func,</code><code><br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; edll_mutex_geterror geterror_func,</code><code><br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; edll_ptr userdata);</code><code><br>
+</code><code>
+</code></div>
+<h4>PARAMETERS</h4>
+<div style="margin-left: 40px;">
+<h4><code></code></h4>
+lock_func &#8212; the function to call to lock resources<br>
+unlock_func &#8212; the function to release resources<br>
+seterror_func &#8212; the function to set thread specific errors<br>
+geterror_func &#8212; the function to get thread specific errors<br>
+userdata &#8212; a pointer to some user data<br>
+</div>
+<h4>DESCRIPTION</h4>
+<div style="margin-left: 40px;">
+The <span style="font-weight: bold;">edll</span> library can be used
+in a multi-thread environment. For that, you need to setup a lock and
+an unlock function.<br>
+<br>
+The library doesn't itself try to lock/unlock anything (thus we avoid
+dependencies to any threading system).<br>
+<br>
+The error handling was added also to make sure that the library doesn't
+have any dependency on any threading system. It makes you responsible
+to save error numbers and to be capable of retrieving them later.<br>
+<br>
+Any of these functions should be setup once by one thread before
+any others access the library and then it should never be changed.<br>
+<br>
+It is legal to set any of these functions to NULL.<br>
+</div>
+<h4>RETURN VALUE</h4>
+<div style="margin-left: 40px;">The <span style="font-weight: bold;">edll_mutex_register()</span>
+function returns 0 on success<br>
+</div>
+<h4>BUGS</h4>
+<div style="margin-left: 40px;">Changing the function pointers while
+another thread is using the library can cause crashes and deadlocks.<br>
+</div>
+<h4>SEE ALSO</h4>
+<div style="margin-left: 40px;"><a href="#edll_mutex_lock"><span
+ style="text-decoration: underline;">edll_mutex_lock</span></a>, <a
+ href="#edll_mutex_lock">edll_mutex_unlock</a>, <a href="#edll_error">edll_seterror</a>,
+<a href="#edll_error">edll_geterror</a><br>
+</div>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="undefined_symbols"></a>Undefined Symbols and Unresolved
+Symbols<br>
+</h4>
+The edll does link your plug-ins at runtime. This means you may get
+errors of symbols that it can't define. This will especially happens
+when you run a C program and try to load C++ plug-ins because C++ needs
+a wealth of symbols and these symbols are not all too clearly named.<br>
+<br>
+The following table is an attempt to define different symbols you most
+certainly will have problems with at some point. Note that you can use
+the list.sh script (under the dev sub-directory) to generate a list of
+all the symbols in all the libraries available on your platform.<br>
+<br>
+<table style="text-align: left;" border="3" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td
+ style="vertical-align: top; background-color: rgb(221, 255, 255); text-align: center;">Symbol&nbsp;Name<br>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(221, 255, 255); text-align: center;">Purpose<br>
+      </td>
+      <td
+ style="vertical-align: top; background-color: rgb(221, 255, 255); text-align: center;">Comment<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">__imp__&lt;name&gt;<br>
+      </td>
+      <td style="vertical-align: top;">compiler introducer<br>
+      </td>
+      <td style="vertical-align: top;">For some reason, gcc/g++ will
+add __imp__ in front of some symbols. The library is supposed to
+search for these and report them as equal to symbols without the
+__imp__ introducer. I searched the linker and I could not find anything
+like this, so I do not have any real ground to believe that this is
+correct other than the fact that it actually works. If you see a
+symbol starting with __imp__... failing, then it can come from a
+mistake in the comparison with that symbol and some system
+symbol.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">__CRT_MT<br>
+      </td>
+      <td style="vertical-align: top;">Multi-thread availability<br>
+      </td>
+      <td style="vertical-align: top;">This is a flag which tells the
+pthread library whether the process was linked with the proper support
+or not (i.e. the pthread library will leak without the proper support).
+This is part of the mtcrt.o file.<br>
+      </td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top;">_Znaj, _Zdaj<br>
+      </td>
+      <td style="vertical-align: top;">New and delete array<br>
+      </td>
+      <td style="vertical-align: top;">These are the new and delete
+operators used with the square brackets:<br>
+      <div style="margin-left: 40px;">array = new int[256];<br>
+      </div>
+This is part of the stdlibc++.a file.<br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<hr style="width: 100%; height: 2px;">
+<h4><a name="known_bugs"></a>Known Bugs &amp; Limitations<br>
+</h4>
+The following list shows you what I know can cause problems with
+the <b>edll</b> library.<br>
+<ul>
+  <li>All the plugin filenames need to be defined in ASCII (character
+32 to 127, not all characters are allowed though)</li>
+  <li>All the files need to be compiled with the same version of gcc or
+g++ (otherwise the resolution may break)<br>
+  </li>
+  <li>The filename may be limited to MAX_PATH (usually around 240
+characters)</li>
+  <li>The automatic versioning feature is not yet functional because
+the linker
+clears out the .version section.<br>
+  </li>
+  <li>The main application cannot have its symbols stripped if it is
+to use multi-threading. This is because each module needs to link back
+to some thread variables which will only be available in your main
+application. Of course, it also cannot be stripped if you want your
+plugins to be able to link back to some of your application functions.</li>
+  <li>Linking COMMON sections and running with <span
+ style="font-weight: bold;">edll</span> is not equivalent. The COMMON
+sections of multiple object files will be merged by the linker. It will
+keep the largest of each symbol. For instance, if you create a table (<code>char
+tbl[100]</code>) in file a.c and a table with the same name in file b.c
+(<code>char tbl[200]</code>) but larger, then the linker will create
+one table in ab.o when you link both files together which has the
+largest size (200 char's in our example). If you use <span
+ style="font-weight: bold;">edll</span> to first load a.o and then b.o,
+when loading b.o <span style="font-weight: bold;">edll</span> will not
+look at the symbols of a.o to know how to resolve <code>tbl</code> and
+thus you will have two tables one of 200 bytes in b.o and one of 100
+bytes in a.o (see the edll-two-bss test). Not only that,
+it also will not share the same memory location. It seems to me that
+for a plugin, this is the correct behavior.</li>
+  <li>strip cannot be used on any of your executable files. Later, I
+will provide a modified version of strip (edll-strip) which will be
+gentle to our sections.<br>
+  </li>
+  <li>If you load the msvcr70.dll in your plugin, the stdout, stdin and
+stderr streams are re-initialized (it seems to me). This means printf()'s
+will not be synchronized between your main application and you plugins. Fun!<br>
+  </li>
+</ul>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<hr style="width: 100%; height: 2px;">
+<div style="text-align: right;">This file was last modified on @date@<br>
+Copyright (c) 2005-2006&nbsp; <a
+ href="mailto:alexis_wilke@users.sourceforge.net">Alexis Wilke</a><br>
+</div>
+</body>
+</html>

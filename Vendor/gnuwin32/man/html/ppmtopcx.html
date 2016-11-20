@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Ppmtopcx User Manual</TITLE></HEAD>
+<BODY>
+<H1>ppmtopcx</H1>
+Updated: 27 March 2004
+<BR>
+<A HREF="ppmtopcx.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+ppmtopcx - convert a PPM image to a PCX file
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>ppmtopcx</B>
+
+[<B>-24bit</B>]
+
+[<B>-8bit</B>]
+
+[<B>-packed</B>]
+
+[<B>-stdpalette</b>]
+
+[<B>-palette=</b><i>palettefile</i>]
+
+[<B>-planes=</b><i>planes</i>]
+
+[<B>-xpos=</B><I>cols</I>]
+
+[<B>-ypos=</B><I>rows</I>]
+
+[<I>ppmfile</I>]
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>ppmtopcx</b> reads a PPM image as input and produces a PCX file
+as output.  The type of the PCX file depends on the number of colors
+in the pixmap:
+
+<DL COMPACT>
+<DT>16 colors or fewer:
+
+<DD>1 bit/pixel, 1-4 planes.
+
+<DT>more than 16 colors, but no more than 256:
+
+<DD>8 bits/pixel, 1 plane, colormap at the end of the file.
+
+<DT>More than 256 colors:
+
+<DD>24bit truecolor file (8 bits/pixel, 3 planes).
+
+</DL>
+
+<p>You can override some of that and explicitly choose the format with
+the options below.
+
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-24bit</B>
+
+<DD>Produce a 24bit truecolor PCX file, even if the image has 256
+colors or fewer.
+
+<DT><B>-8bit</B>
+
+<DD>Produce an 8bit (256 colors) PCX file, even if the image has 16
+colors or fewer.
+
+<p>This option was added in Netpbm 10.18 (August 2003).
+
+<DT><B>-packed</B>
+
+<DD>Use &quot;packed pixel&quot; format for files with 16 colors or
+fewer: 1, 2, or 4 bits/pixel, 1 plane.
+
+<DT><B>-stdpalette</B>
+
+<DD>Instead of computing a palette from the colors in the image, use
+a standard, built-in 16 color palette.  If the image contains a color
+that is not in the standard palette, <b>ppmtopcx</b> fails.
+
+<p>The standard palette is not only a set of colors, but a specific
+mapping of palette indexes to colors.  E.g. red is 4.
+
+<p>You can use <b>pnmremap</b> with a suitable PPM image of the standard
+palette to adapt your image to use exactly those colors in the palette
+so that <b>ppmtopcx -stdpalette</b> will work on it.
+
+<p>The file <b>pcxstd.ppm</b>, part of Netpbm, contains the standard
+palette.
+
+<p>Although the PCX header tells exactly what palette is used in the
+file, some older PCX interpreters do not use that information.  They
+instead assume the standard palette.  If you don't use the
+<b>-stdpalette</b> option, <b>ppmtopcx</b>, <b>ppmtopcx</b> may create
+an image that uses a different palette (a rearrangement of the same
+colors) and then one of these older interpreters would interpret the
+colors in the image wrong.
+
+<p>You cannot specify this option along with <b>-palette</b>.
+
+<p>This option was new in Netpbm 10.22 (April 2004).
+
+<dt><b>-palette=</b><i>palettefile</i>
+
+<dd>Instead of computing the palette from the colors in the image, use
+the palette from the file <i>palettefile</i>.  If the palette contains
+a color that is not in that palette, <b>ppmtopcx</b> fails.
+
+<p>The palette file must be a PPM image that contains one pixel for
+each color in the palette.  It doesn't matter what the aspect ratio
+of the palette image is.  The order of the colors in the PCX palette
+is the order of the pixels in the PPM image in standard western
+reading order (left to right, top to bottom).  If there is a duplicate
+color in the palette, <b>ppmtopcx</b> chooses between them arbitrarily
+in building the PCX raster.
+
+<p>You would need this only if you have a PCX reader that can't read
+the palette that is in the PCX file and instead assumes some particular
+palette.  See also the <b>-stdpalette</b> option.
+
+<p>If your input image might contain colors other than those in your
+palette, you can convert the input image to one that contains only
+those colors in your palette with <b>pnmremap</b>.
+
+<p>You cannot specify this along with <b>-stdpalette</b>.
+
+<p>This option was new in Netpbhm 10.25 (October 2004).
+
+<DT><B>-planes=</b><i>planes</i>
+
+<DD>Generate a PCX file with <i>planes</i> planes, even though the number
+of colors in the image could be represented in fewer.  This makes the file
+larger, but some PCX interpreters are capable of processing only certain
+numbers of planes.
+
+<p>This is meaningful only when <b>ppmtopcx</B> generates an image in
+the 16 color palette format without packed pixels.  Consequently, you
+cannot specify this option together with <b>-24bit</b> or
+<b>-8bit</b> or <b>-packed</b>.
+
+<p>The valid values for <i>planes</i> are 1, 2, 3, and 4.  By default,
+<b>ppmtopcx</b> chooses the smallest number of planes that can represent
+the colors in the image.  E.g. if there are 5 colors, <b>ppmtopcx</b> 
+chooses 3 planes.
+
+<p>This option was new in Netpbm 10.21 (March 2004).
+     
+<DT><B>-xpos=</B><I>cols</I>
+
+<DT><B>-ypos=</B><I>rows</I>
+
+<DD> These options set the position of the image in some field
+(e.g. on a screen) in columns to the right of the left edge and rows
+below the top edge.  The PCX format contains image position
+information.  Don't confuse this with the position of an area of
+interest within the image.  For example, using <B>pnmpad</B> to add a
+10 pixel left border to an image and then converting that image to PCX
+with xpos = 0 is not the same as converting the original image to PCX
+and setting xpos = 10.
+
+<P>The values may be from -32767 to 32768.
+
+<P>The default for each is zero.
+
+</DL>
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pcxtoppm.html">pcxtoppm</A></B>,
+<B><A HREF="ppm.html">ppm</A></B>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>AUTHORS</H2>
+
+Copyright (C) 1994 by Ingo Wilken (<A
+HREF="mailto:Ingo.Wilken@informatik.uni-oldenburg.de">Ingo.Wilken@informatik.uni-oldenburg.de</A>)
+
+<p>Based on previous work by Michael Davidson.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="ppmtopcx.html#lbAB">NAME</A>
+<LI><A HREF="ppmtopcx.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="ppmtopcx.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="ppmtopcx.html#lbAE">OPTIONS</A>
+<LI><A HREF="ppmtopcx.html#lbAF">SEE ALSO</A>
+<LI><A HREF="ppmtopcx.html#lbAG">AUTHORS</A>
+</UL>
+</BODY>
+</HTML>

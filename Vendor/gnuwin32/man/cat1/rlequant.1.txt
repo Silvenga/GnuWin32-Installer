@@ -1,0 +1,149 @@
+RLEQUANT(1)                                         RLEQUANT(1)
+
+
+
+
+
+NAME
+       rlequant  -  variance  based  color quantization for RLE
+       images
+
+SYNOPSIS
+       rlequant [ -b bits ] [ -c ] [ -d ] [ -f ] [ -i  cubeside
+              ]  [  -m ] [ -n colors ] [ -r mapfile ] [ -o out-
+              file ] [ infile ]
+
+DESCRIPTION
+       This program quantizes the colors in an RLE image  using
+       a  variance-based  method.   See  colorquant(3) for more
+       details on the method.
+
+       -b bits
+              The colors in the input image will  be  "prequan-
+              tized"  to  this  many  bits  before applying the
+              variance-based method.  Two  internal  tables  of
+              size  2^(3*bits) are allocated, so values of bits
+              greater than 6 are likely to cause  thrashing  or
+              may prevent the program from running at all.  The
+              default value of bits is 5.  It must be less than
+              or equal to 8 and greater than 0.
+
+       -c     Only the color map will be output; the image will
+              not be digitized.  The output file will be a  0x0
+              RLE  file with a color map, suitable for input to
+              rleldmap(1), rledither(1), or rlequant -r.
+
+       -d     Floyd Steinberg dithering  is  performed  on  the
+              output.   This  is  very helpful for images being
+              quantized to a small number of colors.
+
+       -f     If this option is specified, a faster  approxima-
+              tion  will  be used.  In most cases, the error so
+              introduced will be barely noticeable.
+
+       -i cubeside
+              Initializes the output color map  with  a  "color
+              cube"  of  size  cubeside^3.   I.e., if -i 2 were
+              specified,  the  8  corners  of  the  color  cube
+              (black,  red, green, blue, yellow, cyan, magenta,
+              white) would be added  to  the  output  colormap.
+              This  reduces  the number of colors available for
+              quantization.  The color cube  will  be  used  to
+              quantize the output image, but will not otherwise
+              affect the choice of representative colors.
+
+       -m     Computes a single color map suitable for quantiz-
+              ing  all  the  input images.  This is useful when
+              the quantized images will be used  as  a  "movie"
+              (e.g., with the -m flag of getx11(1)).  The input
+              may not come from a  pipe  when  this  option  is
+              specified, unless -c is also specified.
+
+       -n colors
+              The  output  image  will  be quantized to at most
+              colors colors.  It might have fewer if the  input
+              image  has only a few colors itself.  The default
+              value of colors is 256 -  cubesize^3  -  mapsize.
+              It must be less than or equal to 256.  If a color
+              cube (-c) or an input map (-r) is  given,  colors
+              may be 0; otherwise it must be greater than 0.
+
+       -r mapfile
+              The  color  map from the RLE file mapfile will be
+              added to the output color  map.   The  number  of
+              colors  in the input color map, mapsize is calcu-
+              lated as follows: If a  color_map_length  comment
+              is  present  in  mapfile,  its value is used.  If
+              not, the size of the color map (usually  256)  is
+              used  (the  rlehdr(1)  program  will  display the
+              color map size and the comment, if present).  The
+              input color map will be used to quantize the out-
+              put image, but  will  not  otherwise  affect  the
+              choice of representative colors.  If the combina-
+              tion -n 0 -r mapfile is specified, then  rlequant
+              will just quantize (and dither, if requested) the
+              input images to the given colormap.  This is usu-
+              ally faster than using rledither.
+
+       -o outfile
+              The  output  will be written to the file outfile.
+              If not specified, or if outfile is "-", the  out-
+              put  will  be  written  to  the  standard  output
+              stream.
+
+       infile This file contains one or more  concatenated  RLE
+              images.  Each will be processed in turn.  A sepa-
+              rate quantization map  will  be  constructed  for
+              each  image.   If  not specified, or if infile is
+              "-", the image(s) will be read from the  standard
+              input stream.
+
+EXAMPLES
+       rlequant file.rle
+              Quantizes  file.rle  to  256 colors using a 5-bit
+              pre-quantization.   If  file.rle   has   multiple
+              images,  each  will  get its own (different) col-
+              ormap.
+
+       rlequant -m file.rle
+              Quantizes file.rle to 256 colors  using  a  5-bit
+              pre-quantization.    If   file.rle  has  multiple
+              images, they will all be used to choose the color
+              map,  and will all be quantized to the same color
+              map.
+
+       cat *.rle | rlequant -m -c >map.rle ;
+                   cat *.rle | rlequant -n 0 -r map.rle
+              Computes a  single  colormap  based  on  all  the
+              images  in  the  files *.rle, then quantizes each
+              image to that  color  map.   The  output  is  the
+              stream of quantized images.
+
+       rlequant -i 4 -d file.rle
+              Compute  192 representative colors for each image
+              in file.rle,  add  a  4x4x4  color  cube  to  the
+              resulting  color map, and then quantize the image
+              to the resulting set of colors with dithering.
+
+       rlequant -b 6 file.rle
+              Quantize file.rle to 256  colors  using  a  6-bit
+              prequantization.   This  provides  slightly  more
+              precision in color matching  than  does  a  5-bit
+              prequantization.    It  also  runs  significantly
+              slower and requires  approximately  8  times  the
+              memory for its intermediate storage.
+
+SEE ALSO
+       mcut(1), rledither(1), rlehdr(1), urt(1), colorquant(3),
+       RLE(5).
+
+AUTHOR
+       Spencer W. Thomas
+       Craig Kolb (Yale University) wrote the  color  quantiza-
+       tion code.
+       Rod Bogart wrote the dithering code.
+
+
+
+
+1                        June 12, 1990              RLEQUANT(1)

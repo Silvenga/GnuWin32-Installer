@@ -1,0 +1,540 @@
+# sheets.map - Guessing the type of a file             -*- Makefile -*-
+# This file is part of a2ps.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+# Style Sheet Files
+# =================
+#
+#    The style sheets are defined in various files.  See *note Pretty
+# Printing:: for the structure of these files.  As for most other
+# features, there is main file, a road map, which defines in which
+# condition a style sheet should be used (*note Map Files::).  This file
+# is `sheets.map'.
+#
+#    Its format is simple:
+#      STYLE-KEY: PATTERNS
+#    or
+#      include(FILE)
+#
+#    The PATTERNS need not be on separate lines.  There are two kinds of
+# patterns:
+#
+# /PATTERN/FLAGS
+#      if the current file name matches PATTERN, then select style
+#      STYLE-KEY (i.e. file `STYLE-KEY.ssh').
+#
+# <PATTERN>FLAGS
+#      if the result of a call to `file(1)' matches PATTERN, then select
+#      style STYLE-KEY.
+#
+#    Currently FLAGS can only be `i', standing for an insentive match.
+# Please note that the matching is not truly case insensitive: rather, a
+# lower case version of the string is compared to the PATTERN as is,
+# i.e., the PATTERN should itself be lower case.
+#    The special STYLE-KEY `binary' tells a2ps to consider that the file
+# should not be printed, and will be ignored, unless option
+# `--print-anyway' is given.
+#
+#    If a style name can't be found, the plain style is used.
+#
+#    The map file is read bottom up, so that the "last" match is honored.
+#
+#    Two things are to retain from this:
+#
+#   1. if the file is presented through `stdin', then a2ps will run
+#      `file(1)'.  However, unless you specify a fake file name with
+#      `--stdin', pattern matching upon the name is turn off.  In general
+#      you can expect correct delegations, but almost never pretty
+#      printing.
+#
+#   2. if `file' is wrong on some files, a2ps may use bad style sheets.
+#      In this case, do try option `--guess', compare it with the output
+#      of `file', and if the culprit is `file', go and complain to your
+#      system administrator :-), or fix it by defining your own filename
+#      pattern matching rules.
+#
+#    Consider the case of Texinfo files as an example (the language in
+# which this documentation is written).  Files are usually named
+# `foo.texi', `bar.txi', or even `baz.texinfo'.  `file(1)' is able to
+# recognize Texinfo files:
+#
+#      doc % file a2ps.texi
+#      a2ps.texi: Texinfo source text
+#
+#    Therefore the sheets.map would look like:
+#
+#      # Texinfo files
+#      texinfo:  /*.txi/  /*.texi/  /*.texinfo/
+# 		 <Texinfo source*>
+
+
+# Default language
+plain:	/*/
+
+# Some binary files we probably don't want to print
+binary:	/*.tar.*/
+	/*.tar/
+	/*.tgz/
+	/*.[ao]/
+	<ELF*>
+	<data>
+	<PA-RISC*>
+
+# Backup files
+binary:	/*~/
+	/*.bak/
+	/*.bk[0-9]/
+
+# SCCS files
+# FIXME: SCCS is dead, and I'm not sure what this rule meant anyway.
+# Also, the adverse effect is really bad...so I simply commented this out now.
+#binary:	/[sp].*/
+#	/*\/[sp].*/
+
+# Troff, Nroff, and Groff files
+# We put them at the top, because it is common to see file(1) say a file
+# is a roff file.  So let's first give a chance to the other rules.  Also,
+# compressed files should be check first so that /usr/man/man1/a2ps.1.gz
+# is correctly recognized as compressed.
+roff:	/man\/man*\/*/
+	/*\/man\/man*\/*/
+	<troff*>
+
+# Compressed files
+gzip:	/*.gz/
+	<gzip compressed*>
+bzip:	/*.bz/
+	<bzip compressed*>
+bzip2:	/*.bz2/
+	<bzip2 compressed*>
+compress:	/*.Z/
+		<compress*>
+
+# a2ps configuration files
+a2psrc:	/a2ps*.cfg/
+	/*\/a2ps*.cfg/
+	/.a2psrc/
+	/*\/.a2psrc/
+	/a2psrc/
+	/*\/a2psrc/
+
+# Makefile's
+make:	/*.mk/
+	/[Mm]akefile/	/*\/[Mm]akefile/
+	/[Mm]akefile.*/	/*\/[Mm]akefile.*/
+
+# GNUMakefiles
+gmake:	/GNUmakefile/	/*\/GNUmakefile/
+
+# Don't let file try to guess something else than `plain'
+# (Some file(1) can easily reply `data' on such files).
+plain:	/*.doc/
+	/*.txt/
+
+# Ada files
+ada:	/*.ad[abs]/
+
+# ASN.1 files
+asn1:	/*.asn1/
+
+# Autoconf files
+autoconf: /configure.in/ /*\/configure.in/
+	/ac*.m4/  /*\/ac*.m4/
+
+# AWK scripts
+awk:	<*awk*>
+	/*.awk/
+	/*.nawk/
+
+# B files
+b:	/*.mch/
+
+# BC files
+bc:	/*.b/
+
+# C files
+c:	/*.[chi]/
+	/*._c/
+	/*.h.in/
+
+# C++ files
+# Some people use C and H, but it is much more useful not to consider
+# the case, so we just can't here.
+cxx:	/*.cc/
+	/*.hh/
+	/*.[ch]++/
+	/*.[ch]pp/
+	/*.[ch]xx/
+	/*.pdb/
+
+# C# files
+csharp:	/*.cs/
+
+# SpecC
+specc:	/*.sc/
+	/*.sh/
+
+# OCaml files
+ocaml:	/*.ml/
+	/*.ml[il]/
+
+# ChangeLog files
+chlog:	/ChangeLog*/	/*\/ChangeLog*/
+
+# CORBA IDL
+cidl:	/*.idl/
+
+# claire files
+claire:	/*.cl/
+
+# common-lisp files
+clisp:	/*.l/
+	/*.lisp/
+	/*.lsp/
+	/*.clisp/
+
+
+# Small files
+small: /*.sma/
+
+# coq-vernacular files
+coqv:	/*.coq/
+
+# DVI files
+# a2ps is not supposed to print them, but it proves useful
+# to define them for the delegations
+dvi:	/*.dvi/i
+	<TeX DVI file>
+
+# eiffel files
+eiffel:	/*.e/
+
+# Emacs lisp files
+elisp:	/*.el/
+
+# Encapsulated PostScript files
+eps:	/*.eps/i
+	/*.eps[fi]/i
+	/*.pstex/i
+
+# Fortran files
+# By default a2ps chooses the style sheet `fortran' which tries to
+# support both fixed and free forms of comments.  Nevertheless, this
+# cannot match all your needs, so you may want to specify other rules
+# that map to
+# - for77-fixed, Fortran 77 Fixed form
+# - for77-free, Fortran 77 Free form
+# - for90-fixed, Fortran 90/95 Fixed form
+# - for90-free, Fortran 90/95 Free form
+fortran:
+	/*.f9[50]/i
+	/*.f77/i
+	/*.f/i
+	/*.for/i
+
+# GIF Images
+gif:	/*.gif/i
+	<GIF image*>
+
+# Haskell programs
+haskell:
+	/*.hs/
+	<*/runhugs>
+
+# HTML documents
+html:	<HTML*>
+	/*.html/i
+	/*.htm/i
+	/*.cgi/
+
+# initora files
+initora:	/init.ora/
+	/*\/init.ora/
+
+# Java files
+java:	/*.java/
+
+# JavaScripts
+js:	/*.js/
+
+# JPEG images
+jpeg:	/*.jpg/i  /*.jpeg/i
+	<JPEG*>
+
+# Lace files
+lace:	/*.ace/
+	/Ace.*/	/*\/Ace.*/
+
+# (F)Lex files
+lex:	/*.l/
+	/*.lex/
+
+# 68000 files
+68000:	/*.68000/
+	/*.[sS]/
+
+# NASM files
+nasm:	/*.asm/
+
+# mailfolder files
+mail:	/*.news/  /*.mail/
+	<mail *> <news *> <RFC 822 mail text> <Emacs RMAIL text>
+        # Tmp files from elm.
+	/\/tmp\/snd.*/ 	/\/tmp\/print.*/
+
+# ASN.1 mib files
+mib:	/*.mib/
+
+# OCaml Yacc
+mly:	/*.mly/
+
+# modula-2 files (mocka and default extensions)
+modula2:
+	/*.m[di]/
+	/*.def/
+	/*.mod/
+
+# modula-3 files
+modula3:
+	/*.[im]3/
+
+# Matlab file
+matlab:	/*.m/
+
+# o2c files
+o2c:	/*.o2/
+	/*.o2c/
+
+# oberon files
+oberon:	/*.oberon/
+
+# octave files
+octave:	/*.octavescript/
+
+# oracle files
+oracle:	/*.ora/
+
+# Pascal files
+pascal:	/*.pas/
+	/*.p/
+
+# PDF documents
+pdf:	/*.pdf/i
+	<PDF document*>
+
+# Perl files
+perl:	/*.p[ml]/
+	<*perl*>
+
+# PHP files
+php:	/*.php/
+
+# plsql files
+plsql:	/*.pk[sb]/
+	/*.pls/
+
+# PNG files
+png:	/*.png/i
+	<PNG image*>
+
+# Portable Object (Gettext)
+po:	/*.po/
+
+# Pov-Ray
+pov:	/*.pov/
+
+# PostScript Printer Description files
+ppd:	/*.ppd/i
+
+# PostScript files
+ps:	/*.ps/i
+	/*.prn/i
+	<[pP]ost[Ss]cript*>
+
+# PreScript files
+pre:	/*.prescript/
+	/*.biftex/
+	/*.bif/
+	/*.pre/
+	/*.ptf/
+
+# prolog files
+prolog:	/*.plg/
+	/*.pro/
+
+# Promela files
+promela:
+	/*.pml/
+
+# python files
+python:	<*/python>
+	<*python script*>
+	/*.py/
+
+# GNU R files, as well as S language files
+s:     /*.[RSrsq]/
+
+# GNU R documentation files
+rd:    /*.[Rr]d/
+
+# Ruby files
+ruby:	/*.rb/
+
+# GNU R (and S language) transscript files
+st:    /*.St/
+        /*.Rout/
+
+# REXX command files
+rexx:	/*.cmd/i
+
+# sather files
+sather:	/*.sa/
+
+# scheme files
+scheme:	/*.scm/
+
+# SDL-88 files
+sdl88:	/*.pr/
+	/*.sdl/
+
+# Sed scripts
+# Be very careful not to introduce <*sed*>, which would match `compressed'
+# too!
+sed:	/*.sed/
+	<*/sed*>
+
+# a2ps' style sheet files
+ssh:	/*.ssh/
+
+# sh files
+sh:	<*/sh*>
+	<*[Ss]hell*>
+
+# Ash files
+sh:	<Neil Brown*>
+
+# Bash files
+sh:	<Bourne-Again*>
+	<*bash*>
+
+# Csh files
+csh:	/.csh*/
+	/*\/.csh*/
+	<C [Ss]hell*>
+	<c-shell*>
+	<*csh*>
+
+# Ksh
+sh:	<Korn *>
+	<*ksh*>
+
+# Tcsh
+tcsh:	/.tcsh*/
+	/*\/.tcsh*/
+	<Tenex C shell*>
+	<*tcsh*>
+
+# Zsh files
+zsh:	<*zsh*>
+	<Paul Falstad*>
+	/.zsh*/
+	/*\/.zsh*/
+
+# Standard ML
+sml:	/*.sml/
+	/*.sig/
+	/*.fun/
+
+# sql files
+sql:	/*.sql/
+
+# sql92 files
+sql92:	/*.sql92/
+
+# Synopsis scripts
+synopsis:
+	/*.scr/
+	/*.wscr/
+	/*.con/
+	/.synopsys_dc.setup/
+	/*\/.synopsys_dc.setup/
+
+# (La)TeX files
+tex:	/*.[dl]tx/
+	/*.cl[os]/
+	/*.sty/
+	/*.tex/
+	/*.pstex_t/
+	<TeX document *>
+	<LaTeX *>
+
+# Texinfo files
+texinfo:	/*.txi/		/*.texi/	/*.texinfo/
+	<Texinfo source*>
+
+# tcl files
+tcl:	/*.tcl/
+	/*.tclscript/
+
+# Extended Tcl
+tclx:	/*.tclx/
+	<*tclx*>
+
+# Visual Tcl
+vtcl:	/*.vtcl/
+	<*vtcl*>
+
+# TIFF images
+tiff:	/.tif/i  /.tiff/i
+	<TIFF image*>
+
+# tk files
+tk:	/*.tk/
+	/*.wish/
+
+# Tiger
+tiger:	/*.tig/
+
+# Unity files
+unity:	/*.unity/
+
+# VERILOG files
+verilog:	/*.v/	/*.vh/
+
+# VHDL files
+vhdl:	/*.vhdl/i
+	/*.vhd/i
+
+# VRML files
+vrml:	/*.wrl/
+
+# XBM images
+xbm:	/*.xbm/i
+
+# XPM images
+xpm:	/*.xpm/i
+
+# Perl XS files
+xs:	/*.xs/
+
+# Yacc/Bison grammars
+yacc:	/*.y/
+	/*.yacc/
+
+# Stratego files
+stratego:	/*.r/

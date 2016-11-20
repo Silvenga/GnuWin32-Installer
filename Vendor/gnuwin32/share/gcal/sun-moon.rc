@@ -1,0 +1,138 @@
+; Sun and Moon rise/set/twilights for a GENERIC location, for Gcal-2.20 or newer
+;
+; $Id: sun-moon.rc 0.03 2000/06/30 00:00:03 tom Exp $
+;
+; Copyright (c) 2000   Thomas Esken      <esken@gmx.net>
+;                      Im Hagenfeld 84
+;                      D-48147 M"unster
+;                      GERMANY
+;
+; This software doesn't claim completeness, correctness or usability.
+; On principle I will not be liable for ANY damages or losses (implicit
+; or explicit), which result from using or handling my software.
+; If you use this software, you agree without any exception to this
+; agreement, which binds you LEGALLY !!
+;
+; This program is free software; you can redistribute it and/or modify
+; it under the terms of the `GNU General Public License' as published by
+; the `Free Software Foundation'; either version 2, or (at your option)
+; any later version.
+;
+; You should have received a copy of the `GNU General Public License'
+; along with this program; if not, write to the:
+;
+;   Free Software Foundation, Inc.
+;   59 Temple Place - Suite 330
+;   Boston, MA 02111-1307,  USA
+;
+;
+; Try `--precise' to display data and times more precise!
+; Try `--response-file=FILENAME' to save your command line settings to
+;   create a pool of response files of your preferred locations successively.
+;
+;
+; This file should either be used
+;
+;   A) with a Gcal location response file as it is created by the
+;      `[gcal-]ddiffdrv' script/batch file (see `misc/README', for
+;      further details) like:
+;
+;        gcal -f./sun-moon.rc @LOCATION-RESPONSE-FILE
+;
+; or
+;
+;   B) by directly passing the name and the co-ordinate with or without
+;      the altitude part of the location with the `--text-variable=ARG'
+;      option via the command line like:
+;
+;        gcal -f./sun-moon.rc --text-var='$l=DE-Münster:$c=+5158+00738'
+;
+;
+; The data and times are always calculated for GMT unless you specify
+; the timezone of the location explicitly by passing it via the Gcal
+; text variable $Z, e.g.:
+;
+;   --text-variable='$z=60'
+;
+; or
+;
+;   --text-variable='$z=+1\:'
+;
+; if the location's timezone is GMT-1 (CET respectively CEWT).
+;
+;
+; The data and times are always calculated for the sea-level altitude +0
+; unless you specify the altitude of the location either as part of the
+; co-ordinate of the location or explicitly by passing it via the Gcal
+; text variable $H, e.g.:
+;
+;   --text-variable='$h=+61'
+;
+; if the location's altitude is +61 meters above the sea-level (you have
+; to give the sign explicitly).
+;
+;
+; So the complete call for the (A) case would be:
+;
+;   gcal -f./sun-moon.rc @LOCATION-RESPONSE-FILE --text-var='$z=60:$h=+61'
+;
+; And the complete call for the (B) case would either be:
+;
+;   gcal -f./sun-moon.rc --text-var='$l=DE-Münster:$c=+5158+00738+61:$z=60'
+;
+; or
+;
+;   gcal -f./sun-moon.rc --text-var='$l=DE-Münster:$c=+5158+00738:$z=60:$h=+61'
+;
+;
+; *** If you modify this file you have to rename the modified version.
+; *** If you make any improvements I would like to hear from you.
+; *** But I do not promise any support.
+;
+;
+; Line templates
+;
+$p=0*d1#999
+;
+; Name of location, geographical co-ordinate, altitude and timezone
+; (have to be set to an ``EMPTY'' value here!)
+;
+$l=
+$c=
+$h=
+$z=
+$c=$c$h
+;
+$t=Sun: $c,$z/$l/%:02*.$z :%:02*/$z %"$z
+$m=Moon: $c,$z/$l/%:02*.$z :%:02*/$z %"$z
+;
+$x=$t ~\
+9 > %o9$c,$z    %u9$c,$z ~\
+8 > %o8$c,$z    %u8$c,$z ~\
+7 > %o7$c,$z    %u7$c,$z ~\
+6 > %o6$c,$z    %u6$c,$z ~\
+5 * %o5$c,$z    %u5$c,$z  %oL$c,$z ~\
+4 > %o4$c,$z    %u4$c,$z ~\
+x2> %oQ$c,$z    %uQ$c,$z ~\
+x1> %oR$c,$z    %uR$c,$z ~\
+1 = %o1$c,$z  %oJ$c,$z ~\
+x1< %sR$c,$z    %zR$c,$z ~\
+x2< %sQ$c,$z    %zQ$c,$z ~\
+4 < %s4$c,$z    %z4$c,$z ~\
+5 * %s5$c,$z    %z5$c,$z  %sL$c,$z ~\
+6 < %s6$c,$z    %z6$c,$z ~\
+7 < %s7$c,$z    %z7$c,$z ~\
+8 < %s8$c,$z    %z8$c,$z ~\
+9 < %s9$c,$z    %z9$c,$z ~\
+0 = %s0$c,$z  %sI$c,$z ~\
+$m ~\
+5 * %(5$c,$z    %[5$c,$z  %(Q$c,$z  %(*R$c,$z % ~\
+4 > %(4$c,$z    %[4$c,$z ~\
+1 = %)1$c,$z  %)N$c,$z  %)*O$c,$z % ~\
+4 < %)4$c,$z    %]4$c,$z ~\
+5 * %)5$c,$z    %]5$c,$z  %)Q$c,$z  %)*R$c,$z % ~\
+0 = %(0$c,$z  %(L$c,$z  %(*M$c,$z %
+;
+; And shoot!
+;
+$p $x

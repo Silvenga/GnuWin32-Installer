@@ -1,0 +1,475 @@
+#!/usr/bin/perl
+# Create a composite font program.
+# By J. Chroboczek <jec at dcs.ed.ac.uk>
+#
+# Copyright (c) 1996-1999 by J. Chroboczek
+# This code may be distributed under the terms of the 
+# GNU Public License, either version 3 of the license, or (at your
+# option) any later version.
+
+# Time-stamp: <99/05/14 02:37:45 jec>
+
+$PROGNAME='composeglyphs';
+$VERSION='v. 0.7.10 by J. Chroboczek';
+
+sub usage {
+  local($oldfh)=select(STDERR);
+  print <<"ALAMAKOTA";
+$PROGNAME $VERSION
+$PROGNAME -e<encoding.afm> -E<encoding.ps>
+$PROGNAME -i<input.afm> -o<output.ps> -c<composite.afm> -n<newname> 
+    -e<base_encoding.afm> -t<target_encoding.afm> -a<output.afm>
+    -C<output.afm.c>
+ALAMAKOTA
+  select($oldfh);
+}
+
+sub min {
+  local($x1,$x2) = @_;
+  if($x1<=$x2) {
+    return $x1;
+  } else {
+    return $x2;
+  }
+}
+    
+sub max {
+  local($x1,$x2) = @_;
+  if($x1>=$x2) {
+    return $x1;
+  } else {
+    return $x2;
+  }
+}
+    
+# A finite state automaton for parsing AFMs
+sub readAFM {
+  $fontName=('UnknownFont');
+  local($afmname,$dochars,$doencoding,$docomposites)=@_;
+  open(AFM,$afmname);
+
+  $_=<AFM>;
+
+  if (! (/^StartFontMetrics.*/)) 
+    { die "$afmname is not an Adobe Font Metrics file" ; }
+
+header: while (<AFM>) {
+    if (/^FontName *(.*)$/) { $fontName=$1 ; }
+    elsif (/^EncodingScheme *(.*)$/ && $doencoding) { 
+      if ($doencoding eq 'target') {
+        $encodingName=$1 ;
+      } else {
+        $baseEncodingName=$1;
+      }
+      
+    } elsif (/^FontBBox *(-?[0-9]*)  *(-?[0-9]*)  *(-?[0-9]*)  *(-?[0-9]*)/) {
+      @fontBBox=($1,$2,$3,$4); 
+    }
+    elsif (/^Start/) { reset ; last header ; }
+  }
+
+afmloop: while (TRUE) {
+ garbage: while (TRUE) {
+     if(/^Start([a-zA-Z0-9]*).*/) {
+       $where=$1;
+       last garbage;
+     }
+     elsif(/^EndFontMetrics.*/) { last afmloop; }
+     $_=<AFM>;
+   }
+
+    if ($where eq 'CharMetrics') {
+      while(<AFM>) {
+        if (/^EndCharMetrics.*/) { next afmloop ; }
+        $characterName='Unknown'; $characterCode=-1 ;
+        @_=split(/ *; */);
+        @bbox=();
+        while($_ = $_[0]) {
+          shift @_ ;
+          if(/^C  *(-?[0-9]*)/) { $characterCode=$1 ; }
+          elsif(/^CH  *([0-9a-fA-F]*)/) { $characterCode=hex($1) ; }
+          elsif(/^N  *([a-zA-Z0-9\.]*)/) { $characterName=$1 ; }
+          elsif(/^WX  *(-?[0-9\.]*)/) { $width=$1; }
+          elsif(/^B  *(-?[0-9]*)  *(-?[0-9]*)  *(-?[0-9]*)  *(-?[0-9]*)/) {
+            @bbox=($1,$2,$3,$4);
+          }
+        }
+        if($dochars && !defined($characters{$characterName})) {
+          $characters{$characterName}=$characterName;
+          $characterIndex[$#characterIndex+1]=$characterName;
+          $widths{$characterName}=$width;
+          if($#bbox eq 3) {
+            $BBox{$characterName}=$characterName;
+            $BBox{$characterName,0}=$bbox[0];
+            $BBox{$characterName,1}=$bbox[1];
+            $BBox{$characterName,2}=$bbox[2];
+            $BBox{$characterName,3}=$bbox[3];
+          }
+        }
+        if($doencoding && ($characterCode>=0) && ($characterCode<=255)) {
+          if($doencoding eq 'base') {
+            $decoding{$characterName}=$characterCode;
+            $baseEncoding[$characterCode]=$characterName;
+          } elsif($doencoding eq 'target') {
+            $encoding[$characterCode]=$characterName;
+          }
+        }
+      }
+    }
+
+    if ($where eq 'KernData') {
+      while(<AFM>) {
+        if (/^EndKernData/) { next afmloop ; }
+      }
+    }  
+  
+    if ($where eq 'Composites') {   
+     compositeloop: while(<AFM>) {
+        if (/^EndComposites/) { next afmloop ; }
+        if (!$docomposites) { next; }
+        $characterName='Unknown'; $components=0; $currentComponent=0 ;
+        @_=split(/\s*;\s*/);
+        while($#_ >= 0) {
+          $_=$_[0];
+          shift @_;
+          if(/^CC  *([a-zA-Z0-9\.]*)  *([0-9]*)/) { 
+            $characterName=$1;
+            if(defined($composites{$characterName})) {
+              next compositeloop;
+            }
+            $components=$2;
+            $compositeIndex[$#compositeIndex+1]=$characterName;
+            $composites{$characterName}=$components;
+          }
+          elsif(/^PCC  *([a-zA-Z0-9.]*)  *(-?[0-9]*)  *(-?[0-9]*)/) {
+            $composites{$characterName,$currentComponent}=$1;
+            $composites{$characterName,$currentComponent,'dx'}=$2;
+            $composites{$characterName,$currentComponent,'dy'}=$3;
+            $currentComponent=$currentComponent+1;
+          }
+        }
+        if($components!=$currentComponent) {
+          die "Composite information inconsistent for character $characterName font $fontName";
+        }
+      }
+    }
+  }
+}
+
+# sub readSidebearings {
+#   local($filename)=$_;
+#   open(SB,$filename);
+#   while(<SB>) {
+#     if (/^%/) { next ; }
+#     elsif (/ */) { next ; }
+#     elsif (/^ *([-_$a-zA-Z0-9]*) *([-_$a-zA-Z0-9]*)* ([0-9]*) *$/) {
+#       $sidebearings{$1,$2}=$3;
+#     } else {
+#       die "Error reading sidebearings data";
+#     }
+#   }
+# }           
+
+sub printEncoding {
+  print "%!\n";
+  print "% Automatically generated by the Ogonkify package\n";
+  print "% Do not modify\n";
+  print "% -- code follows this line --\n";
+  print "%%BeginResource: encoding $baseEncodingName\n";
+  print "/$baseEncodingName [\n";
+  for($i=0; $i<256; $i++) {
+    if($i!=0 && $i%64==0) {
+      printf "%% %o\n", $i;
+    }
+    print "/$baseEncoding[$i]";
+    if($i%8==7) {
+      print "\n";
+    } else {
+      print " ";
+    }
+  }
+  print "] def\n";
+  print "%%EndResource\n";
+}
+
+sub printCAFM {
+  $shortFontName=$shortnames{$fontName};
+  if(!$shortFontName) {
+    $shortFontName=$fontName;
+  }
+  $shortEncodingName=$shortnames{$baseEncodingName};
+  if(!$shortEncodingName) {
+    $shortEncodingName=$baseEncodingName;
+  }
+  print "/* Automatically generated by the Ogonkify package */\n";
+  print "/* Do not modify */\n";
+  print "/* -- code follows this line -- */\n";
+  printf "unsigned int %s_%s_WX [256] = {\n  ",
+    $shortEncodingName,$shortFontName;
+  for($i=0; $i<256; $i++) {
+    if(defined($w=$widths{$baseEncoding[$i]})) {
+      printf "%d",$w;
+    } else {
+      print "0";
+    }
+    if($i<255) {
+      if($i%8==7) {
+        print ",\n  ";
+      } else {
+        print ", ";
+      }
+    }
+  }
+  print "\n};\n\n";
+}
+    
+
+
+sub printAFM {
+  print <<"ALAMAKOTA";
+StartFontMetrics 3.0
+Comment Automatically generated by the Ogonkify package
+Comment Do not modify
+FontName $newName
+EncodingScheme $encodingName
+FullName $newName Composite font
+FontBBox $newFontBBox[0] $newFontBBox[1] $newFontBBox[2] $newFontBBox[3]
+ALAMAKOTA
+
+  $numChars=0;
+  for($i=0; $i<=$#characterIndex; $i++) {
+    $charname=$characterIndex[$i];
+    if($characters{$charname} &&
+       ($decoding{$charname} ||
+        $characters{$charname} eq 'GENERATEDCOMPOSITE')) {
+      $numChars++;
+    }
+  }
+
+  print "StartCharMetrics $numChars\n";
+  for($i=0;$i<256;$i++) {
+    $charname=$encoding[$i];
+    if($characters{$charname} &&
+       ($decoding{$charname} || 
+        $characters{$charname} eq 'GENERATEDCOMPOSITE')) {
+      printf "C %d ; WX %d ; N %s ;",$i,$widths{$encoding[$i]},$encoding[$i];
+      if($BBox{$encoding[$i]}) {
+        printf " B %d %d %d %d ;\n",
+        $BBox{$encoding[$i],0},
+        $BBox{$encoding[$i],1},
+        $BBox{$encoding[$i],2},
+        $BBox{$encoding[$i],3};
+      } else {
+        print "\n";
+      }
+      $characters{$charname}='DONE';
+    }
+  }
+  for($i=0; $i<=$#characterIndex; $i++) {
+    $charname=$characterIndex[$i];
+    if($characters{$charname} &&
+       $characters{$charname} ne 'DONE' &&
+       ($decoding{$charname} ||
+        $characters{$charname} eq 'GENERATEDCOMPOSITE')) {
+      printf "C %d ; WX %d ; N %s ;",-1,
+        $widths{$characterIndex[$i]},$characterIndex[$i];
+      if($BBox{$characterIndex[$i]}) {
+        printf " B %d %d %d %d ;\n",
+        $BBox{$characterIndex[$i],0},
+        $BBox{$characterIndex[$i],1},
+        $BBox{$characterIndex[$i],2},
+        $BBox{$characterIndex[$i],3};
+      } else {
+        print "\n";
+      }
+    }
+  }
+  print "EndCharMetrics\n";
+  print "EndFontMetrics\n";
+}
+
+sub printComposite {
+  if($baseEncoding[0] ne '.notdef') {
+    warn "Character 0 is not '.notdef' but '$baseEncoding[0]'; proceeding anyway";
+  }
+
+# just get a rough upper approximation
+  $entries=0;
+  for($i=0; $i<=$#compositeIndex; $i++) {
+    $charName=$compositeIndex[$i];
+    if(!($characters{$charName} && $decoding{$charName}) &&
+       $composites{$charName} == 2 &&
+       $decoding{$composites{$charName,0}} &&       
+       $decoding{$composites{$charName,1}}) {
+      $entries++;
+    }
+  }
+
+  print <<"ALAMAKOTA";
+%!
+% Automatically generated by the Ogonkify package
+% Do not modify
+% -- code follows this line --
+%%BeginResource: font $newName
+/$oldName /$newName $baseEncodingName $encodingName $entries dict
+ALAMAKOTA
+  
+  for($i=0; $i<=$#compositeIndex; $i++) {
+    $charName=$compositeIndex[$i];
+    if(!($characters{$charName} && $decoding{$charName})
+       && $composites{$charName}) {
+      if($composites{$charName}==2 && 
+         ($dx=$composites{$charName,0,'dx'})==0 && 
+         ($dy=$composites{$charName,0,'dy'})==0) {
+        $dx=$composites{$charName,1,'dx'};
+        $dy=$composites{$charName,1,'dy'};
+        if(($C1=$decoding{$CN1=$composites{$charName,0}}) && 
+           ($C2=$decoding{$CN2=$composites{$charName,1}})) {
+          if(!defined($characters{$charName})) {
+            $characterIndex[$#characterIndex+1]=$charName;
+          }
+          $characters{$charName}='GENERATEDCOMPOSITE';
+          $widths{$charName}=$widths{$CN1};
+          $BBox{$charName}='GENERATEDCOMPOSITE';
+          $BBox{$charName,0}=&min($BBox{$CN1,0},$BBox{$CN2,0}+$dx);
+          $BBox{$charName,1}=&min($BBox{$CN1,1},$BBox{$CN2,1}+$dy);
+          $BBox{$charName,2}=&max($BBox{$CN1,2},$BBox{$CN2,2}+$dx);
+          $BBox{$charName,3}=&max($BBox{$CN1,3},$BBox{$CN2,3}+$dy);
+          printf "dup /$charName [%d %d %d %d] put\n",
+            $C1, $dx, $dy, $C2;
+        } else {
+          warn "Composition for $charName uses char not in base encoding -- not used\n";
+        }
+      } else {
+        warn "Composition for $charName not in the right form -- not used\n";
+      }
+    }
+  }
+  print "makeComposite\n%%EndResource\n\n";
+}
+
+# Main program
+
+%shortnames=('Times-Roman','Times',
+             'Times-Roman-Ogonki','Times',
+             'Times-Bold', 'Times_Bold',
+             'Times-Bold-Ogonki', 'Times_Bold',
+             'Times-Italic', 'Times_Italic',
+             'Times-Italic-Ogonki', 'Times_Italic',
+             'Times-BoldItalic', 'Times_BoldItalic',
+             'Times-BoldItalic-Ogonki', 'Times_BoldItalic',
+             'Courier-Ogonki','Courier',
+             'Helvetica-Ogonki','Helvetica',
+             'Helvetica-Bold','Helvetica_Bold',
+             'Helvetica-Bold-Ogonki','Helvetica_Bold',
+             'Helvetica-Oblique','Helvetica_Oblique',
+             'Helvetica-Oblique-Ogonki','Helvetica_Oblique',
+             'Helvetica-BoldOblique','Helvetica_BoldOblique',
+             'Helvetica-BoldOblique-Ogonki','Helvetica_BoldOblique',
+             'ASCIIEncoding', 'ascii',
+             'ISOLatin1Encoding','latin1',
+             'ISOLatin2Encoding','latin2',
+             'ISOLatin3Encoding','latin3',
+             'ISOLatin4Encoding','latin4',
+             'ISOLatin5Encoding','latin5',
+             'ISOLatin6Encoding','latin6',
+             'ISOLatin7Encoding','latin7',
+             'CP1250Encoding','cp1250',
+             'MacintoshEncoding', 'mac',
+             'IBMPCEncoding', 'ibmpc',
+             'HPRomanEncoding', 'hp');
+
+# %sidebearings=() ;
+
+
+$encodingName='UnknownEncoding' ;
+$#encoding=256;
+for($i=0; $i<256; $i++) {
+  $encoding[$i]='.notdef';
+}
+$baseEncodingName='UnknownEncoding';
+$#baseEncoding=256;
+for($i=0; $i<256; $i++) {
+  $baseEncoding[$i]='.notdef';
+}
+%characters=();
+@characterIndex=();
+%decoding=();
+@compositeIndex=();
+%composites=();
+%widths=();
+%BBox=();
+
+$compName='UnknownFont';
+$baseEncodingAFM='ogonki.afm';
+$encodingAFM='latin2.afm';
+$oldAFM='Times-Roman.afm';
+$compFile='Times-Roman-Ogonki.ps';
+
+while($_ = $ARGV[0], /^-/) {
+  shift;
+  if(/^--$/) {last;}
+  elsif (/^-i$/) { $oldAFM=$ARGV[0]; shift; }
+  elsif (/^-i(.*)/) { $oldAFM=$1; }
+  elsif (/^-o$/) { $compFile=$ARGV[0]; shift; }
+  elsif (/^-o(.*)/) { $compFile=$1; }
+  elsif (/^-c$/) { $compAFM=$ARGV[0]; shift; }
+  elsif (/^-c(.*)/) { $compAFM=$1; }
+  elsif (/^-n$/) { $newName=$ARGV[0]; shift; }
+  elsif (/^-n(.*)/) { $newName=$1; }
+  elsif (/^-e$/) { $baseEncodingAFM=$ARGV[0]; shift; }
+  elsif (/^-e(.*)/) { $baseEncodingAFM=$1; }
+  elsif (/^-t$/) { $encodingAFM=$ARGV[0]; shift; }
+  elsif (/^-t(.*)/) { $encodingAFM=$1; }
+  elsif (/^-a$/) { $outputAFM=$ARGV[0]; shift; }
+  elsif (/^-a(.*)/) { $outputAFM=$1; }
+  elsif (/^-E$/) { $encodingFile=$ARGV[0]; shift; }
+  elsif (/^-E(.*)/) { $encodingFile=$1; }
+  elsif (/^-C$/) { $CAFMFile=$ARGV[0]; shift; }
+  elsif (/^-C(.*)/) { $CAFMFile=$1; }
+  else { &usage ; die "Quitting"; }
+}
+
+if($encodingFile) {             # generating a PostScript encoding
+  &readAFM($baseEncodingAFM,0,'base',0);
+  open(ENCODING,'>' . $encodingFile);
+  $oldfh = select(ENCODING); 
+  &printEncoding;
+  select($oldfh);
+} elsif($CAFMFile) {            # generating a CAFM file for a2ps
+  &readAFM($baseEncodingAFM,0,'base',0);
+  &readAFM($oldAFM,TRUE,0,0);
+    if(!$widths{'.notdef'}) {
+    $widths{'.notdef'}=0;
+  }
+  open(CAFM,'>' . $CAFMFile);
+  $oldfh=select(CAFM);
+  &printCAFM;
+  select($oldfh);
+} else {                        # generating PS font programs
+  &readAFM($baseEncodingAFM,0,'base',0);
+  &readAFM($encodingAFM,0,'target',0);
+  &readAFM($oldAFM,TRUE,0,TRUE);
+  @newFontBBox=@fontBBox;
+  $oldName=$fontName;
+  if($compAFM) {
+    &readAFM($compAFM,0,0,TRUE);
+    $compName=$fontName;
+  }
+  if(!$newName) {
+    $newName=$compName;
+  }
+  open(COMPOSITE,'>' . $compFile);
+  $oldfh = select(COMPOSITE); 
+  &printComposite;
+  if($outputAFM) {
+    open(OUTAFM,'>' . $outputAFM);
+    select(OUTAFM);
+    &printAFM;
+  }
+  select($oldfh);
+}
+
+### Local Variables: ***
+### mode: perl ***
+### End: ***

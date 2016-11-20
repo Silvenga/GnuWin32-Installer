@@ -1,0 +1,460 @@
+My apologies to all non finnish speaking people, but since sgrep was developed
+in finland, the latter part of this todo file is in finnish. 
+However, i switched to english after version 1.0.
+(My apologies to all non english speaking people)
+
+Things TODO or to consider:
+- testing
+- regular expressons
+- -R option
+- empty regions between two positions?
+- fix raw("*") when not in indexing mode
+- fix output.c bug when regions is after the filelist
+- maybe support command line filelists and -F option when using index
+- find out to what to about chars (does not work now and is disabled)
+- fix -w \#x1-\#xffff bug
+- add a warning about overflowing term dictionary
+
+Version 1.94a
+	o Killed nasty hash_function() bug
+        o Killed nasty postings entry bug when posting was > 0xfffffff
+	o Bumped hash table size up
+	o Newer automake & autoconf files
+
+version 1.93a
+	o Fixed a bug which caused sgrep to dump core when using SGML
+	  scanner at least on Solaris platform (negative index to memory
+	  mapped file)
+	o Fixed a bug which caused sgrep to  ignore '-n' command line 
+	  option always.
+	
+version 1.92a
+	o Fixed a bug which causes sgrep to core dump every time when
+	  Aho-Corasick search engine was used without the SGML-search
+	  engine.
+	
+version 1.91a
+	o Nearness operators near(bytes) and near_before(bytes)
+	o Cleanup in main.c
+	o sgrep now emits #line directives and query parser parsers them.
+	  This allows accurate file/line/column parse error reporting.
+	o Bug fix in first_bytes(n,e) with nested e
+	o Bug fix in last_bytes(n,e) with nested e
+	o faster parenting operator ((log |l|)+|r|)log |r| in best case 
+	  instead of (|l|+|r|)log|r|
+	o moved the sgml stuff to sgml.c from pmatch.c
+	o added -x and -q options to indexer (currently only dumping index
+	  terms is supported. I needed that feature
+	o Fixed a bug when first occurrence of index term was after
+	  128M of indexed data
+	o Zero sized files are now ignored
+	o Support for 16-bit wide terms
+	o Support for UTF-8 and UTF-16 encodings
+	
+	
+version 1.90a
+	o More bugfixes
+	o elements childrening b works
+	o first(number of regions,expression)
+	o last(number of regions,expression)
+	o first_bytes(number of bytes, expression)
+	o last_bytes(number of bytes, expression)
+	o new way to sort index entries resulting in 2-3 times
+	  faster index search with queries like 'word("*")' or 
+	  'stag("*")'
+  	o configure options --with-prerocessor, --disable-assertions and
+	  --disable-memory-debug
+	o fixed leaked memory on parse errors 
+	o -F options and command line files are now ignored if -x is given
+	
+version 1.89a
+	o Bugfix release dedicated to Greg Coulombe and his valuable
+	  bugreports. Thank you very much.
+	
+version 1.88a
+	o Finally renamed defines.h to sgrep.h :)
+	o sgrep now uses GNU-autoconf.
+	o TODO renamed to ChangeLog
+	o An embarrasing output bug was fixed (sgrep wrote results to
+	  stderr instead of stdout)
+
+version 1.86
+	o "elements" returns a region list containing of all SGML/XML/HTML-
+	   elements
+	o new operator "a parenting b", which returns the regions in a
+	  which directly contain given regions of b
+
+version 1.85
+	o Made a temporary fix to a indexing bug when some index entry
+	  starts from place 0.
+
+version 1.80
+	o New interface to regions in sgrepdll
+
+version 1.75
+	o OSF1 binary released
+	o Uses memory mapped files in pmatch too
+	o Improved temporary file handling
+	o Fixed a bug in preprocess() when using temp files instead of
+	  pipes
+
+version 1.73
+	o Major code cleanup. Removed all calls to exit and all
+	  references to stderr
+	o Parse tree memory leaks fixed
+	o Complete rewrite of output.c using memory mapped files.
+	o All global and static variables removed from DLL
+	o Multiple Sgrep instances can be used in the DLL. However,
+	  Sgrep-instances are not re-entrable (and probably will never
+          be)
+
+version 1.72
+	o Fixed a parser bug when there was '>' right after entitys
+          public id
+	o Fixed a parser bug, where comments never ended when '-' was
+          in word chars
+	o Fixed a simlar bug in PCDATA and marked sections
+
+version 1.71
+	o -w option also present in indexing mode
+	o Temporary fix for generating temp files in Win32
+	o First public release
+
+version 1.70
+	o support for character references (&#50; &#x2a;)
+	o doctype_sid and doctype_pid we're not working. FIXED.
+	o 'comment("*")' changed to 'comments'
+	o 'cdata("*")' changed to 'cdata'
+	o 'prolog("*")' changed to 'prologs'
+	o Fixed a memory handling bug in main.c (it's been there
+          as long as sgrep existed!)
+	o Fixed a scanner bug in entity declarations having syntax errors
+	  (sgrep could hang)
+	o Fixed a scanner bug when external DTD-subset had only public
+          id, but no system id
+
+version 1.69
+	o "end" reserved word was broken. FIXED.
+	o stop word lists (-S option when indexing)
+	o word chars is now "A-Za-z"
+	o names of indexes files are stored in indexes
+	o Entity support in scanner
+	o Scanner now understands most of internal DTD subset:
+		- Entity declarations
+		- comments
+		- pis
+		- skips notations, elements and attlists
+	            (but may be fooled with quoted '>'-characters)
+	o New language features
+		file("filename") - returns the region of files having name
+				"filename"
+		entity("entity name") - Entity reference. Currently only
+					recognised in PCDATA
+		entity_declaration("entity_name") 
+			- Entity declaration of entity
+		entity_literal("entity name")
+			- entity declarations literal value
+		entity_pid("public id")
+			- entity declarations public id
+		entity_sid("system id")
+			- entity declarations system id
+		entity_ndata("notation name")
+			- notation in entity declaration
+		raw("&auml")     
+			- Access to raw entry:
+			  word("blah") <-> raw("wblah"),
+			  file("foobar") <-> raw("ffoobar")
+	o -g include-entities option to include parsable system entities
+	  to end of file list while scanning or indexing
+	o Fixed a fatal but rare memory allocation bug	    
+
+version 1.68
+	o Added interface for scanning index directly (element names 
+	  for citec)
+	o Fixed bad memory leak in index.c. Indexing also uses slightly
+          less memory
+
+version 1.67
+	o FIX header files for portability
+	o Fix a bug in sgrep.clearError()
+
+version 1.66
+	o Ported to MSVC
+	o DLL version: sgrepdll.dll
+	o More WIN32 stuff and library support
+
+version 1.65
+	o C++ clean again
+	o sgrep.hpp contains new C++ interface to sgrep
+	o library.cpp contains implementation of that interface
+	o libtest.cpp is a test case for the library
+
+version 1.60 (no public releases)
+	o New version of SGML-scanner. This should cope with all  
+	  XML-files (at least almost) and all normalized syntax-error 
+	  free SGML/HTML files.
+	o -g sgml option selects SGML mode scanner. -g xml option
+          selects XML mode scanner. -g sgml-debug shows everything that
+          the scanner engine finds in the scanned files.
+	o Modified the pattern matching module to support both
+	  string phrases and XML/SGML phrases at same time
+	o Modified the query language to support all new scanner features:
+	  string("foo")         : traditional Aho-Corasick patterns (default)
+	  regex("regex")	: added to language, but not implemented yet
+	  doctype("name")       : doctype name in prolog (HTML, DOCBOOK)
+	  doctype_pid("pid")    : doctype public identifier
+	  doctype_sid("sid")    : doctype system identifier
+          prolog("*")           : the whole prolog
+	  pi("xml*")            : processing instructions
+	  attribute("name")     : attributes
+          attvalue("value")     : attribute value
+	  stag("GI")            : element start tag
+          etag("GI2")           : element end tag
+          comment("*")          : matches whole comments
+          comment_word("foo")   : matches words inside comments
+          word("z*")            : matches words inside PCDATA or CDATA marked
+                                  sections
+          cdata("*")            : matches cdata marked sections          
+	o Support for wildcards '*' in queries:
+	  all start tags: stag("*")
+	  all words starting with letter 'z': word("z*")
+	o Added INDEX_COMPRESSION_HACK which compresses indexes more 
+	  (hmmm.. 15% ??) with a small runtime penalty
+
+version 1.50 (no public releases)
+	o Index engine
+	o SGML-scanner
+	o Ported to W32
+	o Lots of other smaller things like:
+	o if expression does not contain any phrases, don't do scanning
+	anymore
+	o Fixed, but not tested the "both operators same, but
+	  different sorting" bug
+	o Using execlp instead /bin/sh when spawning external preprocessor.
+          This means that shell scripts given with -p parameter
+          won't work anymore. I hope that no one will notice :)
+	o other things that i've forgotten to mention
+
+versiossa 1.0 (no public releases)
+	sgtool.tcl: toimii nyt sample.sgreprc:n kanssa
+	HUPS: ASSERT ja NO_MACROS oli asetettu p‰‰lle. sgrep oli siis
+		hitaampi, kuin sen olisi pit‰nyt olla
+	preproc.c:ss‰ int p -> pid_t p
+
+versiossa 0.99
+	mkstemp() funktion poistaminen
+	equal ja not_equal tulostukseen
+	linux:in -i bugi korjattu
+	equal man-sivun p‰ivitys
+	quote mansivun p‰ivitys
+	html man sivun p‰ivitys
+	lis‰tty string.h includeja
+	vaihdettu file_num muuttuja output.c:st‰ last_ofile:ksi
+	korjattu pointterivertailu, joka oikkuili 64-bittisiss‰
+	korjattu makroja jotta alpha cc-k‰‰nt‰j‰ sˆisi niit‰
+	kokeiltu kaikilla yliopiston arkkitehtuureilla :)
+	korjattu -a optio, joka ei tulostanut mit‰‰n, jos tuloksessa ei ollut
+		yht‰‰n aluetta
+	PK p‰ivitti man sivun
+	Korjattu Makefileest‰ use -> usr
+
+versiossa 0.95
+	equal ja not equal
+	in, not_in, containing ja not_containing -semantiikan muutos
+	(aito sis‰ltyvyys)
+
+versiossa 0.94
+	quote operaatio
+ 	_quote_ ja muut muunnelmat
+	quote tilastointi
+
+versiossa 0.93
+	-i optio
+	-i optio man sivulla
+	parempi sample.sgreprc
+
+versiossa 0.92
+	P‰ivitetty README
+	lis‰tty sgtool jakelupakettiin
+	uusin versio sgtoolista
+	todo tiedosto taas mukana, oli hukkunut Makefileest‰
+
+versiossa 0.91
+	you have to give a command line ->
+		you have to give an expression line
+	-f - ottaa komennot stdin:inist‰
+	man sivulle -f -
+	muutoksia esimerkki makro tiedostoon, changecom ongelma ratkaistu
+
+versiossa 0.90
+	man sivulle -q optio ja maininta escape sequenceist‰
+	lis‰t‰ \000 - \377 tulostusoptiot ?
+	testata kaikilla yliopistolla olevilla unix-arkkitehtuureilla
+	makro tiedosto ja make install.macros
+
+versiossa 0.29
+	-C optio ( GNU copyright )
+	nollamerkin esto fraaseissa
+	moduuli ja makefile kommentit lis‰tty
+	Koko ohjelman kommentit selattu l‰pi
+	lis‰tty \f ja \b myˆs tulostusoptioiksi.
+	README tiedosto
+	
+versiossa 0.28
+	korjattu end bugi
+	lis‰tty \f \b ja \000 - \377
+	join operaation korjaus
+
+versiossa 0.27
+	chars bugi
+	-q optio
+	korjattu pieni tulostusbugi
+
+versiossa 0.26
+	Aikojen laskenta korjattu
+	tilastoja (mm. optimoinnin vaikutuksesta)
+	muutettu operaatioiden lkm tulostusta ( oli ruma kun > 99 )
+	korjattu bugi kun alue oli 1.tied loppu - 2.tied alku
+	korjattu chars bugi ( johtui LAST makrosta )
+	korjattu vakiolista bugi ilman -S optiota
+	tarkista viittaukset LAST makroon
+
+versiossa 0.25
+	tiedostot yksi kerrallaan
+	Korjata listojen vapautus kun operaatio ohitetaan (inner, outer)
+		(korjattu siten ett‰ operaatioita ei ohiteta)
+	Korjata -c option tulostus
+	enter vain viimeisen tiedoston j‰lkeen
+
+versiossa 0.24
+	ptrs -> refcount
+	korjattu optimize.c bugit & kauneusvirheet
+
+versiossa 0.23
+	join funktion optimointi
+	-P optio ei odota syˆtetiedostoja
+	assertio: evaluoinnin p‰‰ttyess‰ vain 1 gc lista j‰ljell‰
+	chars vakion tuplalistojen optimointi
+	or funktion swappaus
+	optioiden nimen vaihdot -i=-a -v=-V -V=-D
+
+versiossa 0.22
+	operaatio puun optimointi
+
+versiossa 0.21
+	listan vapautus aiheutti swappausta, korjattu
+	listan vapautuksen aikavaatimus on nyt 1
+	-V optio 
+	testaus
+	kirjoitettu e_realloc rutiini
+	erikseen config.h ja defines.h
+	kaunisteltu koodia
+	testailua..
+		
+versiossa 0.20
+	toimiva in operaatio
+	testailua..
+
+versiossa 0.19
+	not_sorted -> sorted
+	selaus k‰ytt‰en GC_POINTER selauskahvaa
+	uudet prev_region ja get_region makrot
+	vakiolistat tarkistuksineen
+
+versiossa 0.18
+	in ja not in operaation uudelleen j‰rjestely
+	viitelaskurit listoissa
+	yhdistet‰‰n samat phraset
+	tilastoidaan yhdistetyt phraset
+	ohitetaan hakemistot
+	-P optio n‰ytt‰‰ vain esiprosessoidun kyselyn
+
+versiossa 0.17
+	poistettu sgrepprepro
+	-O < style file> optio
+	unsigned charrit takaisin signed charriksi. skandien haku toimi
+	order bugin korjaus
+	tcsh skripti testit ja test.macros
+	korjattu ylim. do_get_regionin kutsu
+	tilastointi taas oikein
+selvisi
+	first_of operaatio aiheuttaa do_get_regionin kutsumisen aina kun
+        toinen lista on loppu.
+
+versiossa 0.16
+	ei concattia -c option kanssa
+	unsigned char tyypit
+	Korjattu tabulattori ja newline mokat parserointivirheen selvityksess‰
+	testattu ja korjattu #undef ASSERT ja #define DEBUG
+	not in korjattu
+	ymp‰ristˆmuuttuja SGREPOPT
+	add_region, prev_region ja get_region toteutettu makroilla
+	
+versiossa 0.15
+	join operaatio kaikille listoille
+	korjattu extractingin sort_by_starttia. Putosi 700 > 6
+	gc listan is‰nt‰solmujen mallocointi samalla tavalla kuin
+		tavallistenkin solmujen 
+	suoritettu hieman profilointia. Selvisi, ett‰ kannattaa optimoida
+		add_region ja get_region aliohjelmia, ja makrottaa ne
+	.sgreprc ja /usr/lib/sgreprc tiedostot
+	ymp‰risrˆmuuttuja SGRREPPREPRO:lla voi antaa esiprosessorin nimen
+	nest_stack voi kasvaa miten isoksi tahansa
+	korjattu inner operaatiosta lˆytynyt bugi
+	
+versiossa 0.14
+	helppi‰ v‰h‰n kirjoiteltu uusiksi
+	%l tulostusoptio +1
+	remove_duplicates #ifdef REMOVE_DUPLICATESIN takana
+	chars vakio
+	join operaatio chars optimoiduille listoille
+	joinin tilastointi
+
+versiossa 0.13
+	rem_dup tiedosto, jossa selvitet‰‰n miksi remove_duplicates ei toimi
+	extracting korjattu viel‰ kerran
+	n: tilalle # ja kauniimpi viiva
+	%l kertoo regionin pituuden
+	tulostuksen lopun newline vain silloin kun viimeinen merkki ei ollut nl
+	-C tulostaa copyright informaatiota
+	-N est‰‰ newlinen lis‰‰misen
+	-d est‰‰ concat operaation
+	-c tulostaa alueiden lukum‰‰r‰n
+	-v ja -h pikku korjauksia
+	-p < command> k‰ynnist‰‰ annetun esiprosessorin
+	esiprosessori tiedostossa preproc.c
+	tilastoidaan remove_duplicates
+	sorttien optimointi. Saa pois p‰‰lt‰ #undef OPTIMIZE_SORTS
+		+ sort_by_start order operaatiossa
+		+ sort_by_end order operaatiossa, mik‰li tuloslista
+		  ei ollut nested ( tarttee viel‰ tutkimista )
+		+ inner ja outer operaatioiden ohitus
+		- hidastaa or operaatiota
+		- monimutkaista
+		- vaatii perusteellista tutkimista ( voi rikkoa jotain )
+	paljon lis‰‰ assertioita
+	komentojen luku tiedostosta (optio -f)
+	macros tiedosto, jossa cpp makroja
+	putkesta luku. Tiedostonimi - tarkoittaa stdin:i‰. Jos ei mit‰‰n
+		tiedostoja niin oletetaan stdin. stdin voi siis lukea monta
+		kertaa
+	-t optio kertoo nyt ajakulutuksesta. -T antaa statistiikkaa
+	-i optiolla sgreppi‰ voi k‰ytt‰‰ filtterin‰
+
+versiossa 0.12
+	%n tulostusoptio
+	tilastotietojen keruu
+	__ _. ._ operaattorit
+	concat yhdist‰‰ viereiset alueet
+	exit 0 jos loytyi 1 ei lˆytynyt 2 jos meni pieleen 3 jos sisainen
+		tarkastus ep‰onnistui
+	extracting korjattu
+	optiot -v -h -l -s -o -t < style>
+	concat operaatio ja -s oletusarvoisesti. -l ja -o ei tee concattia
+	newline tulostuksen loppuun
+
+versiossa 0.11
+	rajoittamaton inner_stack
+	concat operaatio
+	tarkastetaan ett‰ lis‰tt‰v‰ alue alkaa ennenkuin loppuu
+	extracting operaattori

@@ -1,0 +1,3 @@
+@echo off
+grep -E %*
+

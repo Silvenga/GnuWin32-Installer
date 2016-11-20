@@ -1,0 +1,1234 @@
+<html lang="en">
+<head>
+<title>Rx</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Rx">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">Rx</h1>
+<div class="node">
+<p><hr>
+<a name="Top"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Copying">Copying</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#dir">(dir)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+
+</div>
+
+<h2 class="unnumbered">Rx</h2>
+
+<p>This document describes Rx.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Copying">Copying</a>:                      	Sharing is good. 
+<li><a accesskey="2" href="#Overview">Overview</a>:                     	Fnord
+<li><a accesskey="3" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>:   	A popular regexp syntax. 
+<li><a accesskey="4" href="#Posix-Entry-Points">Posix Entry Points</a>:           	The POSIX way to regexp. 
+<li><a accesskey="5" href="#Beyond-POSIX">Beyond POSIX</a>:                 	Hints about cool features. 
+<li><a accesskey="6" href="#Rx-Theory">Rx Theory</a>:                    	Hints about how it works. 
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Copying"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Overview">Overview</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">1 Copying</h2>
+
+<div align="center">Copyright (C) 1996</div>
+<div align="center">Tom Lord</div>
+<div align="center">Berkeley, CA USA</div>
+
+<div align="center">except portions of "POSIX Regex Functions" which are</div>
+<div align="center">Copyright (C) 1995</div>
+<div align="center">Free Software Foundation, Inc.</div>
+
+<p class="noindent">Permission to use, copy, modify, distribute, and sell this software and
+its documentation for any purpose is hereby granted without fee,
+provided that the above copyright notice appear in all copies and that
+both that copyright notice and this permission notice appear in
+supporting documentation.
+
+<div align="center">NO WARRANTY</div>
+
+<p class="noindent">BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR
+THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH
+YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+<p class="noindent">IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR
+DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL
+DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM
+(INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED
+INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF
+THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR
+OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+<div class="node">
+<p><hr>
+<a name="Overview"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Copying">Copying</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">2 Overview</h2>
+
+<p>Nothing to say here, yet.
+
+<div class="node">
+<p><hr>
+<a name="Posix-Basic-Regular-Expressions"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Posix-Entry-Points">Posix Entry Points</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">3 Posix Basic Regular Expressions</h2>
+
+<p>The Posix Basic Regular Expression language is a notation for describing
+textual patterns.  Regexps are typically used by comparing them to a
+string to see if that string matches the pattern, or by searching within
+a string for a substring that matches.
+
+   <p>This chapter introduces the Posix regexp notation.  This is not a formal
+or precise definition of Posix regexps &ndash; it is an intuitive and
+hopefully expository description of them.
+
+<ul class="menu">
+<li><a accesskey="1" href="#An-Introduction-to-Regexps">An Introduction to Regexps</a>
+<li><a accesskey="2" href="#Literal-Regexps">Literal Regexps</a>
+<li><a accesskey="3" href="#Character-Sets">Character Sets</a>
+<li><a accesskey="4" href="#Subexpressions">Subexpressions</a>
+<li><a accesskey="5" href="#Repeated-Subexpressions">Repeated Subexpressions</a>
+<li><a accesskey="6" href="#Optional-Subexpressions">Optional Subexpressions</a>
+<li><a accesskey="7" href="#Counted-Subexpressions">Counted Subexpressions</a>
+<li><a accesskey="8" href="#Alternative-Subexpressions">Alternative Subexpressions</a>
+<li><a accesskey="9" href="#Backreferences">Backreferences</a>
+<li><a href="#A-Summary-of-Regexp-Syntax">A Summary of Regexp Syntax</a>
+<li><a href="#Ambiguous-Patterns">Ambiguous Patterns</a>
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="An-Introduction-to-Regexps"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Literal-Regexps">Literal Regexps</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>
+
+</div>
+
+<h3 class="section">3.1 An Introduction to Regexps</h3>
+
+<p>In the simplest cases, a regexp is just a literal string that must
+match exactly.   For example, the pattern:
+
+<pre class="example">     regexp
+</pre>
+   <p>matches the string "regexp" and no others.
+
+   <p>Some characters have a special meaning when they occur in a regexp. 
+They aren't matched literally as in the previous example, but instead
+denote a more general pattern.   For example, the character <code>*</code>
+is used to indicate that the preceeding element of a regexp may be
+repeated 0, 1, or more times.  In the pattern:
+
+<pre class="example">     smooo*th
+</pre>
+   <p>the <code>*</code> indicates that the preceeding <code>o</code> can be repeated 0 or
+more times.   So the pattern matches:
+
+<pre class="example">     smooth
+     smoooth
+     smooooth
+     smoooooth
+     ...
+</pre>
+   <p>Suppose you want to write a pattern that literally matches a special
+character like <code>*</code> &ndash; in other words, you don't want to <code>*</code> to
+indicate a permissible repetition, but to match <code>*</code> literally.  This
+is accomplished by quoting the special character with a backslash. 
+The pattern:
+
+<pre class="example">     smoo\*th
+</pre>
+   <p>matches the string:
+
+<pre class="example">     smoo*th
+</pre>
+   <p>and no other strings.
+
+   <p>In seven cases, the pattern is reversed &ndash; a backslash makes the
+character special instead of making a special character normal.  The
+characters <code>+</code>, <code>?</code>, <code>|</code>, <code>(</code>, and <code>)</code> are
+normal but the sequences <code>\+</code>, <code>\?</code>, <code>\|</code>, <code>\(</code>,
+<code>\)</code>, <code>\{</code>, and <code>\}</code> are special (their meaning is
+described later).
+
+   <p>The remaining sections of this chapter introduce and explain the various
+special characters that can occur in regexps.
+
+<div class="node">
+<p><hr>
+<a name="Literal-Regexps"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Character-Sets">Character Sets</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#An-Introduction-to-Regexps">An Introduction to Regexps</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>
+
+</div>
+
+<h3 class="section">3.2 Literal Regexps</h3>
+
+<p>A literal regexp is a string which contains no special characters. 
+A literal regexp matches an identical string, but no other characters. 
+For example:
+
+<pre class="example">     literally
+</pre>
+   <p>matches
+
+<pre class="example">     literally
+</pre>
+   <p>and nothing else.
+
+   <p>Generally, whitespace characters, numbers, and letters are not special. 
+Some punctuation characters are special and some are not (the syntax
+summary at the end of this chapter makes a convenient reference for
+which characters are special and which aren't).
+
+<div class="node">
+<p><hr>
+<a name="Character-Sets"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Subexpressions">Subexpressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Literal-Regexps">Literal Regexps</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>
+
+</div>
+
+<h3 class="section">3.3 Character Sets</h3>
+
+<p>This section introduces the special characters <code>.</code> and <code>[</code>.
+
+   <p><code>.</code> matches any character except the NULL character.  For example:
+
+<pre class="example">     p.ck
+</pre>
+   <p>matches
+
+<pre class="example">     pick
+     pack
+     puck
+     pbck
+     pcck
+     p.ck
+     
+     ...
+</pre>
+   <p><code>[</code> begins a <dfn>character set</dfn>.  A character set is similar to
+<code>.</code> in that it matches not a single, literal character, but any
+of a set of characters.   <code>[</code> is different from <code>.</code> in that
+with <code>[</code>, you define the set of characters explicitly.
+
+   <p>There are three basic forms a character set can take.
+
+   <p>In the first form, the character set is spelled out:
+
+<pre class="example">     [&lt;cset-spec&gt;]	-- every character in &lt;cset-spec&gt; is in the set.
+</pre>
+   <p>In the second form, the character set indicated is the negation of
+a character set is explicitly spelled out:
+
+<pre class="example">     [^&lt;cset-spec&gt;]	-- every character *not* in &lt;cset-spec&gt; is in the set.
+</pre>
+   <p>A <code>&lt;cset-spec&gt;</code> is more or less an explicit enumeration of a set
+of characters.  It can be written as a string of individual characters:
+
+<pre class="example">     [aeiou]
+</pre>
+   <p>or as a range of characters:
+
+<pre class="example">     [0-9]
+</pre>
+   <p>These two forms can be mixed:
+
+<pre class="example">     [A-za-z0-9_$]
+</pre>
+   <p>Note that special regexp characters (such as <code>*</code>) are <em>not</em>
+special within a character set.  <code>-</code>, as illustrated above,
+<em>is</em> special, except, as illustrated below, when it is the first
+character mentioned.
+
+   <p>This is a four-character set:
+
+<pre class="example">     [-+*/]
+</pre>
+   <p>The third form of a character set makes use of a pre-defined "character
+class":
+
+<pre class="example">     [[:class-name:]] -- every character described by class-name is in the set.
+</pre>
+   <p>The supported character classes are:
+
+<pre class="example">     alnum	- the set of alpha-numeric characters
+     alpha	- the set of alphabetic characters
+     blank	- tab and space
+     cntrl	- the control characters
+     digit	- decimal digits
+     graph	- all printable characters except space
+     lower	- lower case letters
+     print	- the "printable" characters
+     punct	- punctuation
+     space	- whitespace characters
+     upper	- upper case letters
+     xdigit	- hexidecimal digits
+</pre>
+   <p>Finally, character class sets can also be inverted:
+
+<pre class="example">     [^[:space:]] - all non-whitespace characters
+</pre>
+   <p>Character sets can be used in a regular expression anywhere a literal
+character can.
+
+<div class="node">
+<p><hr>
+<a name="Subexpressions"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Repeated-Subexpressions">Repeated Subexpressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Character-Sets">Character Sets</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>
+
+</div>
+
+<h3 class="section">3.4 Subexpressions</h3>
+
+<p>A subexpression is a regular expression enclosed in <code>\(</code> and
+<code>\)</code>.  A subexpression can be used anywhere a single character or
+character set can be used.
+
+   <p>Subexpressions are useful for grouping regexp constructs.  For example,
+the repeat operator, <code>*</code>, usually applies to just the preceeding
+character.   Recall that:
+
+<pre class="example">     smooo*th
+</pre>
+   <p>matches
+
+<pre class="example">     smooth
+     smoooth
+     ...
+</pre>
+   <p>Using a subexpression, we can apply <code>*</code> to a longer string:
+
+<pre class="example">     banan\(an\)*a
+</pre>
+   <p>matches
+
+<pre class="example">     banana
+     bananana
+     banananana
+     ...
+</pre>
+   <p>Subexpressions also have a special meaning with regard to backreferences
+and substitutions (see See <a href="#Backreferences">Backreferences</a>).
+
+<div class="node">
+<p><hr>
+<a name="Repeated-Subexpressions"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Optional-Subexpressions">Optional Subexpressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Subexpressions">Subexpressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>
+
+</div>
+
+<h3 class="section">3.5 Repeated Subexpressions</h3>
+
+<p><code>*</code> is the repeat operator.  It applies to the preceeding
+character, character set, subexpression or backreference.  It indicates
+that the preceeding element can be matched 0 or more times:
+
+<pre class="example">     bana\(na\)*
+</pre>
+   <p>matches
+
+<pre class="example">     bana
+     banana
+     bananana
+     banananana
+     ...
+</pre>
+   <p><code>\+</code> is similar to <code>*</code> except that <code>\+</code> requires the
+preceeding element to be matched at least once.  So while:
+
+<pre class="example">     bana\(na\)*
+</pre>
+   <p>matches
+
+<pre class="example">     bana
+</pre>
+   <pre class="example">     bana(na\)\+
+</pre>
+   <p>does not.   Both match
+
+<pre class="example">     banana
+     bananana
+     banananana
+     ...
+</pre>
+   <p>Thus, <code>bana\(na\)+</code> is short-hand for <code>banana\(na\)*</code>.
+
+<div class="node">
+<p><hr>
+<a name="Optional-Subexpressions"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Counted-Subexpressions">Counted Subexpressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Repeated-Subexpressions">Repeated Subexpressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>
+
+</div>
+
+<h3 class="section">3.6 Optional Subexpressions</h3>
+
+<p><code>\?</code> indicates that the preceeding character, character set, or
+subexpression is optional.  It is permitted to match, or to be skipped:
+
+<pre class="example">     CSNY\?
+</pre>
+   <p>matches both
+
+<pre class="example">     CSN
+</pre>
+   <p>and
+
+<pre class="example">     CSNY
+</pre>
+   <div class="node">
+<p><hr>
+<a name="Counted-Subexpressions"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Alternative-Subexpressions">Alternative Subexpressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Optional-Subexpressions">Optional Subexpressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>
+
+</div>
+
+<h3 class="section">3.7 Counted Subexpressions</h3>
+
+<p>An interval expression, <code>\{m,n\}</code> where <code>m</code> and <code>n</code> are
+non-negative integers with <code>n &gt;= m</code>, applies to the preceeding
+character, character set, subexpression or backreference.  It indicates
+that the preceeding element must match at least <code>m</code> times and may
+match as many as <code>n</code> times.
+
+   <p>For example:
+
+<pre class="example">     c\([ad]\)\{1,4\}
+</pre>
+   <p>matches
+
+<pre class="example">     car
+     cdr
+     caar
+     cdar
+     ...
+     caaar
+     cdaar
+     ...
+     cadddr
+     cddddr
+</pre>
+   <div class="node">
+<p><hr>
+<a name="Alternative-Subexpressions"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Backreferences">Backreferences</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Counted-Subexpressions">Counted Subexpressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>
+
+</div>
+
+<h3 class="section">3.8 Alternative Subexpressions</h3>
+
+<p>An alternative is written:
+
+<pre class="example">     regexp-1\|regexp-2\|regexp-3\|...
+</pre>
+   <p>It matches anything matched by some <code>regexp-n</code>.  For example:
+
+<pre class="example">     Crosby, Stills, \(and Nash\|Nash, and Young\)
+</pre>
+   <p>matches
+
+<pre class="example">     Crosby, Stills, and Nash
+</pre>
+   <p>and
+
+<pre class="example">     Crosby, Stills, Nash, and Young
+</pre>
+   <div class="node">
+<p><hr>
+<a name="Backreferences"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#A-Summary-of-Regexp-Syntax">A Summary of Regexp Syntax</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Alternative-Subexpressions">Alternative Subexpressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>
+
+</div>
+
+<h3 class="section">3.9 Backreferences, Extractions and Substitutions</h3>
+
+<p>A backreference is written <code>\n</code> where <code>n</code> is some single digit
+other than 0.  To be a valid backreference, there must be at least
+<code>n</code> parenthesized subexpressions in the pattern prior to the
+backreference.
+
+   <p>A backreference matches a literal copy of whatever was matched by the
+corresponding subexpression.  For example,
+
+<pre class="example">     \(.*\)-\1
+</pre>
+   <p>matches:
+
+<pre class="example">     go-go
+     ha-ha
+     wakka-wakka
+     ...
+</pre>
+   <p>In some applications, subexpressions are used to extract substrings. 
+For example, Emacs has the functions <code>match-beginnning</code> and
+<code>match-end</code> which report the positions of strings matched by
+subexpressions.  These functions use the same numbering scheme for
+subexpressions as backreferences, with the additional rule that
+subexpression 0 is defined to be the whole regexp.
+
+   <p>In some applications, subexpressions are used in string substitution. 
+This again uses the backreference numbering scheme. For example, this sed
+command:
+
+<pre class="example">     s/From:.*&lt;\(.*\)&gt;/To: \1/
+</pre>
+   <p>first matches the line:
+
+<pre class="example">     From: Joe Schmoe &lt;schmoe@uspringfield.edu&gt;
+</pre>
+   <p>when it does, subexpression 1 matches "schmoe@uspringfield.edu". 
+The command replaces the matched line with "To: \1" after doing
+subexpression substitution on it to get:
+
+<pre class="example">     To: schmoe@uspringfield.edu
+</pre>
+   <div class="node">
+<p><hr>
+<a name="A-Summary-of-Regexp-Syntax"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Ambiguous-Patterns">Ambiguous Patterns</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Backreferences">Backreferences</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>
+
+</div>
+
+<h3 class="section">3.10 A Summary of Regexp Syntax</h3>
+
+<p>In summary, regexps can be:
+
+   <p><code>abcd</code> &ndash; matching a string literally
+
+   <p><code>.</code> &ndash; matching everything except NULL
+
+   <p><code>[a-z_?]</code>, <code>^[a-z_?]</code>, <code>[[:alpha:]]</code> and
+<code>[^[:alpha:]]</code> &ndash; matching character sets
+
+   <p><code>\(subexp\)</code> &ndash; grouping an expression into a subexpression.
+
+   <p><code>\n</code> &ndash; match a copy of whatever was matched by the nth subexpression.
+
+   <p>The following special characters and sequences can be applied to a
+character, character set, subexpression, or backreference:
+
+   <p><code>*</code> &ndash; repeat the preceeding element 0 or more times.
+
+   <p><code>\+</code> &ndash; repeat the preceeding element 1 or more times.
+
+   <p><code>\?</code> &ndash; match the preceeding element 0 or 1 time.
+
+   <p><code>{m,n}</code> &ndash; match the preceeding element at least <code>m</code>, and as
+many as <code>n</code> times.
+
+   <p><code>regexp-1\|regexp-2\|..</code> &ndash; match any regexp-n.
+
+   <p>A special character, like <code>.</code> or <code>*</code> can be made into a literal
+character by prefixing it with <code>\</code>.
+
+   <p>A special sequence, like <code>\+</code> or <code>\?</code> can be made into a
+literal character by dropping the <code>\</code>.
+
+<div class="node">
+<p><hr>
+<a name="Ambiguous-Patterns"></a>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#A-Summary-of-Regexp-Syntax">A Summary of Regexp Syntax</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>
+
+</div>
+
+<h3 class="section">3.11 Ambiguous Patterns</h3>
+
+<p>Sometimes a regular expression appears to be ambiguous.  For example, suppose
+we compare the pattern:
+
+<pre class="example">     begin\|beginning
+</pre>
+   <p>to the string
+
+<pre class="example">     beginning
+</pre>
+   <p>either just the first 5 characters will match, or the whole string will match.
+
+   <p>In every case like this, the longer match is preferred.  The whole
+string will match.
+
+   <p>Sometimes there is ambiguity not about how many characters to match, but
+where the subexpressions occur within the match.  This can effect
+extraction functions like Emacs' <code>match-beginning</code> or rewrite
+functions like sed's <code>s</code> command.  For example, consider matching
+the pattern:
+
+<pre class="example">     b\(\[^q]*\)\(ing\)?
+</pre>
+   <p>against the string
+
+<pre class="example">     beginning
+</pre>
+   <p>One possibility is that the first subexpression matches "eginning" and
+the second is skipped.  Another possibility is that the first
+subexpression matches "eginn" and the second matches "ing".
+
+   <p>The rule is that consistant with matching as many characters as
+possible, the length of lower numbered subexpressions is maximized
+in preference to maximizing the length of later subexpressions.
+
+   <p>In the case of the above example, the two possible matches are equal in
+overall length.  Therefore, it comes down to maximizing the
+lower-numbered subexpression, \1.  The correct answer is that \1 matches
+"eginning" and \2 is skipped.
+
+<div class="node">
+<p><hr>
+<a name="Posix-Entry-Points"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Beyond-POSIX">Beyond POSIX</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Posix-Basic-Regular-Expressions">Posix Basic Regular Expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">4 Posix Entry Points</h2>
+
+<p>This section is excerpted from <em>The GNU C Library</em> reference manual
+by Sandra Loosemore with Richard M. Stallman, Roland McGrath, and Andrew
+Oram.
+
+   <p>The GNU C library supports the standard POSIX.2 interface.  Programs
+using this interface should include the header file <samp><span class="file">rxposix.h</span></samp>.
+
+<ul class="menu">
+<li><a accesskey="1" href="#POSIX-Regexp-Compilation">POSIX Regexp Compilation</a>:     Using <code>regcomp</code> to prepare to match. 
+<li><a accesskey="2" href="#Flags-for-POSIX-Regexps">Flags for POSIX Regexps</a>:      Syntax variations for <code>regcomp</code>. 
+<li><a accesskey="3" href="#Matching-POSIX-Regexps">Matching POSIX Regexps</a>:       Using <code>regexec</code> to match the compiled
+				   pattern that you get from <code>regcomp</code>. 
+<li><a accesskey="4" href="#Regexp-Subexpressions">Regexp Subexpressions</a>:        Finding which parts of the string were matched. 
+<li><a accesskey="5" href="#Subexpression-Complications">Subexpression Complications</a>:   Find points of which parts were matched. 
+<li><a accesskey="6" href="#Regexp-Cleanup">Regexp Cleanup</a>:               Freeing storage; reporting errors. 
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="POSIX-Regexp-Compilation"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Flags-for-POSIX-Regexps">Flags for POSIX Regexps</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Posix-Entry-Points">Posix Entry Points</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Entry-Points">Posix Entry Points</a>
+
+</div>
+
+<h3 class="section">4.1 POSIX Regular Expression Compilation</h3>
+
+<p>Before you can actually match a regular expression, you must
+<dfn>compile</dfn> it.  This is not true compilation&mdash;it produces a special
+data structure, not machine instructions.  But it is like ordinary
+compilation in that its purpose is to enable you to &ldquo;execute&rdquo; the
+pattern fast.  (See <a href="#Matching-POSIX-Regexps">Matching POSIX Regexps</a>, for how to use the
+compiled regular expression for matching.)
+
+   <p>There is a special data type for compiled regular expressions:
+
+<!-- regex.h -->
+<!-- POSIX.2 -->
+<div class="defun">
+&mdash; Data Type: <b>regex_t</b><var><a name="index-regex_005ft-1"></a></var><br>
+<blockquote><p>This type of object holds a compiled regular expression. 
+It is actually a structure.  It has just one field that your programs
+should look at:
+
+          <dl>
+<dt><code>re_nsub</code><dd>This field holds the number of parenthetical subexpressions in the
+regular expression that was compiled. 
+</dl>
+
+        <p>There are several other fields, but we don't describe them here, because
+only the functions in the library should use them. 
+</p></blockquote></div>
+
+   <p>After you create a <code>regex_t</code> object, you can compile a regular
+expression into it by calling <code>regcomp</code>.
+
+<!-- regex.h -->
+<!-- POSIX.2 -->
+<div class="defun">
+&mdash; Functie: int <b>regcomp</b> (<var>regex_t *compiled, const char *pattern, int cflags</var>)<var><a name="index-regcomp-2"></a></var><br>
+&mdash; Functie: int <b>regncomp</b> (<var>regex_t *compiled, const char *pattern, int len, int cflags</var>)<var><a name="index-regncomp-3"></a></var><br>
+<blockquote><p>The function <code>regcomp</code> &ldquo;compiles&rdquo; a regular expression into a
+data structure that you can use with <code>regexec</code> to match against a
+string.  The compiled regular expression format is designed for
+efficient matching.  <code>regcomp</code> stores it into <code>*</code><var>compiled</var>.
+
+        <p>The parameter <var>pattern</var> points to the regular expression to be
+compiled.  When using <code>regcomp</code>, <var>pattern</var> must be
+0-terminated.  When using <code>regncomp</code>, <var>pattern</var> must be
+<var>len</var> characters long.
+
+        <p><code>regncomp</code> is not a standard function;  strictly POSIX programs
+should avoid using it.
+
+        <p>It's up to you to allocate an object of type <code>regex_t</code> and pass its
+address to <code>regcomp</code>.
+
+        <p>Before freeing the object of type <code>regex_t</code> You <em>must</em> pass it
+to <code>regfree</code>.  Not doing so may cause subsequent calls to Rx
+functions to behave strangely.
+
+        <p>The argument <var>cflags</var> lets you specify various options that control
+the syntax and semantics of regular expressions.  See <a href="#Flags-for-POSIX-Regexps">Flags for POSIX Regexps</a>.
+
+        <p>If you use the flag <code>REG_NOSUB</code>, then <code>regcomp</code> omits from
+the compiled regular expression the information necessary to record
+how subexpressions actually match.  In this case, you might as well
+pass <code>0</code> for the <var>matchptr</var> and <var>nmatch</var> arguments when
+you call <code>regexec</code>.
+
+        <p>If you don't use <code>REG_NOSUB</code>, then the compiled regular expression
+does have the capacity to record how subexpressions match.  Also,
+<code>regcomp</code> tells you how many subexpressions <var>pattern</var> has, by
+storing the number in <var>compiled</var><code>-&gt;re_nsub</code>.  You can use that
+value to decide how long an array to allocate to hold information about
+subexpression matches.
+
+        <p><code>regcomp</code> returns <code>0</code> if it succeeds in compiling the regular
+expression; otherwise, it returns a nonzero error code (see the table
+below).  You can use <code>regerror</code> to produce an error message string
+describing the reason for a nonzero value; see <a href="#Regexp-Cleanup">Regexp Cleanup</a>. 
+</p></blockquote></div>
+
+   <p>Here are the possible nonzero values that <code>regcomp</code> can return:
+
+     <dl>
+<!-- regex.h -->
+<!-- POSIX.2 -->
+<dt><code>REG_BADBR</code><dd>There was an invalid `<samp><span class="samp">\{...\}</span></samp>' construct in the regular
+expression.  A valid `<samp><span class="samp">\{...\}</span></samp>' construct must contain either
+a single number, or two numbers in increasing order separated by a
+comma.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_BADPAT</code><dd>There was a syntax error in the regular expression.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_BADRPT</code><dd>A repetition operator such as `<samp><span class="samp">?</span></samp>' or `<samp><span class="samp">*</span></samp>' appeared in a bad
+position (with no preceding subexpression to act on).
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_ECOLLATE</code><dd>The regular expression referred to an invalid collating element (one not
+defined in the current locale for string collation).
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_ECTYPE</code><dd>The regular expression referred to an invalid character class name.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_EESCAPE</code><dd>The regular expression ended with `<samp><span class="samp">\</span></samp>'.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_ESUBREG</code><dd>There was an invalid number in the `<samp><span class="samp">\</span><var>digit</var></samp>' construct.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_EBRACK</code><dd>There were unbalanced square brackets in the regular expression.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_EPAREN</code><dd>An extended regular expression had unbalanced parentheses,
+or a basic regular expression had unbalanced `<samp><span class="samp">\(</span></samp>' and `<samp><span class="samp">\)</span></samp>'.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_EBRACE</code><dd>The regular expression had unbalanced `<samp><span class="samp">\{</span></samp>' and `<samp><span class="samp">\}</span></samp>'.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_ERANGE</code><dd>One of the endpoints in a range expression was invalid.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_ESPACE</code><dd><code>regcomp</code> ran out of memory. 
+</dl>
+
+<div class="node">
+<p><hr>
+<a name="Flags-for-POSIX-Regexps"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Matching-POSIX-Regexps">Matching POSIX Regexps</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#POSIX-Regexp-Compilation">POSIX Regexp Compilation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Entry-Points">Posix Entry Points</a>
+
+</div>
+
+<h3 class="section">4.2 Flags for POSIX Regular Expressions</h3>
+
+<p>These are the bit flags that you can use in the <var>cflags</var> operand when
+compiling a regular expression with <code>regcomp</code>.
+
+     <dl>
+<!-- regex.h -->
+<!-- POSIX.2 -->
+<dt><code>REG_EXTENDED</code><dd>Treat the pattern as an extended regular expression, rather than as a
+basic regular expression.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_ICASE</code><dd>Ignore case when matching letters.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_NOSUB</code><dd>Don't bother storing the contents of the <var>matches-ptr</var> array.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_NEWLINE</code><dd>Treat a newline in <var>string</var> as dividing <var>string</var> into multiple
+lines, so that `<samp><span class="samp">$</span></samp>' can match before the newline and `<samp><span class="samp">^</span></samp>' can
+match after.  Also, don't permit `<samp><span class="samp">.</span></samp>' to match a newline, and don't
+permit `<samp><span class="samp">[^...]</span></samp>' to match a newline.
+
+     <p>Otherwise, newline acts like any other ordinary character. 
+</dl>
+
+<div class="node">
+<p><hr>
+<a name="Matching-POSIX-Regexps"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Regexp-Subexpressions">Regexp Subexpressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Flags-for-POSIX-Regexps">Flags for POSIX Regexps</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Entry-Points">Posix Entry Points</a>
+
+</div>
+
+<h3 class="section">4.3 Matching a Compiled POSIX Regular Expression</h3>
+
+<p>Once you have compiled a regular expression, as described in <a href="#POSIX-Regexp-Compilation">POSIX Regexp Compilation</a>, you can match it against strings using
+<code>regexec</code>.  A match anywhere inside the string counts as success,
+unless the regular expression contains anchor characters (`<samp><span class="samp">^</span></samp>' or
+`<samp><span class="samp">$</span></samp>').
+
+<!-- regex.h -->
+<!-- POSIX.2 -->
+<div class="defun">
+&mdash; Functie: int <b>regexec</b> (<var>regex_t *compiled, char *string, size_t nmatch, regmatch_t matchptr </var><tt>[]</tt><var>, int eflags</var>)<var><a name="index-regexec-4"></a></var><br>
+&mdash; Functie: int <b>regnexec</b> (<var>regex_t *compiled, char *string, int len, size_t nmatch, regmatch_t matchptr </var><tt>[]</tt><var>, int eflags</var>)<var><a name="index-regnexec-5"></a></var><br>
+<blockquote><p>This function tries to match the compiled regular expression
+<code>*</code><var>compiled</var> against <var>string</var>.
+
+        <p><code>regexec</code> returns <code>0</code> if the regular expression matches;
+otherwise, it returns a nonzero value.  See the table below for
+what nonzero values mean.  You can use <code>regerror</code> to produce an
+error message string describing the reason for a nonzero value;
+see <a href="#Regexp-Cleanup">Regexp Cleanup</a>.
+
+        <p>The parameter <var>string</var> points to the text to search.  When using
+<code>regexec</code>, <var>string</var> must be 0-terminated.  When using
+<code>regnexec</code>, <var>string</var> must be <var>len</var> characters long.
+
+        <p><code>regnexec</code> is not a standard function;  strictly POSIX programs
+should avoid using it.
+
+        <p>The argument <var>eflags</var> is a word of bit flags that enable various
+options.
+
+        <p>If you want to get information about what part of <var>string</var> actually
+matched the regular expression or its subexpressions, use the arguments
+<var>matchptr</var> and <var>nmatch</var>.  Otherwise, pass <code>0</code> for
+<var>nmatch</var>, and <code>NULL</code> for <var>matchptr</var>.  See <a href="#Regexp-Subexpressions">Regexp Subexpressions</a>. 
+</p></blockquote></div>
+
+   <p>You must match the regular expression with the same set of current
+locales that were in effect when you compiled the regular expression.
+
+   <p>The function <code>regexec</code> accepts the following flags in the
+<var>eflags</var> argument:
+
+     <dl>
+<!-- regex.h -->
+<!-- POSIX.2 -->
+<dt><code>REG_NOTBOL</code><dd>Do not regard the beginning of the specified string as the beginning of
+a line; more generally, don't make any assumptions about what text might
+precede it.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_NOTEOL</code><dd>Do not regard the end of the specified string as the end of a line; more
+generally, don't make any assumptions about what text might follow it. 
+</dl>
+
+   <p>Here are the possible nonzero values that <code>regexec</code> can return:
+
+     <dl>
+<!-- regex.h -->
+<!-- POSIX.2 -->
+<dt><code>REG_NOMATCH</code><dd>The pattern didn't match the string.  This isn't really an error.
+
+     <!-- regex.h -->
+<!-- POSIX.2 -->
+<br><dt><code>REG_ESPACE</code><dd><code>regexec</code> ran out of memory. 
+</dl>
+
+<div class="node">
+<p><hr>
+<a name="Regexp-Subexpressions"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Subexpression-Complications">Subexpression Complications</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Matching-POSIX-Regexps">Matching POSIX Regexps</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Entry-Points">Posix Entry Points</a>
+
+</div>
+
+<h3 class="section">4.4 Match Results with Subexpressions</h3>
+
+<p>When <code>regexec</code> matches parenthetical subexpressions of
+<var>pattern</var>, it records which parts of <var>string</var> they match.  It
+returns that information by storing the offsets into an array whose
+elements are structures of type <code>regmatch_t</code>.  The first element of
+the array (index <code>0</code>) records the part of the string that matched
+the entire regular expression.  Each other element of the array records
+the beginning and end of the part that matched a single parenthetical
+subexpression.
+
+<!-- regex.h -->
+<!-- POSIX.2 -->
+<div class="defun">
+&mdash; Data Type: <b>regmatch_t</b><var><a name="index-regmatch_005ft-6"></a></var><br>
+<blockquote><p>This is the data type of the <var>matcharray</var> array that you pass to
+<code>regexec</code>.  It containes two structure fields, as follows:
+
+          <dl>
+<dt><code>rm_so</code><dd>The offset in <var>string</var> of the beginning of a substring.  Add this
+value to <var>string</var> to get the address of that part.
+
+          <br><dt><code>rm_eo</code><dd>The offset in <var>string</var> of the end of the substring. 
+</dl>
+        </p></blockquote></div>
+
+<!-- regex.h -->
+<!-- POSIX.2 -->
+<div class="defun">
+&mdash; Data Type: <b>regoff_t</b><var><a name="index-regoff_005ft-7"></a></var><br>
+<blockquote><p><code>regoff_t</code> is an alias for another signed integer type. 
+The fields of <code>regmatch_t</code> have type <code>regoff_t</code>. 
+</p></blockquote></div>
+
+   <p>The <code>regmatch_t</code> elements correspond to subexpressions
+positionally; the first element (index <code>1</code>) records where the first
+subexpression matched, the second element records the second
+subexpression, and so on.  The order of the subexpressions is the order
+in which they begin.
+
+   <p>When you call <code>regexec</code>, you specify how long the <var>matchptr</var>
+array is, with the <var>nmatch</var> argument.  This tells <code>regexec</code> how
+many elements to store.  If the actual regular expression has more than
+<var>nmatch</var> subexpressions, then you won't get offset information about
+the rest of them.  But this doesn't alter whether the pattern matches a
+particular string or not.
+
+   <p>If you don't want <code>regexec</code> to return any information about where
+the subexpressions matched, you can either supply <code>0</code> for
+<var>nmatch</var>, or use the flag <code>REG_NOSUB</code> when you compile the
+pattern with <code>regcomp</code>.
+
+<div class="node">
+<p><hr>
+<a name="Subexpression-Complications"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Regexp-Cleanup">Regexp Cleanup</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Regexp-Subexpressions">Regexp Subexpressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Entry-Points">Posix Entry Points</a>
+
+</div>
+
+<h3 class="section">4.5 Complications in Subexpression Matching</h3>
+
+<p>Sometimes a subexpression matches a substring of no characters.  This
+happens when `<samp><span class="samp">f\(o*\)</span></samp>' matches the string `<samp><span class="samp">fum</span></samp>'.  (It really
+matches just the `<samp><span class="samp">f</span></samp>'.)  In this case, both of the offsets identify
+the point in the string where the null substring was found.  In this
+example, the offsets are both <code>1</code>.
+
+   <p>Sometimes the entire regular expression can match without using some of
+its subexpressions at all&mdash;for example, when `<samp><span class="samp">ba\(na\)*</span></samp>' matches the
+string `<samp><span class="samp">ba</span></samp>', the parenthetical subexpression is not used.  When
+this happens, <code>regexec</code> stores <code>-1</code> in both fields of the
+element for that subexpression.
+
+   <p>Sometimes matching the entire regular expression can match a particular
+subexpression more than once&mdash;for example, when `<samp><span class="samp">ba\(na\)*</span></samp>'
+matches the string `<samp><span class="samp">bananana</span></samp>', the parenthetical subexpression
+matches three times.  When this happens, <code>regexec</code> usually stores
+the offsets of the last part of the string that matched the
+subexpression.  In the case of `<samp><span class="samp">bananana</span></samp>', these offsets are
+<code>6</code> and <code>8</code>.
+
+   <p>But the last match is not always the one that is chosen.  It's more
+accurate to say that the last <em>opportunity</em> to match is the one
+that takes precedence.  What this means is that when one subexpression
+appears within another, then the results reported for the inner
+subexpression reflect whatever happened on the last match of the outer
+subexpression.  For an example, consider `<samp><span class="samp">\(ba\(na\)*s \)*</span></samp>' matching
+the string `<samp><span class="samp">bananas bas </span></samp>'.  The last time the inner expression
+actually matches is near the end of the first word.  But it is
+<em>considered</em> again in the second word, and fails to match there. 
+<code>regexec</code> reports nonuse of the &ldquo;na&rdquo; subexpression.
+
+   <p>Another place where this rule applies is when the regular expression
+`<samp><span class="samp">\(ba\(na\)*s&nbsp;\|nefer\(ti\)*&nbsp;\)*</span></samp>'<!-- /@w --> matches `<samp><span class="samp">bananas nefertiti</span></samp>'. 
+The &ldquo;na&rdquo; subexpression does match in the first word, but it doesn't
+match in the second word because the other alternative is used there. 
+Once again, the second repetition of the outer subexpression overrides
+the first, and within that second repetition, the &ldquo;na&rdquo; subexpression
+is not used.  So <code>regexec</code> reports nonuse of the &ldquo;na&rdquo;
+subexpression.
+
+<div class="node">
+<p><hr>
+<a name="Regexp-Cleanup"></a>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Subexpression-Complications">Subexpression Complications</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Posix-Entry-Points">Posix Entry Points</a>
+
+</div>
+
+<h3 class="section">4.6 POSIX Regexp Matching Cleanup</h3>
+
+<p>When you are finished using a compiled regular expression, you must
+free the storage it uses by calling <code>regfree</code>.
+
+<!-- regex.h -->
+<!-- POSIX.2 -->
+<div class="defun">
+&mdash; Functie: void <b>regfree</b> (<var>regex_t *compiled</var>)<var><a name="index-regfree-8"></a></var><br>
+<blockquote><p>Calling <code>regfree</code> frees all the storage that <code>*</code><var>compiled</var>
+points to.  This includes various internal fields of the <code>regex_t</code>
+structure that aren't documented in this manual.
+
+        <p><code>regfree</code> does not free the object <code>*</code><var>compiled</var> itself. 
+</p></blockquote></div>
+
+   <p>You should always free the space in a <code>regex_t</code> structure with
+<code>regfree</code> before using the structure to compile another regular
+expression.
+
+   <p>When <code>regcomp</code> or <code>regexec</code> reports an error, you can use
+the function <code>regerror</code> to turn it into an error message string.
+
+<!-- regex.h -->
+<!-- POSIX.2 -->
+<div class="defun">
+&mdash; Functie: size_t <b>regerror</b> (<var>int errcode, regex_t *compiled, char *buffer, size_t length</var>)<var><a name="index-regerror-9"></a></var><br>
+<blockquote><p>This function produces an error message string for the error code
+<var>errcode</var>, and stores the string in <var>length</var> bytes of memory
+starting at <var>buffer</var>.  For the <var>compiled</var> argument, supply the
+same compiled regular expression structure that <code>regcomp</code> or
+<code>regexec</code> was working with when it got the error.  Alternatively,
+you can supply <code>NULL</code> for <var>compiled</var>; you will still get a
+meaningful error message, but it might not be as detailed.
+
+        <p>If the error message can't fit in <var>length</var> bytes (including a
+terminating null character), then <code>regerror</code> truncates it. 
+The string that <code>regerror</code> stores is always null-terminated
+even if it has been truncated.
+
+        <p>The return value of <code>regerror</code> is the minimum length needed to
+store the entire error message.  If this is less than <var>length</var>, then
+the error message was not truncated, and you can use it.  Otherwise, you
+should call <code>regerror</code> again with a larger buffer.
+
+        <p>Here is a function which uses <code>regerror</code>, but always dynamically
+allocates a buffer for the error message:
+
+     <pre class="smallexample">          char *get_regerror (int errcode, regex_t *compiled)
+          {
+            size_t length = regerror (errcode, compiled, NULL, 0);
+            char *buffer = xmalloc (length);
+            (void) regerror (errcode, compiled, buffer, length);
+            return buffer;
+          }
+     </pre>
+        </blockquote></div>
+
+<div class="node">
+<p><hr>
+<a name="Beyond-POSIX"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Rx-Theory">Rx Theory</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Posix-Entry-Points">Posix Entry Points</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">5 Beyond POSIX</h2>
+
+<p>This section is not finished documentation, but rather a collection of
+pointers towards some of the interesting, non-standard features of Rx.
+
+<h3 class="section">5.1 New Regexp Operators</h3>
+
+<p>Rx supports some unusual regexp syntax.
+
+   <p><code>[[:cut N:]]</code> sets <code>pmatch[0].final_tag</code> to N and causes the
+matching to stop instantly.  If N is 0, the overall match fails,
+otherwise it succeeds.
+
+   <p><code>[[:(:]] ... [[:):]]</code> is just like <code>\( ... \)</code> except that in
+the first case, no pmatch entries are changed, and the subexpression is
+not counted in the numbering of parenthesized subexpressions.
+
+   <p><code>[[:(:]] ... [[:):]]</code> can be used when you do not need to know
+where a subexpression matched but are only using parentheses to effect
+the parsing of the regexp.
+
+   <p>There are two reasons to use <code>[[:(:]] ... [[:):]]</code>:
+
+   <p>1. regexec will run faster.
+
+   <p>2. Currently, only 8 backreferencable subexpressions are supported:
+<code>\1 .. \9</code>.  Using <code>[[:(:]] ... [[:):]]</code> is a way to conserve
+backreferencable subexpression names in an expression with many
+parentheses.
+
+<h3 class="section">5.2 New POSIX Functions</h3>
+
+<p><code>regncomp</code> and <code>regnexec</code> are non-standard generalizations of
+<code>regcomp</code> and <code>regexec</code>.
+
+<h3 class="section">5.3 Tuning POSIX performance</h3>
+
+<p>Two mysterious parmaters can be used to trade-off performance and
+memory use.
+
+   <p>At compile-time they are <code>RX_DEFAULT_DFA_CACHE_SIZE</code> and
+<code>RX_DEFAULT_NFA_DELAY</code>.
+
+   <p>If you want to mess with these (I generally don't advise it), I suggest
+experimenting for your particular application/memory situation; frob
+these by powers of two and try out the results on what you expect will
+be typical regexp workloads.
+
+   <p>You can also set those parameters at run-time (before calling any regexp
+functions) by tweaking the corresponding variables:
+
+   <p><code>rx_default_cache-&gt;bytes_allowed</code>
+
+   <p>and
+
+   <p><code>rx_basic_unfaniverse_delay</code>
+
+<h3 class="section">5.4 POSIX stream-style interface</h3>
+
+<p><code>rx_make_solutions</code>, <code>rx_next_solution</code>, and
+<code>rx_free_solutions</code> are a lower level alternative to the posix
+functions.  Using those functions, you can compare a compiled regexp to
+a string that is not contiguous in memory or even a string that is not
+entirely in memory at any one time.
+
+   <p>The code in rxposix.c points out how those functions are used.
+
+<h3 class="section">5.5 DFAs Directly</h3>
+
+<p>If you are only interested in pure regular expressions (no pmatch data,
+no backreferences, and no counted subexpressions), you can parse a
+regexp using <code>rx_parse</code>, convert it to an nfa using <code>rx_unfa</code>,
+and run the dfa using <code>rx_init_system</code>, <code>rx_advance_to_final</code>,
+and <code>rx_terminate_system</code>.  The dfa Scheme primitives in
+<samp><span class="file">rgx.c</span></samp> may provide some guide.
+
+<div class="node">
+<p><hr>
+<a name="Rx-Theory"></a>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Beyond-POSIX">Beyond POSIX</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">6 Rx Theory</h2>
+
+<p><a name="index-Rx-Theory-10"></a>
+There are two match algorithms.  One is for truly regular regexps (those
+that can be reduced to a dfa).  The other is for non-regular regexps.
+
+   <p>The dfa algorithm implements the idea suggested in <cite>Compilers</cite> by
+Aho, Sethi and Ullman:
+
+   <blockquote>
+[One] approach [to pattern matching regular expressions] is to use a
+DFA, but avoid constructing all of the transition table by using a
+technique called "lazy transition evaluation".  Here, transitions are
+computed at run time [when] actually needed. [T]ransitions are
+stored in a cache. [....] If the cache becomes full, we can erase some
+previously computed transition to make room for the new transition. 
+</blockquote>
+
+   <p>The implementation in Rx is generalized from that, but the above
+description covers what is used for Posix patterns.
+
+   <p>The non-dfa algorithm implements a "recursive decomposition" technique
+described in email by Henry Spencer.  For a given pattern, this
+algorithm first checks to see if a simpler, superset language,
+DFA-pattern matches.  If it does, then this algorithm does the
+detail-work to see if the non-DFA pattern matches.
+
+   <p>The detail work usually involves recursing on subpatterns.  For example,
+a concatentation of two subexpressions matches a string if the string
+can be divided into two parts, each matching one subexpression, in the
+right order.  More than one solution is often possible for a given
+pattern.  This ambiguity is the subject of the "leftmost longest" rules
+in the spec, and the back-tracking oriented stream-of-solution functions
+<code>rx_make_solutions</code>, <code>rx_next_solution</code> and
+<code>rx_free_solutions</code>.
+
+<pre class="example">     rxspencer.[ch]	 			-- The non-DFA algorithm
+     rxanal.[ch] rxsuper.[ch] rxnfa.[ch]	-- The DFA algorithm
+</pre>
+   </body></html>
+

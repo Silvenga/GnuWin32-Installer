@@ -1,0 +1,392 @@
+' et
+.TH STYLE 1 "August 30th, 2007" "GNU" "User commands"
+.SH NAME \"{{{roff}}}\"{{{
+style \- analyse surface characteristics of a document
+.\"}}}
+.SH SYNOPSIS \"{{{
+.\" Missing options:
+.\" -a    displays all sentences with their length and readability index.
+.\" -e    displays all sentences that begin with an expletive.
+.\" -P    displays parts of speech of the words in the document.
+.\" -p    displays all sentences that contain a passive verb.
+.ad l
+.B style
+.RB [ \-L
+.IR language ]
+.RB [ \-l
+.IR length ]
+.RB [ \-r
+.IR ari ]
+.RI [ file ...]
+.ad b
+.br
+.ad l
+.B style
+.RB [ \-\-language
+.IR language ]
+.RB [ \-\-print-long
+.IR length ]
+.RB [ \-\-print-ari
+.IR ari ]
+.RI [ file ...]
+.ad b
+.br
+.ad l
+.B style
+.BR \-h | \-\-help 
+.ad b
+.br  
+.ad l
+.B style \-\-version
+.ad b
+.\"}}}
+.SH DESCRIPTION \"{{{
+\fBStyle\fP analyses the surface characteristics of the writing style
+of a document.  It prints various readability grades, length of words,
+sentences and paragraphs.
+.\" sentence structure, word usage, verb type, sentence openers
+It can further locate sentences with certain characteristics.
+If no files are given, the document is read from standard input.
+.PP
+Numbers are counted as words with one syllable.
+A sentence is a sequence of words, that starts with a capitalised word and
+ends with a full stop, double colon, question mark or exclamation mark.
+A single letter followed by a dot is considered an abbreviation, so it
+does not end a sentence.  Various multi-letter abbreviations are
+recognized, they do not end a sentence as well.
+A paragraph
+consists of two or more new line characters.
+.SS "Readability grades"
+\fBStyle\fP understands \fIcpp\fP(1) \fB#line\fP lines for being able to
+give precise locations when printing sentences.
+.IP "Kincaid formula" \"{{{ 
+The Kincaid Formula has been developed for Navy training manuals, that
+ranged in difficulty from 5.5 to 16.3.  It is probably best applied
+to technical documents, because it is based on adult training manuals
+rather than school book text.  Dialogs (often found in fictional texts)
+are usually a series of short sentences, which lowers the score.  On the
+other hand, scientific texts with many long scientific terms are rated
+higher, although they are not necessarily harder to read for people
+who are familiar with those terms.
+.sp
+.\"{{{ Kincaid Index
+.if t \{\
+.RS
+.EQ
+italic "Kincaid" = 11.8 * syllables over words + 0.39 * words over sentences - 15.59
+.EN
+.RE
+.\}
+.if n \{\
+.ad l
+Kincaid = 11.8*syllables/wds+0.39*wds/sentences-15.59
+.ad b
+.\}
+.\"}}}
+.\"}}}
+.IP "Automated Readability Index" \"{{{ 
+The Automated Readability Index is typically higher than Kincaid and
+Coleman-Liau, but lower than Flesch.
+.sp
+.\"{{{ Automated Readability Index
+.if t \{\
+.RS
+.EQ
+italic "ARI" = 4.71 * letters over words + 0.5 * words over sentences - 21.43
+.EN
+.RE
+.\}
+.if n \{\
+.ad l
+ARI = 4.71*chars/wds+0.5*wds/sentences-21.43
+.ad b
+.\}
+.\"}}}
+.\"}}}
+.IP "Coleman-Liau Formula" \"{{{ 
+The Coleman-Liau Formula usually gives a lower grade than Kincaid,
+ARI and Flesch when applied to technical documents.
+.sp
+.\"{{{ Coleman-Liau Formula
+.if t \{\
+.RS
+.EQ
+italic "Coleman-Liau" = 5.88 * letters over words - { 29.5 * sentences } over words - 15.8
+.EN
+.RE
+.\}
+.if n \{\
+.ad l
+Coleman-Liau = 5.88*chars/wds-29.5*sent/wds-15.8
+.ad b
+.\}
+.\"}}}
+.\"}}}
+.IP "Flesh reading easy formula" \"{{{ 
+The Flesh reading easy formula has been developed by Flesh in 1948 and
+it is based on school text covering grade 3 to 12.  It is wide spread,
+especially in the USA, because of good results and simple computation.
+The index is usually between 0 (hard) and 100 (easy), standard English
+documents averages approximately 60 to 70.  Applying it to German
+documents does not deliver good results because of the different language
+structure.
+.sp
+.\"{{{ Flesh reading easy formula
+.if t \{\
+.RS
+.EQ
+Flesch ~ Index = 206.835 - 84.6 * syllables over words - 1.015 * words over sentences
+.EN
+.RE
+.\}
+.if n \{\
+.ad l
+Flesch Index = 206.835-84.6*syll/wds-1.015*wds/sent
+.ad b
+.\}
+.\"}}}
+.\"}}}
+.IP "Fog Index" \"{{{
+The Fog index has been developed by Robert Gunning.  Its value is a
+school grade.  The ``ideal'' Fog Index level is 7 or 8.  A level above
+12 indicates the writing sample is too hard for most people to read.
+Only use it on texts of at least hundred words to get meaningful results.
+Note that a correct implementation would not count words of three or
+more syllables that are proper names, combinations of easy words, or
+made three syllables by suffixes such as \(ened, \(enes, or \(ening.
+.sp
+.\"{{{ Fog Index formula
+.if t \{\
+.RS
+.EQ
+Fog ~ Index = 0.4 * left ( words over sentences + 100 * { { words >= 3 ~ syllables } over words } right )
+.EN
+.RE
+.\}
+.if n \{\
+.ad l
+Fog Index = 0.4*(wds/sent+100*((wds >= 3 syll)/wds))
+.ad b
+.\}
+.\"}}}
+.\"}}}
+.\" might be wrong
+.\".IP "WSFT Index" \"{{{
+.\"The first new Vienna text formula (1. neue Wiener Sachtextformel, WSTF)
+.\"has been developed for German documents and its result is a school grade
+.\"that could read the text.
+.\".sp
+.\"{{{ WSTF
+.\".if t \{\
+.\".RS
+.\".EQ
+.\"matrix {
+.\"col { WSTF ~ Index = above ~ }
+.\"lcol {
+.\"0.1935 * { words >= 3 ~ syllables } over words + 0.1672 * words over sentences -
+.\"above 
+.\"down 70 { 0.1297 * { words > 6 ~ characters } over words - 0.0327 * { words = 1 ~ syllable } over words - 0.875 }
+.\"}
+.\"}
+.\".EN
+.\".RE
+.\".\}
+.\".if n \{\
+.\".ad l
+.\"WSTF Index =  0.1935*(wds >= 3 syllables)/wds
+.\"             +0.1672*wds/sent
+.\"             -0.1297*(wds > 6 characters)/wds
+.\"             -0.0327*(wds = 1 syllable)/wds
+.\"             -0.875
+.\".ad b
+.\".\}
+.\"}}}
+.\"}}}
+.\" might be wrong
+.\".IP "Wheeler-Smith Index" \"{{{ 
+.\"The Wheeler-Smith Index is mapped to school grades using a table:
+.\".sp
+.\"{{{ Wheeler-Smith Index
+.\".if t \{\
+.\".RS
+.\".EQ
+.\"italic "Wheeler-Smith" ~ Index =
+.\"words over sentences * 100 * { words >= 3 ~ syllables } over words
+.\".EN
+.\".RE
+.\".\}
+.\".if n \{\
+.\".ad l
+.\"Wheeler-Smith Index = wds/sent*100*((wds >= 3 syll)/wds)
+.\".ad b
+.\".\}
+.\"}}}
+.\".sp
+.\".RS
+.\".TS
+.\"tab(#);
+.\"l c c c c c c c c c c c c c.
+.\"Index#16##20##24##29##34##38##42
+.\"School year##5##6##7##8##9##10
+.\".TE
+.\".RE
+.\"}}}
+.IP "Lix formula" \"{{{
+The Lix formula developed by Björnsson from Sweden is very simple and
+employs a mapping table as well:
+.sp
+.\"{{{ Lix
+.if t \{\
+.RS
+.EQ
+Lix =
+words over sentences + 100 * { words > 6 ~ characters } over words
+.EN
+.RE
+.\}
+.if n \{\
+.ad l
+Lix = wds/sent+100*(wds >= 6 char)/wds
+.ad b
+.\}
+.\"}}}
+.sp
+.RS
+.ne 2
+.TS
+tab(#);
+l c1 c1 c1 c1 c1 c1 c1 c1 c1 c1 c1 c1 c1 c1 c.
+Index#34##38##41##44##48##51##54##57
+School year##5##6##7##8##9##10##11
+.TE
+.RE
+.\"}}}
+.IP "SMOG-Grading" \"{{{
+The SMOG-Grading for English texts has been developed by McLaughlin
+in 1969.  Its result is a school grade.
+.sp
+.\"{{{ SMOG
+.if t \{\
+.RS
+.EQ
+italic "SMOG-Grading" = sqrt { { (words >= 3 ~ syllables) } over sentences * 30 } + 3
+.EN
+.RE
+.\}
+.if n \{\
+.ad l
+SMOG-Grading = square root of (((wds >= 3 syll)/sent)*30) + 3
+.ad b
+.\}
+.\"}}}
+.sp
+It has been adapted to German by Bamberger & Vanecek in 1984, who changed
+the constant +3 to \-2.
+.\"}}}
+.SS "Word usage"
+The word usage counts are intended to help identify excessive use of particular
+parts of speech.
+.IP "Verb Phrases" \"{{{
+The category of verbs labeled "to be" identifies phrases using the passive
+voice.  Use the passive voice sparingly, in favor of more direct verb forms.
+The flag \fB-p\fP causes \fBstyle\fP to list all occurrences of the passive
+voice.
+.PP
+The verb category "aux" measures the use of modal auxiliary verbs, such as
+"can", "could", and "should".  Modal auxiliary verbs modify the mood of a verb.
+.\"}}}
+.IP "Conjunctions" \"{{{
+The conjunctions counted by style are coordinating and subordinating.
+Coordinating conjunctions join grammatically equal sentence fragments, such as
+a noun with a noun, a phrase with a phrase, or a clause to a clause.
+Coordinating conjunctions are "and," "but," "or," "yet," and "nor."
+.PP
+Subordinating conjunctions connect clauses of unequal status.  A subordinating
+conjunction links a subordinate clause, which is unable to stand alone, to an
+independent clause.  Examples of subordinating conjunctions are "because,"
+"although," and "even if."
+.\"}}}
+.IP "Pronouns" \"{{{
+Pronouns are contextual references to nouns and noun phrases.  Documents with
+few pronouns generally lack cohesiveness and fluidity.  Too many pronouns may
+indicate ambiguity.
+.\"}}}
+.IP "Nominalizations" \"{{{
+Nominalizations are verbs that are changed to nouns.  Style recognizes words
+that end in "ment," "ance," "ence," or "ion" as nominalizations.
+Examples are "endowment," "admittance," and "nominalization."  Too much
+nominalization in a document can sound abstract and be difficult to understand.
+The flag \fB-N\fP causes \fBstyle\fP to list all nominalizations.  The
+flag \fB-n\fP prints all sentences with either the passive voice or a
+nominalization.
+.\"}}}
+.\"}}}
+.SH OPTIONS \"{{{
+.IP "\fB\-L\fP \fIlanguage\fP, \fB\-\-language\fP \fIlanguage\fP"
+set the document language (\fBde\fP, \fBen\fP, \fBnl\fP).
+.IP "\fB\-l\fP \fIlength\fP, \fB\-\-print-long\fP \fIlength\fP"
+print all sentences longer than \fIlength\fP words.
+.IP "\fB\-r\fP \fIari\fP, \fB\-\-print-ari\fP \fIari\fP"
+print all sentences whose readability index (ARI) is greater than \fIari\fP.
+.IP "\fB\-p\fP \fIpassive\fP, \fB\-\-print-passive\fP"
+print all sentences phrased in the passive voice.
+.IP "\fB\-N\fP \fInominalizations\fP, \fB\-\-print-nom\fP"
+print all sentences containing nominalizations.
+.IP "\fB\-n\fP \fInominalizations-passive\fP, \fB\-\-print-nom-passive\fP"
+print all sentences  phrased in the passive voice or containing nominalizations.
+.IP "\fB\-h\fP, \fB\-\-help\fP"
+Print a short usage message.
+.IP \fB\-\-version\fP
+Print the version.
+.\"}}}
+.SH ERRORS \"{{{
+On usage errors, 1 is returned.  Termination caused by lack of memory is
+signalled by exit code 2.
+.\"}}}
+.SH ENVIRONMENT \"{{{
+.IP "\fBLC_MESSAGES\fP=\fBde\fP\^|\^\fBen\fP\^|\^\fBnl\fP"
+specifies the default document language.  The default language is \fBen\fP.
+.IP "\fBLC_CTYPE\fP=\fBiso-8859-1\fP"
+specifies the document character set.  The default character set is ASCII.
+.\"}}}
+.SH AUTHOR \"{{{
+This program is GNU software, copyright 1997\(en2007 Michael Haardt <michael@moria.de>.
+.PP
+It contains contributions by Jason Petrone <jpetrone@acm.org>,
+Uschi Stegemeier <uschi@morwain.de> and Hans Lodder.
+.PP
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+.PP
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+.PP
+You should have received a copy of the GNU General Public License along
+with this program.  If not, write to the Free Software Foundation, Inc.,
+59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.\"}}}
+.SH HISTORY \"{{{
+There has been a style command on old UNIX systems, which is now part
+of the AT&T DWB package.  The original version was bound to roff by
+enforcing a call to deroff.
+.\"}}}
+.SH "SEE ALSO" \"{{{
+deroff(1), diction(1)
+.P
+Cherry, L.L.; Vesterman, W.: \fIWriting Tools\(emThe STYLE and DICTION
+programs\fP, Computer Science Technical Report 91, Bell Laboratories,
+Murray Hill, N.J. (1981), republished as part of the 4.4BSD User's
+Supplementary Documents by O'Reilly.
+.P
+Coleman, M. and Liau,T.L. (1975). 'A computer readability formula designed for  
+machine scoring', Journal of Applied Psychology, 60(2), 283-284.
+.\"
+.\" De Vries, Hugo: \fIReading Ease@WWW\fP, http://www.shlrc.mq.edu.au/~hdevries/RE.html
+.\"
+.\" Norbert Groeben: Leserpsychologie: Textverständnis - Textverständlichkeit
+.\" Münster, 1982.
+.\"}}}

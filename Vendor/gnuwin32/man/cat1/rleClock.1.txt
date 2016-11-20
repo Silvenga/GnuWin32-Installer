@@ -1,0 +1,173 @@
+RLECLOCK(1)                                         RLECLOCK(1)
+
+
+
+
+
+NAME
+       rleClock - Generate a clock face in RLE format
+
+SYNOPSIS
+       rleClock [ options ] [ -o outfile ]
+
+DESCRIPTION
+       This  program  generates  an analog clock face in RLE(5)
+       file format and writes it to outfile or standard output.
+       The picture is a standard clock face with optional digi-
+       tal representation above.  The user has control over the
+       colors  of the portions of the clock face, the text, and
+       the text background.  The user also has control over the
+       clock  configuration:  number of ticks, scale of the big
+       and little hands, the  values  of  the  big  and  little
+       hands,  and the format used to generate the digital por-
+       tion.
+
+       By default, rleClock generates a standard  analog  clock
+       face  displaying  the  current  time and with no digital
+       portion.  This default face is transparent, that is, the
+       alpha  channel  is  only  defined for the clock outline,
+       tick marks, and the hands.
+
+       On those options that expect colors, three numbers  must
+       be  given after the option switch.  These are values for
+       red, green, and blue on a scale  of  zero  through  255.
+       Those  color  options  that are capitalized indicate the
+       colors for the filled regions (optional  for  the  clock
+       face  and  text  but default for the hands).  Those that
+       are not capitalized are for lines that either outline or
+       constitute  the  feature (the clock face is default, but
+       they're optional for the hands).
+
+OPTIONS
+       -help  Prints a synopsis of the options.
+
+       The options that control  the  value  displayed  by  the
+       clock are
+
+       -ls FLOAT
+              This  specifies  the  full scale (360 degrees) of
+              the little hand.  Default is 12.
+
+       -lv FLOAT
+              This specifies the  value  of  the  little  hand,
+              expressed in units of the little hand full scale.
+              Default is the current hour  time  on  a  12-hour
+              scale.
+
+       -bs FLOAT
+              This  specifies  the  full scale (360 degrees) of
+              the big hand.  Default is 60.
+
+       -bv FLOAT
+              This  specifies  the  value  of  the  big   hand,
+              expressed  in  units  of the big hand full scale.
+              Default is the current minute time.
+
+       The following options manage the  display  configuration
+       of the clock:
+
+       -x INT The  INT specifies the width of the clock in pix-
+              els.  Default is 128.
+
+       -cy INT
+              The INT specifies the height of  the  clock  face
+              (minus  text  portion) in pixels.  The default is
+              128.
+
+       -ty INT
+              The INT specifies the height  in  pixels  of  the
+              text  portion of the display.  If it is zero (the
+              default), no text portion is displayed.
+
+       -t INT This specifies the number of tick marks to  place
+              around the clock.  The default is 12.
+
+       -lw INT
+              This  specifies  the  line width in pixels of the
+              clock face, the tick  marks,  the  optional  hand
+              borders,  and  the text.  The default is one, but
+              two or three give better looking clocks.
+
+       -tf STR
+              The string describes how to show the digital por-
+              tion of the clock.  The rules for forming STR are
+              the same as for printf format strings, that is, a
+              percent  sign, optionally followed by field width
+              values, followed by a key letter.  In this  case,
+              the  key letter may be b, l, B, or L.  Lower case
+              b means to insert the integer value  of  the  big
+              hand  and upper case B means to insert the float-
+              ing point value of the big hand.   Lower  case  l
+              means  to  insert the integer value of the little
+              hand and upper case L means to insert the  float-
+              ing point value of the little hand.
+
+       -fc R G B
+              This specifies the color in red, green, and blue,
+              of the clock face.
+
+       -Fc R G B
+              This specifies the color to fill  in  inside  the
+              clock  face,  under the hands.  If this option is
+              not supplied, the  clock  is  generated  with  no
+              inside-face background (by use of the alpha chan-
+              nel).
+
+       -Hc R G B
+              This specifies the color to  draw  in  the  hands
+              with.
+
+       -hc R G B
+              This  specifies the color to draw the outlines of
+              the hands.  If it is not given, no  outlines  are
+              drawn on the edges of the hands.
+
+       -tc R G B
+              This  specifies  the  color of the text above the
+              clock.  It only has effect if a text height (-ty)
+              is supplied.
+
+       -Tc R G B
+              This specifies the color of a background field to
+              place behind the text.  If omitted, no background
+              (zero alpha channel) is drawn.
+
+EXAMPLES
+       rleClock
+              Generates  a  transparent  clock face showing the
+              current time and no digital representation.
+
+       rleClock -ty 32
+              Generates a current-time clock with digital  rep-
+              resentation above.
+
+       rleClock  -Fc 255 0 0 -Hc 0 0 255 -lw 3 -ty 96 -tc 0 255
+       0 -Tc 128 128 128
+              Generates  a clock with a red inside, white face,
+              blue hands, wide lines, tall  text  field,  green
+              test, and grey text background.
+
+       rleClock  -ty  32  -bs  10 -bv 4.51 -ls 100 -lv 45.1 -tf
+       "%2l.%2.2B"
+              Generates  a clock with the scale of the big hand
+              set to 10 and it's value at 4.51, the  scale  and
+              value of the little hand as 100 and 45.1, and the
+              format  for  the  digital  portion  formatted  as
+              %2d.%2.2f  to print the integer little hand value
+              (two spaces) and  the  floating  point  big  hand
+              value.
+
+SEE ALSO
+       urt(1), RLE(5).
+
+AUTHOR
+       Robert L. Brown, RIACS, NASA Ames Research Center
+
+BUGS
+       Not  thoroughly  checked  when the line width is cranked
+       up.  May dump core.
+
+
+
+
+1                         Dec 11, 1987              RLECLOCK(1)

@@ -1,0 +1,146 @@
+
+This project started in April 2005.
+
+Welcome to the EDLL project. This project was created by
+Alexis Wilke to solve once and for all the lack of support
+for undefined symbols under MS-Windows.
+
+EDLL stands for Enhanced Dynamic Link Library.
+
+It can load object files (.o) compiled with gcc at runtime.
+It will load the symbols, load dependencies, allocate
+memory to load the content of the .text and .data sections
+and finally relocate the content. If you are using C++
+and have constructors, it will also call them automatically
+(and the destructors on closure).
+
+
+The project now offers .zip files. These are MinGW compatible.
+There is one file with the source (src/edll-<version>/...)
+which is very similar to the .tar.gz file (tarball).
+The two other zip files are pre-compiled versions of the
+edll library. The one with '-bin' is compiled WITHOUT the
+BFD and iberty libraries. This means that version is covered
+by the LGPL. The other, which has -bfd instead, was to the
+contrary compiled WITH the bfd and iberty libraries. This
+means it is covered by the GPL instead. It will allow you
+to load more formats (as long as it was compiled for i386)
+but you have to give your sources along.
+
+  edll-<version>.tar.gz          Sources
+  edll-<version>-src.zip         MinGW like package of Sources
+  edll-<version>-bin.zip         MinGW package of LGPL binaries
+  edll-<version>-bfd.zip         MinGW package of GPL binaries
+
+
+In order to use this library, you may need to create an
+ltdlconfig.h file. To do so, look into the ltdl library
+(see the website for current link -- it is part of libtools).
+
+If my ltdlconfig.h works for you, then you are ready to go!
+
+This work dependents on the BFD and -liberty libraries.
+Also, I use gcc 3.4.2 to compile on my system. You probably
+want to have at least that version.
+
+
+EDLL comes with a configure script. You need to run it
+to create all the Makefile's and more. See the INSTALL document
+for generic and detailed information about configure. To invoke
+the configure script do this in an MSYS shell (bash or sh):
+
+	cd edll-0.3
+	./configure [--flags]
+
+You can also run it in a different directory as I usually do:
+
+	cd edll-0.3
+	mkdir BUILD
+	cd BUILD
+	../configure --enable-cwarnings ...
+	make
+	...
+
+The specialized flags defined by the EDLL are as follow:
+
+--enable-cpptests	Can create and run C++ tests; this
+			is disabled by default.
+
+--enable-docs		Enable the makefile to install the
+			documentation. By default this is
+			set to enable if the documentation
+			is present.
+
+--enable-debug		Enable the DEBUG macro. Useful only
+			if you want to tweak the edll library.
+
+--enable-cwarnings	Enable compilation warnings and make
+			the warnings generate errors (i.e. the
+			compilation will actually fail if anything
+			generates a warning.)
+
+			To be precise, it adds -Wall -Werror
+			to the compilation command line.
+
+			I always test with this flag turn on so
+			in my current environment there won't be
+			any warnings. Newer or older versions of
+			gcc/g++ may however have different policies
+			about warnings and thus this option should
+			only be used if you change the code.
+
+--enable-useltdl	Enable the use of the ltdl library. This is
+			mainly if you are creating a portable project.
+			A project which needs to run under a Unix system
+			such as Linux (POSIX) and Windows and which needs
+			to load modules which link back to the application
+			or between each others, then you certainly want
+			to use the ltdl which will automatically load
+			the modules the way you'd expect on all platforms
+			including Microsoft Windows.
+
+--enable-versioncheck	This flag, when enabled, requests the library to
+			include the version test. You can put a version
+			in your plugins and your main executable. When
+			the EDLL library loads a plugin, it compares its
+			version with the application version. If it is
+			not equal, the loading fails.
+
+--enable-french		Use this flag to get errors in French. This is
+			not currently using the gettext(). It may be
+			changed at a later time.
+
+
+If you only want the library to be compiled, do this:
+
+	make
+or
+	make all
+
+By default, the tests are NOT compiled.
+
+If you want to compile the library and all the tests,
+do this:
+
+	make tests
+
+If you want to create everything and run all the tests
+at once, do this:
+
+	make run
+
+The tests are very simple and they should work under
+all W2k and WinXP.
+
+Note that at this time this code is not really supposed
+to work under Win95/98, but if someone tests under these
+systems, let me know if it worked (and send me a patch
+if you had to fix something!)
+
+Please, don't forget to check out the website, there is
+a wealth of information on these pages that you want to
+know about.
+
+				Alexis Wilke
+				January 1, 2006
+

@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pgmtoppm User Manual</TITLE></HEAD>
+<BODY>
+<H1>pgmtoppm</H1>
+Updated: 24 January 2001
+<BR>
+<A HREF="pgmtoppm.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pgmtoppm - colorize a PGM (grayscale) image into a PPM (color) image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pgmtoppm</B>
+
+<I>colorspec</I>
+
+[<I>pgmfile</I>]
+
+<BR>
+
+<B>pgmtoppm</B>
+
+<I>colorspec1</I><B>-</B><I>colorspec2</I>
+
+[<I>pgmfile</I>]
+
+<BR>
+
+<B>pgmtoppm -map</B>
+
+<I>mapfile</I>
+
+[<I>pgmfile</I>]
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pgmtoppm</b> reads a PGM as input and produces a PPM file as
+output with a specific color assigned to each gray value in the input.
+
+<P>If you specify one color argument, black in the pgm file stays
+black and white in the pgm file turns into the specified color in the
+ppm file.  Gray values in between are linearly mapped to differing
+intensities of the specified color.
+
+<P>If you specify two color arguments (separated by a dash), then
+black gets mapped to the first color and white gets mapped to the
+second and gray values in between get mapped linearly (across a three
+dimensional space) to colors in between.
+
+<P>Specify the color (<i>color</i>) as described for the <a
+href="libppm.html#colorname">argument of the <b>ppm_parsecolor()</b>
+library routine</a>.
+
+<p>Also, you can specify an entire colormap with the <B>-map</B>
+option.  The mapfile is just a <B>ppm</B> file; it can be any shape,
+all that matters is the colors in it and their order.  In this case,
+black gets mapped into the first color in the map file, and white gets
+mapped to the last and gray values in between are mapped linearly onto
+the sequence of colors in between.
+
+<p>A more direct way to specify a particular color to replace each
+particular gray level is to use <b>pamlookup</b>.  You make an index
+file that explicitly associates a color with each possible gray level.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>NOTE - MAXVAL</H2>
+
+<P>The &quot;maxval,&quot; or depth, of the output image is the same
+as that of the input image.  The maxval affects the color resolution,
+which may cause quantization errors you don't anticipate in your
+output.  For example, you have a simple black and white image as a PGM
+with maxval 1.  Run this image through <B>pgmtoppm 0f/00/00</B> to try
+to make the image black and faint red.  Because the output image will
+also have maxval 1, there is no such thing as faint red.  It has to be
+either full-on red or black.  <B>pgmtoppm</B> rounds the color
+0f/00/00 down to black, and you get an output image that is nothing
+but black.
+
+<P>The fix is easy: Pass the input through <B>pnmdepth</B> on the way
+into <B>pgmtoppm</B> to increase its depth to something that would
+give you the resolution you need to get your desired color.  In this
+case, <B>pnmdepth 16</B> would do it.  Or spare yourself the
+unnecessary thinking and just say <B>pnmdepth 255 .</B>
+
+<p>PBM input is a special case.  While you might think this would be
+equivalent to a PGM with maxval 1 since only two gray levels are
+necessary to represent a PBM image, <b>pgmtoppm</b>, like all Netpbm
+programs, in fact treats it as a maxval of 255.
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pnmdepth.html">pnmdepth</A></B>,
+<B><A HREF="rgb3toppm.html">rgb3toppm</A></B>,
+<B><A HREF="ppmtopgm.html">ppmtopgm</A></B>,
+<B><A HREF="ppmtorgb3.html">ppmtorgb3</A></B>,
+<B><A HREF="ppm.html">ppm</A></B>,
+<B><A HREF="pgm.html">pgm</A></B>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1991 by Jef Poskanzer.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pgmtoppm.html#lbAB">NAME</A>
+<LI><A HREF="pgmtoppm.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pgmtoppm.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pgmtoppm.html#lbAE">NOTE - MAXVAL</A>
+<LI><A HREF="pgmtoppm.html#lbAF">SEE ALSO</A>
+<LI><A HREF="pgmtoppm.html#lbAG">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

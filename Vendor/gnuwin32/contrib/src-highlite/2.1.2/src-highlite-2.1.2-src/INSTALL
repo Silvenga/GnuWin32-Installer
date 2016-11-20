@@ -1,0 +1,316 @@
+Basic Installation
+==================
+
+    For more information specific to this package, please read the README
+file. This source code distribution  is autoconfiguring and you should be 
+able to compile it and install it without manual interventions such as 
+editing Makefiles, configuration files, and so on. These are generic 
+instructions for people who are not familiar with installing autoconfiguring
+software.
+
+The simplest way to compile this package is to enter the source code
+main directory and do the following:
+   
+  1. Configure the source code by typing:
+        % sh ./configure
+
+     If you're planning to install the package into your home directory
+     or to a location other than `/usr/local' then add the flag
+     `--prefix=PATH' to `configure'. For example, if your home directory  
+     is `/home/luser' you can configure the package to install itself there
+     by invoking:
+        % sh ./configure --prefix=/home/luser
+     
+     While running, `configure' prints some messages telling which
+     features is it checking for. 
+
+  2. Compile the package by typing:
+        % make
+     Running `make' takes a while. If this is a very large package, now
+     is the time to go make some coffee.
+     
+  3. Some packages are bundled with self-tests for source-code 
+     verification. If this package includes such tests, you can 
+     optionally run them after compilation by typing 
+        % make check
+
+  4. Type `make install' to install the programs and any data files and
+     documentation. Type `make uninstall' to undo the installation.
+     During installation, the following files go to the following directories:
+        Executables          -> /prefix/bin
+        docs and samples     -> /prefix/share/doc/source-highlight
+        conf files           -> /prefix/share/source-highlight
+     where `prefix' is either `/usr/local' or the PATH that you specified
+     in the `--prefix' flag.
+
+     If any of these directories do not presently exist, they will be
+     created on demand. 
+
+     If you are installing in your home directory make sure that 
+     `/home/luser/bin' is in your path. If you're using the bash shell
+     add this line at the end of your .cshrc file:
+        PATH="/home/luser/bin:${PATH}"
+        export PATH
+     If you are using csh or tcsh, then use this line instead:
+        setenv PATH /home/luser/bin:${PATH}
+     By prepending your home directory to the rest of the PATH you can
+     override systemwide installed software with your own custom installation.
+
+  5. You can remove the program binaries and object files from the
+     source code directory by typing `make clean'.  To also remove the
+     files that `configure' created (so you can compile the package for
+     a different kind of computer), type `make distclean'.
+
+Building RPMs
+=============
+
+   You can build an .rpm by issuing the following command:
+
+   rpm -tb source-highlight-@VERSION@.tar.gz
+
+and an .rpm.src with the following command:
+
+   rpm -ts source-highlight-@VERSION@.tar.gz
+
+You may want to check the rpm documentation for further options.
+
+Compilers and Options
+=====================
+
+Some systems require unusual options for compilation or linking that the
+`configure' script does not know about.  Run `./configure --help' for
+details on some of the pertinent environment variables.
+
+   You can give `configure' initial values for configuration parameters
+by setting variables in the command line or in the environment.  Here
+is an example:
+
+     ./configure CC=c89 CFLAGS=-O2 LIBS=-lposix
+
+   *Note Defining Variables::, for more details.
+
+Installation Names
+==================
+
+By default, `make install' will install the package's files in
+`/usr/local/bin', `/usr/local/man', etc.  You can specify an
+installation prefix other than `/usr/local' by giving `configure' the
+option `--prefix=PREFIX'.
+
+   You can specify separate installation prefixes for
+architecture-specific files and architecture-independent files.  If you
+give `configure' the option `--exec-prefix=PREFIX', the package will
+use PREFIX as the prefix for installing programs and libraries.
+Documentation and other data files will still use the regular prefix.
+
+   In addition, if you use an unusual directory layout you can give
+options like `--bindir=DIR' to specify different values for particular
+kinds of files.  Run `configure --help' for a list of the directories
+you can set and what kinds of files go in them.
+
+   If the package supports it, you can cause programs to be installed
+with an extra prefix or suffix on their names by giving `configure' the
+option `--program-prefix=PREFIX' or `--program-suffix=SUFFIX'.
+
+Compiler configuration
+======================
+
+   The `configure' shell script is responsible for choosing and configuring
+the compiler(s). 
+
+The following options allow you to specify whether you
+want to enable or disable various debugging mechanisms:
+
+`--enable-warnings'
+      Make the compilers very picky about warnings. Try this whenever you
+      write new code since it may catch a few bugs. This is not active by
+      default because all too often warnings can be too picky and scare
+      the end-user.
+
+`--enable-input-chroot'
+      hardcode in the program the path to prepend for input files.
+      Useful when the programs are built for CGI, in order to hide,
+      in the html page, the real structure of the server file system.
+
+All programs are compiled with optimization level 2 by default (-O2).
+Occasionally that confuses the debugger when code is inlined. To disable
+optimization and enable debugging, set the shell environment variables
+CFLAGS, CXXFLAGS, FFLAGS to `-g'. On the bash shell, you can do this
+like this:
+  $ export CFLAGS="-g"
+  $ export CXXFLAGS="-g"
+  $ export FFLAGS="-g"
+On the tcsh shell, use the `setenv' command instead:
+  % setenv CFLAGS "-g"
+  ...etc...
+For other shell, please consult your shell's documentation.
+
+Similarly, you can increase the optimization level by assigning these
+variables to "-g -O3". 
+
+Depending on what languages the package uses, some of these options may
+or may not be available. To see what is available, type:
+    % sh ./configure --help
+
+About the configure script
+==========================
+ 
+   The `configure' shell script attempts to guess correct values for
+various system-dependent variables used during compilation.  It uses
+those values to create a `Makefile' in each directory of the package.
+It may also create one or more `.h' files containing system-dependent
+definitions.  Finally, it creates a shell script `config.status' that
+you can run in the future to recreate the current configuration, a file
+`config.cache' that saves the results of its tests to speed up
+reconfiguring, and a file `config.log' containing compiler output
+(useful mainly for debugging `configure').
+
+   If you need to do unusual things to compile the package, please try
+to figure out how `configure' could check whether to do them, and mail
+diffs or instructions to the address given in the `README' so they can
+be considered for the next release.  If at some point `config.cache'
+contains results you don't want to keep, you may remove or edit it.
+
+   The file `configure.in' is used to create `configure' by a program
+called `autoconf'.  You only need `configure.in' if you want to change
+it or regenerate `configure' using a newer version of `autoconf'.
+
+Advanced installation options.
+==============================
+
+   The `configure' script also understands the following more advanced
+options, to handle situations for which `--prefix' alone is not sufficient.
+
+   You can specify separate installation prefixes for
+architecture-specific files and architecture-independent files.  If you
+give `configure' the option `--exec-prefix=PATH', the package will use
+PATH as the prefix for installing programs and libraries.
+Documentation and other data files will still use the regular prefix.
+
+   In addition, if you use an unusual directory layout you can give
+options like `--bindir=PATH' to specify different values for particular
+kinds of files.  Run `configure --help' for a list of the directories
+you can set and what kinds of files go in them.
+
+   If the package supports it, you can cause programs to be installed
+with an extra prefix or suffix on their names by giving `configure' the
+option `--program-prefix=PREFIX' or `--program-suffix=SUFFIX'.
+
+Optional Features
+=================
+
+Some packages pay attention to `--enable-FEATURE' options to
+`configure', where FEATURE indicates an optional part of the package.
+They may also pay attention to `--with-PACKAGE' options, where PACKAGE
+is something like `gnu-as' or `x' (for the X Window System).  The
+`README' should mention any `--enable-' and `--with-' options that the
+package recognizes.
+
+   For packages that use the X Window System, `configure' can usually
+find the X include and library files automatically, but if it doesn't,
+you can use the `configure' options `--x-includes=DIR' and
+`--x-libraries=DIR' to specify their locations.
+
+Specifying the System Type
+==========================
+
+There may be some features `configure' cannot figure out automatically,
+but needs to determine by the type of machine the package will run on.
+Usually, assuming the package is built to be run on the _same_
+architectures, `configure' can figure that out, but if it prints a
+message saying it cannot guess the machine type, give it the
+`--build=TYPE' option.  TYPE can either be a short name for the system
+type, such as `sun4', or a canonical name which has the form:
+
+     CPU-COMPANY-SYSTEM
+
+where SYSTEM can have one of these forms:
+
+     OS KERNEL-OS
+
+   See the file `config.sub' for the possible values of each field.  If
+`config.sub' isn't included in this package, then this package doesn't
+need to know the machine type.
+
+   If you are _building_ compiler tools for cross-compiling, you should
+use the `--target=TYPE' option to select the type of system they will
+produce code for.
+
+   If you want to _use_ a cross compiler, that generates code for a
+platform different from the build platform, you should specify the
+"host" platform (i.e., that on which the generated programs will
+eventually be run) with `--host=TYPE'.
+
+Sharing Defaults
+================
+
+If you want to set default values for `configure' scripts to share, you
+can create a site shell script called `config.site' that gives default
+values for variables like `CC', `cache_file', and `prefix'.
+`configure' looks for `PREFIX/share/config.site' if it exists, then
+`PREFIX/etc/config.site' if it exists.  Or, you can set the
+`CONFIG_SITE' environment variable to the location of the site script.
+A warning: not all `configure' scripts look for a site script.
+
+Defining Variables
+==================
+
+Variables not defined in a site shell script can be set in the
+environment passed to `configure'.  However, some packages may run
+configure again during the build, and the customized values of these
+variables may be lost.  In order to avoid this problem, you should set
+them in the `configure' command line, using `VAR=value'.  For example:
+
+     ./configure CC=/usr/local2/bin/gcc
+
+will cause the specified gcc to be used as the C compiler (unless it is
+overridden in the site shell script).
+
+`configure' Invocation
+======================
+
+`configure' recognizes the following options to control how it operates.
+
+`--help'
+`-h'
+     Print a summary of the options to `configure', and exit.
+
+`--version'
+`-V'
+     Print the version of Autoconf used to generate the `configure'
+     script, and exit.
+
+`--cache-file=FILE'
+     Enable the cache: use and save the results of the tests in FILE,
+     traditionally `config.cache'.  FILE defaults to `/dev/null' to
+     disable caching.
+
+`--config-cache'
+`-C'
+     Alias for `--cache-file=config.cache'.
+
+`--quiet'
+`--silent'
+`-q'
+     Do not print messages saying which checks are being made.  To
+     suppress all normal output, redirect it to `/dev/null' (any error
+     messages will still be shown).
+
+`--srcdir=DIR'
+     Look for the package's source code in directory DIR.  Usually
+     `configure' can determine that directory automatically.
+
+`configure' also accepts some other, not widely useful, options.  Run
+`configure --help' for more details.
+
+--------------------
+
+Please send all bug reports by electronic mail to:
+bug-source-highlight@gnu.org
+
+My home page is
+http://www.lorenzobettini.it
+
+source-highlight is free GPL software. 
+See the file COPYING for copying conditions.
+Anyway I won't get offended if you send me a postcard :-)

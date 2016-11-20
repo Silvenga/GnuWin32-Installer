@@ -1,0 +1,160 @@
+MKNTFS(8)                                             MKNTFS(8)
+
+
+
+
+
+NAME
+       mkntfs  -  create  a  NTFS 1.2 (Windows NT/2000/XP) file
+       system
+
+SYNOPSIS
+       mkntfs [ -s sector-size ] [ -c cluster-size ] [ -L  vol-
+       ume-label  ] [ -z mft-zone-multiplier ] [ -f | -Q ] [ -n
+       ] [ -q ] [ -v ] [ -vv ] [ -C ] [ -F ] [ -I ] [ -V ] [ -l
+       ] [ -h ] device [ number-of-sectors ]
+
+DESCRIPTION
+       mkntfs  is  used  to  create a NTFS 1.2 (Windows NT 4.0)
+       file system on a  device  (usually  a  disk  partition).
+       device  is  the special file corresponding to the device
+       (e.g /dev/hdXX).  number-of-sectors  is  the  number  of
+       blocks  on the device.  If omitted, mkntfs automagically
+       figures the file system size.
+
+OPTIONS
+       -s sector-size
+              Specify the size of sectors in bytes. Valid  sec-
+              tor size values are 256, 512, 1024, 2048 and 4096
+              bytes per sector. If omitted, mkntfs  sector-size
+              is  determined  automatically and if that fails a
+              default of 512 bytes per sector is used.
+
+       -c cluster-size
+              Specify the size  of  clusters  in  bytes.  Valid
+              cluster  size  values  are powers of two, with at
+              least 256, and at most 65536 bytes  per  cluster.
+              If  omitted, mkntfs cluster-size is determined by
+              the volume size. The value is determined as  fol-
+              lows:
+              Volume   size      Default cluster
+              0        - 512MB         512 bytes
+              512MB    - 1GB          1024 bytes
+              1GB      - 2GB          2048 bytes
+              2GB      +              4096 bytes
+
+              Note  that  the default cluster size is set to be
+              at least equal to the sector size  as  a  cluster
+              cannot  be smaller than a sector. Also, note that
+              values greater than 4096  have  the  side  effect
+              that  compression  is disabled on the volume (due
+              to limitations in the NTFS compression  algorithm
+              currently in use by Windows).
+
+       -L volume-label
+              Set the volume label for the filesystem.
+
+       -z mft-zone-multiplier
+              Set the MFT zone multiplier, which determines the
+              size of the MFT zone to use on  the  volume.  The
+              MFT zone is the area at the beginning of the vol-
+              ume reserved for the  master  file  table  (MFT),
+              which  stores  the  on disk inodes (MFT records).
+              It is noteworthy  that  small  files  are  stored
+              entirely within the inode; thus, if you expect to
+              use the volume for storing large numbers of  very
+              small  files, it is useful to set the zone multi-
+              plier to a higher value. Note, that the MFT  zone
+              is  resized  on the fly as required during opera-
+              tion of the NTFS driver but choosing a good value
+              will reduce fragmentation. Valid values are 1, 2,
+              3 and 4. The values have the following meaning:
+              MFT zone     MFT zone size
+              multiplier   (% of volume size)
+                  1        12.5% (default)
+                  2        25.0%
+                  3        37.5%
+                  4        50.0%
+
+       -f     Same as -Q.
+
+       -Q     Perform quick format. This will skip both zeroing
+              of the volume and bad sector checking.
+
+       -n     Causes  mkntfs  to not actually create a filesys-
+              tem, but display what it would do if it  were  to
+              create  a filesystem. All steps of the format are
+              carried out except  the  actual  writing  to  the
+              device.
+
+       -q     Quiet  execution;  only  errors  are  written  to
+              stderr, no output to stdout occurs at all. Useful
+              if mkntfs is run in a script.
+
+       -v     Verbose execution.
+
+       -vv    Really  verbose  execution;  includes the verbose
+              output from the -v option as well  as  additional
+              output useful for debugging mkntfs.
+
+       -C     Enable compression on the volume.
+
+       -F     Force mkntfs to run, even if the specified device
+              is not a block special device, or appears  to  be
+              mounted.
+
+       -I     Disable  content indexing on the volume. (This is
+              only meaningful on Windows 2000 and  later.  Win-
+              dows  NT  4.0  and earlier ignore this as they do
+              not implement content indexing at all.)
+
+       -V     Print the version number of mkntfs and exit.
+
+       -l     Print the licensing  information  of  mkntfs  and
+              exit.
+
+       -h     Print the usage information of mkntfs and exit.
+
+BUGS
+       mkntfs  writes the backup boot sector to the last sector
+       of the block device being  formatted.  However,  current
+       versions  of  the  Linux  kernel (all versions up to and
+       including todays 2.4.18) either only report an even num-
+       ber of sectors when the sector size is below 1024 bytes,
+       which is the case for most hard drives today (512  bytes
+       sector  size)  or  they  return  the  correct number but
+       accessing the last sector fails. Either way, this  means
+       that when a partition has an odd number of 512-byte sec-
+       tors, the last sector is either not reported  to  us  at
+       all  or  it  is not writable by us and hence the created
+       NTFS volume will either  have  the  backup  boot  sector
+       placed one sector ahead of where it should be or it can-
+       not be written at all. For this reason, mkntfs marks the
+       NTFS volume dirty, so that when you reboot into Windows,
+       check disk runs automatically and creates a copy of  the
+       backup  boot  sector  in the correct location. This also
+       has the benefit of catching any bugs in mkntfs as  check
+       disk  would find any corrupt structures and repair them,
+       as well as report them. - If you  do  see  any  problems
+       reported, please report the messages to the author.
+       There  may  be  other  bugs.  Please, report them to the
+       author.
+
+AUTHOR
+       This version of mkntfs has been written by  Anton  Alta-
+       parmakov   <aia21@cantab.net>   (if   that   fails,  use
+       <antona@users.sourceforge.net>).
+
+AVAILABILITY
+       mkntfs is part of the ntfsprogs package and is available
+       for  download  from http://sourceforge.net/project/show-
+       files.php?group_id=13956 in source (tar  ball  and  rpm)
+       and pre-compiled binary (i386 rpm and deb) form.
+
+SEE ALSO
+       badblocks(8), ntfsprogs(8)
+
+
+
+
+ntfsprogs version 1.9.0    March 2002                 MKNTFS(8)

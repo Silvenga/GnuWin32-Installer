@@ -1,0 +1,67 @@
+PYRMASK(1)                                           PYRMASK(1)
+
+
+
+
+
+NAME
+       pyrmask - Blend two images together using Gaussian pyra-
+       mids.
+
+SYNOPSIS
+       pyrmask [ -l levels ] [  -o  outfile  ]  inmask  outmask
+       maskfile
+
+DESCRIPTION
+       Pyrmask blends two images together by first breaking the
+       images down into  separate  bandpass  images,  combining
+       these  separate images, and then adding the new bandpass
+       images back into a single output image.  This  can  pro-
+       duce  very  seamless  blends of digital images.  The two
+       images are combined on  the  basis  of  a  third  "mask"
+       image.   The  resulting  image  will  contain the inmask
+       image where the mask contains a maximum value (255)  and
+       the  outmask  image where the mask contains zeros.  This
+       is done on a channel by channel basis, i.e. the maskfile
+       should  have data in each channel describing how to com-
+       bine each channel of the inmask and outmask images.  All
+       three images must have exactly the same dimensions (both
+       image size and number of channels).  For  best  results,
+       it's often useful to filter the mask image a little with
+       smush(1) first.
+
+OPTIONS
+       -l levels
+              How many pyramid levels to use (maximum is log(2)
+              of image size).
+
+       -o outfile
+              If  specified,  output  will  be  written to this
+              file, otherwise it will go to stdout.
+
+SEE ALSO
+       smush(1), rleswap(1), urt(1), RLE(5),
+       Burt and Adelson, "A Multiresolution Spline With  Appli-
+       cations to Image Mosaics", ACM Transactions on Graphics,
+       October 1983, V2 #4, p. 217.
+       Ogden, Adelson, Bergen and Burt, "Pyramid-based Computer
+       Graphics", RCA Engineer, Sept/Oct 1985, p. 4.
+
+AUTHOR
+       Rod Bogart
+
+BUGS
+       The  current implementation has very strict requirements
+       for image sizes and dimensions.  The  extensive  use  of
+       floating point computation makes it very slow for normal
+       sized images.  It also keeps all of the bandpass  images
+       in  core at once, which requires considerable amounts of
+       memory.
+
+       Pyrmask is built on top of a library  of  functions  for
+       working with Gaussian pyramids.  This library has yet to
+       be documented or fully tested.
+
+
+
+1                         Nov 8, 1987                PYRMASK(1)

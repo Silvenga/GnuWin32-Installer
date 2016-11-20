@@ -1,0 +1,378 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pnmtofiasco User Manual</TITLE></HEAD>
+<BODY>
+<H1>pnmtofiasco</H1>
+Updated: July 12, 2000
+<BR>
+<A HREF="pnmtofiasco.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pnmtofiasco - Convert PNM file to FIASCO compressed file
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pnmtofiasco</B>
+[<I>option</I>]...
+[<I>filename</I>]...
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<B>pnmtofiasco</B> compresses the named pbm, pgm, or ppm image files,
+or Standard Input if no file is named, and produces a FIASCO file on
+Standard Output.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<p>All option names may be abbreviated; for example, --optimize may be
+written --optim or --opt. For most options a one letter short option
+is provided.  Mandatory or optional arguments to long options are
+mandatory or optional for short options, too.  Both short and long
+options are case sensitive.
+
+<P>The basic options are:
+
+<DL COMPACT>
+<DT><B>-i</B> <I>name</I>, <B>--input-name=</B><I>name</I>
+
+<DD>Compress the named images, not Standard Input.  If <I>name</I> is
+<B>-</B>, read Standard Input.  <I>name</I> has to be either an image
+filename or a template of the form:
+
+<PRE>
+prefix[start-end{+,-}step]suffix<BR>
+</PRE>
+
+<P>Templates are useful when compressing video streams: e.g., if you
+specify the template <B>img0[12-01-2].pgm</B>, then <B>pnmtofiasco</B>
+compresses the images img012.pgm, img010.pgm, ..., img002.pgm.
+
+<P>If <I>name</I> is a relative path, <B>pnmtofiasco </B> searches for
+the image files in the current directory and in the (colon-separated)
+list of directories given by the environment variable
+<B>FIASCO_IMAGES</B>.
+
+<DT><B>-o</B> <I>output-file</I>, <B>--output-name=</B><I>name</I>
+
+<DD>Write FIASCO output to the named file, not to Standard Output.
+
+<P>If <I>name</I> is a relative path and the environment variable
+<B>FIASCO_DATA</B> is a (colon-separated) list of directories, then
+<B>pnmtofiasco</B> writes the output file to the first (writable)
+directory of this list. Otherwise, <B>pnmtofiasco</B> write it to the
+current directory.
+
+<DT><B>-q</B> <I>N</I>, <B>--quality=</B><I>N</I>
+
+<DD>Set quality of compression to <I>N</I>.  Quality is 1 (worst) to
+100 (best); default is 20.
+
+<DT><B>-v</B>, <B>--version</B>
+
+<DD>Print <B>pnmtofiasco</B> version number, then exit.
+
+<DT><B>-V</B> <I>N</I>, <B>--verbose </B><I>N</I>
+
+<DD>Set level of verbosity to <I>N</I>.  Level is 0 (no output at
+all), 1 (show progress meter), or 2 (show detailed compression
+statistics); default is 1.
+
+<DT><B>-B</B> <I>N</I>, <B>--progress-meter </B><I>N</I>
+
+<DD>Set type of progress-meter to <I>N</I>.  The following types are
+available; default is 1:
+
+<dl>
+<dt><B>0</B>
+<dd>no progress meter
+
+<dt><B>1</B>
+<dd>RPM style progress bar using 50 hash marks
+
+<dt><B>2</B>
+
+<dd>percentage meter
+
+</dl>
+
+<DT><B>-f</B> <I>name</I>, <B>--config=</B><I>name</I>
+
+<DD>Load parameter file <I>name </I> to initialize the options of
+<B>pnmtofiasco</B>.  See file <B>system.fiascorc</B> for an example of
+the syntax. Options of <B>pnmtofiasco</B> are set by any of the
+following methods (in the specified order):
+
+<ol>
+<li>Global resource file <B>/etc/system.fiascorc</B>
+<li>$HOME/.fiascorc
+<li>command line
+<li>--config=<I>name</I>
+</ol>
+
+<DT><B>-h</B>, <B>--info</B>
+
+<DD>Print brief help, then exit.
+
+<DT><B>-H</B>, <B>--help</B>
+
+<DD>Print detailed help, then exit.
+
+</dl>
+
+<p>The options for advanced users are:
+
+<dl>
+<DT><B>-b</B> <I>name</I>, <B>--basis-name=</B><I>name</I>
+
+<DD>Preload compression basis <I>name</I> into FIASCO.  The basis
+<I>name</I> provides the initial compression dictionary.  Either use
+one of the files &quot;small.fco&quot;, &quot;medium.fco&quot;, or
+&quot;large.fco&quot; that come with <B>pnmtofiasco </B> or create a
+new ASCII basis file.
+
+<DT><B>-z</B> <I>N</I>, <B>--optimize=</B><I>N</I> 
+
+<dd>Set optimization level to <I>N</I>.  Level is 0 (fastest) to 3
+(slowest); default is 1.  Be warned, the encoding time dramatically
+increased when <I>N</I>=<B>2</B> or <I>N</I>=<B>3</B> while the
+compression performance only slightly improves.
+
+<DT><B>-P</B>, <B>--prediction</B>
+
+<DD>Use additional predictive coding.  If this optimization is enabled
+then the image is compressed in two steps.  In the first step, a coarse
+approximation of the image is computed using large unichrome
+blocks.  Finally, the delta image is computed and the prediction error
+is approximated using the standard FIASCO algorithm.
+
+<DT><B>-D</B> <I>N</I>, <B>--dictionary-size=</B><I>N</I>
+
+<DD>Set size of dictionary that is used when coding the luminance band
+to <I>N</I>; default is 10000, i.e., the dictionary is not restricted.
+
+<DT><B>-C</B> <I>N</I>, <B>--chroma-dictionary=</B><I>N</I>
+
+<DD>Set size of dictionary that is used when coding chroma bands to
+<I>N</I>; default is 40.
+
+<DT><B>-Q</B> <I>N</I>, <B>--chroma-qfactor=</B><I>N</I>
+
+<DD>Reduce the quality of chroma band compression <I>N</I>-times with
+respect to the user defined quality <I>q</I> of the luminance band
+compression (<B>--quality</B>=<I>q</I>); default is 2.
+
+<DT><B>-t</B> <I>N</I>, <B>--tiling-exponent=</B><I>N</I>
+
+<DD>Subdivide the image into 2^<I>N</I> tiles prior coding; default is
+4, i.e. the image is subdivided into 16 tiles. The processing order of
+the individual tiles is defined by the option
+<B>--tiling-method=</B><I>name</I>.
+
+<DT><B>-T</B> <I>name</I>, <B>--tiling-method=</B><I>name</I>
+
+<DD>Order the individual image tiles (the image is subdivided into;
+see option <B>--tiling-exponent=</B><I>N</I>) by method <I>name</I>;
+default is <b>desc-variance</b>.
+
+<dl>
+<dt><B>desc-variance</B>
+<dd>Tiles with small variances are processed first.
+
+<dt><B>asc-variance</B>
+<dd>Tiles with large variances are processed first.
+
+<dt><B>desc-spiral</B>
+<dd>Tiles are process in spiral order starting in the middle. 
+
+<dt><B>asc-spiral</B>
+<dd>Tiles are process in spiral order starting at the border.
+
+</dl>
+
+<DT><B>--rpf-mantissa=</B><I>N</I>
+
+<DD>Use <I>N</I> mantissa bits for quantized coefficients.
+
+<DT><B>--dc-rpf-mantissa=</B><I>N</I>
+<DD>Use <I>N</I> mantissa bits for quantized DC coefficients.
+
+<DT><B>--rpf-range=</B><I>N</I>
+
+<DD>Coefficients outside the quantization interval
+[-<I>N</I>,+<I>N</I>] are set to zero.
+
+<DT><B>--dc-rpf-range=</B><I>N</I>
+
+<DD>DC coefficients outside the quantization interval
+[-<I>N</I>,+<I>N</I>] are set to zero.
+
+</dl>
+
+<p>Additional options for video compression are
+
+<dl>
+<DT><B>-s</B> <I>N</I>, <B>--smooth=</B><I>N</I>
+
+<DD>Smooth decompressed reference frames along the partitioning
+borders by the given amount <I>N</I>.  <I>N</I> is 0 (no smoothing) to
+100; default is 70.  This factor is stored in the FIASCO file.
+
+<DT><B>-m</B> <I>N</I>, <B>--min-level=</B><I>N</I>
+
+<DD>Start prediction (motion compensated prediction or additional
+prediction) on block level <I>N</I>; default is level 6.  I.e., motion
+compensation is applied to all image blocks of at least 8x8 pixels
+(binary tree level <I>N</I>=6), 16x8 (<I>N</I>=7), 16x16 (<I>N</I>=8),
+etc.
+
+<DT><B>-M</B> <I>N</I>, <B>--max-level=</B><I>N</I>
+
+<DD>Stop prediction (motion compensated prediction or additional
+prediction) on block level <I>N</I>; default is level 10.  I.e.,
+motion compensation is applied to all image blocks of at most 16x16
+pixels (<I>N</I>=8), 32x16 (<I>N</I>=9), 32x32 (<I>N</I>=10), etc.
+
+<DT><B>-2</B>, <B>--half-pixel</B>
+
+<DD>Use half pixel precise motion compensation.
+
+<DT><B>-F</B> <I>N</I>, <B>--fps=</B><I>N</I>
+
+<DD>Set number of frames per second to <I>N</I>.  This value is stored
+in the FIASCO output file and is used in the decoder <A
+HREF="fiascotopnm.html">fiascotopnm</A> to control the framerate.
+
+<DT><B>-p</B> <I>type</I>, <B>--pattern=</B><I>type</I>
+
+<DD>Defines the type of inter frame compression which should be
+applied to individual frames of a video stream.  <I>type</I> is a
+sequence of characters; default is &quot;IPPPPPPPPP&quot;.  Element
+<B>N</B> defines the type of predicting which should be used for frame
+<B>N</B>; the frame type pattern is periodically extended.  Valid
+characters are:
+
+<dl>
+<dt><B>I</B>
+<dd>intra frame, i.e., no motion compensated prediction is used at
+all.
+
+<dt><B>P</B>
+<dd>predicted frame, i.e., a previously encoded frame is used for
+prediction (forward prediction).
+
+<dt><B>B</B>
+<dd>bidirectional predicted frame, i.e., not only a previously shown
+frame but also a frame of the future is used for prediction (forward,
+backward or interpolated prediction).
+
+</dl>
+
+<DT><B>--cross-B-search</B>
+
+<DD>Instead of using exhaustive search the &quot;Cross-B-Search&quot;
+algorithm is used to find the best interpolated prediction of
+B-frames.
+
+<DT>--B-as-past-ref
+
+<DD>Also use previously encoded B-frames when prediction the current
+frame. If this option is not set, only I- and P-frames are used to
+predict the current frame.
+
+</DL>
+
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>EXAMPLES</H2>
+
+<p>Compress the still image &quot;foo.ppm&quot; to the FIASCO file
+&quot;foo.wfa&quot; using the default options:
+
+<pre>
+        pnmtofiasco &lt; foo.ppm &gt;foo.wfa
+</pre>
+
+<P>Compress the video frames &quot;foo0*.ppm&quot; to the FIASCO file
+&quot;video.wfa&quot; using half pixel precise motion compensation at
+a frame rate of 15 frames per second.  Intra frame 1 is used to
+predict P-frame 4, frames 1 and 4 are used to predict B-frames 2 and
+3, and so on.  Frame 10 is again an intra-frame.
+
+<pre>
+        pnmtofiasco -2 -p &quot;IBBPBBPBB&quot; -fps 15 -o video.wfa foo0*.ppm
+</pre>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>FILES</H2>
+
+<DL COMPACT>
+<DT><B>/etc/system.fiascorc</B>
+
+<DD>The systemwide initialization file.
+
+<DT>$HOME<B>/.fiascorc</B>
+
+<DD>The personal initialization file.
+
+</DL>
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>ENVIRONMENT</H2>
+
+
+<DL COMPACT>
+
+<DT><B>FIASCO_IMAGES</B>
+
+<DD>Search path for image files.  Default is &quot;./&quot;.
+
+<DT><B>FIASCO_DATA</B>
+
+<DD>Search and save path for FIASCO files.  Default is &quot;./&quot;.
+
+</DL>
+
+<A NAME="lbAI">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="fiascotopnm.html">fiascotopnm</A></B>,
+<B><A HREF="pnmtojpeg.html">ppmtojpeg</A></B>,
+<B><A HREF="pnmtojbig.html">pnmtojbig</A></B>,
+<B><A HREF="ppmtogif.html">ppmtogif</A></B>,
+<B><A HREF="pnm.html">pnm</A></B>
+
+<P>Ullrich Hafner, Juergen Albert, Stefan Frank, and Michael Unger.
+<B>Weighted Finite Automata for Video Compression</B>, IEEE Journal on
+Selected Areas In Communications, January 1998
+
+<p>Ullrich Hafner. <B>Low Bit-Rate Image and Video Coding with
+Weighted Finite Automata</B>, Ph.D. thesis, Mensch &amp; Buch Verlag,
+ISBN 3-89820-002-7, October 1999.
+
+<A NAME="lbAJ">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Ullrich Hafner &lt;<A HREF="mailto:hafner@bigfoot.de">hafner@bigfoot.de</A>&gt;
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pnmtofiasco.html#lbAB">NAME</A>
+<LI><A HREF="pnmtofiasco.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pnmtofiasco.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pnmtofiasco.html#lbAE">OPTIONS</A>
+<LI><A HREF="pnmtofiasco.html#lbAF">EXAMPLES</A>
+<LI><A HREF="pnmtofiasco.html#lbAG">FILES</A>
+<LI><A HREF="pnmtofiasco.html#lbAH">ENVIRONMENT</A>
+<LI><A HREF="pnmtofiasco.html#lbAI">SEE ALSO</A>
+<LI><A HREF="pnmtofiasco.html#lbAJ">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

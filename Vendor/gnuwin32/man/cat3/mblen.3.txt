@@ -1,0 +1,64 @@
+MBLEN(3)           Linux Programmer's Manual           MBLEN(3)
+
+
+
+
+
+NAME
+       mblen  -  determine  number  of  bytes in next multibyte
+       character
+
+SYNOPSIS
+       #include <stdlib.h>
+
+       int mblen (const char* s, size_t n);
+
+DESCRIPTION
+       If s is not a NULL pointer, the mblen function  inspects
+       at  most  n  bytes of the multibyte string starting at s
+       and extracts the next complete multibyte  character.  It
+       uses  a  static  anonymous shift state only known to the
+       mblen function. If the multibyte character  is  not  the
+       null wide character, it returns the number of bytes that
+       were consumed from s. If the multibyte character is  the
+       null wide character, it returns 0.
+
+       If  the  n bytes starting at s do not contain a complete
+       multibyte character, mblen returns -1. This  can  happen
+       even  if  n  >= MB_CUR_MAX, if the multibyte string con-
+       tains redundant shift sequences.
+
+       If the  multibyte  string  starting  at  s  contains  an
+       invalid  multibyte  sequence  before  the  next complete
+       character, mblen also returns -1.
+
+       If s is a NULL pointer, the mblen  function  resets  the
+       shift state, only known to this function, to the initial
+       state, and returns non-zero if  the  encoding  has  non-
+       trivial  shift  state, or zero if the encoding is state-
+       less.
+
+RETURN VALUE
+       The mblen function returns the number  of  bytes  parsed
+       from the multibyte sequence starting at s, if a non-null
+       wide character was recognized.  It returns 0, if a  null
+       wide  character  was  recognized.  It  returns -1, if an
+       invalid multibyte sequence  was  encountered  or  if  it
+       couldn't parse a complete multibyte character.
+
+CONFORMING TO
+       ISO/ANSI C, UNIX98
+
+SEE ALSO
+       mbrlen(3)
+
+NOTES
+       The  behaviour of mblen depends on the LC_CTYPE category
+       of the current locale.
+
+       The function mbrlen provides a better interface  to  the
+       same functionality.
+
+
+
+GNU                      July 25, 1999                 MBLEN(3)

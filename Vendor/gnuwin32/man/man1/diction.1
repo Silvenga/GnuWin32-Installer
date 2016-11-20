@@ -1,0 +1,134 @@
+.TH DICTION 1 "August 30th, 2007" "GNU" "User commands"
+.SH NAME \"{{{roff}}}\"{{{
+diction \- print wordy and commonly misused phrases in sentences
+.\"}}}
+.SH SYNOPSIS \"{{{
+.ad l
+.B diction
+.RB [ \-b ]
+.RB [ \-d ]
+.RB [ \-f
+.IR file
+.RB [ \-n | \-L
+.IR language ]]
+.RI [ file ...]
+.ad b
+.br
+.ad l
+.B diction
+.RB [ \-\-beginner ]
+.RB [ \-\-ignore-double-words ]
+.RB [ \-\-file
+.IR file
+.RB [ \-\-no-default-file | \-\-language
+.IR language ]]
+.RI [ file ...]
+.ad b
+.br
+.ad l
+.B diction
+.BR \-h | \-\-help
+.ad b
+.br
+.ad l
+.B diction \-\-version
+.ad b
+.\"}}}
+.SH DESCRIPTION \"{{{
+\fBDiction\fP finds all sentences in a document that contain phrases
+from a database of frequently misused, bad or wordy diction.  It further
+checks for double words.  If no files are given, the document is read from
+standard input.  Each found phrase is enclosed in \fB[ ]\fP (brackets).
+Suggestions and advice, if any and if asked for, are printed headed
+by a right arrow \fB->\fP.  A sentence is a sequence of words, that
+starts with a capitalised word and ends with a full stop, double colon,
+question mark or exclaimation mark.  A single letter followed by a dot
+is considered an abbreviation, so it does not terminate a sentence.
+Various multi-letter abbreviations are recognized, they do not terminate
+a sentence as well, neither do fractional numbers.
+.PP
+\fBDiction\fP understands \fIcpp\fP(1) \fB#line\fP lines for being able to
+give precise locations when printing sentences.
+.\"}}}
+.SH OPTIONS \"{{{
+.IP "\fB\-b\fP, \fB\-\-beginner\fP"
+Complain about mistakes typically made by beginners.
+.IP "\fB\-d\fP, \fB\-\-ignore-double-words\fP"
+Ignore double words and do not complain about them.
+.IP "\fB\-s\fP, \fB\-\-suggest\fP"
+Suggest better wording, if any.
+.IP "\fB\-f\fP \fIfile\fP, \fB\-\-file\fP \fIfile\fP"
+Read the user specified database from the specified \fIfile\fP in addition
+to the default database.
+.IP "\fB\-n\fP, \fB\-\-no-default-file\fP"
+Do not read the default database, so only the user-specified database is used.
+.IP "\fB\-L\fP \fIlanguage\fP, \fB\-\-language\fP \fIlanguage\fP"
+Set the phrase file language (\fPde\fP, \fBen\fP, \fBnl\fP).
+.IP "\fB\-h\fP, \fB\-\-help\fP"
+Print a short usage message.
+.IP \fB\-\-version\fP
+Print the version.
+.\"}}}
+.SH ERRORS \"{{{
+On usage errors, 1 is returned.  Termination caused by lack of memory is
+signalled by exit code 2.
+.\"}}}
+.SH EXAMPLE \"{{{
+The following example first removes all roff constructs and headers
+from a document and feeds the result to diction with a German database:
+.RS
+.sp
+deroff -s file.mm | diction -L de | fmt
+.RE
+.\"}}}
+.SH ENVIRONMENT \"{{{
+.IP "\fBLC_MESSAGES\fP=\fBde\fP\^|\^\fBen\fP\^|\^\fBnl\fP"
+specifies the message language and is also used as default for the
+phrase language.  The default language is \fBen\fP.
+.\"}}}
+.SH FILES \"{{{
+.nf
+${prefix}/share/diction/*	databases for various languages
+.fi
+.\"}}}
+.SH AUTHOR \"{{{
+This program is GNU software, copyright 1997\(en2007 Michael Haardt <michael@moria.de>.
+.PP
+The english phrase file contains contributions by Greg Lindahl
+<lindahl@pbm.com>, Wil Baden, Gary D. Kline, Kimberly Hanks and
+Beth Morris.  The dutch phrase file was contributed by Hans Lodder.
+.PP
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+.PP
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+.PP
+You should have received a copy of the GNU General Public License along
+with this program.  If not, write to the Free Software Foundation, Inc.,
+59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.\"}}}
+.SH HISTORY \"{{{
+There has been a diction command on old UNIX systems, which is now part
+of the AT&T DWB package.  The original version was bound to roff by
+enforcing a call to deroff.
+This version is a reimplementation
+and must run in a pipe with \fBderoff\fP(1) if you want to process
+roff documents.  Similarly, you can run it in a pipe with \fBdehtml\fP(1)
+or \fBdetex\fP(1) to process HTML or TeX documents.
+.\"}}}
+.SH "SEE ALSO" \"{{{
+deroff(1), fmt(1), style(1)
+.PP
+Cherry, L.L.; Vesterman, W.: \fIWriting Tools\(emThe STYLE and DICTION
+programs\fP, Computer Science Technical Report 91, Bell Laboratories,
+Murray Hill, N.J. (1981), republished as part of the 4.4BSD User's
+Supplementary Documents by O'Reilly.
+.PP
+Strunk, William: \fIThe elements of style\fP, Ithaca, N.Y.: Priv. print., 1918,
+http://coba.shsu.edu/help/strunk/
+.\"}}}

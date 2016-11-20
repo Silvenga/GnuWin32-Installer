@@ -1,0 +1,126 @@
+ilogb(P)                                               ilogb(P)
+
+
+
+
+
+NAME
+       ilogb, ilogbf, ilogbl - return an unbiased exponent
+
+SYNOPSIS
+       #include <math.h>
+
+       int ilogb(double x);
+       int ilogbf(float x);
+       int ilogbl(long double x);
+
+
+DESCRIPTION
+       The  functionality  described  on this reference page is
+       aligned with the ISO C standard.  Any  conflict  between
+       the  requirements  described here and the ISO C standard
+       is unintentional.  This volume  of  IEEE Std 1003.1-2001
+       defers to the ISO C standard.
+
+       These  functions shall return the exponent part of their
+       argument x.  Formally, the return value is the  integral
+       part  of  log_r|x|  as a signed integral value, for non-
+       zero x, where r is the radix of the machine's  floating-
+       point  arithmetic,  which  is  the  value  of  FLT_RADIX
+       defined in <float.h>.
+
+       An application wishing to  check  for  error  situations
+       should   set   errno   to   zero   and  call  feclearex-
+       cept(FE_ALL_EXCEPT) before calling these functions.   On
+       return,  if errno is non-zero or fetestexcept(FE_INVALID
+       | FE_DIVBYZERO | FE_OVERFLOW  |  FE_UNDERFLOW)  is  non-
+       zero, an error has occurred.
+
+RETURN VALUE
+       Upon successful completion, these functions shall return
+       the exponent part of x as a signed integer  value.  They
+       are equivalent to calling the corresponding logb() func-
+       tion and casting the returned value to type int.
+
+       If x is 0,    a domain error shall occur, and the  value
+       FP_ILOGB0 shall be returned.
+
+       If  x  is  +-Inf,    a domain error shall occur, and the
+       value {INT_MAX} shall be returned.
+
+       If x is a NaN,    a domain error shall  occur,  and  the
+       value FP_ILOGBNAN shall be returned.
+
+       If   the   correct  value  is  greater  than  {INT_MAX},
+       {INT_MAX} shall be returned and  a  domain  error  shall
+       occur.
+
+       If  the  correct value is less than {INT_MIN}, {INT_MIN}
+       shall be returned and a domain error shall occur.
+
+ERRORS
+       These functions shall fail if:
+
+       Domain Error
+              The x argument is zero, NaN,  or  +-Inf,  or  the
+              correct value is not representable as an integer.
+
+       If   the   integer   expression   (math_errhandling    &
+       MATH_ERRNO)  is  non-zero,  then  errno  shall be set to
+       [EDOM]. If the integer  expression  (math_errhandling  &
+       MATH_ERREXCEPT)  is non-zero, then the invalid floating-
+       point exception shall be raised.
+
+
+       The following sections are informative.
+
+EXAMPLES
+       None.
+
+APPLICATION USAGE
+       On   error,   the   expressions   (math_errhandling    &
+       MATH_ERRNO)  and (math_errhandling & MATH_ERREXCEPT) are
+       independent of each other, but at least one of them must
+       be non-zero.
+
+RATIONALE
+       The  errors come from taking the expected floating-point
+       value and converting it to  int,  which  is  an  invalid
+       operation  in  IEEE Std 754-1985 (since overflow, infin-
+       ity, and NaN are not representable in a  type  int),  so
+       should be a domain error.
+
+       There  are  no  known implementations that overflow. For
+       overflow  to  happen,  {INT_MAX}  must  be   less   than
+       LDBL_MAX_EXP*log2(FLT_RADIX)   or   {INT_MIN}   must  be
+       greater than LDBL_MIN_EXP*log2(FLT_RADIX) if  subnormals
+       are  not  supported,  or  {INT_MIN} must be greater than
+       (LDBL_MIN_EXP-LDBL_MANT_DIG)*log2(FLT_RADIX) if  subnor-
+       mals are supported.
+
+FUTURE DIRECTIONS
+       None.
+
+SEE ALSO
+       feclearexcept()  ,  fetestexcept()  , logb() , scalb() ,
+       the Base  Definitions  volume  of  IEEE Std 1003.1-2001,
+       Section  4.18,  Treatment of Error Conditions for Mathe-
+       matical Functions, <float.h>, <math.h>
+
+COPYRIGHT
+       Portions of this text are reprinted  and  reproduced  in
+       electronic  form  from  IEEE  Std  1003.1, 2003 Edition,
+       Standard for Information Technology -- Portable  Operat-
+       ing System Interface (POSIX), The Open Group Base Speci-
+       fications Issue 6, Copyright (C) 2001-2003 by the Insti-
+       tute  of  Electrical  and Electronics Engineers, Inc and
+       The Open Group. In the event of any discrepancy  between
+       this  version  and  the original IEEE and The Open Group
+       Standard, the original IEEE and The Open Group  Standard
+       is  the  referee  document. The original Standard can be
+       obtained        online        at        http://www.open-
+       group.org/unix/online.html .
+
+
+
+POSIX                         2003                     ilogb(P)

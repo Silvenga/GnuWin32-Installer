@@ -1,0 +1,154 @@
+Since May 2002, Netpbm does not have traditional man pages for
+documentation.  BUT YOU CAN CONFIGURE NETPBM, IF YOU WANT, SO YOU GET
+ESSENTIALLY THE SAME 'MAN' FUNCTION AS WITH A TRADITIONAL UNIX PACKAGE.
+
+Netpbm's maintainer believes man pages are obsolete and too limiting,
+and doesn't have time to maintain the documentation in multiple
+formats.  So instead of classic nroff man page format, the Netpbm
+documentation is available as HTML, with one HTML file per program,
+plus some others.  The current user manual is accessible on the World
+Wide Web at <http://netpbm.sourceforge.net/doc>, and if it's practical
+for you, you should access it there instead of making a local copy.
+This manual is always up to date.  It is not maintained on a release
+schedule like the source code is, but rather updated continuously.
+The user manual describes past Netpbm function as well as the present,
+so you can use the current manual with old Netpbm code.
+
+
+INSTALLING A LOCAL COPY OF DOCUMENTATION
+----------------------------------------
+
+If accessing the manual on the World Wide Web is not convenient for
+you (for example, if you want to access it from a computer that is not
+always connected to the Internet), just make a local copy of the web
+site files using GNU Wget:
+
+  wget --recursive --relative http://netpbm.sourceforge.net/doc/
+
+The above copies all the HTML files from the web site into your
+current directory, under a subdirectory 'netpbm.sourceforge.net/doc'
+that it creates.  You can browse those files directly with a web
+browser.  If you don't have Wget, get it from
+ftp://ftp.gnu.org/gnu/wget.  It is very useful.
+
+
+GETTING COMMAND HELP WITH A "MAN" COMMAND
+-----------------------------------------
+
+You can get the same quick access to program documentation with this
+HTML setup as with traditional man pages, using the Manweb program.
+This works whether you use the www copy or a local copy of the HTML
+files.  Manweb is distributed with Netpbm.  With Manweb and Netpbm
+installed and configured appropriately (see below), you can type
+
+  man netpbm
+
+and get the top level page of the Netpbm user manual (with hyperlinks to
+all the other pages), or
+
+  man netpbm ppmtogif
+
+or 
+
+  man ppmtogif
+
+to go straight to the Ppmtogif documentation.
+
+Installnetpbm normally installs Manweb and the netpbm.url file that
+Manweb needs to find the Netpbm documentation.  Through the Configure
+dialog, or editing Makefile.config, you determine whether Manweb
+accesses the master web copy or a local copy you installed.
+
+Installnetpbm installs the program as 'manweb'.  If you want to invoke
+it as 'man', you'll have to set that up yourself.  Perhaps with a
+symbolic link from 'man' to 'manweb'.  Note that 'manweb' is mostly
+backward compatible with 'man' so that this is a reasonable thing to
+do.  Manweb can find documentation on the web, in HTML files, in GNU
+info files, and in traditional man pages.
+
+
+In a standard installation of Netpbm, Installnetpbm also creates a
+traditional man page for every Netpbm program it installs, but the man
+page just tells you to go to the HTML file.  This way, even if the "man"
+program isn't capable of reading the HTML documentation and even if the
+user doesn't know specifically where Netpbm documentation lives, he isn't
+stranded without information.
+
+
+VIEWING NETPBM DOC WITH TRADITIONAL MAN PROGRAM
+-----------------------------------------------
+
+Some people want to be able to access the Netpbm documentation with an
+existing man program that doesn't know HTML.  You can install the
+documentation that way, with some loss of quality.  There are two
+ways:
+
+  1) convert the HTML to troff with the 'makeman' program in the
+     'buildtools' directory of the Netpbm source tree.  This is a 
+     Python program.
+
+  2) convert the HTML to formatted plain text (suitable as man "cat"
+     pages) with the 'makecat' program in the 'buildtools' directory
+     of the Netpbm source tree.  This program just does a 
+     'lynx -dump'.
+
+The "loss of quality" mentioned above is because:
+
+  - The classic Unix manual format isn't as expressive as the
+    worldwide web format; you can't convert down losslessly.
+
+  - There is less maintenance effort put into maintaining the
+    secondary non-web format.  It requires certain idioms to be
+    followed in the HTML source and lists of man pages to be
+    separately maintained.  This maintenance is essentially done on a
+    fault basis -- when someone notices the Unix man pages aren't
+    right, he fixes something.
+    
+    Bear in mind that the person who writes most of the Netpbm
+    documentation updates never sees the troff versions; he uses
+    Manweb, which renders directly from the HTML.
+
+Also, these methods require manual effort, and technical
+understanding, on your part to set up.  Setting it up is too complex
+for an automated process to do it for you with any significant
+integrity.  The examples are guidelines and you shouldn't expect them
+to work literally in your situtation.
+
+Here is an example of making troff pages:
+
+  mkdir netpbmdoc
+  cd netpbmdoc
+  wget --recursive --relative http://netpbm.sourceforge.net/doc/
+  cd netpbm.sourceforge.net/doc
+  PATH="/usr/src/netpbm/buildtools/:$PATH"
+  make -f /usr/src/netpbm/buildtools/Makefile.manpage manpages
+  make -f /usr/src/netpbm/buildtools/Makefile.manpage installman
+  cd ../../..
+  rm -r netpbmdoc
+
+  man ppmtogif
+
+Here is an example of making "cat" pages:
+
+  mkdir netpbmdoc
+  cd netpbmdoc
+  wget --recursive --relative http://netpbm.sourceforge.net/doc/
+  cd netpbm.sourceforge.net/doc
+  /usr/src/netpbm/buildtools/makecat *.html
+  cp *.1 /usr/man/cat1/
+  cd ../../..
+  rm -r netpbmdoc
+
+  man ppmtogif
+
+
+DOCBOOK
+-------
+
+You can turn the Netpbm user manual into Docbook XML pages using
+Doclifter.  Because Doclifter works on troff pages, you have to
+convert the documentation down to troff first, which means the Docbook
+pages are of lower quality than the main HTML documentation.
+
+To create Docbook XML, follow the example above for creating troff
+pages, and use 'make xmlpages' instead of 'make manpages'.

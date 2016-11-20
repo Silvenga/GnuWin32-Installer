@@ -1,0 +1,119 @@
+#!/usr/bin/perl -w
+
+use strict;
+use FileHandle;
+
+sub convert_acl($)
+{
+	my ($value) = @_;
+
+	local $_ = $value;
+
+	die "ACL value must be hex encoded\n" unless (s/^0x//);
+	s/\s//g;
+
+	my ($x4, $x8) = ('([0-9A-Fa-f]{4})', '([0-9A-Fa-f]{8})');
+
+	if (s/^01000000//) {
+		my $new_value = '0x02000000 ';
+		while ($_ ne '') {
+			if (s/^(0100|0400|1000|2000)$x4//) {
+				$new_value .= "$1$2ffffffff ";
+			} elsif (s/^(0200|0800)$x4$x8//) {
+				$new_value .= "$1$2$3 ";
+			} else {
+				die "ACL format not recognized\n"
+			}
+		}
+		return $new_value;
+	} elsif (s/^02000000//) {
+		my $new_value = '0x01000000 ';
+		while ($_ ne '') {
+			if (s/^(0100|0400|1000|2000)$x4$x8//) {
+				$new_value .= "$1$2 ";
+			} elsif (s/^(0200|0800)$x4$x8//) {
+				$new_value .= "$1$2$3 ";
+			} else {
+				die "ACL format not recognized\n"
+			}
+		}
+		return $new_value;
+	} else {
+		die "ACL format not recognized\n"
+	}
+}
+
+sub check_name($) {
+	my ($name) = @_;
+	if ($name =~ m[^[^A-Za-z]]) {
+		print STDERR "Renaming attribute `user.$name' to `X$name'.\n";
+		return "X$name";
+	}
+	return $name;
+}
+
+sub convert($) {
+	my ($file) = @_;
+
+	eval {
+		while (<$file>) {
+			m[^(#.*)?$] ||
+			s[^system\.posix_acl_access=(0x02.*)]
+				['$acl=' . convert_acl($1)]e ||
+			s[^system\.posix_acl_default=(0x02.*)]
+				['$defacl=' . convert_acl($1)]e ||
+			s[^user\.([^=]*)][check_name($1)]e ||
+			
+			s[^\$acl=(0x01.*)]
+				['system.posix_acl_access=' .
+				 convert_acl($1)]e ||
+			s[^\$defacl=(0x01.*)]
+				['system.posix_acl_default=' .
+				 convert_acl($1)]e ||
+			s[^([A-Za-z][^=]*)][user.$1] ||
+			
+			die "Input format error\n";
+
+			print;
+		}
+	};
+	if ($@) {
+		chomp $@;
+		print STDERR "$@ in line $..\n";
+	}
+	return (not $@);
+}
+
+unless (@ARGV) {
+	printf STDERR <<EOF;
+$0 -- convert between aget and getfattr format
+
+This script converts between the extended attribute text formats of
+getfattr and its predecessor, aget. To get all attributes with aget
+and convert the result to getfattr format, use the following command:
+
+	aget -Rds -e hex . | $0 -
+
+To get all attributes with getfattr and convert the result to aget
+format, use the following command:
+
+	getfattr -Rd -m - -e hex . | $0 -
+
+EOF
+	exit 1;
+}
+
+my $good = 1;
+foreach my $arg (@ARGV) {
+	my $fh = ($arg eq '-') ?  *STDIN : new FileHandle($arg);
+
+	unless ($fh) {
+		print STDERR "$0: $arg: $!\n";
+		next;
+	}
+
+	$good = 0 unless convert $fh;
+
+	$fh->close unless ($arg eq '-');
+}
+exit (not $good);

@@ -1,0 +1,222 @@
+GIF2PNG(1)                                           GIF2PNG(1)
+
+
+
+
+
+NAME
+       gif2png - convert GIFs to PNGs
+
+SYNOPSIS
+       gif2png [-bdfghinprsvwO] [file.[gif]...]
+
+
+DESCRIPTION
+       The  gif2png  program  converts files in the obsolescent
+       and patent-encumbered Graphic Interchange  Format  (GIF)
+       to  Portable  Network Graphics (PNG) format, an open W3C
+       standard.
+
+
+       Normally gif2png converts each file named on the command
+       line,  leaving the original in place. If a name does not
+       have a .gif extension, the unmodified name will be tried
+       first, followed by the name with .gif appended. For each
+       file named `foo.gif', a foo.png will be created.
+
+
+       When a multi-image GIF file named foo.gif is  converted,
+       gif2png  creates multiple PNG files, each containing one
+       frame; their names will  be  foo.png,  foo.p01,  foo.p02
+       etc.
+
+
+       If  no  source files are specified and stdin is a termi-
+       nal, gif2png lists a usage summary and version  informa-
+       tion, then exits.
+
+
+       If  no source files are specified, and stdin is a device
+       or pipe, stdin is converted to noname.png. (The  program
+       can't  be a normal stdin-to-stdout filter because of the
+       possibility that  the  input  GIF  might  have  multiple
+       images).
+
+
+       However,  if  filter mode is forced (with -f) stdin will
+       be converted to stdout, with gif2png returning an  error
+       code if the GIF is multi-image.
+
+
+       The program will preserve the information contained in a
+       GIF file as closely as possible, including  GIF  comment
+       and application-data extension blocks. All graphics data
+       (pixels, RGB color tables)  will  be  converted  without
+       loss  of  information.  Transparency  is also preserved.
+       There is one exception; GIF  plain-text  extensions  are
+       skipped.
+
+
+       The  program  automatically  converts interlaced GIFs to
+       interlaced PNGs. It detects images in which  all  colors
+       are  gray  (equal  R, G, and B values) and converts such
+       images to PNG grayscale. Other images are  converted  to
+       use  the  PNG  palette type. Duplicate color entries are
+       silently preserved. Unused color-table entries cause  an
+       error message.
+
+
+       The  action of the program can be modified with the fol-
+       lowing command-line switches:
+
+
+       -b {#}RRGGBB
+              Background. Replace transparent pixels with given
+              RGB  value, six hexadecimal digits interpreted as
+              two hexits each of red, green,  and  blue  value.
+              The  value  may optionally be led with a #, HTML-
+              style.
+
+
+       -d     Delete source GIF files after successful  conver-
+              sion.
+
+
+       -f     Filter  mode. Convert GIF on stdin to PNG on std-
+              out, return error if the GIF is multi-image.
+
+
+       -g     Write gamma=1/2.2 and sRGB chunks in the PNG.
+
+
+       -h     Generate  PNG  color-frequency  histogram  chunks
+              into converted color files.
+
+
+       -i     Force conversion to interlaced PNG files.
+
+
+       -n     Force conversion to non-interlaced PNG files.
+
+
+       -p     Display progress of PNG writing.
+
+
+       -r     Try to recover data from corrupted GIF files.
+
+
+       -s     Do  not translate the GIF Software chunk to a PNG
+              annotation.
+
+
+       -t     Change behavior of web-probe (-w) mode to  accept
+              GIFs with transparency.
+
+
+       -v     Verbose mode; show summary line, -vv enables con-
+              version-statistics and debugging messages.
+
+
+       -w     Web-probe switch; list GIFs that do not have mul-
+              tiple images or transparency to stdout. GIFs that
+              fail this filter cause error messages to  stderr.
+
+
+        -O    Optimize; remove unused color-table entries. Nor-
+              mally these trigger an error message and  disable
+              -d  (but  conversion  is completed anyway). Also,
+              use zlib compression level 9  (best  compression)
+              instead  of the default level. The recovery algo-
+              rithm enabled by -r is as follows:  Unused  color
+              table  entries  will not trigger an error message
+              as they normally do, but will still be  preserved
+              unless  -O is also on, in which case they will be
+              discarded. Missing color tables will  be  patched
+              with  a default that puts black at index 0, white
+              at index 1, and supplies red, green,  blue,  yel-
+              low,  purple and cyan as the remaining color val-
+              ues. Missing image  pixels  will  be  set  to  0.
+              Unrecognized or corrupted extensions will be dis-
+              carded.
+
+
+PROBLEMS
+       Naively converting all your GIFs at one go with  gif2png
+       is  not  likely  to  give  you the results you want. The
+       problem is not with PNG itself or with gif2png, but with
+       the poor-to-nonexistent support for PNG transparency and
+       animation in most browsers.
+
+
+       The web-probe switch is intended to be used with scripts
+       for  converting  web  sites. All PNGs generated from the
+       pathnames  it  returns  will  be  properly  rendered  in
+       Netscape  Navigator  4.04+,  Internet  Explorer versions
+       4.0b1+, and all other current  web  browsers.  Note:  in
+       future  releases  of gif2png, the meaning of this switch
+       may change to  reflect  the  capabilities  of  prevalent
+       browsers.
+
+
+PATENT ISSUES
+       The  GIF format is encumbered by a Unisys patent (see <:
+       http://www.delphion.com/detailshttp://www.del-
+       phion.com/details?&pn10=US04464650>) for the Lempel-Ziv-
+       Welch compression algorithm. Use of any GIF image gener-
+       ator  not licensed by Unisys can make you liable to law-
+       suit. Unisys apparently refuses to  issue  licenses  for
+       use  of  LZW in open-source programs, and in 1999 stated
+       that its policy is to require a $5000 fee from  websites
+       that  carry  GIF  images  made by unlicensed software --
+       even nonprofit websites created and displayed with  free
+       software.  See <: http://corp2.unisys.com/LeadStory/lzw-
+       license.htmlhttp://corp2.unisys.com/LeadStory/lzw-
+       license.html> for details.
+
+
+       The  patent  probably  does  not cover LZW decompressors
+       such as the one gif2png uses; legal opinions are divided
+       on  this,  there  has  been  no  court  test, and Unisys
+       refuses to commit itself. It is possible that you may be
+       liable  if  you  distribute gif2png in a commercial pro-
+       gram, or distribute gif2png on a for-profit basis.
+
+
+       For a history of the  GIF  patent  controversy,  see  <:
+       http://lpf.ai.mit.edu/Patents/Gif/Gif.html-
+       http://lpf.ai.mit.edu/Patents/Gif/Gif.html>.  To   avoid
+       legal  problems,  it would be a good idea to convert all
+       GIFs on your websites  and  elsewhere  to  PNGs  without
+       delay.   See  <:  http://burnallgifs.org/http://burnall-
+       gifs.org/> for discussion.
+
+
+STANDARDS AND SPECIFICATIONS
+       Copies of the GIF89 specification are  widely  available
+       on  the  Web;  search for "GRAPHICS INTERCHANGE FORMAT".
+       The Graphics  Interchange  Format(c)  is  the  Copyright
+       property  of  CompuServe Incorporated. GIF(sm) is a Ser-
+       vice Mark property of CompuServe Incorporated.
+
+
+       The       PNG       home        site        at        <:
+       http://www.libpng.org/pub/png/http://www.libpng.org/pub/png/>
+       has very complete information on the PNG  standard,  PNG
+       libraries, and PNG tools.
+
+
+SEE ALSO
+       web2png(1)
+
+
+AUTHORS
+       Code   by  Alexander  Lehmann  <alex@hal.rhein-main.de>,
+       1995. Auto-interlace conversion and tRNS optimization by
+       Greg  Roelofs  <newt@pobox.com>, 1999. Man page, -O, -w,
+       and production packaging by Eric S.  Raymond  <esr@thyr-
+       sus.com>, 1999.
+
+
+
+
+                                                     GIF2PNG(1)

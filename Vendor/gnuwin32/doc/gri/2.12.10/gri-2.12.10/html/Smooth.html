@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: `smooth' command</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile Smooth.html "Gri: `smooth' command" "Gri Commands" --> 
+
+<!-- @node   Smooth, Source, Sleep, List Of Gri Commands -->
+<a name="Smooth" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="ListOfGriCommands.html#ListOfGriCommands" shape="rect" coords="516,2,532,24" href="ListOfGriCommands.html#ListOfGriCommands">
+<area alt="Gri: `sleep' command" shape="rect" coords="557,2,573,24" href="Sleep.html">
+<area alt="Gri: `source' command" shape="rect" coords="581,2,599,24" href="Source.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: `source' command" shape="rect" coords="581,2,599,24" href="Source.html">
+</map>
+<h3>9.3.45: `<font color="#82140F"><code>smooth</code></font>'</h3>
+
+<!-- latex: \index{smooth} -->
+All these smoothing commands ignore the <b>location</b> of the data.  For
+equispaced data these algorithms have the standard interpretation in
+terms of digital filters.  For non-equispaced data, the interpretation
+is up to the user.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+`smooth {x [.n.]} \
+  | {y [.n.]} \
+  | {grid data [.f.|{along x|y}]}'
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+The `<font color="#82140F"><code>smooth x</code></font>' command does smoothing by the following formula
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+x[i-1]   x[i]   x[i+1]
+------ + ---- + ------
+  4       2       4
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+The `<font color="#82140F"><code>smooth x .n.</code></font>' command does boxcar smoothing with centred
+boxcars `<font color="#82140F"><code>.n.</code></font>' points wide.  The `<font color="#82140F"><code>smooth y</code></font>' command does the
+same as `<font color="#82140F"><code>smooth x</code></font>', but on the `<font color="#82140F"><code>y</code></font>' column.
+<p>
+<!-- latex: \index{smooth grid data} -->
+There are several methods of smoothing grid data.  Note that isolated
+missing values are filled in by each method.  (Let the author know if
+you'd like that `feature' to be an option.)
+<p>
+The `<font color="#82140F"><code>smooth grid data</code></font>' command smooths gridded data, by weighted
+average in a plus-shaped window about each gridpoint.  The smoothing
+algorithm replaces each interior gridpoint value `<font color="#82140F"><code>z[i][j]</code></font>' by
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+z[i][j]   z[i-1][j] + z[i+1][j] + z[i][j-1] + z[i][j+1]
+------- + ---------------------------------------------
+   2                          8
+</font></PRE>
+</TD>
+</TR>
+</TABLE>     
+<p>
+
+Points along the edges are smoothed by the same formula, after
+inventing image points outside the domain by planar extrapolation.
+<p>
+The `<font color="#82140F"><code>smooth grid data .f.</code></font>' command performs partial smoothing.  A
+temporary fully-smoothed grid `<font color="#82140F"><code>zSMOOTH[i][h]</code></font>' is constructed as
+above, and a linear combination of this grid and the original grid is
+used as the replacement grid:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+z[i][j] = (1-f) * z[i][j] + f * zSMOOTH[i][j]
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+where `<font color="#82140F"><code>f</code></font>' is the value indicated on the command line.  
+Thus, `<font color="#82140F"><code>smooth grid data 0</code></font>' performs no smoothing at all, while
+`<font color="#82140F"><code>smooth grid data 1</code></font>' is equivalent to `<font color="#82140F"><code>smooth grid data</code></font>'.
+<p>
+The `<font color="#82140F"><code>smooth grid data along x</code></font>' command smooths the grid data
+across `<font color="#82140F"><code>x</code></font>' (i.e., horizontally), by replacing each value
+`<font color="#82140F"><code>z[i][j]</code></font>' with the value
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+z[i][j]   z[i-1][j] + z[i+1][j]
+------- + ---------------------
+   2                4
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Points along the edges are smoothed by the same formula, after
+inventing image points outside the domain by linear extrapolation.
+<p>
+The `<font color="#82140F"><code>smooth grid data along y</code></font>' command does the same thing as
+`<font color="#82140F"><code>smooth grid data along x</code></font>', but the smoothing is along `<font color="#82140F"><code>y</code></font>'.
+<p>
+
+<b>See also</b> see <a href="Filter.html#Filter">Filter</a>, a generalization of `<font color="82140F"><code>smooth x|y</code></font>'
+which allows for more sophisticated filters.
+<p>
+
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

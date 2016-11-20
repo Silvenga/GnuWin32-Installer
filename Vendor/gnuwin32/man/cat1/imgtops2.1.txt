@@ -1,0 +1,123 @@
+imgtops2(1)                                         imgtops2(1)
+
+
+
+
+NAME
+       imgtops2 - convert images to PostScript
+
+SYNOPSIS
+       imgtops2  [-t]  [-e] [-d] [-h] [-c xcorner,ycorner ] [-s
+       xsize,ysize ] [-o outputfile ] [pnmfile]
+
+DESCRIPTION
+       Reads an image (binary PPM, binary PGM,  JFIF/JPEG)  and
+       produces a Level 2 PostScript EPS file as output.
+
+       Level  2  PostScript contains support for more efficient
+       encoding of binary data than the traditional hexadecimal
+       representation.   It also natively supports of JPEG-com-
+       pressed image data.  This  program  takes  advantage  of
+       those features to produce PostScript files that are con-
+       siderably smaller than those produced with  older  tools
+       (such as pnmtops ).  The resulting files will print only
+       on PostScript devices supporting Level 2  features,  but
+       Level  2  has  been  around  since 1991 so virtually all
+       printers today support it.
+
+       The output of this program with no  options  will  be  a
+       one-page  PostScript document with the image centered on
+       the page with one-inch margins.  (The default paper size
+       will be US letter or A4, depending on options given when
+       the package was built.)  The file will contain  a  tight
+       bounding  box for the image and other necessary DSC com-
+       ments to make the output a legal Encapsulated PostScript
+       (EPS) file, suitable for inclusion in other documents.
+
+INPUT IMAGES
+       For  PPM  and PGM inputs, only binary (raw format) files
+       are supported, and maxval is assumed to be 255.
+
+       If the input is a JFIF file (JPEG File Interchange  For-
+       mat,  the  format  commonly known as "a JPEG file"), the
+       program  will  directly  encode   the   JPEG   data   as
+       PostScript, without further loss of quality.  Both color
+       and grayscale JFIFs are supported.  Only  baseline  JPEG
+       is  supported,  since  the  PostScript standard does not
+       specify support for progressive JPEG.  If you give  img-
+       tops2  a  progressive JPEG, it will print a warning mes-
+       sage  but  produce  PostScript  output   anyway.    Many
+       PostScript devices will choke on this output, but you're
+       welcome to try it.
+
+       rdjpgcom -verbose can be used to determine the  encoding
+       process  used  for  a  particular  JFIF  file.  jpegtran
+       -optimize will  losslessly  transcode  progressive  JPEG
+       into  baseline  JPEG.   Both programs are available from
+       the Independent JPEG Group (www.ijg.org).
+
+       For all inputs, the output file should be  approximately
+       25% larger than the input image file.
+
+OPTIONS
+       The  -h  option causes the program to print a summary of
+       the command-line options to stderr and exit.
+
+       The -o option causes output to be placed  in  the  given
+       file, rather than sent to stdout.
+
+       When  the -t flag is present, the image may be rotated a
+       quarter-turn  counterclockwise  on  the  page,  if  that
+       allows  the image to be scaled larger.  Whether the out-
+       put is turned or not will depend on  the  dimensions  of
+       the  input  image  and the size of the printable area on
+       the page.  Without the -t option, the image will  always
+       appear upright.
+
+       Because  EPS bounding boxes must be specified with inte-
+       gral coordinates, it might not be possible to produce  a
+       bounding  box  which exactly surrounds the image once it
+       is scaled to fit the page.  The  bounding  box  produced
+       will  be  conservative:   the program will round so that
+       the bounding box includes all of the  image,  but  might
+       include  slightly  more of the page.  While the width of
+       this extra border will never exceed 1/72", the -e option
+       is  provided  for  the  serious purist.  This causes the
+       program to ignore the page size  completely,  and  place
+       the  image upright, starting at the lower left corner of
+       the page, scaled to one pixel per PostScript unit.  This
+       file will not be suitable for printing (few printers can
+       print all the way to the edges  of  the  page,  and  the
+       image  might  be larger than the physical page), but the
+       bounding box will exactly contain the image.  Files pro-
+       duced  with this option should only be used as EPS input
+       to other programs.
+
+       The printable area on the page can be modified with  the
+       -c and -s options.  The first sets the lower left corner
+       of the printable area, relative to the lower left corner
+       of  the  page.   The second sets the width and height of
+       the  printable  area.   All  values  are  specified   in
+       PostScript  units  (equal  to  1/72"  of  an inch).  The
+       default is either US letter size with one  inch  margins
+       (equivalent  to  "-c  72,72 -s 468,648") or A4 size with
+       one inch margins (eqivalent to "-c 72,72  -s  451,698"),
+       depending  on what option was specified when the package
+       was built.  Use -h to see the default.
+
+       The -d option omits the image from the output file,  but
+       draws  rectangles  indicating  the printable area (red),
+       the image area and orientation (blue), and the  bounding
+       box  (green).   This  may  be useful for debugging image
+       placement on the page.
+
+SEE ALSO
+       pnm(5), pnmtops(1), jpegtran(1), rdjpgcom(1)
+
+AUTHOR
+       Copyright (C) 2000 by Doug Zongker.
+
+
+
+
+                        19 January 2000             imgtops2(1)

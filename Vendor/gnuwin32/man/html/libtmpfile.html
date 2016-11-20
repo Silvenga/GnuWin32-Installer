@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html> <head>
+<title>Netpbm subroutine library: pm_tmpfile() function</title>
+<meta name="manual_section" content="3">
+</head>
+
+<body>
+<h1>pm_tmpfile()</h1>
+Updated: 22 July 2004
+<br>
+<h2>NAME</h2>
+pm_tmpfile() - tempfile creation routine using TMPFILE
+<h2>SYNOPSIS</h2>
+
+<pre>
+#include &lt;netpbm/pm.h&gt;
+
+FILE *
+pm_tmpfile(void);
+</pre>
+
+<h2>EXAMPLE</h2>
+
+<p>This simple example creates a temporary file, writes "hello world"
+to it, then reads back and prints those contents.
+
+<pre>
+#include &lt;netpbm/pm.h&gt;
+
+FILE * myfile;
+
+myfile = pm_tmpfile();
+
+fprintf(myfile, "hello world\n");
+
+fseek(myfile, 0, SEEK_SET);
+
+fread(buffer, sizeof(buffer), 1, myfile);
+
+fprintf(STDOUT, "temp file contains '%s'\n", buffer);
+
+fclose(myfile);
+
+</pre>
+
+<h2>DESCRIPTION</H2>
+
+<p>This library function is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pm_tmpfile()</b> creates and opens an unnamed temporary file.
+It is basically the same thing as the standard C library
+<b>tmpfile()</b> function, except that it uses the <b>TMPFILE</B>
+environment variable to decide where to create the temporary file.
+If <b>TMPFILE</b> is not set or is set to something unusable (e.g.
+too long), <b>pm_tmpfile()</b> falls back to the value of the
+standard C library symbol <b>P_tmpdir</b>, just like <b>tmpfile()</b>.
+
+<p>Unlike <b>tmpfile()</b>, <b>pm_tmpfile()</b> never returns NULL.
+If it fails, it issues a message to Standard Error and aborts the
+program, like most libnetpbm routines do.
+
+<h2>HISTORY</h2>
+<b>pm_tmpfile()</b> was introduced in Netpbm 10.20 (January 2004).
+
+</body>
+</html>

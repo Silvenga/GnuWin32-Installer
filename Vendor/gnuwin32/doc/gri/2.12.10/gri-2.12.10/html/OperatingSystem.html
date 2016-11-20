@@ -1,0 +1,307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: operating system</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile OperatingSystem.html "Gri: operating system" "Programming Gri" --> 
+
+<!-- @node   Operating System, Using OS Inside Gri, Missing Values, Programming -->
+<a name="OperatingSystem" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Programming.html#Programming" shape="rect" coords="516,2,532,24" href="Programming.html#Programming">
+<area alt="Gri: missing values" shape="rect" coords="557,2,573,24" href="MissingValues.html">
+<area alt="Gri: The Gri resource file" shape="rect" coords="581,2,599,24" href="ResourceFile.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: The Gri resource file" shape="rect" coords="581,2,599,24" href="ResourceFile.html">
+</map>
+<h2>10.16: Interaction Between Gri and Operating System</h2>
+
+
+<UL>
+<LI><a href="OperatingSystem.html#UsingOSInsideGri">Using OS Inside Gri</a>: Accessing the OS from inside Gri
+<LI><a href="OperatingSystem.html#UsingGriInsideOS">Using Gri Inside OS</a>: Tricks for using Gri in unix
+</UL>
+
+<!-- @node   Using OS Inside Gri, Using Gri Inside OS, Operating System, Operating System -->
+<a name="UsingOSInsideGri" ></a>
+<h3>10.16.1: Using the OS from within Gri</h3>
+
+
+Gri uses the operating system internally for things like paging through
+help information.
+<p>
+The operating system may be called <b>within</b> Gri commands, using a
+syntax borrowed from the `<font color="#82140F"><code>Bash</code></font>' unix shell.  After substituting
+synonyms in the commandline, Gri scans for dollar-parenthesis blocks
+(e.g. `<font color="#82140F"><code>\$(system-command)</code></font>', replacing them with the textual result
+of sending the indicated system-command to the OS.  The replacements are
+done from left to right in the commandline, starting at the deepest
+nesting level.
+<p>
+Often the dollar-parentheis syntax is used in title commands, to
+indicate the full pathname of the Gri commandfile, e.g.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+draw title "\$(pwd)/\.command_file."
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+In assignment to synonyms, expansion of dollar-parenthesis is not done.
+Thus the operating system is called twice on the second line below, and
+not at all on the first line; to see this, run it as `<font color="#82140F"><code>gri -s8 -t</code></font>'.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\dir = "\$(echo $MY_DIR)"
+show "\$(head -1 \dir/MY_FILE)"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<b>Syntax Note</b> Dollar-parenthesis blocks must be prefixed with
+backslash to avoid confusion with math expressions within strings, for
+example to avoid breaking `<font color="#82140F"><code>draw label "$(x,y)$" at 3 3 cm</code></font>'.  This
+is an example of how TeX notation and unix shell notation collide.
+<p>
+<b>Example</b> It is a good idea to employ unix environment variables to name
+directories containing data, so that Gri scripts will work unchanged
+even if the data are moved (so long as the environment variables are
+altered), e.g.
+<p>
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+# Figure how many lines in a file
+\dir ="$(echo DIRECTORY_WHERE_I_STORE_SOLAR_DATA)"
+open "\dir/solar_data_file_name`
+...
+open "\$(echo DIR_ANOTHER)/another_data_set"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+Another method is to pass instructions to the operating system with the
+`<font color="#82140F"><code>system</code></font>' command.  This discards output.  Whatever follows the word
+`<font color="#82140F"><code>system</code></font>' is first scanned for synonyms (but not rpn expressions or
+variables); after replacement of any existing synonyms, the line is
+passed directly to the operating system.  Any results are printed on the
+terminal.
+<p>
+Frequently used system commands are `<font color="#82140F"><code>awk</code></font>', `<font color="#82140F"><code>head</code></font>', `<font color="#82140F"><code>grep</code></font>' and
+`<font color="#82140F"><code>sed</code></font>'.  Examples:
+<p>
+<ul>
+<li>
+Here's how to paste several files together to form a temporary file for
+plotting.  (Notice that a temporary file incorporating the PID of the job
+is created and later removed.)
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+system paste -d" " 1.dat 2.dat 3.dat &gt; tmp.\.pid.
+open tmp.\.pid.
+read columns x y
+close
+system rm tmp.\.pid.
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+Here's how to plot each line in a file called `<font color="#82140F"><samp>inp</samp></font>' which has
+the string `<font color="#82140F"><code>;</code></font>' at the start of the line.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+system cat inp | grep -v "^;" | cat &gt; tmp.\.pid.
+open tmp.\.pid.
+read columns x y
+system rm tmp.\.pid.
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+Here's how to use the `<font color="#82140F"><code>awk</code></font>' system command to create a tabulated
+function for plotting.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+system awk                             \
+    'BEGIN {                           \
+       for (x=0; x&lt;1; x+=0.1) {        \
+         printf ("%f %f\n", x, sin(x)) \
+       }                               \
+     }'                                \
+    &gt; tmp.\.pid.
+open tmp.\.pid.
+read columns x y
+close
+system rm tmp.\.pid.
+draw curve
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+
+This example is more cleanly written using the piping facility of the
+`<font color="#82140F"><code>open</code></font>' command (which automatically creates a temporary file, and
+destroys it when `<font color="#82140F"><code>close</code></font>' is done)
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "awk 'BEGIN {       \
+  for(x=0;x&lt;1;x+=0.1) {  \
+    print(x,sin(x))      \
+  }                      \
+}'|"
+read columns x y
+close
+draw curve
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+<li> Sometimes you need just a single output item from the operating
+system.  In this case, you can store the results from the operating
+system in a synonym by using the `<font color="#82140F"><code>\synonym = system ...</code></font>'
+assignment command.  
+<li>
+subroutine A related command is `<font color="#82140F"><code>\synonym = tmpname</code></font>', which
+stores in the synonym the name of a temporary file created by the
+system.  The file is created with the `<font color="#82140F"><code>tmpname</code></font>' system call, so
+it is guaranteed not to clash with any existing files.  Typically, the
+filename is something like `<font color="#82140F"><samp>/usr/tmp/griAAAa1233</samp></font>'.  In many cases
+you'll want to remove the file within Gri, once you're done, and that
+can be done with `<font color="82140F"><code>unlink</code></font>' (see <a href="Unlink.html#Unlink">Unlink</a>) or with a
+`<font color="#82140F"><code>system rm -f</code></font>' command.  A useful bit of code is as follows
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\file = tmpname
+system ... SOME_SYSTEM_COMMANDS ... &gt; \file
+... use this new file for something ...
+unlink \file
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+</ul>
+<p>
+
+<!-- @node   Using Gri Inside OS, Resource File, Using OS Inside Gri, Operating System -->
+<a name="UsingGriInsideOS" ></a>
+<h3>10.16.2: Using Gri from within the OS</h3>
+
+
+<b>This section only applies to unix systems.</b>
+<p>
+Save the following into a file called `<font color="#82140F"><samp>p</samp></font>' and then make it
+executable using `<font color="#82140F"><code>chmod</code></font>'.  It runs Gri on a named file, with the 
+`<font color="#82140F"><code>-yes</code></font>' flag set
+so that any `<font color="#82140F"><code>query</code></font>' commands are automatically answered in the
+affirmative, and then displays the results in a Ghostscript window.
+(USAGE: `<font color="#82140F"><code>p cmdfile.gri</code></font>')
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+#!/usr/bin/sh
+# Run Gri, then plot in gs window
+case $# in
+1)
+        base=`basename $1 .gri | sed -e s/.*,#`
+        gri -yes $base.gri &amp;&amp; ghostview $base.ps
+        ;;
+*)
+        echo "Proper usage: $0 cmdfile.gri"
+        ;;
+esac
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

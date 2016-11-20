@@ -1,0 +1,77 @@
+# Example 3 -- Controlling scales, etc
+
+#
+# Example of how to control axis scales, etc.  This example makes
+# two panels, plotting the same data in different ways.
+#
+#
+# ----- PANEL 2 ------------------------------------------------
+#
+# Set up the x axis.
+#
+# Make the x axis run from 0 to 1, with labelled tics each 0.25. 
+set x axis 0   1   .25
+# Make the plot 5 cm wide.
+set x size 5
+# 2 cm of space between the left edge of the plot
+# and the left edge of the paper.
+set x margin 2
+# Give the x-axis the name "t" with subscript 0.
+set x name "$t_0$"
+#
+# Set up the y axis.
+#
+# Make the y axis run from 10 to 20, with labelled tics at intervals
+# of 5 and smaller, unlabelled, tics, at intervals of 1.  Other
+# commands are similar to those for the x-axis.
+set y axis 10 20 5 1
+set y size 10
+set y margin 2
+set y name "F"
+#
+# Now, read our simple data set.
+open example1.dat
+read columns x y
+close
+#
+# Draw a curve connecting these (x,y) data.  Note that the axes, as
+# defined above, will be drawn automatically along with the curve.
+draw curve 
+
+
+#
+# ----- PANEL 2 -----------------------------------------
+#
+# OK, now for a more complicated version.  We'll keep the
+# same data, but redraw it in a new panel, to the right of
+# the first graph.  So, the first step is to increase the
+# x margin.  The rpn command creates a number which is
+# the sum of the old x margin (stored in the variable
+# ..xmargin..) and the old plot width (stored in
+# the variable ..xsize..), plus an extra 1 cm
+set x margin {rpn ..xsize.. ..xmargin.. + 1 +}
+# 
+# Set the line thickness for the curve to 1 point (0.3 mm) and the
+# axis line thickness to 0.2 points (0.1 mm).
+set line width 1.0		# points
+set line width axis 0.2		# points
+# Set the tics to be 1.5 mm.
+set tic size 0.15		# centimetres
+# Draw axes and frame, with axes offset from frame.  Some
+# people find this more attractive.
+set axes style offset
+draw axes 1
+# Now draw the actual curve.
+draw curve
+# Superimpose dots (radius 1.5 mm) at the data.
+set symbol size 0.15
+draw symbol bullet
+#
+# All done.
+# Draw a title above the plot.
+set font size 20
+\label = "Example 3 -- scales, axes, etc"
+draw label "\label" centered at \
+    {rpn 2 5 + .5 + } \
+    {rpn ..ytop.. yusertocm 2 +} cm
+

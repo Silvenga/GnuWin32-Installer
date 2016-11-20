@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Rawtopgm User Manual</TITLE></HEAD>
+<BODY>
+<H1>rawtopgm</H1>
+Updated: 14 September 2000
+<BR>
+<A HREF="rawtopgm.html#index">Table Of Contents</A>
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+rawtopgm - convert raw grayscale bytes to a PGM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>rawtopgm</B>
+
+[<B>-bpp</B> [<B>1</B>|<B>2</B>]]
+
+[<B>-littleendian</B>]
+
+[<B>-maxval</B> <I>N</I>]
+
+[<B>-headerskip</B> <I>N</I>]
+
+[<B>-rowskip</B> <I>N</I>]
+
+[<B>-tb</B>|<B>-topbottom</B>]
+
+[<I>width</I> <I>height</I>]
+
+[<I>imagefile</I>]
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>rawtopgm</b> reads raw grayscale values as input and produces a
+PGM image as output.  The input file is just a sequence of pure binary
+numbers, either one or two bytes each, either bigendian or
+littleendian, representing gray values.  They may be arranged either
+top to bottom, left to right or bottom to top, left to right.  There
+may be arbitrary header information at the start of the file (to which
+<B>rawtopgm</B> pays no attention at all other than the header's
+size).
+
+<P>Arguments to <B>rawtopgm</B> tell how to interpret the pixels (a
+function that is served by a header in a regular graphics format).
+
+<P>The <I>width</I> and <I>height</I> parameters tell the dimensions
+of the image.  If you omit these parameters, <B>rawtopgm</B> assumes
+it is a quadratic image and bases the dimensions on the size of the
+input stream.  If this size is not a perfect square, <B>rawtopgm</B>
+fails.
+
+<P>When you don't specify <I>width</I> and <I>height</I>,
+<B>rawtopgm</B> reads the entire input stream into storage at once,
+which may take a lot of storage.  Otherwise, <B>rawtopgm</B>
+ordinarily stores only one row at a time.
+
+<P>If you don't specify <I>imagefile</I>, or specify <B>-</B>, the
+input is from Standard Input.
+
+<P>The PGM output is to Standard Output.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-maxval</B> <I>N</I>
+
+<DD><I>N</I> is the maxval for the gray values in the input, and is
+also the maxval of the PGM output image.  The default is the maximum
+value that can be represented in the number of bytes used for each
+sample (i.e. 255 or 65535).
+
+<DT><B>-bpp</B> [<B>1</B>|<B>2</B>]
+
+<DD>tells the number of bytes that represent each sample in the input.
+If the value is <B>2</B>, The most significant byte is first in the
+stream.
+
+<P>The default is 1 byte per sample.
+
+<DT><B>-littleendian</B>
+
+<DD>says that the bytes of each input sample are ordered with the
+least significant byte first.  Without this option, <B>rawtopgm</B>
+assumes MSB first.  This obviously has no effect when there is only
+one byte per sample.
+
+<DT><B>-headerskip</B> <I>N</I>
+
+<DD><B>rawtopgm</B> skips over <I>N</I> bytes at the beginning of the
+stream and reads the image immediately after.  The default is 0.
+
+<P>This is useful when the input is actually some graphics format that
+has a descriptive header followed by an ordinary raster, and you don't
+have a program that understands the header or you want to ignore the
+header.
+
+<DT><B>-rowskip</B> <I>N</I>
+
+<DD>If there is padding at the ends of the rows, you can skip it with
+this option.  Note that rowskip need not be an integer.  Amazingly, I
+once had an image with 0.376 bytes of padding per row.  This turned
+out to be due to a file-transfer problem, but I was still able to read
+the image.
+
+<P>Skipping a fractional byte per row means skipping one byte per
+multiple rows.
+
+<DT><B>-bt -bottomfirst</B>
+
+<DD>By default, <B>rawtopgm</B> assumes the pixels in the input go top
+to bottom, left to right.  If you specify <B>-bt</B> or
+<B>-bottomfirst</B>, <B>rawtopgm</B> assumes the pixels go bottom to
+top, left to right.  The Molecular Dynamics and Leica confocal format,
+for example, use the latter arrangement.
+
+<P>If you don't specify <B>-bt</B> when you should or vice versa, the
+resulting image is upside down, which you can correct with
+<B>pamflip</B>.
+
+<P>This option causes <B>rawtopgm</B> to read the entire input stream
+into storage at once, which may take a lot of storage.  Ordinarly,
+<B>rawtopgm</B> stores only one row at a time.
+
+<P>For backwards compatibility, <B>rawtopgm</B> also accepts <B>-tb
+</B> and <B>-topbottom</B> to mean exactly the same thing.  The
+reasons these are named backwards is that the original author thought
+of it as specifying that the wrong results of assuming the data is top
+to bottom should be corrected by flipping the result top for bottom.
+Today, we think of it as simply specifying the format of the input
+data so that there are no wrong results.
+
+</DL>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pgm.html">pgm</A></B>,
+
+<B><A HREF="rawtoppm.html">rawtoppm</A></B>,
+
+<B><A HREF="pamflip.html">pamflip</A></B>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>AUTHORS</H2>
+
+Copyright (C) 1989 by Jef Poskanzer.
+<BR>
+
+Modified June 1993 by Oliver Trepte, <A
+HREF="mailto:oliver@fysik4.kth.se">oliver@fysik4.kth.se</A>
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="rawtopgm.html#lbAB">NAME</A>
+<LI><A HREF="rawtopgm.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="rawtopgm.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="rawtopgm.html#lbAE">OPTIONS</A>
+<LI><A HREF="rawtopgm.html#lbAF">SEE ALSO</A>
+<LI><A HREF="rawtopgm.html#lbAG">AUTHORS</A>
+</UL>
+</BODY>
+</HTML>

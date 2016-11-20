@@ -1,0 +1,81 @@
+RLETOABA62(1)                                     RLETOABA62(1)
+
+
+
+
+
+NAME
+       rletoabA62  - Convert from RLE Format to Abekas A62 Dump
+       Format
+
+SYNOPSIS
+       rletoabA62 [ -N ] [ -f n ] [ -n n ] [ infile ]
+
+DESCRIPTION
+       RletoabA62 converts a raster file  in  the  Utah  Raster
+       Toolkit RLE format into a format suitable for writing to
+       an Abekas A62 dump tape and subsequent loading onto  the
+       Abekas disk.  The generated image is 768 pixels wide and
+       512 pixels high.  If the input is larger,  it  is  trun-
+       cated.   If  it  is smaller, it is padded on the top and
+       right with black.  The output is written to stdout,  and
+       should  be  written to a tape in 24K byte blocks with dd
+       as in the following:
+
+            dd of=/dev/rmt8 obs=24k
+
+       Normally, the output is processed with a simple  digital
+       filter;  this  feature may be turned off with an option.
+       RletoabA62 normally writes two consecutive frames,  nor-
+       mally starting at frame 1.
+
+       Input is taken from stdin unless a file name is given on
+       the command line.  Only a single file may be given,  and
+       so  if  multiple invocations of rletoabA62 are performed
+       in a script, care must be taken to tell the  program  to
+       convert  the  data  for  the  proper Abekas frame number
+       (1-4).  Otherwise, the colors will  appear  wrong;  they
+       will be rotated on a vector scope diagram.
+
+EXAMPLE
+       The  following example converts all files ending in .rle
+       in the current directory and writes them to a tape.  Two
+       frames  are  written  per  image and the frame number is
+       incremented accordingly.
+
+                 frame=1
+                 number=2
+                 for file in *.rle
+                 do
+                      rletoabA62 -f $frame $file
+                      frame=`expr \( \( $frame - 1 \) + $number
+                 \) % 4 + 1`
+                 done |
+                 dd of=/dev/rmt8 obs=24k
+
+OPTIONS
+       Options are parsed by getopt(3).
+
+       -N     Do not apply digital filtering.
+
+       -f n   Create  the first frame as Abekas frame number n,
+              having a value from  one  to  four.   Consecutive
+              frames  increment  this  number modulo four.  The
+              default is one.
+
+       -n n   Write n frames of output, incrementing the  frame
+              number each time.  The default is two.
+
+SEE ALSO
+       urt(1), RLE(5).
+
+AUTHOR
+       Bob Brown, RIACS.
+
+BUGS
+       This  program  does not preserve the aspect ratio of the
+       input.
+
+
+
+1                       6 February 1988           RLETOABA62(1)

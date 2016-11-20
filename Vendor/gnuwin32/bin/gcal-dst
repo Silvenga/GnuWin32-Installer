@@ -1,0 +1,349 @@
+#! /bin/sh
+#
+#  Generated automatically from dst.in by configure.
+#
+#  $Id: dst.in 0.09 2000/03/24 00:00:09 tom Exp $
+#
+#  dst.in:  Uses `dst[.awk|.pl]' for processing ZONEINFO files and saves the
+#             dates at which Daylight-Saving Times take place converted to the
+#             Gcal fixed date format in a resource file.
+#
+#           Usage: dst --help | --version
+#           Usage: dst [--debug] [--before=DAYS] [--after=DAYS] ZONEINFO-FILE...
+#
+#           `--debug':        Turn on shell debugging.
+#           `--before=DAYS':  Display the fixed date up to number DAYS
+#                               before the Daylight-Saving Time is active.
+#                               If this option is not given, `--before=0'
+#                               is used by default.
+#           `--after=DAYS':   Display the fixed date up to number DAYS
+#                               after the Daylight-Saving Time is active.
+#                               If this option is not given, `--after=0'
+#                               is used by default.
+#
+#  UN*X solution.
+#
+#  Needs `test', `echo', `eval', `set', `sed', `mv', `rm',
+#    `zdump', and `perl' or `awk' for processing!
+#
+#  Returns 0 if any fixed dates are created (returned by AWK/Perl script
+#            if neither `--help' nor `--version' option was specified).
+#  Returns 1 in case no fixed dates are created (returned by AWK/Perl script).
+#  Returns 2 if neither Zdump, or neither Perl nor AWK are present for
+#            further processing.
+#
+#  Copyright (c) 1998, 2000  Thomas Esken      <esken@uni-muenster.de>
+#                            Im Hagenfeld 84
+#                            D-48147 M"unster
+#                            GERMANY
+#
+#  This software doesn't claim completeness, correctness or usability.
+#  On principle I will not be liable for ANY damages or losses (implicit
+#  or explicit), which result from using or handling my software.
+#  If you use this software, you agree without any exception to this
+#  agreement, which binds you LEGALLY !!
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the `GNU General Public License' as published by
+#  the `Free Software Foundation'; either version 2, or (at your option)
+#  any later version.
+#
+#  You should have received a copy of the `GNU General Public License'
+#  along with this program; if not, write to the:
+#
+#    Free Software Foundation, Inc.
+#    59 Temple Place - Suite 330
+#    Boston, MA 02111-1307,  USA
+#
+#
+
+#
+# Basically used programs.
+#
+Mv=mv
+Rm=rm
+Sed=sed
+Set=set
+Test=test
+Echo=echo
+
+#
+# Basically used texts.
+#
+packagedatamiscdir=c:/progra~1/Gcal/share/gcal/misc/dst
+#
+PACKAGE=gcal
+VERSION=3.01
+transform=s,$$,,; s,^,,; s/i386-pc-mingw32//
+#
+mydefaultname=dst
+#
+myname=`$Echo "$0" | $Sed -e 's,.*/,,' -e "$transform"`
+myversion=0.09
+myinternalname="$myname ($PACKAGE $VERSION) $myversion"
+#
+gcal_resource_file_suffix=.rc
+backup_suffix="~"
+#
+info1="$myname: Processes ZONEINFO files and saves the dates"
+info2="$myname: at which Daylight-Saving Times take place in"
+info3="$myname: a Gcal resource file by the name \`ZONEINFO-FILE""$gcal_resource_file_suffix'."
+info4="$myname:"
+usage1="usage: $myname  --help | --version"
+usage2="usage: $myname  [--debug] [--before=DAYS] [--after=DAYS] ZONEINFO-FILE..."
+usage3="usage: $myname  without \`--before=DAYS' option uses \`--before=0' by default"
+usage4="usage: $myname  without \`--after=DAYS'  option uses \`--after=0'  by default"
+
+#
+# Some constant values.
+#
+EXIT_SUCCESS=0
+EXIT_FAILURE=1
+EXIT_FATAL=2
+
+#
+# The used programs.
+#
+Eval=eval
+ThisGcal=`$Echo "$PACKAGE" | $Sed "$transform"`
+#
+Zdump=
+#
+Awk=gawk
+Awk_script=$mydefaultname"".awk
+#
+Perl=perl
+Perl_script=$mydefaultname"".pl
+
+#
+# Let's check for command line arguments.
+#
+debug=no
+FILS=""
+previous=""
+for option in $*
+do
+  #
+  # If the previous option needs an argument, assign it.
+  #
+  if $Test -n "$previous";
+  then
+    $Eval "$previous=\$option"
+    previous=""
+    continue
+  fi
+
+  case "$option" in
+    -*=)  optarg="###error###" ;;
+    -*=*) optarg=`$Echo "$option" | $Sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *)    optarg="" ;;
+  esac
+
+  #
+  # Manage the options.
+  #
+  case "$option" in
+    -help=* | -hel=* | -he=* | -h=* | -help | -hel |-he | -h | \
+    --help=* | --hel=* | --he=* | --h=* | --help | --hel | --he | --h)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$info1"
+      $Echo "$info2"
+      $Echo "$info3"
+      $Echo "$info4"
+      $Echo "$usage1"
+      $Echo "$usage2"
+      $Echo "$usage3"
+      $Echo "$usage4"
+      exit $EXIT_SUCCESS ;;
+
+    -version=* | -versio=* | -versi=* | -vers=* | -ver=* | -ve=* | -v=* | \
+    -version | -versio | -versi | -vers | -ver | -ve | -v | \
+    --version=* | --versio=* | --versi=* | --vers=* | --ver=* | --ve=* | --v=* | \
+    --version | --versio | --versi | --vers | --ver | --ve | --v)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      $Echo "$myinternalname"
+      exit $EXIT_SUCCESS ;;
+
+    -debug=* | -debu=* | -deb=* | -de=* | -d=* | \
+    -debug | -debu | -deb | -de | -d | \
+    --debug=* | --debu=* | --deb=* | --de=* | --d=* | \
+    --debug | --debu | --deb | --de | --d)
+      if $Test -n "$optarg";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=.*//'`' doesn't allow an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      debug=yes
+      shift ;;
+
+    -before | -befor | -befo | -bef | -be | -b | \
+    --before | --befor | --befo | --bef | --be | --b)
+      previous=before ;;
+    -before=* | -befor=* | -befo=* | -bef=* | -be=* | -b=* | \
+    --before=* | --befor=* | --befo=* | --bef=* | --be=* | --b=*)
+      if $Test -z "$optarg" || $Test "$optarg" = "###error###";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=//g'`' requires an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      opt_before="$optarg"
+      shift ;;
+
+    -after | -afte | -aft | -af | -a | \
+    --after | --afte | --aft | --af | --a)
+      previous=after ;;
+    -after=* | -afte=* | -aft=* | -af=* | -a=* | \
+    --after=* | --afte=* | --aft=* | --af=* | --a=*)
+      if $Test -z "$optarg" || $Test "$optarg" = "###error###";
+      then
+        $Echo "$myname: error: option \``$Echo $option | $Sed -e 's/=//g'`' requires an argument" 1>&2
+        exit $EXIT_FAILURE
+      fi
+      opt_after="$optarg"
+      shift ;;
+
+    -* | /*)
+      $Echo "$myname: error: $option: invalid option, use --help to show usage" 1>&2
+      exit $EXIT_FAILURE ;;
+
+    *)
+     if $Test -z "$FILS";
+     then
+       FILS="$option"
+     else
+       FILS="$FILS $option"
+     fi
+  esac
+done
+
+if $Test -n "$previous";
+then
+  $Echo "$myname: error: missing argument to --$previous" 1>&2
+  exit $EXIT_FAILURE
+fi
+
+#
+# Enable tracing.
+#
+if $Test "$debug" = yes;
+then
+  $Set -x
+fi
+
+#
+# Let's start processing now.
+#
+if $Test -n "$Zdump" && ($Test -n "$Awk" || $Test -n "$Perl");
+then
+  if $Test -z "$FILS";
+  then
+    $Echo "$info1"
+    $Echo "$info2"
+    $Echo "$info3"
+    $Echo "$info4"
+    $Echo "$usage1"
+    $Echo "$usage2"
+    $Echo "$usage3"
+    $Echo "$usage4"
+    exit $EXIT_FAILURE
+  fi
+  ARGS=""
+  if $Test -n "$opt_after";
+  then
+    arg=`$Echo "$opt_after" | $Sed -e 's/[0-9]//g'`
+    if $Test -z "$arg";
+    then
+      ARGS="-a""$opt_after"
+    else
+      $Echo "$myname: error: invalid option argument \`$opt_after' specified" 1>&2
+      $Echo "$myname: use --help to show usage" 1>&2
+      exit $EXIT_FAILURE
+    fi
+  fi
+  if $Test -n "$opt_before";
+  then
+    arg=`$Echo "$opt_before" | $Sed -e 's/[0-9]//g'`
+    if $Test -z "$arg";
+    then
+      ARGS="$ARGS -b""$opt_before"
+    else
+      $Echo "$myname: error: invalid option argument \`$opt_before' specified" 1>&2
+      $Echo "$myname: use --help to show usage" 1>&2
+      exit $EXIT_FAILURE
+    fi
+  fi
+  #
+  for file in $FILS
+  do
+    #
+    # Design the name of the resulting Gcal resource file.
+    #
+    outfile="`$Echo $file | $Sed -e 's,.*/,,'`""$gcal_resource_file_suffix"
+    #
+    if $Test -s "$outfile" && \
+       $Test -f "$outfile" && \
+       $Test -r "$outfile";
+    then
+      $Mv $outfile $outfile""$backup_suffix
+    fi
+    #
+    if $Test "$debug" = no;
+    then
+      trap "$Rm -f $outfile; \
+        if $Test -s "$outfile""$backup_suffix" && \
+           $Test -f "$outfile""$backup_suffix" && \
+           $Test -r "$outfile""$backup_suffix"; \
+        then \
+           $Mv $outfile""$backup_suffix $outfile; \
+        fi;\
+        exit $EXIT_FAILURE" 1 2 15
+    fi
+    #
+    # We prefer the use of Perl.
+    #
+    if $Test -n "$Perl";
+    then
+      $Echo "$myname: \``$Echo $Zdump | $Sed -e 's,.*/,,'`/$Perl' are working on \`$file' ..." 1>&2
+      $Zdump -v $file | $Perl -- $packagedatamiscdir/$Perl_script $ARGS > $outfile
+    else
+      $Echo "$myname: \``$Echo $Zdump | $Sed -e 's,.*/,,'`/$Awk' are working on \`$file' ..." 1>&2
+      $Zdump -v $file | $Awk -f $packagedatamiscdir/$Awk_script $ARGS > $outfile
+    fi
+    status=$?
+    if $Test "$status" -eq "$EXIT_SUCCESS";
+    then
+      $Echo "$myname: daylight-saving times found, \`$outfile' created" 1>&2
+    else
+      if $Test "$status" -eq "$EXIT_FAILURE";
+      then
+        $Echo "$myname: no daylight-saving times found in \`$file'" 1>&2
+      else
+        if $Test -n "$Perl";
+        then
+          $Echo "$myinternalname: error: invalid option \`$ARGS' to \`$Perl' given" 1>&2
+        else
+          $Echo "$myinternalname: error: invalid option \`$ARGS' to \`$Awk' given" 1>&2
+        fi
+      fi
+      $Rm -f $outfile
+      if $Test -s "$outfile""$backup_suffix" && \
+         $Test -f "$outfile""$backup_suffix" && \
+         $Test -r "$outfile""$backup_suffix";
+      then
+        $Mv $outfile""$backup_suffix $outfile
+      fi
+    fi
+  done
+  exit $status
+else
+  $Echo "$myinternalname: error: neither \`zdump', OR neither \`perl' nor \`awk' available" 1>&2
+  exit $EXIT_FATAL
+fi

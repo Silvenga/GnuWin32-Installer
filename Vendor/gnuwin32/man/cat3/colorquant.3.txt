@@ -1,0 +1,122 @@
+COLORQUANT(3)                                     COLORQUANT(3)
+
+
+
+
+
+NAME
+       colorquant - variance-based color quantization
+
+SYNOPSIS
+       #include <colorquant.h>
+       int colorquant(red, green, blue, npix, colormap, colors,
+              bits, rgbmap, flags, accum_hist)
+       unsigned char *red, *green, *blue;
+       unsigned long npix;
+       unsigned char *colormap[3];
+       int colors, bits;
+       unsigned char *rgbmap;
+       int flags;
+       int accum_hist;
+
+DESCRIPTION
+       Colorquant performs variance-based color quantization on
+       a  given  image.   A representative colormap and a table
+       for performing RGB to colormap index  mapping  are  com-
+       puted.   The  number  of  colors  to which the image was
+       quantized (the total number  of  colormap  entries  com-
+       puted) is returned.  The arguments to colorquant are:
+
+       red, green, blue
+              The  red,  green  and blue channels of the image.
+              The ith pixel is represented as  the  RGB  triple
+              (red[i],  green[i],  blue[i]).  These arrays usu-
+              ally contain values that have been 'prequantized'
+              (see below).
+
+       npix   The  length, in bytes, of the red, green and blue
+              arrays.  Equal to the total number of  pixels  in
+              the image.
+
+       colormap
+              Points  to  a  pre-allocated,  three-channel col-
+              ormap.  These arrays will be filled with the col-
+              ormap values computed by the variance-based color
+              quantization  algorithm.   colormap[0][i],   col-
+              ormap[1][i],   and  colormap[2][i]  are,  respec-
+              tively, the red, green and blue components of the
+              ith colormap entry.
+
+       colors The  number  of  pre-allocated  colormap entries.
+              The image will be quantized to at most this  many
+              colors.
+
+       bits   The  number  of significant bits in each entry of
+              the red, green and blue  arrays.   Normally,  the
+              red,  green  and  blue arrays contain values that
+              have been prequantized to fewer than  eight  sig-
+              nificant  bits  (see flags below).  Five signifi-
+              cant bits  usually  represents  a  good  tradeoff
+              between image quality and running time.  Anything
+              above six significant bits will  likely  lead  to
+              excessive  paging,  as the size of rgbmap and the
+              internal   histogram    are    proportional    to
+              (2^bits)^3.
+
+       rgbmap A  pointer  to an array of unsigned chars of size
+              (2^bits)^3.  This array is used to map from  pix-
+              els  to  colormap entries.  The prequantized red,
+              green and blue components of a pixel are used  as
+              an index into this array to retrieve the colormap
+              index that should be used to represent the pixel.
+              The array is indexed as:
+              colorindex = rgbmap[(((r << bits) | g) << bits) | b];
+              where r, g, and b are the prequantized red, green
+              and blue components of the pixel in question.
+
+       flags  A collection of bit-flags that modify the  opera-
+              tion of colorquant.  Currently defined values are
+              CQ_FAST, CQ_QUANTIZE, and CQ_NO_RGBMAP.
+              If CQ_FAST is set,  the  construction  of  rgbmap
+              will  be relatively fast.  If not, rgbmap will be
+              built slowly but more accurately.  In most cases,
+              the  error introduced by the 'fast' approximation
+              is barely noticeable.
+              If CQ_QUANTIZE is set, the values in red,  green,
+              and  blue  are  taken as 8-bit values and will be
+              quantized to bits significant bits by colorquant.
+              If  not  set, these values are assumed to be pre-
+              quantized.
+              If CQ_NO_RGBMAP is set, rgbmap will not be built.
+
+       accum_hist
+              This  argument  provides a facility to accumulate
+              multiple  images  into  a  single  colormap.   If
+              accum_hist  is  zero, the routine works normally.
+              To  build  a   colormap   for   several   images,
+              accum_hist  should have the value 1 for the first
+              image, and 2  for  subsequent  images.   Finally,
+              after all the images have been processed, a value
+              of 3 for accum_hist will compute the colormap and
+              rgbmap.  The values of colors and bits should not
+              change during this process.  The  arguments  col-
+              ormap, rgbmap, and fast are ignored if accum_hist
+              is 1 or 2, and red, green,  blue,  and  npix  are
+              ignored if accum_hist is 3.
+
+AUTHOR
+       Craig Kolb, Yale University.
+       Martin  Friedmann,  MIT  Media  Lab  did  the accum_hist
+       changes.
+
+REFERENCE
+       Wan, Wong, and Prusinkiewicz, An Algorithm for  Multidi-
+       mensional  Data Clustering, Transactions on Mathematical
+       Software, Vol. 14 #2 (June, 1988), pp. 153-162.
+
+SEE ALSO
+       rlequant(1), inv_cmap(3).
+
+
+
+                        August 14, 1989           COLORQUANT(3)

@@ -1,0 +1,186 @@
+Ppmtoarbtxt User Manual(0)           Ppmtoarbtxt User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       ppmtoarbtxt  -  generate  image in arbitrary text format
+       from PPM image
+
+
+SYNOPSIS
+       ppmtoarbtxt bodyskl [-hd headskl]  [-tl  tailskl]  [ppm-
+       file]
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       ppmtoarbtxt generates simple text-based graphics formats
+       based on format descriptions given as  input.   A  text-
+       based graphics format is one in which an image is repre-
+       sented by text (like PNM plain format,  but  unlike  PNM
+       raw format).
+
+       ppmtoarbtxtreads  a  PPM image as input.  For each pixel
+       in the image, ppmtoarbtxt writes  the  contents  of  the
+       skeleton  file bodyskl, with certain substitutions based
+       on the value of the pixel, to stdout.  The substitutions
+       are as follows:
+
+
+
+       #(ired format blackref whiteref)
+              generates  an  integer  in  the range blackref to
+              whiteref using format representing the red inten-
+              sity  of the pixel.  A red intensity of 0 becomes
+              blackref;  a  red  intensity  of  maxval  becomes
+              whiteref.
+
+              #(ired) is equivalent to #(ired %d 0 255).
+
+
+       #(igreen format blackref whiteref)
+              Same as #(ired..., but for green.
+
+
+       #(iblue format blackref whiteref)
+              Same as #(ired..., but for blue.
+
+
+       #(ilum format blackref whiteref)
+              Same as #(ired..., but representing the luminance
+              value (0.299*red + 0.587*green +  0.114*blue)  of
+              the pixel.
+
+
+       #(fred format blackref whiteref)
+              Same as #(ired..., but generates a floating point
+              number instead of an integer.
+
+              #(fred) is equivalent to #(fred %f 0.0 1.0).
+
+
+       #(fgreen format blackref whiteref)
+              Same as #(fred..., but for green.
+
+
+       #(fblue format blackref whiteref)
+              Same as #(fred..., but for blue.
+
+
+       #(flum format blackref whiteref)
+              Same as #(fred..., but representing the luminance
+              value  (0.299*red  + 0.587*green + 0.114*blue) of
+              the pixel.
+
+
+
+       #(width)
+              Generates the width in pixels of the image.
+
+
+       #(height)
+              Generates the height in pixels of the image.
+
+
+
+       #(posx)
+              Generates the horizontal position of  the  pixel,
+              in pixels from the left edge of the image.
+
+
+       #(posy)
+              Generates  the vertical position of the pixel, in
+              pixels from the top edge of the image.
+
+
+
+       If the skeleton file  ends  with  a  LF-character,  ppm-
+       toarbtxt  ignores  it  --  it does not include it in the
+       output.
+
+
+OPTIONS
+       -hd headskl
+              This option causes ppmtoarbtxt to place the  con-
+              tents  of the file named headskl at the beginning
+              of the output, before the first pixel.   It  does
+              the  same  substitutions  as  for bodyskl, except
+              substitutions based on a pixel  value  are  unde-
+              fined.
+
+
+       -tl tailskl
+              This  option causes ppmtoarbtxt to place the con-
+              tents of the file named tailskl at the end of the
+              output, after the last pixel.  It is analogous to
+              -hd.
+
+
+
+EXAMPLES
+   gray inversion
+       Here we generate a  PGM  plain-format  image  with  gray
+       inversion (like ppmtopgm | pnminvert).
+
+       Contents of our head skeleton file:
+
+       P2
+       #(width) #(height)
+       255
+
+       Contents of our body skeleton file:
+
+       #(ilum %d 255 0)
+
+
+   povray file
+       Here  we generate a povray file where each pixel is rep-
+       resented by a sphere at location (x,y,z) = (posx,height-
+       posy,luminance).   The  color of the sphere is the color
+       of the pixel.
+
+       Contents of our head skeleton:
+
+       #include 'colors.inc'
+       #include 'textures.inc'
+       camera {
+          location  <#(width) * 0.6, #(height) * 0.7, 80>
+          look_at   <#(width) * 0.5, #(height) * 0.5, 0>
+       }
+
+       light_source { <#(width) * 0.5, #(height) * 0.5, 25> color White
+       }
+
+       Contents of our body skeleton:
+
+       sphere { <#(posx),#(height)-#(posy),#(ilum %d 0 10)>, 0.5
+         texture {
+           pigment {
+             color rgb <#(fred),#(fgreen),#(fblue)>
+           }
+           finish {
+             phong 1
+           }
+         }
+       }
+
+
+SEE ALSO
+       pnmtoplainpnm(1) ppm(1)
+
+
+HISTORY
+       ppmtoarbtxt was added to Netpbm in Release 10.14  (March
+       2003).  It existed under the name ppmtotxt since 1995.
+
+
+AUTHOR
+       Copyright (C) 1995 by Peter Kirchgessner
+
+
+
+netpbm documentation     27 April 200Ppmtoarbtxt User Manual(0)

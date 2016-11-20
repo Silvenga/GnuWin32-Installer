@@ -1,0 +1,114 @@
+#!/bin/sh
+#
+# @configure.input@
+#
+# gcalltx.in -- (C) Claus-Peter R"uckemann, 1996, 1998, 1999
+#
+# version 1.5
+#
+# This file may be distributed with Gcal under the terms
+# of the GNU public license.
+#
+# This script calls gcalltx.sed to convert 'gcal -n -u %0001 year' output to
+# LaTeX tabular output.
+# 
+# UN*X solution.
+#
+packagedatamiscdir=c:/progra~1/Gcal/share/gcal/misc/gcalltx
+#
+PACKAGE=gcal
+VERSION=3.01
+transform=s,$$,,; s,^,,; s/i386-pc-mingw32//
+#
+INSTALL_DATA="/bin/install.exe -cp"
+#
+Rm=rm
+Sed=sed
+Echo=echo
+Test=test
+Chmod=chmod
+#
+mydefaultname=gcalltx
+#
+myname=`$Echo "$0" | $Sed -e 's,.*/,,' -e "$transform"`
+#
+ThisGcal=`$Echo "$PACKAGE" | $Sed "$transform"`
+#
+Sed_script_in=$packagedatamiscdir/$mydefaultname"".sed
+Sed_script_out=$packagedatamiscdir/$mydefaultname"".cpr
+#
+SRCPERMS=`$Echo "$INSTALL_DATA" | $Sed -e 's,^.*/,,' -e 's/[^0-9]//g'`
+SRCPERMS2=0644
+#
+trap "$Rm -f gcaltmp* $mydefaultname"".tex;exit 2" 1 2 15
+#
+case "$#" in
+     1) GCAL= $ThisGcal -n -u %0001 --christian-holidays $* >gcaltmp
+        ;;
+     2) GCAL= $ThisGcal -n -u %0001 --cc-holidays=$* >gcaltmp
+        ;;
+     3) GCAL= $ThisGcal -n -u %0001 --christian-holidays --cc-holidays=$* >gcaltmp
+        ;;
+     *) $Echo "usage: $myname year";
+        $Echo "       $myname country_code year";
+        $Echo "       $myname country_code year --christian-holidays";
+        $Echo "";
+        $Echo "(1st usage provides only Christian holidays)";
+        $Echo "(2nd usage provides country_code holidays)";
+        $Echo "(3rd usage provides Christian and country_code holidays)";
+        $Echo "";
+        $Echo "country_codes is a country code or a list of country codes";
+        $Echo "as supported by \`$ThisGcal'.";
+        $Echo "";
+        $Echo "Country codes are for example: BE ES FR";
+        $Echo "";
+        $Echo "A list of country codes can be created this way: BE+FR";
+        $Echo "(s. $PACKAGE-$VERSION documentation)";
+        exit 1;;
+esac
+
+if $Test "$?" -ne 0;
+then
+  $Rm -f gcaltmp* $mydefaultname"".tex
+  exit 2;
+fi
+
+# Added the two lines for 4-digits line numbers (BREAKPOINT & DEL)
+#
+$Sed "s/^/XYZ/g" gcaltmp >gcaltmp.tm1
+$Sed "=" gcaltmp.tm1 >gcaltmp.tm2
+# v--- breakpoint part
+$Echo "s/^\([5][0]\)/BREAKPOINT \1/g">gcaltmp.tm3
+$Echo "s/^\([0-9][50][0]\)/BREAKPOINT \1/g">>gcaltmp.tm3
+$Echo "s/^\([0-9][0-9][50][0]\)/BREAKPOINT \1/g">>gcaltmp.tm3
+$Echo "/^[0-9]/d">>gcaltmp.tm3
+$Echo "/^[0-9][0-9]/d">>gcaltmp.tm3
+$Echo "/^[0-9][0-9][0-9]/d">>gcaltmp.tm3
+$Echo "/^[0-9][0-9][0-9][0-9]/d">>gcaltmp.tm3
+$Echo "s/^XYZ//">>gcaltmp.tm3
+$Sed -f gcaltmp.tm3 gcaltmp.tm2 >gcaltmp
+# ^--- breakpoint part
+#
+if $Test ! -f "$Sed_script_out";
+then
+  if $Test -f "$Sed_script_in";
+  then
+    $Sed -e '/^#.*[^\\]$/d' -e '/^#$/d' $Sed_script_in > $Sed_script_out
+    if $Test -n "$SRCPERMS";
+    then
+      $Chmod $SRCPERMS $Sed_script_out
+    else
+      $Chmod $SRCPERMS2 $Sed_script_out
+    fi
+  else
+    $Echo "$myname: error: file \`$Sed_script_in' is missing" 2>&1
+    exit 2;
+  fi
+fi
+
+        $Sed -f $Sed_script_out gcaltmp >$mydefaultname"".tex
+
+        $Rm -f gcaltmp*
+
+$Echo "$myname: Eternal holiday list written to file \`$mydefaultname"".tex'"
+##EOF:

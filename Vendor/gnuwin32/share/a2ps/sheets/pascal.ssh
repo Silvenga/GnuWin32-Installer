@@ -1,0 +1,102 @@
+# Style sheet for Pascal
+# Copyright (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+# Copyright (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+# $Id: pascal.ssh,v 1.1.1.1.2.1 2007/12/29 01:58:31 mhatta Exp $
+#
+
+#
+# This file is part of a2ps.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+## 1.8 Akim Demaille <akim@freefriends.org>
+# Added `destructor' (reported by Daniel.Meier@ascom.ch)
+## 1.7 Akim Demaille <akim@freefriends.org>
+# Highlights functions and procedures.
+# Removed write and so one.
+# Fixed strings.
+
+style Pascal is
+
+written by "Akim Demaille <akim@freefriends.org>"
+version is 1.9
+requires a2ps version 4.12a
+
+documentation is
+  "The standard Pascal is covered by this style."
+  "But some extension have been added too, hence modern Pascal programs"
+  "should be correctly handled."
+  "Heavy highlighting maps mathematical symbols to their typographic"
+  "equivalents."
+end documentation
+
+alphabets are
+   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_"
+
+keywords in Keyword_strong are
+   and, array, begin, constructor, const, dec, destructor, downto, do,
+   else, "end", exit, false, file, forward, for, goto, halt, if, inc,
+   "in", label, new, nil, not, object, of, or, packed, record, repeat,
+   set, shl, shr, then, to, true, type, until, uses, var, while, with,
+   xor
+end keywords
+
+keywords in Keyword are
+   abs, boolean, byte, div, integer, length, mod, odd, pointer, real,
+   registers, string, text, trunc, word
+end keywords
+
+keywords in Label are
+   interface
+end keywords
+
+optional keywords are
+   "in" \in,
+   not \not,
+   and \wedge,
+   or \vee
+end keywords
+
+optional operators are
+   -> \rightarrow,
+   <= \leq,
+   >= \geq,
+   :=,
+   <> \neq,
+   = \equiv
+end operators
+
+# Highlighting the functions and procedures
+operators are
+  (/(procedure|function)([[:blank:]]+)([^ \t(;]+)/
+   \1 Keyword_strong, \2 Plain, \3 Label),
+
+  (/(unit|interface|implementation|program)([[:blank:]]+)([^ \t(;]+)/
+   \1 Keyword_strong, \2 Plain, \3 Label_strong)
+end operators
+
+sequences are
+    "(*"  Comment_strong "*)",
+    { 	  Comment	 },
+    # Pascal strings are not exactly C-char, since 'Foo''bar'
+    # represents "Foo'bar"
+     "\'" Plain String "\'" Plain
+       exceptions are
+          "\'\'"
+       end exceptions
+end sequences
+end style

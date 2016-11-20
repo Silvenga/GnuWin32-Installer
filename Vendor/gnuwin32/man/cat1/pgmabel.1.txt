@@ -1,0 +1,107 @@
+Pgmabel User Manual(0)                   Pgmabel User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       pgmabel  -  create  cross section using Abel Integration
+       for Deconvolution
+
+
+SYNOPSIS
+       pgmabel [-help] [-axis axis] [-factor factor]  [-pixsize
+       pixsize] [-left | -right] [-verbose] [filespec]
+
+       You  can  abbreviate  any  option to its shortest unique
+       prefix.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       pgmabel reads as input a PGM image, which it assumes  to
+       be  an  image  of  a  rotational  symmetric  transparent
+       object.  The image must have a vertical  symmetry  axis.
+       pgmabel  produces  as output an image of a cross-section
+       of the image.
+
+       pgmabel does the  calculation  by  performing  the  Abel
+       Integration  for  Deconvolution  of an axial-symmetrical
+       image by solving the system of linear equations.
+
+       After integration, pgmabel weights  all  gray-values  of
+       one  side  by the surface area of the calculated ring in
+       square pixels divided by 4*factor multiplied by the size
+       of one pixel (pixsize).  With the -verbose option, pgma-
+       bel prints the weighting factors.
+
+       Where the caculation generates a  negative  result,  the
+       output is black.
+
+       The  computation is unstable against periodic structures
+       with size 2 in the vertical direction.
+
+
+OPTIONS
+       -help  Prints a help message.
+
+
+       -axis axis
+              Position of the axis of symmetry in the image  in
+              pixels  from the left edge of the image.  Default
+              is the center of the image.
+
+
+       -factor factor
+              User defined factor for enhancement of  the  out-
+              put.   Use  a  factor  less than 1 for decreasing
+              gary values.  Default is 1.0.
+
+
+       -pixsize pixsize
+              The size of a pixel for getting scale  invariant.
+              Default is 0.1.
+
+
+       -left  Calculate  only  the left side of the image.  You
+              cannot specify both left and right.
+
+
+       -right Analogous to -left.
+
+
+       -verbose
+              print information about the calculation.
+
+
+
+
+EXAMPLE
+       Rotate a PGM image to get an image with a vertical  axis
+       of symmetry, then calculate the cross section:
+
+           pnmrotate 90 file.pgm | pgmabel -axis 140 >cross_section.pgm
+
+
+
+
+SEE ALSO
+       pnmrotate(1), pgm(1),
+
+
+HISTORY
+       This  program  was added to Netpbm in Release 10.3 (June
+       2002).
+
+
+AUTHOR
+       Volker Schmidt (lefti@voyager.boerde.de)
+
+       Copyright (C) 1997-2002 German Aerospace research estab-
+       lishment
+
+
+
+netpbm documentation       June 2002     Pgmabel User Manual(0)

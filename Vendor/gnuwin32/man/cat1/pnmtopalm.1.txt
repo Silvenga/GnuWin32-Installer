@@ -1,0 +1,305 @@
+Pnmtopalm User Manual(0)               Pnmtopalm User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       pnmtopalm - convert a PNM image to a Palm Bitmap
+
+
+SYNOPSIS
+       pnmtopalm
+
+       [-verbose]
+
+       [-depth=N]
+
+       [-maxdepth=N]
+
+       [-colormap]
+
+       [-transparent=color]
+
+       [-density=N]
+
+       [-offset]
+
+       [-withdummy] [-scanline-compression | -rle-compression |
+       -packbits-compression]
+
+       [pnmfile]
+
+       Minimum unique abbreviation  of  option  is  acceptable.
+       You  may  use double hyphens instead of single hyphen to
+       denote options.  You may use white space in place of the
+       equals sign to separate an option name from its value.
+
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       pnmtopalm  reads  a  PNM  image  as input, from Standard
+       Input or pnmfile and produces a Palm Bitmap as output.
+
+       Palm Bitmap files are either grayscale files 1, 2, or  4
+       bits  wide,  or  color  files  8 bits wide, so pnmtopalm
+       automatically scales colors to have an appropriate  max-
+       val,  unless  you  specify  a depth or max depth.  Input
+       files must have an appropriate number and set of  colors
+       for the selected output constraints.
+
+       This  often  means  that  you  should  run the PNM image
+       through pnmquant or pnmremap before you pass it to  pnm-
+       topalm.   Netpbm  comes  with several colormap files you
+       can use  with  pnmremap  for  this  purpose.   They  are
+       palmgray2.map  (4  shades  of  gray  for  a depth of 2),
+       palmgray4.map (16 shades of gray for a depth of 4),  and
+       palmcolor8.map  (232  colors  in default Palm colormap).
+       In a standard Netpbm  installation,  these  are  in  the
+       Netpbm  data directory, and you can find the Netpbm data
+       directory with a netpbm-config --datadir shell  command.
+
+       Example:
+
+         pnmremap myimage.ppm            -mapfile=$(netpbm-config --datadir)/palmgray2.map   | pnmtopalm -depth=2 >myimage.palm
+
+
+
+
+   Palm Bitmap Version
+       pnmtopalm generates a Version 0, 1, 2, or 3 Palm Bitmap.
+       It generates the oldest (lowest) version it can for  the
+       given image and the options you specify.
+
+
+
+       o      If you specify a density (-density option) higher
+              than 'low,' the version is at least 3.
+
+
+       o      If you specify transparency (-transparent option)
+              or any compression, the version is at least 2.
+
+
+       o      If  you  specify  a  custom  colormap  (-colormap
+              option), the verison is at least 1.
+
+
+       o      If the image has more than one bit per pixel, the
+              version  is  at least 1.  The image has more than
+              one bit per pixel if you specify it  with  -depth
+              or  if  you let it default and the image has more
+              than two colors (or shades of gray).
+
+
+
+       All releases of Palm OS can read  a  Version  0  bitmap.
+       Palm OS 3.0 and later can read a Version 1 bitmap.  Palm
+       OS 3.5 and later can read a Version 2 bitmap.  To read a
+       Version  3 bitmap, you need Palm OS Garnet or a handheld
+       running the High Density Display Feature Set.
+
+
+OPTIONS
+       -verbose
+              Display the format of the output file.
+
+
+       -depth=N
+              Produce a file of depth N, where N must be either
+              1,  2,  4,  8,  or  16.  Because the default Palm
+              8-bit colormap is not grayscale, if the input  is
+              a  grayscale or monochrome image, the output will
+              never be more than 4 bits deep, regardless of the
+              specified  depth.   Note  that  8-bit color works
+              only in  PalmOS  3.5  (and  higher),  and  16-bit
+              direct  color  works  only  in  PalmOS  4.0  (and
+              higher).  However, the 16-bit direct color format
+              is  also  compatible  with the various PalmOS 3.x
+              versions used in the Handspring Visor,  so  these
+              images may also work in that device.
+
+
+       -maxdepth=N
+              Produce  a file of minimal depth, but in any case
+              less than N bits wide.  If  you  specify  16-bit,
+              the output will always be 16-bit direct color.
+
+
+       -offset
+              Set  the  nextDepthOffset  field in the palm file
+              header to indicate the end of the file  (and  pad
+              the   end   of   the   file  to  4  bytes,  since
+              nextDepthOffset can point only to 4  byte  bound-
+              aries).
+
+              A palm image file can contain multiple renditions
+              of the same image, with different  color  depths,
+              so  a  viewer  can choose one appropriate for the
+              display.  The nextDepthOffset field  tells  where
+              in the stream the next rendition begins.
+
+              pnmtopalm  creates  a file that contains only one
+              image, but you can separately concatenate  multi-
+              ple one-image files to create a multi-image file.
+              If you do that, you'll need  to  use  -offset  so
+              that  the  resulting  concatenation  is a correct
+              stream.
+
+              By default (if you don't specify  -offset),  pnm-
+              topalm  generates  a  nextDepthOffset  field that
+              says there is no following image  (and  does  not
+              add any padding after the image).
+
+              Version   3   Palm   Bitmaps   actually   have  a
+              nextBitmapOffset    field    instead    of    the
+              nextDepthOffset.  The foregoing applies to which-
+              ever is relevant.
+
+              The -offset option was new in Netpbm 10.26  (Jan-
+              uary  2005).   Before  that, pnmtopalm always set
+              the nextDepthOffset field to 'none.'
+
+              Before Netpbm 10.27 (March 2005), you cannot  use
+              -offset   if   you  create  a  compressed  raster
+              (because pnmtopalm isn't smart enough to be  able
+              to  know  the  size  of  the image at the time it
+              writes the header).  You also cannot use it  with
+              16  bit color depth or with the -colormap option,
+              for much the same reason.
+
+
+       -withdummy
+              This option tells pnmtopalm to put in the stream,
+              after  after  the  image, a dummy image header to
+              introduce subsequent high density images.
+
+              This dummy image header  is  a  special  sequence
+              specified  in  Palm  Bitmap  specifications.   It
+              looks to an older Palm Bitmap interpreter like an
+              invalid  image header, so such an intepreter will
+              stop reading the stream there.  But  a  new  Palm
+              Bitmap  interpreter  recognizes it for what it is
+              (just something to choke an old interpreter)  and
+              skips  over  it.  Presumably, you will add to the
+              stream after this high density images which would
+              confuse an older interpreter.
+
+              If  you specify -withdummy, you must also specify
+              -offset, since it doesn't make any  sense  other-
+              wise.
+
+              -withdummy  was new in Netpbm 10.27 (March 2005).
+
+
+       -colormap
+              Build a custom colormap and  include  it  in  the
+              output  file.   This  is not recommended by Palm,
+              for  efficiency  reasons.   Otherwise,  pnmtopalm
+              uses  the default Palm colormap for color output.
+
+
+       -transparent=color
+              Marks one particular color as fully  transparent.
+              The  format  to specify the color is either (when
+              for example orange) '1.0,0.5,0.0', where the val-
+              ues  are floats between zero and one, or with the
+              syntax '#RGB', '#RRGGBB' or '#RRRRGGGGBBBB' where
+              R, G and B are hexadecimal numbers.  Transparency
+              works only on Palm OS 3.5 and higher.
+
+
+       -scanline-compression
+              Specifies that the output Palm  bitmap  will  use
+              the  Palm  scanline compression scheme.  Scanline
+              compression works only in Palm OS 2.0 and higher.
+
+
+       -rle-compression
+              Specifies  that  the  output Palm bitmap will use
+              the Palm RLE compression scheme.  RLE compression
+              works only with Palm OS 3.5 and higher.
+
+
+       -packbits-compression
+              Specifies  that  the  output Palm bitmap will use
+              the Palm packbits compression  scheme.   Packbits
+              compression  works  only  with  Palm  OS  4.0 and
+              higher.
+
+              This option was new in Netpbm 10.27 (March 2005).
+
+
+       -density=N
+              This specifies the Palm Bitmap density.  The den-
+              sity is a number that is proportional to the res-
+              olution  the  image  should  have when displayed.
+              The proportionality factor is up to  whatever  is
+              doing  the  displaying, but it's helpful to think
+              of these numbers as being pixels per  inch.   The
+              allowable values are:
+
+
+
+       o      72
+
+       o      108
+
+       o      144
+
+       o      216
+
+       o      288
+
+
+              This option was new in Netpbm 10.27 (March 2005).
+              Earlier Netpbm could not generate Version 3  Palm
+              Bitmaps, so there was no such thing as density.
+
+
+
+
+
+SEE ALSO
+       palmtopnm(1),  pnmquant(1),  pnmremap(1), pnm(1), PalmOS
+       Reference (1), PalmOS Companion .
+
+
+
+NOTES
+       Palm Bitmaps may contains  multiple  renditions  of  the
+       same  bitmap,  in  different depths.  To construct an N-
+       multiple-rendition Palm  Bitmap  with  pnmtopalm,  first
+       construct  renditions  1  through  N-1 using the -offset
+       option, then construct the Nth image without the -offset
+       option.   Then  concatenate  the  individual  renditions
+       together in a single file using cat.
+
+       If you will include both high density  and  low  density
+       renditions,  put  the  high density images last and when
+       you create the last of the low density images,  use  the
+       -withdummy option.
+
+
+LIMITATIONS
+       You cannot generate an alpha mask if the Palm pixmap has
+       a transparent color.  However, you  can  still  do  this
+       with ppmcolormask with a Netpbm pipe similar to:
+
+       palmtopnm  pixmap.palm | ppmcolormask `palmtopnm -trans-
+       parent pixmap.palm`
+
+
+AUTHORS
+       This program was originally written as  ppmtoTbmp.c,  by
+       Ian  Goldberg and George Caswell.  It was completely re-
+       written by Bill Janssen to add color,  compression,  and
+       transparency function.  Copyright 1995-2001 by Ian Gold-
+       berg, George Caswell, and Bill Janssen.
+
+
+
+netpbm documentation    05 October 2003Pnmtopalm User Manual(0)

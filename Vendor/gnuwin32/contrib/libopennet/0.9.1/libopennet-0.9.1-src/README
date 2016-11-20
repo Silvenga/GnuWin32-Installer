@@ -1,0 +1,41 @@
+                                libopennet 0.9.1
+
+Release information:
+  pkg:  libopennet version 0.9.1
+  url:  http://www.rkeene.org/devel/libopennet-0.9.1.tar.gz
+  date: Wed Jul  6 23:10:46 CDT 2005
+--------------------------------------------------------------------------
+
+Libopennet allows you to open_net()  urls (or files, for that matter) the same
+way you would normally open() just files.
+
+Example:
+	#include <opennet.h>
+	int fd;
+	char buf[512];
+
+	fd=open_net("http://www.rkeene.org/", O_RDONLY);
+	read_net(fd, &buf, 512);  /* You could just read() it, but read_net 
+                                  tries harder to get all 512 bytes. */
+	lseek_net(fd, 0, SEEK_SET);
+	close(fd);
+
+
+
+open_net() even parses URLs for certain things:
+          @@OSNM@@ = OS Name (linux, freebsd, sunos, etc)
+          @@OSVR@@ = OS version (2.2.x, 4.2, 5.8, etc)
+          @@OSVS@@ = OS version (short) (2.2, 4.2, 5.8, etc)
+          @@ARCH@@ = Arch (i386, sparc64, sun4u, sun4m, etc)
+          @@DIST@@ = If OSNM=Linux, distribution of Linux.
+          @@ATSN@@ = Put an `@'
+
+So you could open_net("http://www.@@OSNM@@.com/", O_RDONLY);
+
+LIMITATIONS:
+open_net() only does READ-ONLY with HTTP, and READ or WRITE with FTP (not both)
+libopennet doesn't do mailto:, or anything besides http and ftp for that matter.
+
+
+CONTACT:
+	Roy Keene	<rkeene_opennet@rkeene.org>

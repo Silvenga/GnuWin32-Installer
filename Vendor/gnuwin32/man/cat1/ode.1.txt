@@ -1,0 +1,211 @@
+ODE(1)               GNU Plotting Utilities              ODE(1)
+
+
+
+
+
+NAME
+       ode  - numerical solution of ordinary differential equa-
+       tions
+
+SYNOPSIS
+       ode [ options ] [ file ]
+
+DESCRIPTION
+       ode is a tool that solves, by numerical integration, the
+       initial  value  problem for a specified system of first-
+       order ordinary differential equations.   Three  distinct
+       numerical    integration    schemes    are    available:
+       Runge-Kutta-Fehlberg (the default),  Adams-Moulton,  and
+       Euler.   The  Adams-Moulton  and Runge-Kutta schemes are
+       available with adaptive step size.
+
+       The operation of ode is specified by a program,  written
+       in  its input language.  The program is simply a list of
+       expressions for the derivatives of the variables  to  be
+       integrated, together with some control statements.  Some
+       examples are given in the EXAMPLES section.
+
+       ode reads the program from the specified file,  or  from
+       standard  input  if  no  file name is given.  If reading
+       from standard input, ode will stop reading and exit when
+       it sees a single period on a line by itself.
+
+       At  each time step, the values of variables specified in
+       the program are written to standard output.  So a  table
+       of values will be produced, with each column showing the
+       evolution of a variable.  If there are only two columns,
+       the  output  can be piped to graph(1) or a similar plot-
+       ting program.
+
+OPTIONS
+   Input Options
+       -f file
+       --input-file file
+              Read input from file before reading from standard
+              input.   This  option  makes  it possible to work
+              interactively, after reading a  program  fragment
+              that  defines  the  system  of differential equa-
+              tions.
+
+   Output Options
+       -p prec
+       --precision prec
+              When printing numerical results, use prec signif-
+              icant  digits (the default is 6).  If this option
+              is given, the print  format  will  be  scientific
+              notation.
+
+       -t
+       --title
+              Print  a  title  line  at the head of the output,
+              naming the variables in  each  column.   If  this
+              option  is given, the print format will be scien-
+              tific notation.
+
+   Integration Scheme Options
+       The following options specify the numerical  integration
+       scheme.   Only one of the three basic options -R, -A, -E
+       may    be    specified.     The    default     is     -R
+       (Runge-Kutta-Fehlberg).
+
+       -R [stepsize]
+       --runge-kutta [stepsize]
+              Use a fifth-order Runge-Kutta-Fehlberg algorithm,
+              with an adaptive stepsize unless a constant step-
+              size  is  specified.  When a constant stepsize is
+              specified and no  error  analysis  is  requested,
+              then  a classical fourth-order Runge-Kutta scheme
+              is used.
+
+       -A [stepsize]
+       --adams-moulton [stepsize]
+              Use a fourth-order  Adams-Moulton  predictor-cor-
+              rector scheme, with an adaptive stepsize unless a
+              constant stepsize, stepsize, is  specified.   The
+              Runge-Kutta-Fehlberg  algorithm  is  used  to get
+              past `bad' points (if any).
+
+       -E [stepsize]
+       --euler [stepsize]
+              Use a `quick and dirty' Euler scheme, with a con-
+              stant stepsize.  The default value of stepsize is
+              0.1.  Not recommended for serious applications.
+
+              The error bound options -r and -e (see below) may
+              not be used if -E is specified.
+
+       -h hmin [hmax]
+       --step-size-bound hmin [hmax]
+              Use  a  lower  bound  hmin  on the stepsize.  The
+              numerical scheme will not  let  the  stepsize  go
+              below hmin.  The default is to allow the stepsize
+              to shrink to the machine limit, i.e., the minimum
+              nonzero double-precision floating point number.
+
+              The  optional  argument hmax, if included, speci-
+              fies a maximum value for  the  stepsize.   It  is
+              useful  in  preventing the numerical routine from
+              skipping quickly over an interesting region.
+
+   Error Bound Options
+       -r rmax [rmin]
+       --relative-error-bound rmax [rmin]
+              The -r option sets an upper bound on the relative
+              single-step error.  If the -r option is used, the
+              relative single-step error in any dependent vari-
+              able  will  never  exceed  rmax  (the default for
+              which is 10^-9).  If this should occur, the solu-
+              tion  will be abandoned and an error message will
+              be printed.  If the stepsize is not constant, the
+              stepsize  will be decreased `adaptively', so that
+              the upper bound on the single-step error  is  not
+              violated.   Thus,  choosing a smaller upper bound
+              on the single-step error will cause smaller step-
+              sizes  to  be  chosen.   A  lower  bound rmin may
+              optionally be  specified,  to  suggest  when  the
+              stepsize  should  be  increased  (the default for
+              rmin is rmax/1000).
+
+       -e emax [emin]
+       --absolute-error-bound emax [emin]
+              Similar to -r, but  bounds  the  absolute  rather
+              than the relative single-step error.
+
+       -s
+       --suppress-error-bound
+              Suppress the ceiling on single-step error, allow-
+              ing ode to  continue  even  if  this  ceiling  is
+              exceeded.   This  may  result  in large numerical
+              errors.
+
+   Informational Options
+       --help Print a list of command-line options, and exit.
+
+       --version
+              Print the version number of ode and the  plotting
+              utilities package, and exit.
+
+DIAGNOSTICS
+       Mostly self-explanatory.  The biggest exception is `syn-
+       tax error', meaning there is a grammatical error.   Lan-
+       guage error messages are of the form
+
+              ode: nnn: message...
+
+       where  `nnn'  is the number of the input line containing
+       the error.   If  the  -f  option  is  used,  the  phrase
+       "(file)" follows the `nnn' for errors encountered inside
+       the file.  Subsequently, when  ode  begins  reading  the
+       standard input, line numbers start over from 1.
+
+       No effort is made to recover successfully from syntactic
+       errors in the input.  However, there is a meager  effort
+       to  resynchronize so more than one error can be found in
+       one scan.
+
+       Run-time errors elicit a message describing the problem,
+       and the solution is abandoned.
+
+EXAMPLES
+       The program
+
+              y' = y
+              y = 1
+              print t, y
+              step 0, 1
+
+       solves an initial value problem whose solution is y=e^t.
+       When ode runs this program, it will write two columns of
+       numbers  to  standard  output.   Each line will show the
+       value of the independent variable t, and the variable y,
+       as t is stepped from 0 to 1.
+
+       A more sophisticated example would be
+
+              sine' = cosine
+              cosine' = -sine
+              sine = 0
+              cosine = 1
+              print t, sine
+              step 0, 2*PI
+
+       This  program solves an initial value problem for a sys-
+       tem of two differential equations.   The  initial  value
+       problem  turns  out  to define the sine and cosine func-
+       tions.  The program steps the system over a full period.
+
+AUTHORS
+       ode was written by Nicholas B. Tufillaro (nbt@reed.edu),
+       and slightly enhanced by Robert S. Maier  (rsm@math.ari-
+       zona.edu) to merge it into the GNU plotting utilities.
+
+SEE ALSO
+       "The GNU Plotting Utilities Manual".
+
+BUGS
+       Email bug reports to bug-gnu-utils@gnu.org.
+
+
+
+FSF                         Dec 1998                     ODE(1)

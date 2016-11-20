@@ -1,0 +1,561 @@
+#!/bin/sh
+#
+# anytopnm - attempt to convert an unknown type of image file to a P?M file.
+#
+# Copyright (C) 1991 by Jef Poskanzer.
+#
+# Permission to use, copy, modify, and distribute this software and its
+# documentation for any purpose and without fee is hereby granted, provided
+# that the above copyright notice appear in all copies and that both that
+# copyright notice and this permission notice appear in supporting
+# documentation.  This software is provided "as is" without express or
+# implied warranty.
+
+
+
+findAwk() {
+# Find the best Awk command to use and set AWK to its name
+#
+# On some systems, 'awk' is a primitive version and 'nawk' has more function
+# and is, for our purposes, backward compatible.  In particular, on these
+# systems, 'awk' does not have gsub().  On other systems, 'awk' has all the
+# functions and 'nawk' does not exist.  On Solaris 8 and 9, we need 'nawk.
+
+  nawk 1>/dev/null 2>/dev/null 1</dev/null
+    
+  if [ $? -eq 127 ]; then
+    AWK=awk
+  else
+    AWK=nawk
+  fi
+}
+
+
+
+putInputIntoTempfile() {
+
+    # $1 is the input file specification
+    # $2 is the temporary file name
+    
+    rm -f "$2"
+    if [ "$1" = "-" ] ; then
+            cat > "$2"
+    else
+        # We'd like to do a -e here to test the existence of the filesystem
+        # object per se, and thus give a more specific error message.  But
+        # some systems don't have -e.
+        if [ ! -f "$1" ] ; then
+            echo "$progname: '$1' does not exist or is not a file" 1>&2
+            exit 1
+            fi
+        
+        if [ ! -r "$1" ] ; then
+            echo "$progname: '$1' is not readable" 1>&2
+            exit 1
+            fi
+        
+        if [ -z "$1" ] ; then
+            echo "$progname: '$1' is empty" 1>&2
+            exit 1
+            fi
+        
+        cat < "$1" > "$2"
+        fi
+}
+
+
+
+setMimeType() {
+    # $1 is the file name
+
+    # Christos Zoulas's current 'file' (see Freshmeat) has the --mime option.
+
+    file --mime /dev/null >/dev/null 2>/dev/null
+    if [ $? -eq 0 ]; then
+        # Now that we know the --mime option exists, use it.
+        mimeType=`file --mime "$1" | cut -d: -f2-`
+    else
+        # file --mime failed; we don't know why, but we assume it's because it
+        # is a traditional 'file' program that doesn't have a --mime option.
+    mimeType="unknown"
+    fi
+}
+
+
+
+computeTypeFromMimeType () {
+
+# $1 is the mime type string
+    
+    case "$1" in
+
+        image/jpeg )
+            type = "jfif"
+            ;;
+        image/gif )
+            type = "gif"
+            ;;
+        image/tiff )
+            type = "tiff"
+            ;;
+        image/bmp )
+            type = "bmp"
+            ;;
+        image/png )
+            type = "png"
+            ;;
+        image/x-portable-bitmap | image/x-portable-pixmap | \
+                image/x-portable-greymap)
+            type = "pnm"
+            ;;
+        image/x-xpm )
+            type = "xpm"
+            ;;
+        * )
+            filetype=unknown
+            ;;
+        esac
+}
+
+
+
+computeTypeFromTypeDescription () {
+
+# $1 is the full description from 'file' of the file type
+
+    case "$1" in
+    
+        *PBM* | *PGM* | *PPM* )
+            filetype=pnm
+            ;;
+    
+        *JPEG* | *JFIF* )
+            filetype=jfif
+            ;;
+    
+        *PNG* )
+            filetype=png
+            ;;
+    
+        *GIF* )
+            filetype=gif
+            ;;
+    
+        *TIFF* )
+            filetype=tiff
+            ;;
+    
+        *PC*bitmap*data* )
+            filetype=bmp
+            ;;
+        
+        *uuencoded* )
+            filetype=uuencoded
+            ;;
+    
+        *bzip2*compressed*data* )
+            filetype=bzip2
+            ;;
+    
+        *bzip*compressed*data* )
+            filetype=bzip
+            ;;
+        
+        *gzip*compressed*data* )
+            filetype=gzip
+            ;;
+    
+        *compress* )
+            filetype=compress
+            ;;
+    
+        *btoa* )
+            filetype=btoa
+            ;;
+    
+        *Sun* | *rasterfile* )
+            filetype=rast
+            ;;
+    
+        *IFF*ILBM* )
+            filetype=ilbm
+            ;;
+    
+        *Lisp* )
+            filetype=lispm
+            ;;
+    
+        *PC*Paintbrush* )
+            filetype=pcx
+            ;;
+    
+        *Bennet* )
+            filetype=ybm
+            ;;
+    
+        *pixmap*image*text* )
+            filetype=xpm
+            ;;
+    
+        # This has to come after all other 'text' files, or you may be
+        # disappointed.
+        *text* )
+            filetype=text
+            ;;
+    
+        *MicroDesign* )
+            filetype=mda
+            ;;
+    
+        * )
+            filetype=unknown
+            ;;
+        esac
+}
+
+
+
+computeTypeFromFilenameExtension () {
+# $1 is the filename extension (".gif", etc.)
+
+    case "$1" in
+
+        *.pbm | *.pbm.* | *.pgm | *.pgm.* | *.ppm | *.ppm.* )
+            filetype=pnm
+            ;;
+        *.JPEG | *.jpeg | *.jpg | *.JPG )
+            filetype=jfif
+            ;;
+        *.gif | *.gif.* )
+            filetype=gif
+            ;;
+        *.png | *.PNG )
+            filetype=png
+            ;;
+        *.tif | *.tif.* | *.tiff | *.tiff.* )
+            filetype=tiff
+            ;;
+        *.bmp )
+            filetype=bmp
+            ;;
+        *.x | *.x.* | *.xbm | *.xbm.* | *.x10bm | *.x10bm.* | \
+            *.x11bm | *.x11bm.* | *.bitmap | *.bitmap.* )
+            filetype=xbm
+            ;;
+        *.r | *.r.* | *.rast | *.rast.* )
+            filetype=rast
+            ;;
+        *.mac | *.mac.* | *.macp | *.macp.* )
+            filetype=macp
+            ;;
+        *.g3 | *.g3.* | *.fax | *.fax.* )
+            filetype=g3
+            ;;
+        *.xwd | *.xwd.* | *.x10wd | *.x10wd.* \
+                | *.x11wd | *.x11wd.* )
+            filetype=xwd
+            ;;
+        *.brush | *.brush.* )
+            filetype=brush
+            ;;
+        *.img | *.img.* )
+            filetype=gem
+            ;;
+        *.pcx | *.pcx.* )
+            filetype=pcx
+            ;;
+        *.pic | *.pic.* | *.pict | *.pict.* | *.pict2 | *.pict2.* )
+            filetype=pict
+            ;;
+        *.fs | *.fs.* | *.face | *.face.* )
+            filetype=fs
+            ;;
+        *.hips | *.hips.* )
+            filetype=hips
+            ;;
+        *.fits | *.fits.* )
+            filetype=fits
+            ;;
+        *.iff | *.iff.* | *.ilbm | *.ilbm.* )
+            filetype=ilbm
+            ;;
+        *.lispm | *.lispm.* )
+            filetype=lispm
+            ;;
+        *.mtv | *.mtv.* )
+            filetype=mtv
+            ;;
+        *.qrt | *.qrt.* )
+            filetype=qrt
+            ;;
+        *.tga | *.tga.* | *.targa | *.targa.* )
+            filetype=tga
+            ;;
+        *.xim | *.xim.* )
+            filetype=xim
+            ;;
+        *.xpm | *.xpm.* | *.xpm2 | *.xpm2.* )
+            filetype=xpm
+            ;;
+        *.pi1 | *.pi1.* )
+            filetype=pi1
+            ;;
+        *.pi3 | *.pi3.* )
+            filetype=pi3
+            ;;
+        *.spu | *.spu.* )
+            filetype=spu
+            ;;
+        *.spc | *.spc.* )
+            filetype=spc
+            ;;
+        *.ybm | *.ybm.* | *.face | *.face.* )
+            filetype=ybm
+            ;;
+        *.mda | *.mdp )
+            filetype=mda
+            ;;
+        * )
+            filetype=unknown
+            ;;
+        esac
+}
+
+
+
+determineType () {
+
+# $1 is the name of the file that contains the subject file's contents
+# $2 is the mime type or "unknown"
+# $3 is the type description from 'file'
+
+    if [ "$2" = "unknown" ]; then
+        filetype="unknown"
+    else
+        computeTypeFromMimeType "$2"
+        fi
+
+    if [ "$filetype" = "unknown" ]; then
+        computeTypeFromTypeDescription "$3"
+        fi
+
+    if [ "$filetype" = "unknown" ]; then
+        computeTypeFromFilenameExtension "$4"
+        fi
+}
+
+
+
+convertIt () {
+# Based on the file type computed, do the conversion
+
+# $1 is the input file name
+# $2 is our file type code
+
+case "$2" in
+
+    pnm )
+        cat "$file"
+        ;;
+
+    uuencoded )
+        newfile="$tempdir/atn.decode.$$"
+        rm -f "$newfile"
+        (echo begin 600 $newfile; sed 1d < "$file") | uudecode
+        anytopnm "$newfile"
+        ;;
+
+    bzip2 )
+        bzip2 -dk < "$file" | anytopnm -
+        ;;
+
+    bzip )
+        bzip -dk < "$file" | anytopnm -
+        ;;
+
+    gzip )
+        gzip --decompress --to-stdout < "$file" | anytopnm -
+        ;;
+
+    compress )
+        uncompress -c < "$file" | anytopnm -
+        ;;
+
+    btoa )
+        atob < "$file" | anytopnm -
+        ;;
+
+    rast )
+        rasttopnm "$file"
+        ;;
+
+    gif )
+        giftopnm "$file"
+        ;;
+
+    tiff )
+        tifftopnm "$file"
+        ;;
+
+    ilbm )
+        ilbmtoppm "$file"
+        ;;
+
+    lispm )
+        lispmtopgm "$file"
+        ;;
+
+    pcx )
+        pcxtoppm "$file"
+        ;;
+
+    ybm )
+        ybmtopbm "$file"
+        ;;
+
+    xpm )
+        xpmtoppm < "$file"
+        ;;
+
+    # This has to come after all other 'text' files, or you may be
+    # disappointed.
+    text )
+        pbmtext -builtin fixed < "$file"
+        ;;
+
+    jfif )
+        jpegtopnm "$file"
+        ;;
+
+    png )
+        pngtopnm "$file"
+        ;;
+
+    mda )
+        mdatopbm -d -- "$file"
+        ;;
+
+    bmp )
+        bmptoppm "$file"
+        ;;
+    
+    xbm )
+        xbmtopbm "$file"
+        ;;
+    macp )
+        macptopbm "$file"
+        ;;
+    g3 )
+        g3topbm "$file"
+        ;;
+    xwd )
+        xwdtopnm "$file"
+        ;;
+    brush )
+        brushtopbm "$file"
+        ;;
+    img )
+        gemtopbm "$file"
+        ;;
+    pcx ) 
+        pcxtoppm "$file"
+        ;;
+    pict )
+        picttoppm "$file"
+        ;;
+    fs )
+        fstopgm "$file"
+        ;;
+    hips )
+        hipstopgm "$file"
+        ;;
+    fits )
+        fitstopnm "$file"
+        ;;
+    mtv )
+        mtvtoppm "$file"
+        ;;
+    qrt )
+        qrttoppm "$file"
+        ;;
+    tga )
+        tgatoppm "$file"
+        ;;
+    xim )
+        ximtoppm "$file"
+        ;;
+    pi1 )
+        pi1toppm "$file"
+        ;;
+    pi3 )
+        pi3topbm "$file"
+        ;;
+    spu )
+        sputoppm "$file"
+        ;;
+    spc )
+        spctoppm "$file"
+        ;;
+    * )
+        echo "$progname: INTERNAL ERROR.  Illegal value of filetype variable"
+        exit 1
+        ;;
+
+    esac
+}
+
+
+
+###############################################################################
+#                                MAINLINE
+###############################################################################
+
+progname=$0
+
+if [ $# -gt 1 ] ; then
+    echo "Too many arguments: $#.  The only valid argument is the" \
+         "input file name." 1>&2
+    exit 1
+elif [ $# -eq 1 ] ; then
+    inputFile="$1"
+else
+    inputFile="-"
+fi
+
+tempdir=$(mktemp -d -t anytopnm.XXXXXXXXXX) || exit 1
+
+findAwk;
+
+# Take out all spaces
+# Find the filename extension for last-ditch efforts later
+fileExtension=`echo "$inputFile" | \
+               $AWK '{gsub(" ","");gsub(".*\\\\.",".");print}'`
+
+file="$tempdir/atn.stdin.$$"
+
+putInputIntoTempfile "$inputFile" "$file"
+
+setMimeType "$file"
+
+typeDescription=`file "$file" | cut -d: -f2-`
+
+determineType "$file" "$mimeType" "$typeDescription" "$fileExtension"
+
+if [ "$filetype" = "unknown" ]; then
+    echo "$progname: unknown file type.  " \
+        "'file' says mime type is '$mimeType', " 1>&2
+    echo "type description is '$typeDescription'" 1>&2
+    if [ -d "$tempdir" ] ; then
+        rm -rf "$tempdir"
+    fi
+
+    exit 1
+    fi
+
+convertIt $file $filetype
+
+if [ -d "$tempdir" ] ; then
+    rm -rf "$tempdir"
+fi
+
+exit 0

@@ -1,0 +1,941 @@
+This is gcal.info, produced by makeinfo version 4.0 from gcal.texi.
+
+INFO-DIR-SECTION GNU packages
+START-INFO-DIR-ENTRY
+* Gcal: (gcal).                       GNU calendar program.
+* Tcal: (gcal)Invoking tcal.          Run Gcal with tomorrow's date.
+* Txt2gcal: (gcal)Invoking txt2gcal.  Calendar text to resource file.
+* Gcal2txt: (gcal)Invoking gcal2txt.  Calendar resource to text file.
+END-INFO-DIR-ENTRY
+
+  This file documents Gcal, a program for calculating and printing
+calendars.
+
+  Copyright (c) 1994, 95, 96, 1997, 2000 Thomas Esken
+
+  This edition is for Gcal version 3.01.
+
+  Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+  Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+  Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation approved by the Free Software Foundation.
+
+  Any suggestions, improvements, extensions, bug reports, donations,
+proposals for contract work, and so forth are welcome!  Please send
+them directly to my eMail address <esken@gmx.net>.  If you like my
+work, I'd appreciate a postcard from you!
+
+------------------------oOO      \\\_''/      OOo---------------------------
+Thomas Esken               O     (/o-o\)     O  eMail: esken@gmx.net
+Im Hagenfeld 84                 ((  ^  ))       Phone: +49 251 232585
+D-48147 Muenster; Germany    \____) ~ (____/    MotD : 2old2live, 2young2die
+
+
+File: gcal.info,  Node: Ranges of days,  Next: Repetition factor of days,  Prev: Lists of days,  Up: Further date part attributes
+
+Ranges of days
+..............
+
+  A range of days just as a list of days is used to define recurrent
+fixed dates and to use only one line in the resource file for them,
+instead of using several lines in a resource file needed for defining
+these recurrent fixed dates separately.
+
+  A range of days is specified by a `#' separator character and must
+consist of two elements, namely the starting day and the final day.
+The starting day and likewise the final day of the range may not be set
+to a zero value and be not concrete therefore.  (This would not make
+any sense in this context.)
+
+  Assuming a fixed date shall always occur during the 1st and the 15th
+day (inclusive) in every month of the year 1996, e.g. `Inside work',
+one solution would be on the one hand a fixed date entry in the resource
+file for the 1st of the month, another one for the 2nd of the month
+until the 15th of the month, which would be a total of 15 entries in
+the resource file for such a fixed date(1) (*note Ranges of
+days-Footnote-1::).
+
+  On the other hand, this expense can be reduced to a total of only one
+entry in the resource file by using a range of days, which is likewise
+valid for the 1st until the 15th day in every month, that is
+
+     19960001#15 Inside work
+
+The use of ranges of days in the date part is permitted as follows:
+
+   * `YYYYMMWWW#WWW'
+
+   * `YYYYMMDD|WWWN#[MM]DD|[MM]WWWN'
+
+   * `YYYY*d|wN[WWW]#N[WWW]'
+
+   * `YYYY@e|t|DVAR[[+|-]N[WWW]]#[+|-]N[WWW]'
+
+  Preceding table shows that the starting and ending day can only be
+specified by using date formats of the same type left and right the `#'
+separator character.  Thus, it is not explicitly possible to define a
+range of days by using different types of date formats, means, fixed
+date entries like:
+
+     1996@e+3fr#1012 In the year 1996: every day that appears within the\
+                     period of the date 3 Fridays after Easter Sunday's\
+                     date until the 12th October.
+
+cannot be defined like this.  But this problem can be solved by using an
+inclusive date period `%i[DATE][#[DATE]]' special text for defining the
+ending day of the range(2) (*note Ranges of days-Footnote-2::), and the
+fixed dates are simply produced until the last day of the year, e.g.:
+
+     1996@e+3fr#+999 In the year 1996: every day that appears within the\
+                     period of the date 3 Fridays after Easter Sunday's\
+                     date until the 12th October.%i0#19961012
+
+  *Note Inclusive date period `%i[DATE][#[DATE]]' special text:
+Inclusive date period, for more details.
+
+Some examples to this:
+
+`199600mon#fr'
+     In the year 1996 in every month: every day that appears within the
+     day sequence `mon, tue, wed, thu, fri'.
+
+`000000fr#mon'
+     In every year in every month: every day that appears within the day
+     sequence `fri, sat, sun, mon'.
+
+`000001fr3#12'
+     In every year in January: every day that appears within the period
+     of the 3rd Friday of the month until the 12th of the month.
+
+`00000112#fr3'
+     In every year in January: every day that appears within the period
+     of the 12th of the month until the 3rd Friday of the month.
+
+`00000112#augfri3'
+     In every year: every day that appears within the period of the
+     12th January until the 3rd Friday of August.
+
+`0000sep13#99fr9'
+     In every year: every day that appears within the period of the
+     13th September until the last Friday of December.
+
+`0*d1#1fr'
+     In every year: every day that appears within the period of the 1st
+     day of the year until the 1rd Friday of the year.
+
+`0*d99fr#333'
+     In every year: every day that appears within the period of the
+     last Friday of the year until the 333rd day of the year.
+
+`1996*w1fr#17mo'
+     In the year 1996: every day that appears within the period of the
+     Friday of the 1st week until the Monday of the 17th week.
+
+`0@a#+4fr'
+     In every year: every day that appears within the period of the
+     date of the date variable A until the 4th Friday after the date of
+     the date variable A.
+
+`1996@e-3#+9fr'
+     In the year 1996: every day that appears within the period of the
+     date three days before the Easter Sunday's date until the 9th
+     Friday after the date of the Easter Sunday's date.
+
+`1996@t-3#+99fr'
+     In the year 1996: every day that appears within the period of the
+     date three days before today's date until the last Friday of the
+     year.
+
+
+File: gcal.info,  Node: Ranges of days-Footnotes,  Up: Ranges of days
+
+  (1) Apart from the possibility, that a list of days can be used in
+such a case.
+
+  (2) Implicit solution.
+
+
+File: gcal.info,  Node: Repetition factor of days,  Next: Appearance factor of days,  Prev: Ranges of days,  Up: Further date part attributes
+
+Repetition factor of days
+.........................
+
+  A repetition factor of days is used to define recurrent fixed dates
+and to use only one line in the resource file for them, instead of
+using several lines in a resource file needed for defining these
+recurrent fixed dates separately.
+
+  A repetition factor of days (`:N') is specified by a `:' character
+and must trail the day field --which must have a concrete value in a
+date part of a Gcal resource file and has not been set to a zero
+value-- respectively either lead or trail an appearance factor of days.
+Except ranges of days or fixed dates which occur only on a definite
+weekday like `199600mon Every Monday 1996', such a repetition factor
+may be specified in all possible codings of date parts of a Gcal
+resource file.
+
+  This factor may have values in range `1...999'.  Values greater than
+the real difference between the date of the first occurrence of the
+fixed date and the last day of the year are always reduced to this real
+difference.  In this sense, any value greater `365'(1) (*note
+Repetition factor of days-Footnote-1::) means a repetition factor until
+the last day of the year.
+
+  Assuming a fixed date shall always occur on the 15th day in every
+month of the year 1996 and covers a period of four days (inclusive the
+15th itself), e.g. `Co-workers training', one solution would be on the
+one hand a fixed date entry in the resource file for the 15th of the
+month and the succeeding three days, which would be a total of four
+entries in the resource file for such a fixed date(2) (*note Repetition
+factor of days-Footnote-2::).
+
+  On the other hand, this expense can be reduced to a total of only one
+entry in the resource file by using a repetition factor of days, which
+is likewise valid for the 15th and the three days which succeed the
+15th in every month, namely
+
+     19960015:4 Co-workers training
+
+The use of repetition factors of days in the date part is permitted as
+follows:
+
+   * `YYYYMMDD:N|WWWN:N'
+
+   * `YYYY*d|wN:N|NWWW:N'
+
+   * `YYYY@e|t|DVAR[[+|-]N[WWW]]:N'
+
+   * `YYYYMMDD:N|WWWN:N,[MM]DD:N|[MM]WWWN:N ...'
+
+   * `YYYY*d|wN:N|NWWW:N,N:N|NWWW:N ...'
+
+   * `YYYY@e|t|DVAR:N,|[+|-]N[WWW]:N,[+|-]N[WWW]:N ...'
+
+Some examples to this:
+
+`000001fr3:11'
+     In every year in January: every day that appears within the period
+     of the 3rd Friday of the month and the succeeding ten days.
+
+`00000112:3'
+     In every year in January: every day that appears within the period
+     of the 12th of the month and the succeeding two days.
+
+`00000112:3,fr3:5'
+     In every year in January: every day that appears within the period
+     of the 12th of the month and the succeeding two days, and that
+     appears within the period of the 3rd Friday of the month and the
+     succeeding four days.
+
+`0*d1:1'
+     In every year: every day that appears within the period of the 1st
+     day of the year and no succeeding day.
+
+`0*d1:2'
+     In every year: every day that appears within the period of the 1st
+     day of the year and the succeeding day.
+
+`0*d99fr:333'
+     In every year: every day that appears within the period of the
+     last Friday of the year and the succeeding 332 days.  Well, in
+     cases a fixed date exceeds the year bounds, it will only be
+     produced until the last day of the year.
+
+`1996*w1fr:17'
+     In the year 1996: every day that appears within the period of the
+     Friday of the 1st week and the succeeding 16 days.
+
+`0@a:4'
+     In every year: every day that appears within the period of the
+     date of the date variable A and the succeeding three days.
+
+`1996@e-3:9'
+     In the year 1996: every day that appears within the period of the
+     date three days before the Easter Sunday's date and the succeeding
+     eight days.
+
+`1996@t-3:9'
+     In the year 1996: every day that appears within the period of the
+     date three days before today's date and the succeeding eight days.
+
+
+File: gcal.info,  Node: Repetition factor of days-Footnotes,  Up: Repetition factor of days
+
+  (1) Or `366' in leap years.
+
+  (2) Apart from the possibility, that a list or a range of days can be
+used in such a case.
+
+
+File: gcal.info,  Node: Appearance factor of days,  Prev: Repetition factor of days,  Up: Further date part attributes
+
+Appearance factor of days
+.........................
+
+  An appearance factor of days is used to define a concrete
+displacement of recurrent fixed dates.
+
+  An appearance factor of days (`.N') is specified by a `.' character
+and must trail the day field --which must have a concrete value in a
+date part of a Gcal resource file and has not been set to a zero
+value-- respectively either lead or trail a repetition factor of days.
+Except fixed dates which occur only on a definite weekday and are not
+specified by using a range of days, like `199600mon Every Monday 1996',
+such an appearance factor may be specified in all possible codings of
+date parts of a Gcal resource file.  This factor may be specified with
+each single element of lists of days, but in a range of days, this
+factor may trail *only* the final day of the range.  Well, the use of
+such an appearance factor is only helpful if it is either given in a
+range of days, or if it is given together with a repetition factor.
+
+  This factor may have values in range `1...999'.  Fixed dates will be
+ignored if the factor takes values greater than the real difference
+between the date of the occurrence of the fixed date and the last day
+of the year, respectively the end of the period, for which the fixed
+dates shall either be produced or respected.
+
+  Assuming a fixed date shall always occur on the 15th day in every
+month of the year 1996 and covers a period of seven days (inclusive the
+15th itself), but shall only be respected every third day (i.e. two
+days have to be skipped at a time) within this period, e.g.
+`Training-college', one solution would be on the one hand a fixed date
+entry in the resource file for the 15th of the month, for the 18th and
+for the 21st of the month, which would be a total of three entries in
+the resource file for such a fixed date(1) (*note Appearance factor of
+days-Footnote-1::).
+
+  On the other hand, this expense can be reduced to a total of only one
+entry in the resource file by using an appearance factor of days, which
+is likewise valid for the 15th, the 18th and the 21st in every month,
+namely on the one hand by the use of a repetition factor
+
+     19960015:7.3 Training-college
+
+or on the other hand by the use of a range of days
+
+     19960015#21.3 Training-college
+
+The use of appearance factors of days in the date part is permitted as
+follows:
+
+   * `YYYYMMDD:N.N|DD.N:N'
+
+   * `YYYYMMWWWN:N.N|WWWN.N:N'
+
+   * `YYYY*d|wN:N.N|N.N:N'
+
+   * `YYYY*d|wNWWW:N.N|NWWW.N:N'
+
+   * `YYYY@e|t|DVAR[[+|-]N[WWW]]:N.N'
+
+   * `YYYY@e|t|DVAR[[+|-]N[WWW]].N:N'
+
+   * `YYYYMMDD:N.N|WWWN:N.N,[MM]DD:N.N|[MM]WWWN:N.N ...'
+
+   * `YYYYMMDD.N:N|WWWN.N:N,[MM]DD:N.N|[MM]WWWN.N:N ...'
+
+   * `YYYY*d|wN:N.N|NWWW:N.N,N:N.N|NWWW:N.N ...'
+
+   * `YYYY*d|wN.N:N|NWWW.N:N,N.N:N|NWWW.N:N ...'
+
+   * `YYYY@e|t|DVAR:N.N,|[+|-]N[WWW]:N.N,[+|-]N[WWW]:N.N ...'
+
+   * `YYYY@e|t|DVAR.N:N,|[+|.]N[WWW].N:N,[+|.]N[WWW].N:N ...'
+
+   * `YYYYMMWWW#WWW.N'
+
+   * `YYYYMMDD|WWWN#[MM]DD|[MM]WWWN.N'
+
+   * `YYYY*d|wN[WWW]#N[WWW].N'
+
+   * `YYYY@e|t|DVAR[[+|-]N[WWW]]#[+|-]N[WWW].N'
+
+Some examples to this:
+
+`000001fr3:11.3'
+     In every year in January: every day that appears within the period
+     of the 3rd Friday of the month and the succeeding ten days, but
+     only every 3rd day within this period (skip two days at a time).
+
+`00000112:3.2'
+     In every year in January: every day that appears within the period
+     of the 12th of the month and the succeeding two days, but only
+     every 2nd day within this period (skip one day at a time).
+
+`00000112:3.2,fr3:5.3'
+     In every year in January: every day that appears within the period
+     of the 12th of the month and the succeeding two days, but only
+     every 2nd day within this period (skip one day at a time), and that
+     appears within the period of the 3rd Friday of the month and the
+     succeeding four days, but only every 3rd day within this period
+     (skip two days at a time).
+
+`0*d1:10.1'
+     In every year: every day that appears within the period of the 1st
+     day of the year and the succeeding nine days, and this for any day
+     within this period (skip zero days at a time).
+
+`0*d1:2.5'
+     In every year: every day that appears within the period of the 1st
+     day of the year and the succeeding day, but only every 5th day
+     within this period (skip four days at a time).  Well, the
+     succeeding days (only one in this example) of the starting day
+     (1st day of year) are not respected, because the next day resulted
+     by the appearance factor exceeds the final day (resulted by the
+     repetition factor) of the period.
+
+`0*d99fr:333.61'
+     In every year: every day that appears within the period of the
+     last Friday of the year and the succeeding 332 days, but only
+     every 61st day within this period (skip 60 days at a time).  Well,
+     in cases a fixed date exceeds the year bounds, it will only be
+     produced until the last day of the year.  No succeeding day (332
+     in this example) of the starting day (last Friday of the year) is
+     respected by reason of the displacement value of 60 days, because
+     the next day resulted by the appearance factor exceeds the final
+     day (resulted by the repetition factor) of the period (the last
+     day of the year).
+
+`1996*w1fr:17.8'
+     In the year 1996: every day that appears within the period of the
+     Friday of the 1st week and the succeeding 16 days, but only every
+     8th day within this period (skip seven days at a time).
+
+`0@a:4.3'
+     In every year: every day that appears within the period of the
+     date of the date variable A and the succeeding three days, but
+     only every 3rd day within this period (skip two days at a time).
+
+`1996@e-3:9.4'
+     In the year 1996: every day that appears within the period of the
+     date three days before the Easter Sunday's date and the succeeding
+     eight days, but only every 4th day within this period (skip three
+     days at a time).
+
+`1996@e3#-20sun.15'
+     In the year 1996: every day that appears within the period of the
+     date three days after the Easter Sunday's date until the 20th
+     Sunday before the Easter Sunday's date, but only every 15th day
+     within this period (skip 14 days at a time).
+
+`1996@t3#-20sun.15'
+     In the year 1996: every day that appears within the period of the
+     date three days after today's date until the 20th Sunday before
+     today's date, but only every 15th day within this period (skip 14
+     days at a time).
+
+
+File: gcal.info,  Node: Appearance factor of days-Footnotes,  Up: Appearance factor of days
+
+  (1) Apart from the possibility, that a list of days can be used in
+such a case.
+
+
+File: gcal.info,  Node: Text part of a line,  Next: Special Texts processed,  Prev: Further date part attributes,  Up: Resource file
+
+Text part of a line
+-------------------
+
+  The "text part" of a line in a resource file can be any text you like.
+Indeed, some characters have a special meaning (`%', `$', `~', `^' and
+`\') and must be protected should the occasion arise that special
+character combinations are formed with them(1) (*note Text part of a
+line-Footnote-1::) which might be used only textually.  If the text part
+contains characters that are used for highlighting the text or format
+it for a printer, or characters with decimal values above 127 in the
+code table of the used character set(2) (*note Text part of a
+line-Footnote-2::) not produced by Gcal itself, such characters
+respectively sequences are displayed by Gcal in an *uninterpreted*
+manner!  For that very reason, it can happen that the output of such
+characters can potentially create problems with the used screen device
+driver software and/or the external pager program, likewise mailing of
+such texts by means of electronic mail.
+
+  So-called `NUL' characters(3) (*note Text part of a
+line-Footnote-3::) may also occur in the text part, but they only cause
+the suppression of all succeeding characters in the line.  In my
+opinion, it makes no perceptible sense to output these `NUL' characters
+uninterpreted, so they are used for remarking purposes only; besides,
+the `NUL' characters would lead to the same problems as already
+mentioned above.
+
+  A line of the resource file is continued on the next line if a `\-\n'
+(backslash-newline) character sequence is found, e.g.:
+
+The line:
+     000000Mo Every Monday
+
+and the lines:
+     000000Mo \
+     Every \
+     Monday
+
+produce the same output and are essentially equivalent.
+
+  Furthermore, you can break-up the text of a "long text part" at any
+place you like.  The term _long_ means in this context, that the text
+displayed by Gcal would override the right text margin of the screen
+respectively break-up at that margin.
+
+  Each time a `~' (tilde) character is found in the text part, this
+character is replaced by a real `\n' (newline) character.  Such texts
+will be displayed by Gcal in a formatted manner at a left margin, this
+means, they are lead by a definite number of space characters.
+
+  You may depreciate the special meaning of the `~' (tilde) character
+--in case this character itself is needed-- by placing a `\'
+(backslash) character before it, e.g. `\~'.  If you need the `\~'
+characters themselves, you have to protect the `\' (backslash) character
+by another `\' (backslash) character, e.g. `\\~'.
+
+  Each time a `^' (caret) character is found in the text part, this
+character is also replaced by a real `\n' (newline) character.  Such
+texts will be displayed by Gcal at column 1, this means, they are not
+lead by space characters.  The rules for protecting the `^' character
+are the same as the rules used for protecting the `~' character.
+
+The resource file `lbrk-1.rc'
+
+     $ cat lbrk-1.rc
+     -| ; Hi, I'm `lbrk-1.rc' and alive now
+     -| ;
+     -| 0 I know I'm a short text
+     -| 0 I hope I'm long enough~here, a line break-up~\
+     -| and again~and now for the last time...
+     -| 0 I hope I'm also long enough^here, a line break-up\
+     -| ~and again^and now for the last time...
+     -| 0 Am I another short text? Dunno...
+
+is displayed as follows:
+
+     $ gcal %00000101 --resource-file=./lbrk-1.rc --disable-highlighting
+     -|
+     -| Fixed date list:
+     -|
+     -| Sat, Jan   1st 2000: Am I another short text? Dunno...
+     -| Sat, Jan   1st 2000: I hope I'm also long enough
+     -| here, a line break-up
+     -|                      and again
+     -| and now for the last time...
+     -| Sat, Jan   1st 2000: I hope I'm long enough
+     -|                      here, a line break-up
+     -|                      and again
+     -|                      and now for the last time...
+     -| Sat, Jan   1st 2000: I know I'm a short text
+
+  Because _whitespace_ characters are used to separate the date part
+from the text part(4) (*note Text part of a line-Footnote-4::), it is
+not possible to supply the text part with leading _whitespace_
+characters without further ado.  If one or more _whitespace_ characters
+shall lead the text part, this can be arranged by protecting the
+*first* of these _whitespace_ characters (and that by placing a `\'
+(backslash) character before it), e.g. `\ ' if it is a space character.
+By means of such a character sequence, Gcal notices that the text
+trailing the `\' character is no longer used for separating purposes,
+but is member of the text part.  Gcal skips this specific, marking
+backslash character (avoids its output) and processes the rest of the
+line as usual.
+
+  The following example should be enough to elucidate the above facts.
+The resource file `wspc-1.rc'
+
+     $ cat wspc-1.rc
+     -| 0 BANG BANG
+     -| 0 bogus
+     -| 0         bogomips
+     -| 0    \hello world
+     -| 0    \ main(){for(;;)fork();}
+     -| 0 \     sh $0 & $0 &
+     -| 0    \  a  \  b  \\  c  \\\  d
+     -| 0    What happens now?\
+     -| ~0  \  This!
+     -| 0    What happens now?\\
+     -| ~0  \  That!
+
+is displayed as follows:
+
+     $ gcal --resource-file=./wspc-1.rc --disable-highlighting
+     -|
+     -| Fixed date list:
+     -|
+     -| Wed, Jun  14th 2000:      sh $0 & $0 &
+     -| Wed, Jun  14th 2000:   a  \  b  \\  c  \\\  d
+     -| Wed, Jun  14th 2000:  main(){for(;;)fork();}
+     -| Wed, Jun  14th 2000: BANG BANG
+     -| Wed, Jun  14th 2000: What happens now?~0  \  That!
+     -| Wed, Jun  14th 2000: What happens now?
+     -|                      0  \  This!
+     -| Wed, Jun  14th 2000: \hello world
+     -| Wed, Jun  14th 2000: bogomips
+     -| Wed, Jun  14th 2000: bogus
+
+
+File: gcal.info,  Node: Text part of a line-Footnotes,  Up: Text part of a line
+
+  (1) Like `%i', `$a'...
+
+  (2) These are potentially non-printable.
+
+  (3) That is the character with the value zero in the code table of
+the used character set.
+
+  (4) These are internally skipped and remain undisplayed therefore.
+
+
+File: gcal.info,  Node: Special Texts processed,  Next: Comment line,  Prev: Text part of a line,  Up: Resource file
+
+`%?'... Special Texts
+---------------------
+
+  The text part of a resource file line may be provided with different
+special texts which may occur in any(1) (*note Special Texts
+processed-Footnote-1::) number and order.  All these texts start with a
+`%' (percent) character which may be protected by a leading `\'
+(backslash) character if the `%' (percent) character itself is wanted
+to be used in the text part, e.g. `\%'.  The `%' character is mostly
+trailed by an optional format instruction, (see *Note Format
+Instruction::, for the detailed description of the format instruction
+and its components), and then trailed by a distinguishing mark --which
+defines the kind of the special text to be used-- and if it is a
+letter, Gcal accepts it *case-sensitive*.
+
+  The purpose of these special texts is mainly to suppress output of
+fixed dates in definite cases, either, or to provide them with
+particular texts respectively to start external commands.  *Note
+Description of all `%?'... Special Texts: Special Texts, for a complete
+description of all usable special texts, and *Note Summary of all
+`%?'... Special Texts: Special Texts Summary, for an according
+short-list of them.
+
+For example, the resource file `speci-1.rc'
+
+     $ cat speci-1.rc
+     -| ; I'm veracious very special :)
+     -| ;
+     -| 0 1. Today is %>1u*K , %>02&*D  %U  %Y !
+     -| 0 2. It's the %>03&*N  day of the year.
+     -| 0 3. The actual week number is: %k .
+     -| 0 4. Currently, it's %t*  o'clock, Mr. %-USER .
+     -| 0 5. Hurry up with your work~\
+     -|    by reason sunrise is at %o+5158+00738+61,2: .
+
+is displayed as follows (in case today's date is the 4th October 1996):
+
+     $ gcal --resource-file=speci-1.rc -H no -ox
+     -|
+     -| Mon, Oct   4th 1999: 1. Today is MONDAY, 04th October 1999!
+     -|                      2. It's the 277th day of the year.
+     -|                      3. The actual week number is: 40.
+     -|                      4. Currently, it's 06:53pm o'clock, Mr. esken.
+     -|                      5. Hurry up with your work
+     -|                         by reason sunrise is at 07:33.
+
+
+File: gcal.info,  Node: Special Texts processed-Footnotes,  Up: Special Texts processed
+
+  (1) Rational!
+
+
+File: gcal.info,  Node: Comment line,  Next: Include directives,  Prev: Special Texts processed,  Up: Resource file
+
+Comment line
+------------
+
+  A line(1) (*note Comment line-Footnote-1::) beginning with a `;'
+(semicolon) character in the resource file is treated as a remark and
+will not be used by Gcal!  Any _whitespace_ characters may lead the
+remark character.  *Note Text part of a line::, for information how a
+`NUL' character can be used for remarking purposes in a text part.
+
+  The following example of the `remark.rc' resource file --which *only*
+consists of remarks-- should be enough to elucidate the above facts:
+
+     $ cat remark.rc
+     -| ;00001031 ^\
+     -|                         .......^\
+     -|                         ;::;::,^\
+     -|                         ;::;::;,^\
+     -|                        ;;::;;:;;,^\
+     -|           .vmnv\%vnv\%,.;;;:::;;:;;,  .,vnmv\%vnn,^\
+     -|        vmmmn\%vmmnv\%vnmmnv\%;;;;;;\%nmmmnv\%vnmv\%vmmv^\
+     -|      vmmnv\%vmmmnv\%vnmmmmmnv\%;:\%nmmmmmmnv\%vnm\%vnmmmv^\
+     -|     vmmnv\%vmmmnv\%vnmmmmmmmmnv\%nmmmmmmmmnv\%vnmm\%vnmmmv^\
+     -|    vmmnv\%vmmmnv\%vnmmmmmmmmnv\%vmmmmmmmmmmnv\%vnmv\%vnmmmv^\
+     -|   vmmnv\%vmmmnv\%vnmm;mmmmmmnv\%vmmmmmmmm;mmnv\%vnmv\%vnmmmv,^\
+     -|  vmmnv\%vmmmnv\%vnmm;' mmmmmnv\%vmmmmmmm;' mmnv\%vnmv\%vnmmmv,^\
+     -|  vmmnv\%vmmmnv\%vn;;    mmmmnv\%vmmmmmm;;    nv\%vnmmv\%vnmmmv^\
+     -| vmmnv\%vmmmmnv\%v;;      mmmnv\%vmmmmm;;      v\%vnmmmv\%vnmmmv^\
+     -| vmmnv\%vmmmmnv\%vnmmmmmmmmm;;      mmmmmmmmmnv\%vnmmmmv\%vnmmmv^\
+     -| vmmnv\%vmmmmnv\%vnmmmmmmmmmm;;    mmmmmmmmmmnv\%vnmmmmv\%vnmmmv^\
+     -| vmmnv\%vmmmmnv\%vnmmmmmmmmmmnv;,mmmmmmmmmmmmnv\%vn;mmmv\%vnmmmv^\
+     -| vmmnv\%vmmm. nv\%vnmmmmmmmmmnv\%;mmmmmmmmmmmnv\%vn; mmmv\%vnmmmv^\
+     -| `vmmnv\%vmm,  v\%vnmmmmmmmmmmnv\%nmmmmmmmmmmnv\%v;  mmv\%vnnmmv'^\
+     -|  vmmnv\%vmm;,   \%vnmmmmmmmmmnv\%nmmmmmmmmmnv\%;'   mv\%vnmmmmv^\
+     -|   vmmnv\%vmm;;,   nmmm;'             mmmm;;'    mv\%vnmmmmv'^\
+     -|   `vmmnv\%vmmm;;,.         mmnvv;,            mmv\%vnmmmmv'^\
+     -|    `vmmnv\%vmmmmnv\%vnmmmmmmmmnvvnmmmmmmnv\%vnmmmv\%vnmmmmv'^\
+     -|      `vmvn\%vmmmmnv\%vnmmmmmmmnvvnmmmmmnv\%vnmmmm\%vnmmmv'^\
+     -|          `v\%mmmmmn%:\%vnmnmmmmn\%vnmmmnv%:\%vnmv\%nmv'
+     -|
+     -| ; A remarked line
+     -|       ; Also a remarked line
+     -| ;     A                          \
+     -|       formatted and multi-line   \
+     -|       remark
+
+
+File: gcal.info,  Node: Comment line-Footnotes,  Up: Comment line
+
+  (1) Physically and logically.
+
+
+File: gcal.info,  Node: Include directives,  Next: Date variables,  Prev: Comment line,  Up: Resource file
+
+Include directives
+------------------
+
+  You may add `#include' directives in a resource file for searching and
+loading further resource files(1) (*note Include
+directives-Footnote-1::).  An `#include' directive tells Gcal to
+suspend reading the current resource file and read one other resource
+file before continuing.  The directive is a line in the resource file
+that looks like this template:
+
+     #include _whitespace_ ARGUMENT [_whitespace_] _newline_
+
+The ARGUMENT can either be
+
+     "FILE NAME"
+
+or(2) (*note Include directives-Footnote-2::)
+
+     <FILE NAME>
+
+  One _whitespace_ character minimum is required between `#include' and
+the ARGUMENT.  The ARGUMENT may be trailed by extra _whitespace_
+characters and the line must always end with a `\n' (newline)
+character, except it is the last line of a resource file.
+
+Let us inspect a example which is a bit more concrete:
+
+  1. #include "foo/bar"
+
+  2. #include <bar>
+
+  The first `#include' directive tells Gcal to load the file `bar' in
+the file directory `foo' from the actual file directory.  If this
+fails, Gcal tries to load this file by using steps 1...4 of the
+previously explained mechanism used for searching files (*note File
+searching mechanism: x-File-searching-mechanism.).
+
+  The second `#include' directive tells Gcal to load the file `bar'
+from the user respectively system data file directory by using steps
+3...4 of the previously explained mechanism used for searching files.
+It is not allowed to include files which have a fixed access path
+starting from the root file directory by such an `#include' directive
+like `#include </file>' or `#include </foo/bar/file>'; just as the
+specification of a single or an extended file name containing a
+disk/drive specifier(3) (*note Include directives-Footnote-3::),
+because the resulting path name(4) (*note Include
+directives-Footnote-4::) would not be a valid file name any longer.
+
+  Included files may include other files again.  But the nesting level
+of included files is limited on the one hand by the amount of usable
+working storage of the computer, and on the other hand by the value
+which is given by the operating system respectively the compiler for
+the number of files which can be opened simultaneously.  Recursive
+includes(5) (*note Include directives-Footnote-5::) or cyclic
+includes(6) (*note Include directives-Footnote-6::) are not permitted,
+because such backward references would produce an infinite loop in the
+program internally!  Gcal recognizes such situations and terminates
+immediately with a fatal error.  *Note Error Code 119: x-119-Error-code,
+for more information.
+
+  If an included resource file cannot be found and no `--debug=abort'
+option is given, processing of the resource file containing the
+`#include' continues.
+
+
+File: gcal.info,  Node: Include directives-Footnotes,  Up: Include directives
+
+  (1) A mechanism similar the method which is used by the C
+Preprocessor.
+
+  (2) Thus, a file name which is embraced by `""' or `<>'.
+
+  (3) Even if operating systems like MS-DOS or OS/2 permits such a
+disk/drive specification on principle.
+
+  (4) A path name lead by the user respectively system data file
+directory name.
+
+  (5) The included file tries to include itself again.
+
+  (6) The included file is included again by another file that occurs
+at a deeper place in such a chain.
+
+
+File: gcal.info,  Node: Date variables,  Next: Text variables,  Prev: Include directives,  Up: Resource file
+
+Date variables
+--------------
+
+  Gcal respects _global_ and/or _local_ date variables which may be
+used either in the date part of a Gcal resource file line, or which may
+be part of a special text in the text part of a Gcal resource file line.
+This means, up to *24* user-defined date variables can be set and
+referenced during program execution.  *Note Fixed date option
+`--date-variable=ARGUMENT': x-date-variable, for more information how
+global date variables can be used.
+
+  A date variable name DVAR consists of a single, case-insensitive
+letter(1) (*note Date variables-Footnote-1::).  In a definition, this
+name is trailed by the assignment operator character `=', and the
+numerical values of month MM (or a short, three characters month name,
+e.g. `Jan', `Feb'...) and day DD, this variable has to store(2) (*note
+Date variables-Footnote-2::), e.g.:
+
+     a=1127
+     c=a
+
+stores the 27th November into the local date variable A and into the
+local date variable C.  You should always remember that date variables
+can only be referenced in a line if they are already defined, because
+Gcal processes a resource file line by line.
+
+  Only local date variables can store dynamical dates given in the
+`MMWWWN', `DVAR[+|-]N[WWW]' or `*d|wN[WWW]' format, e.g.:
+
+     a=03su2
+     b=JunMon9
+     c=b-3
+     d=c+4Sa
+     x=*d10
+     y=*d10fri
+     z=*w3Su
+
+which means, date variable A stores the date of second Sunday in March
+and B stores date of last Monday in June.  The date variable C stores
+the date which is three days before the date of the last Monday in June
+and this date is set in the date variable D to that date which is four
+Saturdays after the date of C.  The date variable X stores the date of
+the 10th absolute day of the year (== 10th January).  Y stores the date
+of the 10th Friday of the year, and the assignment to Z is the date of
+the Sunday which occurs in the 3rd week of the year.
+
+*Caution:*
+These kinds of assignments to date variables are *only* computed
+correctly in simple year bounds --which means during a current year--
+and not in fixed dates shown after the current year has changed, e.g.
+in *fiscal years*.
+
+  Date variables which are defined in a resource file are always local
+and only respected in this specific file, and that file which is
+included by it.  This means for the included file, that *all* local
+variables of the caller are visible.  The included file itself may
+define its own local variables in its own name-space, which are not
+exported to caller on return.  All other definitions of date
+variables(3) (*note Date variables-Footnote-3::) are always global.  If
+a resource file line contains a reference to a date variable which is
+not locally defined in that file, Gcal will try to use the global
+values held by this variable.  If this fails because no global
+definition of this date variable is given, Gcal will not process this
+line.  If the simple `--debug' respectively `--debug=internal' option
+is given, informational messages for each undefined date variable will
+be shown on the _standard error channel_ (*note Global option
+`--debug=internal': x-debug-internal.).  If the `--debug=abort' option
+is given, the Gcal program will be aborted with an error code when the
+first undefined global date variable reference occurs.  *Note Error
+Code 113: x-113-Error-code, and *Note Global option `--debug=abort':
+x-debug-abort, for further information.
+
+  A local date variable can be deleted.  This means, that this date
+variable is no longer valid in its local scope and be undefined
+therefore.  So it is possible to use its potentially defined global
+value in succeeding lines if this date variable is referenced there.
+The following example of the resource file `dvar-1.rc' elucidates these
+facts:
+
+     $ cat dvar-1.rc
+     -| ; dvar-1.rc
+     -| ;
+     -| z=0202
+     -| 0@z The local assigned date to `z'
+     -| z=
+     -| 0@z The global assigned date to `z'
+     -| z=0404
+     -| 0@z The local assigned date to `z'
+
+So Gcal creates the following output:
+
+     $ gcal %1777 -H no -x -v z=1212 -f ./dvar-1.rc -y
+     -|
+     -| Sun, Feb   2nd 1777: The local assigned date to `z'
+     -| Fri, Apr   4th 1777: The local assigned date to `z'
+     -| Fri, Dec  12th 1777: The global assigned date to `z'
+     $ gcal %1777 -H no -x -f ./dvar-1.rc -y
+     -|
+     -| Sun, Feb   2nd 1777: The local assigned date to `z'
+     -| Fri, Apr   4th 1777: The local assigned date to `z'
+
+  Only advanced users should apply the `--export-date-variables' option
+which causes that the actual incarnation of a local date variable
+--which was previously defined in a resource file and not in an
+included file-- is being exported to further resource files instead of
+using its global value, in case that date variable is not locally
+defined in that further resource file.  *Note Include directives::, for
+more details.
+
+  But be aware, the use of this option could create unwanted results,
+because the order of processing the resource files is an important
+entity in managing the `--export-date-variables' option, so it is not
+recommended to use it.  You, the user, must exactly know what you are
+doing when applying this option; *you are expressively warned now!*
+
+Some basic operations can be performed on date variables.  These are:
+
+*Operation*    *Description*
+
+`DVAR++'       Simple increment by one day.
+`DVAR--'       Simple decrement by one day.
+`DVAR+=[+|-]N' Addition of a constant numerical day factor [+|-]N.
+`DVAR-=[+|-]N' Subtraction of a constant numerical day factor [+|-]N.
+`DVAR+=NWWW'   Addition of N weekdays WWW.
+`DVAR-=NWWW'   Subtraction of N weekdays WWW.
+
+  The scope of the operations which are done on a local date variable,
+is that resource or include file, where the local date variable is
+defined.
+
+  If operations on a global date variable are performed in a resource
+file or that file which is included by it, these operations are only
+valid in that specific file(4) (*note Date variables-Footnote-4::), not
+in further resource files processed.  This means, the initial values of
+global date variables are always restored if the resource file changes.
+
+  Please finally note, that each date variable assignment/operation
+must be given separately on a single line in the resource file.
+
+
+File: gcal.info,  Node: Date variables-Footnotes,  Up: Date variables
+
+  (1) Except the date variable E which is internally reserved for the
+Easter Sunday's date, so it cannot be assigned or operated therefore.
+And except the date variable T which is internally reserved for today's
+date, so it likewise cannot be assigned or operated.
+
+  (2) Or the name of another date variable, which is already defined.
+
+  (3) In the command line, environment variable `GCAL' or response file.
+
+  (4) They are only done locally.
+

@@ -1,0 +1,139 @@
+############################## -*- Mode: a2ps -*- #############################
+## tex.ssh --- Sheet definitions for (La)TeX files
+## 
+## Author          : Denis GIROU (CNRS/IDRIS - France) <Denis.Girou@idris.fr>
+## Created the     : Wed May  6 15:35:36 1997
+## Last mod. by    : Denis GIROU (CNRS/IDRIS - France) <Denis.Girou@idris.fr>
+## Last mod. the   : Thu Jun 26 11:18:14 1997
+###############################################################################
+
+## 1.10 Akim
+# * Inherit from symbols.ssh for \Alpha and the like
+# * Make sure that specific rules are always _after_ generic rules
+#   (see the \def section)
+# * Cleaner handling of \begin et \end, \newcommand and the like
+#   (as operators not sequences)
+# * Highlight title given to environment (\begin{foo}[title])
+# * Support (sub)*sections, chapter and part
+## 1.9 Akim
+# Case sensitive, updated to new syntax for closers, and requirement
+## 1.8 Akim
+# The prescript-like symbols are keywords, not operators.
+# Put them as optional
+
+style TeX is
+
+written by "Denis Girou <Denis.Girou@idris.fr>"
+version is 1.11
+requires a2ps version 4.12a
+
+ancestors are
+  symbols
+end ancestors
+
+case sensitive
+
+documentation is
+    "This is the style for (La)TeX files."
+    "It's mainly useful for people who develop (La)TeX packages."
+    "With samp(-g)samp, common mathematical symbols are represented graphically."
+end documentation
+
+operators are
+# It happens to see \' or \" outside a string, for instance in \catcodes.
+    "\\\'", "\\\"",
+
+# LaTeX environments
+    (/\\\\(begin|end)([[:blank:]]*)\\{/
+     /([^}]+)\\}/
+      "\\" Keyword_strong, \1 Keyword_strong, \2 Plain, "{" Plain,
+      \3 Label, "}" Plain),
+
+# LaTeX environments with title
+    (/\\\\(begin|end)([[:blank:]]*)\\{/   # \1 and \2
+     /([^}]+)\\}([[:blank:]]*)\\[/        # \3, \4
+     /([^]]+)\\]/                         # \5
+      "\\" Keyword_strong, \1 Keyword_strong, \2 Plain, "{" Plain,
+      \3 Label, "}" Plain, \4 Plain, "[" Plain,
+      \5 Label, "]" Plain),
+
+# LaTeX sections
+    (/\\\\((sub)*section|part|chapter)([[:blank:]]*)\\{/
+     /([^}]+)\\}/
+      "\\" Keyword_strong, \1 Keyword_strong, \3 Plain, "{" Plain,
+      \4 Label_strong, "}" Plain),
+
+# LaTeX macros definitions
+    (/\\\\/
+     /((new|renew|provide)command|environment)/    # \1
+     /([[:blank:]]*)\\{/                           # \3
+     /([^}]+)\\}/                                  # \4
+      "\\" Keyword_strong, \1 Keyword_strong, \3 Plain, "{" Plain,
+      \4 (Label_strong + Index1), "}" Plain)
+end operators
+
+sequences are
+# (La)TeX comments
+    %                     Comment,
+
+# Strings
+    "\""                  Plain          String                  "\"" Plain,
+
+# TeX macros definitions
+    "\\def"               Keyword_strong (Label_strong  + Index1)
+	closers are
+	   "{" Plain,
+	   " " Plain,
+	   "\#" Plain
+	end closers,
+    "\\edef"              Keyword_strong (Label_strong  + Index1)
+	closers are
+	   "{" Plain,
+	   " " Plain,
+	   "\#" Plain
+	end closers,
+    "\\gdef"              Keyword_strong (Label_strong  + Index1)
+	closers are
+	   "{" Plain,
+	   " " Plain,
+	   "\#" Plain
+	end closers,
+    "\\xdef"              Keyword_strong (Label_strong  + Index1)
+	closers are
+	   "{" Plain,
+	   " " Plain,
+	   "\#" Plain
+	end closers,
+
+# We must not mark other commands beginning by \def !
+    "\\defaulthyphenchar" Keyword_strong Keyword_strong          ""   Plain,
+    "\\defaultskewchar"   Keyword_strong Keyword_strong          ""   Plain,
+    "\\definecolor"       Keyword_strong Keyword_strong          ""   Plain,
+    "\\define@key"        Keyword_strong Keyword_strong          ""   Plain,
+    "\\defineshortverb"   Keyword_strong Keyword_strong          ""   Plain,
+    "\\defineverbatimenvironment" Keyword_strong Keyword_strong  ""   Plain,
+
+# LaTeX class of document
+    "\\documentclass"     Keyword_strong Label_strong
+	closers are
+	  " "  Plain,
+	  /$/ Plain
+	end closers,
+    "\\documentclass{"    Keyword_strong Label_strong            "}"  Plain,
+
+# LaTeX packages
+    "\\usepackage"        Keyword_strong Label_strong
+	closers are
+	  " "  Plain,
+	  /$/ Plain
+	end closers,
+    "\\usepackage{"       Keyword_strong Label_strong            "}"  Plain,
+
+# (La)TeX macros usage
+    "\\\\"                Keyword_strong Keyword_strong
+	closers in Plain are
+	  /[-{}%[(),=<>+]/, "\#", "\$", "/$/"
+	end closers
+end sequences
+
+end style

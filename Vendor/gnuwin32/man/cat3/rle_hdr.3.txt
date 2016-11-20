@@ -1,0 +1,141 @@
+RLE_HDR(3)                                           RLE_HDR(3)
+
+
+
+
+
+NAME
+       rle_hdr  -  Structure  for  communication with RLE func-
+       tions.
+
+
+SYNOPSIS
+       #include <rle.h>
+
+       rle_hdr rle_dflt_hdr;
+
+       RLE_SET_BIT(the_hdr,bit)
+       RLE_CLR_BIT(the_hdr,bit)
+       RLE_BIT(the_hdr,bit)
+       rle_hdr the_hdr;
+
+DESCRIPTION
+       This  data  structure  provides  communication  to   and
+       between  all the RLE(5) file routines.  It describes the
+       parameters of the image being saved or  read,  and  con-
+       tains some variables describing file state that are pri-
+       vate  to  the  routines.   The  public  components   are
+       described below.
+
+            typedef unsigned char rle_pixel;
+            typedef unsigned short rle_map;
+
+            rle_hdr {
+                 int     ncolors,  /* Number of colors being saved */
+                         *bg_color,/* Background color array */
+                         alpha,    /* if != 0, save alpha channel (color -1) */
+                                   /* alpha channel background is always 0 */
+                         background,/* if = 0, no background processing */
+                                   /* if = 1 or 2, save only non-bg pixels */
+                                   /* If 2, set clear-to-bg flag in file */
+                         xmin,     /* Min X bound of saved raster */
+                         xmax,     /* Max X bound */
+                         ymin,     /* Min Y bound */
+                         ymax,     /* Max Y bound */
+                         ncmap,    /* number of color channels in color map */
+                                   /* if = 0, color map is not saved */
+                         cmaplen;  /* Log2 of the number of entries in */
+                                   /* each channel of the color map */
+                 rle_map *cmap;    /* pointer to color map, stored as 16-bit */
+                                   /* words, with values left justified */
+                 char    **comments;/* Pointer to array of pointers */
+                                   /* to comment strings. */
+                 FILE *  rle_file; /* I/O to this file */
+                 /*
+                  * Bit map of channels to read/save.  Indexed by (channel mod 256).
+                  */
+                 char    bits[256/8];
+           };
+
+       A  global  variable,  rle_dflt_hdr, is available, conve-
+       niently initialized with default values.
+
+FIELDS
+       ncolors
+              The number of  colors  (exclusive  of  the  alpha
+              channel)  in the image.  This is one greater than
+              the largest channel index (i.e., ncolors would be
+              3  if channels 0, 1, and 2 were saved, or if only
+              channel 2 were saved.)
+
+       bg_color
+              A  pointer  to  an  array  of  ncolors  integers,
+              defines  the  background  color  (if  used).  The
+              background alpha value is always  0,  so  is  not
+              included in the bg_color array.
+
+       alpha  If non-zero, an alpha channel is present as chan-
+              nel  -1.   This  should  always  be   0   or   1.
+              Rle_get_setup and rle_put_setup enforce this con-
+              straint.  The alpha channel will only be actually
+              read  or written if the corresponding bit in bits
+              is also set.
+
+       background
+              Controls whether background color  processing  is
+              done.   If 0, no background processing is done at
+              all (and bg_color is ignored).  If 1 or  2,  then
+              runs  of 3 or more pixels in the background color
+              are not saved at all.  If 2, then these runs will
+              be  restored  by  rle_getrow; if 1, they will not
+              (this can lead to some strange images).
+
+       xmin, xmax, ymin, ymax
+              The bounds of the image.  All pixels from xmin to
+              xmax,  inclusive,  in  rows numbered from ymin to
+              ymax, inclusive, will be saved.  Thus the  dimen-
+              sions of the image are
+                        (xmax - xmin + 1) x (ymax - ymin + 1)
+
+       ncmap, cmaplen
+              The  size  of  the  saved colormap (if any).  The
+              color  map  will  have   ncmap   channels,   each
+              2^cmaplen  long.   If ncmap is zero, no color map
+              is present.
+
+       cmap   A pointer to colormap data, if present.  The data
+              is  stored  in "channel major" order, so that all
+              the values for channel 0 precede all  the  values
+              for  channel  1,  etc.   Each individual value is
+              left-justified in 16 bits  (i.e.,  the  range  of
+              values is 0-65535).
+
+       comments
+              A  pointer  to  picture comment data, if present.
+              Use the functions  rle_putcom(3),  rle_getcom(3),
+              and rle_delcom(3) to manipulate this field.
+
+       rle_file
+              The  standard  I/O FILE pointer for the file con-
+              taining this image.
+
+       bits   A bitmap that selects the channels that are actu-
+              ally  written  to/read from the file.  The macros
+              below are used to modify this bitmap.
+
+MACROS
+       The macro RLE_BIT will retrieve the state of one of  the
+       bits  in the bits map.  RLE_SET_BIT, and RLE_CLR_BIT set
+       and clear bits in the bits map.  The predefined  symbols
+       RLE_RED, RLE_GREEN, RLE_BLUE, and RLE_ALPHA, or an inte-
+       ger value from -1 to 254 may be used in these macros.
+
+SEE ALSO
+       librle(3), RLE(5).
+
+AUTHOR
+       Spencer W. Thomas, Todd Fuqua
+
+
+
+3                            2/2/87                  RLE_HDR(3)

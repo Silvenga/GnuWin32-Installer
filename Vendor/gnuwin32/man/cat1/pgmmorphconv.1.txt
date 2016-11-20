@@ -1,0 +1,89 @@
+Pgmmorphconv User Manual(0)         Pgmmorphconv User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       pgmmorphconv - perform morphological convolutions: dila-
+       tion, erosion
+
+
+SYNOPSIS
+       pgmmorphconv [ -erode | -dilate | -open | -close ]  tem-
+       platefile [pgmfile]
+
+       Minimum  unique  abbreviation  of  option is acceptable.
+       You may use double hyphens instead of single  hyphen  to
+       denote options.  You may use white space in place of the
+       equals sign to separate an option name from its value.
+
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       pgmmorphconv performs morphological  convolutions  on  a
+       PGM image: dilation and erosion.
+
+       pgmmorphconv  performs a "topological" convolution.  For
+       each pixel of the input, pgmmorphconv generates an  out-
+       put pixel in the same position.  To determine the inten-
+       sity of the output pixel, pgmmorphconv lays the template
+       image over the input image such that the middle pixel of
+       the template is over the input pixel in question.   pgm-
+       morphconv  looks  at  the  input  pixels underneath each
+       white pixel in the template.  For a dilation, the  maxi-
+       mum  intensity  of  all those pixels is the intensity of
+       the output pixel.  For an erosion, it is the minimum.
+
+       Thus, the dilation effect is that bright  areas  of  the
+       input  get  bigger  and dark areas smaller.  The erosion
+       effect is the opposite.   The  simplest  template  image
+       would  be  one  with a white pixel in the middle and the
+       rest black.  This would produce an output image  identi-
+       cal  to  the  input.  Another simple template image is a
+       fully white square.  This causes bright or dark areas to
+       expand  in  all  directions.   A  template image that is
+       white on the left side and  black  on  the  right  would
+       smear the image to the right.
+
+       The  template  file  named  by templatefile contains the
+       template image as a PBM image.  It must have an odd num-
+       ber  of rows and an odd number of columns, so there is a
+       definite middle pixel.  It must  contain  at  least  one
+       white pixel.
+
+       This  is  similar  to the continuous convolution done by
+       pnmconvol, except that with pnmconvol the output  inten-
+       sity  is  a  weighted  average  of  nearby  input pixels
+       instead of a minimum or maximum.
+
+       This convolution changes the three  Minkowski  integrals
+       in  a  predefined way, an can be used to filter an image
+       to enhance certain features,  to  ease  their  automatic
+       recognition.
+
+       The options -erode and -dilate obviously produce an ero-
+       sion or dilation, respectively.
+
+       The -open option causes pgmmorphconv to perform first an
+       erode  and  then  a dilate operation.  The -close option
+       causes a dilate first and then an erode.  If you specify
+       none of these options, it is the same as -dilate.
+
+
+SEE ALSO
+       pgmminkowski(1) pnmconvolz(1) pgm(1)
+
+
+AUTHORS
+       Luuk van Dijk, 2001.
+
+       Based  on  work which is Copyright (C) 1989, 1991 by Jef
+       Poskanzer.
+
+
+
+netpbm documentation    29 October 2Pgmmorphconv User Manual(0)

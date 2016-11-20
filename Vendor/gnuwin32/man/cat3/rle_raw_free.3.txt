@@ -1,0 +1,61 @@
+RLE_RAW_ALLOC(3)                               RLE_RAW_ALLOC(3)
+
+
+
+
+
+NAME
+       rle_raw_alloc   -  Allocate  memory  for  rle_getraw  or
+              rle_putraw.
+       rle_raw_free - free memory allocated by rle_raw_alloc.
+
+SYNOPSIS
+       #include <rle.h>
+       #include <rle_raw.h>
+
+       rle_raw_alloc( the_hdr, scanp, nrawp )
+       rle_hdr * the_hdr;
+       rle_op *** scanp;
+       int ** nrawp;
+
+       rle_raw_free( the_hdr, scanp, nrawp )
+       rle_hdr * the_hdr;
+       rle_op ** scanp;
+       int * nrawp;
+
+
+DESCRIPTION
+       The function rle_raw_alloc is provided to make it easier
+       to  allocate storage for use by the RLE "raw" functions.
+       It examines the the_hdr structure  provided  and  return
+       (via its other arguments) newly allocated space suitable
+       for reading from or writing to an RLE file described  by
+       the    the_hdr   structure.    Rle_raw_alloc   allocates
+       (the_hdr->xmax - the_hdr->xmin + 1) elements  per  chan-
+       nel,  which  is  more  than  should ever be needed for a
+       valid RLE file.
+
+       Rle_raw_free should be used to free memory allocated  by
+       rle_raw_alloc(3).   The  arguments  are  pointers to the
+       allocated    storage.     This    is    distinct    from
+       rle_freeraw(3), which only frees pixel arrays referenced
+       by  individual  rle_op  structures,  while  rle_raw_free
+       frees the storage consumed by the arrays of pointers and
+       rle_op  structures.   In  fact,  rle_freeraw  should  be
+       called before calling rle_raw_free.
+
+SEE ALSO
+       rle_hdr(3), rle_op(3), rle_putraw(3), rle_getraw(3),
+       rle_freeraw(3), librle(3), RLE(5).
+
+AUTHOR
+       Spencer W. Thomas
+       University of Utah
+
+BUGS
+       The   naming   confusion   between    rle_freeraw    and
+       rle_raw_free is unfortunate.
+
+
+
+3                            2/2/87            RLE_RAW_ALLOC(3)

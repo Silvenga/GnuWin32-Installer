@@ -1,0 +1,59 @@
+FREXP(3)           Linux Programmer's Manual           FREXP(3)
+
+
+
+
+
+NAME
+       frexp, frexpf, frexpl - convert floating-point number to
+       fractional and integral components
+
+SYNOPSIS
+       #include <math.h>
+
+       double frexp(double x, int *exp);
+
+       float frexpf(float x, int *exp);
+
+       long double frexpl(long double x, int *exp);
+
+DESCRIPTION
+       The frexp() function is used to split the number x  into
+       a normalized fraction and an exponent which is stored in
+       exp.
+
+RETURN VALUE
+       The frexp() function returns  the  normalized  fraction.
+       If  the  argument x is not zero, the normalized fraction
+       is x times a power of two, and is always  in  the  range
+       1/2  (inclusive)  to  1 (exclusive).  If x is zero, then
+       the normalized fraction is zero and zero  is  stored  in
+       exp.
+
+CONFORMING TO
+       SVID  3,  POSIX,  BSD  4.3, ISO 9899.  The float and the
+       long double variants are C99 requirements.
+
+EXAMPLE
+       #include <stdio.h>
+       #include <math.h>
+       #include <float.h>
+       int main () {
+               double d = 2560;
+               int e;
+               double f = frexp(d, &e);
+               printf("frexp(%g, &e) = %g: %g * %d^%d = %g\n",
+                      d, f, f, FLT_RADIX, e, d);
+               return 0;
+       }
+
+       This program prints
+
+            frexp(2560, &e) = 0.625: 0.625 * 2^12 = 2560
+
+SEE ALSO
+       ldexp(3), modf(3)
+
+
+
+                           2002-07-27                  FREXP(3)

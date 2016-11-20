@@ -1,0 +1,503 @@
+<html lang="en">
+<head>
+<title>jwhois, Whois client</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="jwhois, Whois client">
+<meta name="generator" content="makeinfo 4.8">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; } 
+  span.sansserif { font-family:sans-serif; font-weight:normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">jwhois, Whois client</h1>
+<div class="node">
+<p><hr>
+<a name="Top"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Introduction">Introduction</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#dir">(dir)</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+
+</div>
+
+   <p>This file documents the GNU jwhois package, en extended Whois client. 
+This is edition 3.2.1, for jwhois version 3.2.3, last updated 30 June 2002.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Introduction">Introduction</a>:                 Introduction
+<li><a accesskey="2" href="#Invocation">Invocation</a>:                   How to invoke jwhois
+<li><a accesskey="3" href="#Site-Configuration">Site Configuration</a>:           Syntax of the configuration file
+<li><a accesskey="4" href="#RIPE-Extensions">RIPE Extensions</a>:              Extensions for RIPE databases
+<li><a accesskey="5" href="#Reporting-bugs">Reporting bugs</a>:               Reporting bugs
+
+</li></ul>
+<p>--- The Detailed Node Listing ---
+
+<p>Site Configuration
+
+</p>
+<ul class="menu">
+<li><a accesskey="6" href="#Global-options">Global options</a>:               Global configuration options
+<li><a accesskey="7" href="#Whois-servers">Whois servers</a>:                Syntax for selecting whois servers
+<li><a accesskey="8" href="#Server-options">Server options</a>:               Syntax for server options
+
+   </ul>
+
+<div class="node">
+<p><hr>
+<a name="Introduction"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Invocation">Invocation</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">1 Introduction</h2>
+
+<p><span class="sc">jwhois</span> is an Internet Whois client that contains an extensible
+configuration file which defines its operation. The client supports
+queries to foreign hosts either through the RFC 954 - NICNAME/WHOIS
+protocol, the RFC 2167 - Referral Whois 1.5 protocol, or HTTP using
+an external browser.
+
+   <p>Upon execution, <span class="sc">jwhois</span> searches through the its configuration
+to find the most specific whois server to query. Depending upon the
+reply from that whois server, <span class="sc">jwhois</span> can assume the query was
+successfull and display the result to the user, or optionally redirect
+the query to another server to find more specific information.
+
+<div class="node">
+<p><hr>
+<a name="Invocation"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Site-Configuration">Site Configuration</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Introduction">Introduction</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">2 Invocation</h2>
+
+<p><span class="sc">jwhois</span> uses the following command-line options:
+     <dl>
+<dt>`<samp><span class="samp">--version</span></samp>'<dd>Print the program version and licensing information.
+
+     <br><dt>`<samp><span class="samp">--help</span></samp>'<dd>Print a usage message summarizing the command-line options.
+
+     <br><dt>`<samp><span class="samp">-c FILE</span></samp>'<br><dt>`<samp><span class="samp">--config=FILE</span></samp>'<dd>Reads configuration from FILE instead of from the default
+system global configuration file.
+
+     <br><dt>`<samp><span class="samp">-h HOST</span></samp>'<br><dt>`<samp><span class="samp">--host=HOST</span></samp>'<dd>Overrides any specifications in the configuration file and queries HOST
+directly.
+
+     <br><dt>`<samp><span class="samp">-p PORT</span></samp>'<br><dt>`<samp><span class="samp">--port=PORT</span></samp>'<dd>Specifies a port number to use when querying a HOST
+
+     <br><dt>`<samp><span class="samp">-f</span></samp>'<br><dt>`<samp><span class="samp">--force-lookup</span></samp>'<dd>Forces a query to be made to a host even if a current object
+is available from the cache.
+
+     <br><dt>`<samp><span class="samp">-v</span></samp>'<br><dt>`<samp><span class="samp">--verbose</span></samp>'<dd>Outputs verbose debugging information while running (use this before
+sending a bugreport to ensure that it's indeed a bug and not a
+misconfiguration). You can increase the verbosity by giving several
+verbose commands to jwhois, such as `<samp><span class="samp">-vv</span></samp>'.
+
+     <br><dt>`<samp><span class="samp">-n</span></samp>'<br><dt>`<samp><span class="samp">--no-redirect</span></samp>'<dd>Disable features that redirect queries from one server to another.
+
+     <br><dt>`<samp><span class="samp">-s</span></samp>'<br><dt>`<samp><span class="samp">--no-whoisservers</span></samp>'<dd>Disable the built-in support for whois-servers.net.
+
+     <br><dt>`<samp><span class="samp">-a</span></samp>'<br><dt>`<samp><span class="samp">--raw</span></samp>'<dd>Send query verbatim to receiving hosts instead of rewriting them according
+to the configuration.
+
+     <br><dt>`<samp><span class="samp">-i</span></samp>'<br><dt>`<samp><span class="samp">--display-redirections</span></samp>'<dd>Display every step in a redirection (default is to display only the
+last answer).
+
+     <br><dt>`<samp><span class="samp">-d</span></samp>'<br><dt>`<samp><span class="samp">--disable-cache</span></samp>'<dd>Completely disable both reading and writing to cache
+
+     <br><dt>`<samp><span class="samp">-r</span></samp>'<br><dt>`<samp><span class="samp">--rwhois</span></samp>'<dd>Force the query to use the rwhois protocoll instead of HTTP or whois.
+
+     <br><dt>`<samp><span class="samp">--rwhois-display=DISPLAY</span></samp>'<dd>Asks receiving rwhois servers to display the results in the DISPLAY display
+instead of the default dump display.
+
+     <br><dt>`<samp><span class="samp">--rwhois-limit=LIMIT</span></samp>'<dd>asks receiving rwhois servers to limit their responses to LIMIT matches.
+
+   </dl>
+
+   <p>The query can optionally contain the character `<samp><span class="samp">@</span></samp>' followed by
+a host name to direct the search to that host. This works exactly like
+specifying the host with `<samp><span class="samp">--host</span></samp>' or `<samp><span class="samp">-h</span></samp>'.
+
+<div class="node">
+<p><hr>
+<a name="Site-Configuration"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Global-options">Global options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invocation">Invocation</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">3 Site Configuration</h2>
+
+<p><span class="sc">jwhois</span> is configurable via its configuration file, normally
+called <samp><span class="file">jwhois.conf</span></samp>. This file is looked for in the sysconfdir
+that was specified when compiling the program (default is
+<samp><span class="file">/usr/local/etc/</span></samp> on most systems).
+
+   <p>If no configuration file can be found, <span class="sc">jwhois</span> will default all queries
+to <a href="whois.internic.net">whois.internic.net</a>.
+
+   <p>An example configuration file that includes most known Whois servers can be
+found in the <code>example</code> subdirectory of the official distribution. 
+This example configuration also contains a lot of well used options
+that should be suitable for most setups.
+
+   <p>The configuration file is split into a number of blocks. Each block
+can contain a number of different options which are explained in the
+sections below. You can also get an overview of the syntax by looking
+at the example configuration file included in the distribution.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Global-options">Global options</a>:               Global configuration options
+<li><a accesskey="2" href="#Whois-servers">Whois servers</a>:                Syntax for selecting whois servers
+<li><a accesskey="3" href="#Server-options">Server options</a>:               Syntax for server options
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Global-options"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Whois-servers">Whois servers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Site-Configuration">Site Configuration</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">4 Global options</h2>
+
+<p>The global options of <span class="sc">jwhois</span> configure some basic facilities
+that are to be used for all hosts and queries made.
+
+     <dl>
+<dt><samp><span class="option">cachefile</span></samp><dd>By default, the location of the cache file is
+<samp><span class="file">/usr/local/var/jwhois.db</span></samp>, but this can be changed
+at compile time. The option <samp><span class="option">cachefile</span></samp> also
+changes the location.
+
+     <br><dt><samp><span class="option">cacheexpire</span></samp><dd>The default expire time for all cached objects it
+7 days (168 hours). this can be changed with the
+<samp><span class="option">cacheexpire</span></samp> option. The value is the number
+of hours that objects is considered to be current.
+
+     <br><dt><samp><span class="option">whois-servers-domain</span></samp><dd>Whois-servers.net is a service offered by the
+CenterGate Research Group. They register CNAMEs in
+the <a href="whois-servers.net">whois-servers.net</a> domain for every known
+top-level domain, pointing to the appropriate whois
+server.
+
+     <p>When querying for `<samp><span class="samp">wildebeest.se</span></samp>' for example,
+<span class="sc">jwhois</span> would look for an address <a href="se.whois-servers.net">se.whois-servers.net</a>
+and query the appropriate server based on that information.
+
+     <p>If you wish to make whois-servers.net-style queries
+using another domain name than <a href="whois-servers.net">whois-servers.net</a>, you
+can change this option to the domain name you want.
+
+     <br><dt><samp><span class="option">browser-pathname</span></samp><br><dt><samp><span class="option">browser-stdarg</span></samp><br><dt><samp><span class="option">browser-postarg</span></samp><br><dt><samp><span class="option">post-as-file</span></samp><dd>These options control the HTTP support on <span class="sc">jwhois</span>. 
+<samp><span class="option">browser-pathname</span></samp> should be set to the path
+and executable of the browser you wish to use to download
+information from HTTP-gateways. This is normally a
+program such as <span class="sc">lynx</span> or <span class="sc">curl</span>.
+
+     <p><samp><span class="option">browser-stdarg</span></samp> sets the arguments to pass to
+the browser in order to have the browser direct its
+options to the standard output. <span class="sc">jwhois</span> catches
+this information and displays it to the user.
+
+     <p><samp><span class="option">browser-postarg</span></samp> sets the arguments used to
+enable a processing of POST requests.
+
+     <p><samp><span class="option">post-as-file</span></samp> selects the way POST data is sent to
+the browser. If set to <span class="sc">true</span>, <span class="sc">lynx</span>-style processing
+is enabled, which means that the program,
+when passed the option specified in <samp><span class="option">browser-postarg</span></samp>,
+should accept one variable per line of input on standard input,
+terminated with three dashes. 
+If set to <span class="sc">false</span>, <span class="sc">w3m</span>-style processing is enabled,
+which means that the program, when passed this option,
+should consider the parameter that follows the one specified
+in <samp><span class="option">browser-postarg</span></samp> as a file name from which to read
+POST data.
+
+   </dl>
+
+   <p>Examples:
+
+<pre class="example">     cachefile = "/var/lib/jwhois.db";
+     cacheexpire = 168;
+     browser-pathname = "/usr/bin/lynx";
+     browser-stdarg = "-dump";
+     browser-postarg = "-post_data";
+</pre>
+   <div class="node">
+<p><hr>
+<a name="Whois-servers"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Server-options">Server options</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Global-options">Global options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">5 Whois servers</h2>
+
+<p>When making a query, <span class="sc">jwhois</span> looks at the <samp><span class="option">whois-servers</span></samp>
+block to determine which host to send the query to. This block
+consists of a number of rules. Each rule is evaluated in turn,
+starting with the first one in <samp><span class="option">whois-servers</span></samp>. 
+A rule consists of a key and a value. The key can be either
+a special option, or a CIDR block or regular expression that
+is matched against the query that the user specified.
+
+   <p>The special option <samp><span class="option">type</span></samp> takes one value, either
+<samp><span class="option">cidr</span></samp> or <samp><span class="option">regex</span></samp>. This defines the current
+blocks matching. Each block can match either with CIDR
+blocks or regular expressions, never both.
+
+   <p>If the key is a regular expression, the value can take on
+of two forms. Either a single string containing the hostname
+of the appropriate whois-server, optionally postfixed with
+a colon and a port number, or a block.
+
+   <p>If the value of the regular expression is a block, it can
+contain any number of options. The options <samp><span class="option">whois-server</span></samp>
+and <samp><span class="option">query-format</span></samp> are supported today.
+
+   <p><samp><span class="option">whois-server</span></samp> specifies the hostname of the whois server
+to send a query to, optionally postfixed with a colon and a
+port number, just as if the value had been a single string
+containing the whois server hostname.
+
+   <p><samp><span class="option">query-format</span></samp> rewrites queries matching this rule
+according to the contents of the options value. The special
+characters `<samp><span class="samp">$*</span></samp>' are replaced with the original query. 
+If a <samp><span class="option">query-format</span></samp> is specified both on an individual
+rule and on a server option, the most <samp><span class="option">query-format</span></samp>
+for the individual rule will be used since it is most specific.
+
+   <p>The special keyword `<samp><span class="samp">default</span></samp>' can be used to mark an entry
+as valid for all keys. The most specific rule will be used when
+searching for a host to query.
+
+   <p>Examples:
+
+<pre class="example">     whois-servers {
+             type = regex;
+     
+     	"\\([0-9]+\\.\\)+[0-9]+" = "struct cidr-blocks";
+             ".*-[A-Z]+$" = "struct handles";
+     
+             default = "whois.internic.net";
+     };
+     handles {
+             type = regex;
+     
+             ".*-RIPE$" = "whois.ripe.net";
+     };
+     
+     cidr {
+             type = cidr;
+     
+             "61.0.0.0/8" {
+                     whois-server = "whois.apnic.net";
+                     query-format = "$* /e";
+             }
+             default = "whois.arin.net";
+     };
+     
+</pre>
+   <div class="node">
+<p><hr>
+<a name="Server-options"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#RIPE-Extensions">RIPE Extensions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Whois-servers">Whois servers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">6 Server options</h2>
+
+<p>The <samp><span class="option">server-options</span></samp> block defines a number of parameters
+that are specific to each host.
+
+     <dl>
+<dt><samp><span class="option">whois-redirect</span></samp><dd>This option, previously located in a separate content-redirect
+block of the configuration file, matches output from standard
+whois servers and redirects the query to another host based on
+the output.
+
+     <p>The most commonly used option here is to redirect the query from
+the Internic shared whois server to the whois server of each
+individual registrar.
+
+     <p>The value of the key <samp><span class="option">whois-redirect</span></samp> should contain a
+regular expression which matches one or two string. If it matches
+one string, it will be treated as the hostname of a server to ask
+for more information. If it matches two strings, the first string
+will be treated as the hostname and the second as the port number.
+
+     <p>The matching follows standard regular expressions and grouping
+of regular expressions into one string is done by enclosing the
+group in parentheses.
+
+     <br><dt><samp><span class="option">query-format</span></samp><dd>By specifying a <samp><span class="option">query-format</span></samp>, the query can be rewritten
+before being sent to the target whois server. This is useful
+for example if the server defaults to output its information in
+another language than English, and you wish to always rewrite
+queries sent to it according to some syntax that enables output
+in English.
+
+     <p>The value of this option is a simple string where the special
+characters `<samp><span class="samp">$*</span></samp>' will be replaced with the original query. 
+If a <samp><span class="option">query-format</span></samp> is specified both on an individual
+rule and on a server option, the <samp><span class="option">query-format</span></samp>
+for the individual rule will be used since it is most specific.
+
+     <p>For more advanced query rewrites, it is also possible to access
+subfields of the domain query. These subfields are counted from
+the left or the right, starting at 1 (one). To select the fields,
+the syntax `<samp><span class="samp">${start-end}</span></samp>' (left to right) or `<samp><span class="samp">${start+end}</span></samp>'
+(right to left). Either of the start or end fields can be omitted,
+and the two formats cannot be combined in one query. You can also
+select a single field (counting from the left) by using the format
+`<samp><span class="samp">${fieldnumber}</span></samp>'. To do this when counting from the right, you
+need to write `<samp><span class="samp">${fieldnumber+fieldnumber}</span></samp>'. Please note that
+the first field number is always the leftmost field, so the
+numerical values are swapped when counting right to left.
+
+     <p>To include a verbatim `<samp><span class="samp">$</span></samp>' in the query, write `<samp><span class="samp">$$</span></samp>'.
+
+     <p>You can use <samp><span class="option">query-format</span></samp> also for HTTP based queries, but
+it cannot be combined with <samp><span class="option">http-action</span></samp>,
+<samp><span class="option">form-element</span></samp> or <samp><span class="option">form-extra</span></samp>.
+
+     <br><dt><samp><span class="option">http</span></samp><dd>The <samp><span class="option">http</span></samp> option specifies that this server supports
+queries made via HTTP. The value should be set to `<samp><span class="samp">true</span></samp>'
+if this is the case. The options <samp><span class="option">http-method</span></samp>,
+<samp><span class="option">http-action</span></samp> and <samp><span class="option">form-element</span></samp> must also
+be set for this to work.
+
+     <br><dt><samp><span class="option">http-method</span></samp><dd>When asking servers for information through HTTP, this
+option specifies the HTTP method to use. It can be either
+`<samp><span class="samp">GET</span></samp>' or `<samp><span class="samp">POST</span></samp>'. Many servers support either
+method, so selecting one is a matter of personal preference.
+
+     <br><dt><samp><span class="option">http-action</span></samp><dd>This option specifies the action of the HTTP query sent
+to a remote host. Most often, this is simply the pathname
+of the URL.
+
+     <br><dt><samp><span class="option">form-element</span></samp><dd>The <samp><span class="option">form-element</span></samp> is the name of the HTML form element
+which should contain the query. Usually this is something
+simple, like `<samp><span class="samp">domain</span></samp>', but you need to verify this by
+looking at each servers HTML documents before setting this
+option to its correct value.
+
+     <br><dt><samp><span class="option">form-extra</span></samp><dd>Lists any extra form elements that are to be submitted with
+the query.
+
+     <br><dt><samp><span class="option">rwhois</span></samp><dd>Set this option to `<samp><span class="samp">true</span></samp>' if the server supports the
+rwhois protocol, this option makes <span class="sc">jwhois</span> send all
+queries to the server as rwhois queries.
+
+     <br><dt><samp><span class="option">rwhois-display</span></samp><dd>If the server supports rwhois and you wish to select another
+display than the default dump format, you can set this option
+to the display you wish to use.
+
+     <br><dt><samp><span class="option">rwhois-limit</span></samp><dd>If the server supports rwhois and you wish to limit the
+amount of responses to a query, you can set this option
+to the number of responses you would like to receive at
+maximum.
+
+   </dl>
+
+   <p>Examples:
+<pre class="example">     server-options {
+     	"rwhois\\.nic\\.ve" {
+     		rwhois = true;
+     		rwhois-display = "dump";
+     		rwhois-limit = 10;
+     	}
+     	"whois\\.crsnic\\.net" {
+     		whois-redirect = ".*Whois Server: \\(.*\\)";
+     	}
+     	"whois\\.ncst\\.ernet\\.in" {
+     		query-format = "domain $*";
+     	}
+     	"www\\.nic-se\\.se" {
+     		http = true;
+     		http-method = "GET";
+     		http-action = "/cgi-bin/whois/www-to-whois";
+     		form-element = "domain";
+     	}
+     }
+</pre>
+   <div class="node">
+<p><hr>
+<a name="RIPE-Extensions"></a>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Reporting-bugs">Reporting bugs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Server-options">Server options</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">7 RIPE Extensions</h2>
+
+<p>RIPE (Réseaux IP Européens) has defined a number of options that can be
+used against a RIPE-compatible whois server (ripe.net, apnic.net and
+others).  Unfortunately, there is really no way of telling whether a
+host we are connecting to is RIPE-compatible or not.  RIPE extensions
+are therefore not directly incorporated into the <span class="sc">jwhois</span> client. 
+A list of the options can be found in RIPE Document 157 which you can get
+from the RIPE ftp server, <a href="ftp://ftp.ripe.net/ripe/docs/">ftp://ftp.ripe.net/ripe/docs/</a>.
+
+   <p>It is possible to use these options together with <span class="sc">jwhois</span> by changing
+the format of the query slightly. If you were to search for all entries in
+the RIPE database which lists the admin-c, tech-c or zone-c as CO19-RIPE,
+you could use the following command syntax:
+
+<pre class="example">     $ jwhois -h whois.ripe.net -- -i admin-c,tech-c,zone-c CO19-RIPE
+</pre>
+   <p>`<samp><span class="samp">--</span></samp>' is used to separate the RIPE options from the jwhois options.
+
+<div class="node">
+<p><hr>
+<a name="Reporting-bugs"></a>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#RIPE-Extensions">RIPE Extensions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">8 Reporting bugs</h2>
+
+<p>Email bug reports to <code>bug-jwhois@gnu.org</code>.
+
+   <div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Introduction" href="#Introduction">1 Introduction</a>
+<li><a name="toc_Invocation" href="#Invocation">2 Invocation</a>
+<li><a name="toc_Site-Configuration" href="#Site-Configuration">3 Site Configuration</a>
+<li><a name="toc_Global-options" href="#Global-options">4 Global options</a>
+<li><a name="toc_Whois-servers" href="#Whois-servers">5 Whois servers</a>
+<li><a name="toc_Server-options" href="#Server-options">6 Server options</a>
+<li><a name="toc_RIPE-Extensions" href="#RIPE-Extensions">7 RIPE Extensions</a>
+<li><a name="toc_Reporting-bugs" href="#Reporting-bugs">8 Reporting bugs</a>
+</li></ul>
+</div>
+
+</body></html>
+

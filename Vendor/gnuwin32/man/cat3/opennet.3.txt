@@ -1,0 +1,70 @@
+OPENNET(3)                                           OPENNET(3)
+
+
+
+
+
+NAME
+       opennet - URL handling library.
+
+
+SYNOPSIS
+       #include <opennet.h>
+
+       int opennet_init(void);
+       int  open_net(const  char  *pathname,  int flags, mode_t
+       mode);
+       off_t lseek_net(int filedes, off_t offset, int whence);
+       ssize_t read_net(int fd, void *buf, size_t count);
+       FILE *fopen_net(const char *path, const char *mode);
+       int fseek_net(FILE *stream, long offset, int whence);
+
+
+DESCRIPTION
+       Opennet is a library to provide  an  easy  mechanism  to
+       open  and handle URLs in the same way you would open and
+       handle a regular file.  The  very  first  function  that
+       must  be  called in your program is opennet_init(3) (for
+       win32 compatability).
+
+
+EXAMPLE
+       #include <opennet.h>
+       #include <stdlib.h>
+       #include <unistd.h>
+       #include <stdio.h>
+
+       int main(int argc, char **argv) {
+            FILE *fp = NULL;
+            char *filename = NULL, *fg_ret = NULL;
+            char buf[512] = {0};
+
+            filename = "http://www.rkeene.org/robots.txt";
+
+            fp = fopen_net(filename, "r");
+
+            if (fp == NULL) {
+                 perror("fopen_net");
+                 return(EXIT_FAILURE);
+            }
+
+            fg_ret = fgets(buf, sizeof(buf) - 1, fp);
+
+            if (fg_ret == NULL) {
+                 perror("fgets");
+                 return(EXIT_FAILURE);
+            }
+
+            printf("read: %s", buf);
+
+            return(EXIT_SUCCESS);
+       }
+
+
+SEE ALSO
+       fopen_net(3), fseek_net(3),  lseek_net(3),  open_net(3),
+       opennet_init(3), read_net(3)
+
+
+
+libconfig 0.9.1            25 Nov 04                 OPENNET(3)

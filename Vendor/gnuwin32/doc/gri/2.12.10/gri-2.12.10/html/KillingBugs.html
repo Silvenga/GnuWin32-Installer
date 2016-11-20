@@ -1,0 +1,446 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: bugs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile KillingBugs.html "Gri: bugs" "Gri Bugs" --> 
+
+<!-- @node   Killing Bugs, Debugging Software You Will Need, Reporting Bugs, Bugs -->
+<a name="KillingBugs" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Bugs.html#Bugs" shape="rect" coords="516,2,532,24" href="Bugs.html#Bugs">
+<area alt="Gri: bugs" shape="rect" coords="557,2,573,24" href="ReportingBugs.html">
+<area alt="Gri: Test Suite" shape="rect" coords="581,2,599,24" href="TestSuite.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: Test Suite" shape="rect" coords="581,2,599,24" href="TestSuite.html">
+</map>
+<h2>15.3: Killing Bugs</h2>
+
+<UL>
+<LI><a href="KillingBugs.html#DebuggingSoftwareYouWillNeed">Debugging Software You Will Need</a>: 
+<LI><a href="KillingBugs.html#DebuggingataGlance">Debugging at a Glance</a>: 
+<LI><a href="KillingBugs.html#DebuggingExample">Debugging Example</a>: 
+</UL>
+
+<!-- @node   Debugging Software You Will Need, Debugging at a Glance, Killing Bugs, Killing Bugs -->
+<a name="DebuggingSoftwareYouWillNeed" ></a>
+<h3>15.3.1: Software that you'll need</h3>
+
+This section is intended to help you find and kill bugs yourself, by
+indicating how the author does this work.  Since Gri is open-source,
+all users are invited to try to kill bugs themselves!
+<p>
+If you know nothing of C or C++, you may as well not read further,
+since there is little chance of your making progress.  On the other
+hand, experienced programmers won't need any of the advice I give
+below.
+<p>
+You'll need the Gri source and a C++ compiler.  It also helps if you
+have `<font color="#82140F"><code>gdb</code></font>', the GNU debugger, installed; the instructions below
+assume that's the case.  Also, the instructions assume that you're
+using the Emacs editor, and running `<font color="#82140F"><code>gdb</code></font>' from within Emacs.
+Otherwise, you'll want to glance at the documentation on `<font color="#82140F"><code>gdb</code></font>' to
+see how to use it in standalone mode.
+<p>
+<!-- @node   Debugging at a Glance, Debugging Example, Debugging Software You Will Need, Killing Bugs -->
+<a name="DebuggingataGlance" ></a>
+<h3>15.3.2: Debugging at a glance</h3>
+
+The list below is a sketch of what you might try, and in what order.
+<p>
+<ul>
+<p>
+<li> Check the bug list to see if other users have found your bug,
+and also to see if there is a workaround.
+<p>
+<li> Try a more recent version of gri.  If it works, you might wish to 
+archive the version you have at the moment and upgrade.
+<p>
+<li> If you suspect your bug has something to do with system calls, 
+as in the `<font color="82140F"><code>system</code></font>' command (see <a href="System.html#System">System</a>) or as in piped input
+files (see <a href="Open.html#Open">Open</a>), you should re-run the script with 
+`<font color="#82140F"><code>gri -superuser8</code></font>' instead of with `<font color="#82140F"><code>gri</code></font>'.  This will cause
+Gri to print out all commands that it is handing over to the operating
+system; you may see the error that way.  (Hint: it may help to
+interactively cut/paste the commands into your OS shell to see what the 
+action of the command is.)
+<p>
+<li> If your bug results in early termination, you should run Gri
+inside a debugger (e.g. GDB, assumed henceforth).  When the program
+terminates, type `<font color="#82140F"><code>where</code></font>' to see where termination occured.  Often
+this will give a clue.  In many cases, early termination results from
+faults in memory allocation.  To check memory allocation, you'll need to
+recompile Gri, linking it against a debugging memory allocator.  Many
+such tools exist; see comments in the `<font color="#82140F"><code>Makefile</code></font>' for a hint at how
+to use a popular one, called ``Electric Fence.''
+<p>
+<li> If your bug does not result in early termination, you may find 
+the best scheme is to trim your example down as much as possible, and
+then run Gri inside the GDB (or other debugger) so that you can monitor
+program execution.  The next section explains this in detail.
+</ul>
+<p>
+
+<!-- @node   Debugging Example, Test Suite, Debugging at a Glance, Killing Bugs -->
+<a name="DebuggingExample" ></a>
+<h3>15.3.3: A debugging Example</h3>
+
+Let's take a recent bug as an example.  Peter Galbraith found that the
+gri script
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+set color hsb 0.999 1 1
+draw box filled 2 2 3 3 cm
+set color hsb 1.000 1 1
+draw box filled 4 2 5 3 cm
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+produced odd results in a previous version of Gri; the color patches
+should have been of nearly the same color, but the first one was red, as
+expected, and the second was magenta.
+<p>
+The list below shows how I found Peter's bug.  Experienced C or C++
+programmers will find all of this very familiar, and will really only
+need to read item 6 of the list below, since that's the only action that
+is really specific to Gri.  (Note: for display purposes, I've broken
+some of the lines in the files into two lines in this list.)
+<p>
+<ol>
+<p>
+
+<li> Copy the above script (called `<font color="#82140F"><samp>test.gri</samp></font>') into the Gri source 
+directory, and the script into an Emacs buffer.  <b>Note:</b> all the
+following steps are done within Emacs, and the items in parentheses are
+the Emacs keys to get the indicated actions.
+<p>
+
+<li> If you're working from a pre-compiled version, you'll need to get the
+source first and do a compile yourself (see <a href="uncompiled-unix.html#UncompiledUnix">Uncompiled Unix</a>).  Then do
+a `<font color="#82140F"><code>make tags</code></font>' command (type this to the unix shell) to create a
+so-called "tag" table.
+<p>
+
+<li> Run Gri in this emacs buffer (`<font color="#82140F"><kbd>C-cC-r</kbd></font>') noting from the 
+postscript window that pops up that the colors are, indeed, mixed up.
+<p>
+
+<li> Load up the `<font color="#82140F"><code>gdb</code></font>' debugger by typing `<font color="#82140F"><kbd>M-x gdb gri</kbd></font>'.  This
+will open a new Emacs buffer in which you may type commands.  We'll be
+switching back and forth between this buffer and various source files.
+<p>
+
+<li> Reasoning that the error probably occurs at `<font color="#82140F"><code>set color</code></font>' or
+`<font color="#82140F"><code>draw box</code></font>', try replacing the latter by a command such as
+`<font color="#82140F"><code>draw label "hi" at 3 3 cm"</code></font>'.  The color is still wrong, indicating
+that it is the `<font color="#82140F"><code>set color</code></font>' command that has the problem.
+<p>
+
+<li> Next, we must find where the C++ code corresponding to the
+`<font color="#82140F"><code>set color</code></font>' command resides.  As it turns out, all `<font color="#82140F"><code>set</code></font>'
+commands are defined in the source file `<font color="#82140F"><code>set.cc</code></font>', and this command
+is defined in a subroutine called `<font color="#82140F"><code>set_colorCmd()</code></font>'.  But the author
+knows this -- how would you?  The answer is to look in the
+`<font color="#82140F"><samp>gri.cmd</samp></font>' file, for the `<font color="#82140F"><code>set color</code></font>' command.  (Search for the
+string `<font color="#82140F"><code>`set color </code></font>'.) Then read down to see the body of the
+command, enclosed in braces; you'll see
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+{
+    extern "C" bool set_colorCmd(void);
+}
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+which indicates that the subroutine name is `<font color="#82140F"><code>set_colorCmd()</code></font>'.
+<p>
+
+<li> Next we need to edit this subroutine to see what it is doing.
+There are several ways to find it (e.g. `<font color="#82140F"><code>grep</code></font>' through the source
+files), but the easiest is to use the "tags" feature of Emacs, by typing
+`<font color="#82140F"><kbd>M-. set_colorCmd</kbd></font>'.  This will bring you to the indicated
+subroutine.
+<p>
+
+<li> Have a look through this subroutine to see what it is doing.  It
+looks very much like many other Gri subroutines.  A check is done on the
+number of words provided to the command, in the 
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+	switch (_nword) {
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+line.  (That's line `<font color="#82140F"><samp>set.cc:484</samp></font>' at the moment -- but it may be
+different by the time you read this file, if I've changed it!)  We are
+calling it with 6 words (`<font color="#82140F"><code>set color hsb 1.000 1 1</code></font>'), so move down
+to the line
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+	case 6:
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+and you'll see that there is an `<font color="#82140F"><code>if</code></font>' statement seeing whether this
+word is `<font color="#82140F"><code>rgb</code></font>' or `<font color="#82140F"><code>hsv</code></font>'.  These statements are checking
+`<font color="#82140F"><code>_word[2]</code></font>', which is the third word of the command.  (In Gri, as in
+C, words start at zero.  Thus, for this command, `<font color="#82140F"><code>_word[0]</code></font>' is
+`<font color="#82140F"><code>set</code></font>', `<font color="#82140F"><code>_word[1]</code></font>' is `<font color="#82140F"><code>color</code></font>', and `<font color="#82140F"><code>_word[2]</code></font>' is
+expected to be either `<font color="#82140F"><code>rgb</code></font>' or `<font color="#82140F"><code>hsb</code></font>'.  We are having problems
+with the `<font color="#82140F"><code>hsb</code></font>' style, so we'll move down to that code.  The code
+that's being executed is as follows.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+} else if (!strcmp(_word[2], "hsb")) {
+        // `set color hsb .hue. .saturation. .brightness.'
+        double          hue, saturation, brightness;
+        Require(getdnum(_word[3], &amp;hue),
+                READ_WORD_ERROR(".hue."));
+        Require(getdnum(_word[4], &amp;saturation),
+                READ_WORD_ERROR(".saturation."));
+        Require(getdnum(_word[5], &amp;brightness), 
+                READ_WORD_ERROR(".brightness."));
+        // Clip if necessary
+        CHECK_HSB_RANGE(hue);
+        CHECK_HSB_RANGE(saturation);
+        CHECK_HSB_RANGE(brightness);
+        gr_hsv2rgb(hue, saturation, brightness,
+                &amp;red, &amp;green, &amp;blue);
+        PUT_VAR("..red..", red);
+        PUT_VAR("..green..", green);
+        PUT_VAR("..blue..", blue);
+        c.setHSV(hue, saturation, brightness);
+        _griState.set_color_line(c);
+        if (_griState.separate_text_color() == false)
+                _griState.set_color_text(c);
+        return true;
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+The `<font color="#82140F"><code>Require</code></font>' lines are ensuring that we could decode the values of
+the variables `<font color="#82140F"><code>hue</code></font>', etc, from the commandline.  Then we clip the
+range of these values.  Then we convert from `<font color="#82140F"><code>hsb</code></font>' color format to
+`<font color="#82140F"><code>rgb</code></font>' color format, save the values of the colors in Gri variables
+with `<font color="#82140F"><code>PUT_VAR</code></font>', and then set the color with `<font color="#82140F"><code>c.setHSV</code></font>'.
+Finally we save this color in the Gri "state" with
+`<font color="#82140F"><code>_griState.set_color_line(c)</code></font>'.
+<p>
+As it turns out, Gri outputs all colors to the PostScript file in RGB
+format, so the we may well suspect that the problem is in the
+`<font color="#82140F"><code>gr_hsv2rgb()</code></font>' line. 
+<p>
+
+<li> We have an idea where to look now, so let's go to the line just after 
+it, in the editor, and insert a "breakpoint" there by typing
+`<font color="#82140F"><kbd>C-x SPC</kbd></font>'.  Then move to the `<font color="#82140F"><code>gdb</code></font>' buffer and re-run Gri
+by typing 
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+run -directory . test.gri
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+to run Gri on our script.  Then, magic happens!  Gri stops at the
+indicated breakpoint, and Emacs will display both the `<font color="#82140F"><code>gdb</code></font>' buffer
+and the `<font color="#82140F"><code>set.cc</code></font>' buffer.  The latter has a margin indication
+telling what line were are on.  You may now type `<font color="#82140F"><code>gdb</code></font>' commands in
+the `<font color="#82140F"><code>gdb</code></font>' buffer.  In particular, type
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+p hue
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+to print the hue.  Then type
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+p red
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+to see the red value.  Then type
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+c
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+to continue running Gri.  It will pause again.  Check the hue and red
+values again, as above.  If you like, play around with hue value in the
+Gri script `<font color="#82140F"><samp>test.gri</samp></font>' and run gri again (type `<font color="#82140F"><code>r</code></font>' in
+`<font color="#82140F"><code>gdb</code></font>').  This seems to indicate that the conversion is working
+strangely.
+<p>
+
+<li> To see how the conversion is done, clear the breakpoints by typing
+`<font color="#82140F"><kbd>delete</kbd></font>' in the `<font color="#82140F"><code>gdb</code></font>' buffer, then insert a breakpoint
+<b>before</b> `<font color="#82140F"><code>gr_hsv2rgb</code></font>' is called.  Then, run Gri again (`<font color="#82140F"><kbd>r</kbd></font>'
+in the `<font color="#82140F"><code>gdb</code></font>' buffer).  When it stops just before this subroutine,
+type `<font color="#82140F"><kbd>s</kbd></font>' to "step into" the subroutine.  Then you'll see a
+conversion code from the (wonderful) textbook of Foley and Van Dam.
+You'll see
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+void
+gr_hsv2rgb(double h, double s, double v, 
+           double *r, double *g, double *b)
+{
+	h = 6.0 * pin0_1(h);
+	s = pin0_1(s);
+	v = pin0_1(v);
+	int i = (int) floor(h);
+	if (i &gt; 5)
+		i = 5; // Prevent problem if hue is exactly 1
+	double f = h - i;
+	double p = v * (1.0 - s);
+        ...
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+in the present version of Gri, but in the previous (buggy) version, the
+`<font color="#82140F"><code>if</code></font>' statement was missing.  Without this `<font color="#82140F"><code>if</code></font>' statement, Gri
+produced wrong colors.  With the statement, the colors are correct.
+</ol>
+And so ends the example.  You may wish to read the Foley and Van Dam
+textbook to see just what I'm doing in `<font color="#82140F"><code>gr_hsv2rgb</code></font>', but suffice it
+to say that the problem in the (older) version of Gri was that `<font color="#82140F"><code>i</code></font>'
+could take the value 6 if the hue was exactly equal to 1, and that was
+erroneous.
+<p>
+In reading the code, you may notice that it is formatted in a uniform
+way: the Kernighan and Ritchie scheme (from their classic C textbook),
+with 8-character indents.  I get this by putting the following lines
+in the `<font color="#82140F"><samp>~/.emacs</samp></font>' file, which is used to customize the Emacs editor:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+(defun my-c-mode-common-hook ()
+  (c-set-style "K&amp;R")
+  (setq c-basic-offset 8)
+  )
+(add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+If you submit patches, please use the same format as I've done, so
+that I can more easily see the changes you've made.
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+.\" ****************************
+.\" ******** module tbl ********
+.\" ****************************
+.\" Tbl support.
+.nr tbl*have-header 0
+.de TS
+.sp \\n[DD]u
+.if '\\$1'H' .di tbl*header-div
+..
+.de tbl@top-hook
+.if \\n[tbl*have-header] \{\
+.	ie \\n[.t]-\\n[tbl*header-ht]-1v .tbl*print-header
+.	el .sp \\n[.t]u
+.\}
+..
+.de tbl*print-header
+.ev nf
+.tbl*header-div
+.ev
+.mk #T
+..
+.de ds@need
+.if '\\n(.z'' \{\
+.	while \\n[.t]<=(\\$1)&(\\n[nl]>\\n[pg@header-bottom]) \{\
+.		rs
+'		sp \\n[.t]u
+.	\}
+.\}
+..
+.de TH
+.ie '\\n[.z]'tbl*header-div' \{\
+.	nr T. 0
+.	T#
+.	br
+.	di
+.	ie \\n[dn]+\\n[FM]+\\n[HM]+2v>=\\n[.p] \{\
+.		@error ridiculously long table header
+.		ds@need \\n[dn]
+.		tbl*print-header
+.	\}
+.	el \{\
+.		nr tbl*header-ht \\n[dn]
+.		ds@need \\n[dn]u+1v
+.		tbl*print-header
+.		nr tbl*have-header 1
+.	\}
+.\}
+.el .@error-recover .TH without .TS H
+..
+.de @div-end!tbl*header-div
+.TH
+.TE
+..
+.de TE
+.ie '\\n(.z'tbl*header-div' .@error-recover .TS H but no .TH before .TE
+.el \{\
+.	nr tbl*have-header 0
+.	sp \\n[DD]u
+.\}
+.\" reset tabs
+.TA
+..
+.de tbl@bottom-hook
+.if \\n[tbl*have-header] \{\
+.	nr T. 1
+.	T#
+.\}
+..
+.de T&
+..

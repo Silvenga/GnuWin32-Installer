@@ -1,0 +1,381 @@
+Hpcdtoppm User Manual(0)               Hpcdtoppm User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       hpcdtoppm - convert a Photo-CD image into a PBM image
+
+
+SYNOPSIS
+       hpcdtoppm  infile  [-a]  [{-C|-0|-Overview|-O} file opt]
+       [-c0] [-c-] [-c+] [-crop] [-d] [-dpi f]  [-eps]  [-epsd]
+       [-epsg]  [-fak  scale]  [-hori] [-i] [-l] [-m] [-n] [-pb
+       pos] [-pgm] [-ph height] [-pl pos] [-pos]  [-ppm]  [-ps]
+       [-psd]  [-psg]  [-pw  width] [-r] [-rep] [-S long short]
+       [-s]   [-vert]   [-x]   [-ycc]    [-1|-Base/16|-128x192]
+       [-2|-Base/4|-256x384]                [-3|-Base|-512x768]
+       [-4|-4Base|-1024x1536]           [-5|-16Base|-2048x3072]
+       [-6|-64Base|-4096x6144] [outfile]
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       This  program  accepts  Photo-CD  image or overview file
+       data from the specified input file, infile (or,  if  the
+       resolution is lower than 64Base and the file argument is
+       specified as -, from standard input), and writes  either
+       PBM  Format  or  PostScript to the specified output file
+       (or to standard output if no file is specified).
+
+       On a standard Photo-CD, image files appear in the direc-
+       tory  photo_cd/images,  in  files with names of the form
+       imgnnnn.pcd, where nnnn is a 4-digit-number.  The  over-
+       view file appears in photo_cd/overview.pcd.
+
+       Photo-CD  images are stored using as many as 6 different
+       resolutions:
+
+
+                 Format              Resolution
+                 ------              ----------
+                 64Base              4096x6144 (ProPhotoCD only)
+                 16Base              2048x3072
+                 4Base               1024x1536
+                 Base                512x768
+                 Base/4              256x384
+                 Base/16             128x192
+
+       The overview file employs Base/16 format.
+
+
+
+OPTIONS
+       Invoking hpcdtoppm without arguments produces a list  of
+       default  values.  Note that you can supply only one size
+       option.
+
+
+
+       -a     Automatically determine image  orientation  (this
+              option  is  experimental,  and  does not work for
+              overview files).
+
+
+       {-C | -0 | -Overview | -O } file opt
+              Extract all images from an  overview  file.   The
+              mandatory  file  argument  is  the  name of a PPM
+              file; output files are named filennnn, where nnnn
+              is   a   4-digit  number.   Overview  images  are
+              extracted in their original Base/16 format.   The
+              value  of  opt  determines the orientation of the
+              contact sheet image; recognized values are:
+
+
+
+       n      Do not rotate the image.
+
+
+       l      Rotate the  picture  counter-clockwise  (portrait
+              mode).
+
+
+       r      Rotate the picture clockwise (portrait mode).
+
+
+
+
+       -c0    Do not correct (brighten or darken) the image.
+
+
+       -c-    Darken the image.
+
+
+       -c+    Brighten the image.
+
+
+       -crop  Cut  off  the black frame which sometimes appears
+              at the image borders.
+
+
+       -d     Show only the decompressed difference rather than
+              the  complete image (applicable only to 4Base and
+              16Base images).
+
+
+       -dpi res
+              Set the printer resolution to  res  for  dithered
+              Postscript images.
+
+
+       -eps   Write  a RGB Encapsulated Postscript color image.
+
+
+       -epsd  Write a Floyd-Steinberg dithered image in  Encap-
+              sulated Postscript.
+
+
+       -epsg  Write  a  grayscale  image  in Encapsulated Post-
+              script.
+
+
+       -fak scale
+              Set the scaling factor  for  dithered  PostScript
+              images to scale.
+
+
+       -hori  Flip the image horizontally.
+
+
+       -i     Send  information  from  an  image file header to
+              Standard Error.
+
+
+       -l     Rotate the  picture  counter-clockwise  (portrait
+              mode).
+
+
+       -m     Write  messages  about  the phases of decoding to
+              standard error.
+
+
+       -n     Do not rotate the image.
+
+
+       -pb pos
+              Set the bottom position of the  Postscript  image
+              to pos.
+
+
+       -pgm   Write a pgm (grayscale) image.
+
+
+       -ph height
+              Set the height of the Postscript image to height.
+
+
+       -pl pos
+              Set the leftmost position of the Postscript image
+              to pos.
+
+
+       -pos   Print  the relative starting position of the data
+              for the current resolution.
+
+
+       -ppm   Write a ppm RGB (color) image.
+
+
+       -ps    Write a RGB Postscript color image.
+
+
+       -psd   Write a Floyd-Steinberg dithered image  in  Post-
+              script.
+
+
+       -psg   Write a Postscript grayscale image.
+
+
+       -pw width
+              Set the width of the Postscript image to width.
+
+
+       -r     Rotate the picture clockwise (portrait mode).
+
+
+       -rep   Try  to  jump  over reading errors in the Huffman
+              code.
+
+
+       -S long short
+              Cut out a subrectangle with boundaries defined by
+              the values:
+
+
+
+       long   For the longer side of the image.
+
+
+       short  For the shorter side of the image.
+
+
+
+              where long and short take one of two forms:
+
+
+
+       a-b    Cut from position a to position b.
+
+
+       a+b    Starting at offset a, cut a length of b.
+
+
+
+              and  where a and b are either integers represent-
+              ing pixel locations,  or  floating  point  values
+              over  the  range  [0.0 ... 1.0], representing the
+              fraction of the length of a side.
+
+
+       -s     Apply a simple sharpness operator to the luminos-
+              ity channel.
+
+
+       -vert  Flip the image vertically.
+
+
+       -x       Overskip  Mode  (applicable to Base/16, Base/4,
+              Base and 4Base).  In Photo-CD images the luminos-
+              ity channel is stored in full resolution, the two
+              chromaticity channels are stored in half  resolu-
+              tion  only and have to be interpolated.  In Over-
+              skip Mode, the chromaticity channels of the  next
+              higher  resolution  are taken instead of interpo-
+              lating.  To see the difference, generate one  PPM
+              with  and  one  PPM  without  this  option.   Use
+              pamarith(1)togeneratethedifferenceimage of  these
+              two  images.  Call ppmhist(1) for this difference
+              or show it with xv (push the HistEq button in the
+              color editor).
+
+
+       -ycc   Write  the  image in a variation on PPM format in
+              which the samples are YCC instead of RGB.
+
+
+       -1|-Base/16|-128x192
+              Extract the Base/16 image.
+
+
+       -2|-Base/4|-256x384
+              Extract the Base/4 image.
+
+
+       -3|-Base|-512x768
+              Extract the Base image.
+
+
+       -4|-4Base|-1024x1536
+              Extract the 4Base image.
+
+
+       -5|-16Base|-2048x3072
+              Extract the 16Base image.
+
+
+       -6|-64Base|-4096x6144
+              Extract the 64Base image.  This resolution can be
+              extracted  from ProPhotoCD images only.  The path
+              of the 64Base extension files is derived from the
+              path  to  the  image  file.  This  means  that it
+              doesn't work on stdin an the directory  structure
+              must be the very same as on the ProPhotoCD.
+
+
+
+
+Postcript Output
+       For  Postscript  output (options -ps, -eps, -psg, -epsg,
+       -psd, -epsg) you can  define  both  the  resolution  and
+       placement  of  the  image.   Both  size and position are
+       specified in points (1/72 inch).
+
+       The position of the image (where the origin  is  assumed
+       to  be  at  the  lower  left corner of the page) is con-
+       trolled by the -pl and -pb options  (applicable  at  all
+       resolutions).
+
+       The  size  of color and grayscale images is changed with
+       the -pw and -ph options.  Every image  pixel  is  mapped
+       onto one Postscript pixel.
+
+       There  are  three  modes  of  control for dithered Post-
+       script:
+
+
+
+       Image size
+               (-pw and -ph)
+
+
+       Printer resolution
+              (-dpi)
+
+
+       Scaling factor
+              (-fak)
+
+
+
+       These three factors are interdependent,  hence  no  more
+       then  two  can  be specified simultaneously.  Using -dpi
+       and the -pw/-ph options together often  yields  pleasing
+       results.   Even  using  the  default  values  for  these
+       options  will  produce  results  differing  from   those
+       obtained without use of the options.
+
+
+Limitations
+       The program ignores read protection.
+
+       The -i option is not working correctly.
+
+       Available  information  obout  the  Photo-CD  format  is
+       vague; this program  was  developed  by  trial-and-error
+       after  staring  at  hex-dumps.  Please send bugs reports
+       and patches to the author.
+
+
+
+SEE ALSO
+       pcdovtoppm(1),    pamarith(1),    ppm(1),    ppmhist(1),
+       pnmquant(1), ppmtopgm(1), ppmtorgb3(1), xv
+
+
+
+VERSION
+       The  name  hpcdtoppm  stands for 'Hadmut's pcdtoppm,' to
+       make it distinguishable in the event that  someone  else
+       is  building  a  similar  application and naming it pcd-
+       toppm.
+
+       This is version 0.6.
+
+
+
+AUTHOR
+       Copyright  (c)  1992,  1993,  1994  by  Hadmut   Danisch
+       (danisch@ira.uka.de).
+
+       Hadmut  Danish  has  given permission to Bryan Henderson
+       (August 2003) to distribute this documentation  as  part
+       of  Netpbm  on Sourceforge and therefore to license this
+       copy of this documentation to the public with  the  fol-
+       lowing  Sourceforge-compatible  license.  Note that this
+       license does not contain a restriction on one's right to
+       sell  the material, as does the hpcdtoppm program itself
+       and other copies of this documentation.
+
+       This software is not public domain.  Permission  to  use
+       and  distribute  this software and its documentation for
+       noncommercial use and without  fee  is  hereby  granted,
+       provided  that  the above copyright notice appear in all
+       copies and that both that copyright notice and this per-
+       mission notice appear in supporting documentation.
+
+       The  hpcdtoppm  software itself (as opposed to this sup-
+       porting documentation) is licensed by  Danisch  under  a
+       similar license, but with an additional restriction that
+       a recipient may not sell  the  software  or  use  it  in
+       profit-making activity.  See the source code of the pro-
+       gram for details on its license.
+
+        Manual page extensively modified by R.  P.  C.  Rodgers
+       (rodgers@nlm.nih.gov).
+
+
+
+netpbm documentation     7 August 2003 Hpcdtoppm User Manual(0)

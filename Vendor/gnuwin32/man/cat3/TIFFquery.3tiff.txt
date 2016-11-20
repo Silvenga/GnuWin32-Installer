@@ -1,0 +1,93 @@
+QUERY(3TIFF)                                       QUERY(3TIFF)
+
+
+
+
+
+NAME
+       TIFFCurrentRow,    TIFFCurrentStrip,    TIFFCurrentTile,
+       TIFFCurrentDirectory,   TIFFLastDirectory,   TIFFFileno,
+       TIFFFileName,    TIFFGetMode,    TIFFIsTiled,    TIFFIs-
+       ByteSwapped, TIFFIsUpSampled, TIFFIsMSB2LSB, TIFFGetVer-
+       sion - query routines
+
+SYNOPSIS
+       #include <tiffio.h>
+
+       uint32 TIFFCurrentRow(TIFF* tif)
+       tstrip_t TIFFCurrentStrip(TIFF* tif)
+       ttile_t TIFFCurrentTile(TIFF* tif)
+       tdir_t TIFFCurrentDirectory(TIFF* tif)
+       int TIFFLastDirectory(TIFF* tif)
+       int TIFFFileno(TIFF* tif)
+       char* TIFFFileName(TIFF* tif)
+       int TIFFGetMode(TIFF* tif)
+       int TIFFIsTiled(TIFF* tif)
+       int TIFFIsByteSwapped(TIFF* tif)
+       int TIFFIsUpSampled(TIFF* tif)
+       int TIFFIsMSB2LSB(TIFF* tif)
+       const char* TIFFGetVersion(void)
+
+DESCRIPTION
+       The  following  routines return status information about
+       an open TIFF file.
+
+       TIFFCurrentDirectory returns the index  of  the  current
+       directory (directories are numbered starting at 0). This
+       number is suitable for  use  with  the  TIFFSetDirectory
+       routine.
+
+       TIFFLastDirectory  returns  a non-zero value if the cur-
+       rent directory is the last directory in the file; other-
+       wise zero is returned.
+
+       TIFFCurrentRow,  TIFFCurrentStrip,  and TIFFCurrentTile,
+       return the current row, strip, and  tile,  respectively,
+       that  is being read or written. These values are updated
+       each time a read or write is done.
+
+       TIFFFileno returns the underlying file  descriptor  used
+       to access the TIFF image in the filesystem.
+
+       TIFFFileName  returns  the  pathname  argument passed to
+       TIFFOpen or TIFFFdOpen.
+
+       TIFFGetMode returns the mode with which  the  underlying
+       file  was  opened.  On  UNIX  systems, this is the value
+       passed to the open(2) system call.
+
+       TIFFIsTiled returns a non-zero value if the  image  data
+       has  a tiled organization. Zero is returned if the image
+       data is organized in strips.
+
+       TIFFIsByteSwapped returns a non-zero value if the  image
+       data  was  in  a  different  byte-order  than  the  host
+       machine. Zero is returned if the  TIFF  file  and  local
+       host  byte-orders  are  the  same.   Note that TIFFRead-
+       Tile(), TIFFReadStrip() and TIFFReadScanline() functions
+       already  normally  perform  byte  swapping to local host
+       order if needed.
+
+       TIFFIsUpSampled returns a non-zero value if  image  data
+       returned  through  the  read interface routines is being
+       up-sampled. This can be useful to applications that want
+       to  calculate  I/O  buffer  sizes  to reflect this usage
+       (though the usual strip and tile size  routines  already
+       do this).
+
+       TIFFIsMSB2LSB returns a non-zero value if the image data
+       is being returned with bit 0  as  the  most  significant
+       bit.
+
+       TIFFGetVersion  returns  an ASCII string that has a ver-
+       sion stamp for the TIFF library software.
+
+DIAGNOSTICS
+       None.
+
+SEE ALSO
+       libtiff(3TIFF), TIFFOpen(3TIFF), TIFFFdOpen(3TIFF)
+
+
+
+libtiff                 October 29, 2004           QUERY(3TIFF)

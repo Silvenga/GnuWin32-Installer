@@ -1,0 +1,504 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: `open' command</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile Open.html "Gri: `open' command" "Gri Commands" --> 
+
+<!-- @node   Open, Opening Simple Files, New Postscript File, List Of Gri Commands -->
+<a name="Open" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="ListOfGriCommands.html#ListOfGriCommands" shape="rect" coords="516,2,532,24" href="ListOfGriCommands.html#ListOfGriCommands">
+<area alt="Gri: `newpage' command" shape="rect" coords="557,2,573,24" href="Newpage.html">
+<area alt="Gri: `postscript' command" shape="rect" coords="581,2,599,24" href="PostScript.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: `postscript' command" shape="rect" coords="581,2,599,24" href="PostScript.html">
+</map>
+<h3>9.3.28: `<font color="#82140F"><code>open</code></font>'</h3>
+
+<!-- latex: \index{open} -->
+There are two styles of `<font color="#82140F"><code>open</code></font>' command.  In the first style, a
+simple file is to be opened.  In the second style a unix-like "pipe" is
+opened, i.e. Gri will read the output of a system command instead of a
+file.
+<UL>
+<LI><a href="Open.html#OpeningSimpleFiles">Opening Simple Files</a>: 
+<LI><a href="Open.html#OpeningPipes">Opening Pipes</a>: 
+<LI><a href="Open.html#OpeningURLs">Opening URLs</a>: 
+</UL>
+<p>
+
+<!-- @node   Opening Simple Files, Ascii Files, Open, Open -->
+<a name="OpeningSimpleFiles" ></a>
+<h4>9.3.28.1: Opening simple files</h4>
+
+
+<UL>
+<LI><a href="Open.html#AsciiFiles">Ascii Files</a>: 
+<LI><a href="Open.html#BinaryFiles">Binary Files</a>: 
+<LI><a href="Open.html#NetCDFFiles">NetCDF Files</a>: 
+</UL>
+
+<!-- @node   Ascii Files, Binary Files, Opening Simple Files, Opening Simple Files -->
+<a name="AsciiFiles" ></a>
+<b>Ascii Files</b>
+Most applications involve ascii files, and these are very easy to handle
+in Gri.  For example given a data file named `<font color="#82140F"><samp>foo.dat</samp></font>', just use
+the command
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open foo.dat
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+and then you can read the data using various commands.  Thus a complete
+program might be
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open foo.dat
+read columns x y
+draw curve
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+If a filename contains blanks or punctuation symbols, you must put it in
+double quotes (`<font color="#82140F"><code>"</code></font>'), e.g.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "foo bar.dat"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Indeed, Gri accepts double-quotes on any `<font color="#82140F"><code>open</code></font>' command and some
+folks use it on all commands, as a matter of habit.
+<p>
+Gri can handle compressed files appropriately, e.g.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open foo.data.gz
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+so that there is no need to uncompress data for use with Gri.
+<p>
+
+Gri is quite persistant in looking for your file, and if a given file is
+not found, it will then check to see if a compressed version is
+available, and use that instead.  Thus
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open foo.dat
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+will look for a file named `<font color="#82140F"><samp>foo.dat.gz</samp></font>' if `<font color="#82140F"><samp>foo.dat</samp></font>' is not
+available.  (Only files compressed with the GNU `<font color="#82140F"><code>gzip</code></font>' utility are
+handled.)
+<p>
+If the `<font color="#82140F"><code>open</code></font>' command was successful in opening the file, it will
+set the value of the synonym `<font color="#82140F"><code>\.return_value.</code></font>' to the <b>full</b>
+pathname of the file.  Thus, if `<font color="#82140F"><code>open a.dat</code></font>' is done in directory
+`<font color="#82140F"><code>/home/gri</code></font>', then `<font color="#82140F"><code>\.return_value.</code></font>' will equal
+the string `<font color="#82140F"><code>/home/gri/a.dat</code></font>'.
+<p>
+
+<!-- @node   Binary Files, NetCDF Files, Ascii Files, Opening Simple Files -->
+<a name="BinaryFiles" ></a>
+
+<b>Binary Files</b>
+Like most computer programs, Gri has some trouble with binary files.
+One big issue is the so-called "endian" character of the computer.  Some
+computers store multi-byte values with the most significant bytes first,
+while others store them with the most significant bytes last.  The
+problem is that nothing is stored in data files to indicate which
+convention was employed.  For this reason, a version of Gri compiled on
+a so-called "big-endian" computer will misinterpret multi-byte values
+that were created on a so-called "little-endian" computer.  Many folks
+in the scientific community have converted to using the NetCDF format
+(see next section) for precisely this reason, since this format is
+independent of the endian character of the computer.
+<p>
+Presuming an appropriate endian character, however, reading is
+straightforward.  A command of the form
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open foo.dat binary
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+tells Gri that the data are stored in a binary format.  With the above
+syntax, Gri expects images to be in `<font color="#82140F"><code>unsigned char</code></font>' (8 bits), while
+other data, such as columns and grids, are expected to be in 32-bit
+format (suitable for reading into a so-called "float" variable in the C
+programming language).
+<p>
+You may also specify the format directly, as in the following examples;
+Gri then interprets all data as being in the indicated format and then
+converts to the internal format before using the data.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open \filename binary uchar
+open \filename binary 8bit
+open \filename binary int
+open \filename binary float
+open \filename binary double
+open \filename binary 16bit
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+As with ascii files, Gri will automatically uncompress any files that
+are compressed, and if it fails to find a given filename, it will try to
+open a compressed version of it (i.e. one with a `<font color="#82140F"><samp>.gz</samp></font>' suffix).
+<p>
+
+<!-- @node   NetCDF Files, Opening Pipes, Binary Files, Opening Simple Files -->
+<a name="NetCDFFiles" ></a>
+<b>NetCDF Files</b>
+The NetCDF format provides the best of both worlds.  It is binary, so
+that data are relatively compact, and may be read very quickly.
+(Reading ascii data is time-consuming in C++, the language in which Gri
+is written.)  But it does not suffer the endian problem problem of
+normal binary files (see previous section), since information about the
+endian character is stored in the file itself, and Gri uses this
+information to decode the data without difficulty, regardless of the
+endian characteristics of the computer on which Gri is running and of
+the computer that created the data.
+<p>
+For more information on netCDF format, see
+<p>
+`<font color="#82140F"><code>http://www.unidata.ucar.edu/packages/netcdf/index.html</code></font>'
+<a href="http://www.unidata.ucar.edu/packages/netcdf/index.html"> 
+here </a>. 
+<p>
+The syntax of opening NetCDF files is as below
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open foo.nc netCDF
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+and the syntax for reading such files is described in sections on the
+various `<font color="82140F"><code>read</code></font>' commands (see e.g. see <a href="Read.html#ReadColumns">Read Columns</a>).
+<p>
+
+
+<!-- @node   Opening Pipes, Opening URLs, NetCDF Files, Open -->
+<a name="OpeningPipes" ></a>
+<h4>9.3.28.2: Opening pipes</h4>
+
+
+Sometimes it makes sense to get Gri to work with the results of another
+command in the OS.  Gri handles this by creating a so-called "pipe",
+thus reading the output from the other command.  (Readers familiar with
+the unix OS will know what pipes are all about, and especially why they
+are a good thing.  Other readers might wish to skip this section.)
+<p>
+Suppose we wish to plot an x-y plot using just the first few lines of a
+datafile named `<font color="#82140F"><samp>foo.dat</samp></font>'.  Unix users will know that a good way to
+see the first few lines of such a file would be to type the command
+`<font color="#82140F"><code>head foo.dat</code></font>'.  They also know that these lines could be provided
+to a second unix command, named `<font color="#82140F"><samp>do_foo</samp></font>' say, by the command
+`<font color="#82140F"><code>head foo.dat | do_foo</code></font>'.  This uses a so-called "pipe", designated
+by the vertical line (called a pipe symbol below).
+<p>
+Gri can read the output from system commands by using a syntax in which
+the (quoted) system command ends in a pipe symbol, e.g.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "head foo.dat |"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+as in the example above.
+<p>
+<b>Aside</b>: When pipe-open commands are used, Gri creates a temporary
+file (often located in `<font color="#82140F"><samp>/usr/tmp</samp></font>', but that varies with machine).
+This is automatically cleaned up when Gri completes executation, but if
+Gri dies (or is interrupted) before it finishes, you'll be left with an
+extra file in this temporary-storage directory.  It's up to you to clean
+that directory up from time to time.
+<p>
+Some common examples of pipe-open commands are given below.
+<p>
+<ol>
+<p>
+<li>
+<b>Comma-separated values</b> are common in files created by, or
+intended for, spreadsheets.  Since Gri expects data elements to be
+separated by blanks (or tabs), you'll have to convert the commas into
+blanks.  There are many ways to do that using pipes, e.g.
+`<font color="#82140F"><samp>sed</samp></font>' system utility, e.g.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "sed -e 's/,/ /g' foo.dat |"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Other unix facilities, such as `<font color="#82140F"><code>tr</code></font>' will also work, of course.  If
+the file has headers, you'll want to remove them also.  This can be done
+with the `<font color="82140F"><code>skip</code></font>' command (see <a href="Skip.html#Skip">Skip</a>) but you could also do it at
+the open stage, e.g. to remove the first two lines, use
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "sed -e 's/,/ /g' foo.dat | tail +2 |"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+<b>Manipulating column data</b> is done by e.g.
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "cat foo.dat | awk '{$1, $2 * 22}' |"
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+where `<font color="#82140F"><samp>awk</samp></font>' has been used to multiply the second column in the file
+named `<font color="#82140F"><samp>foo.dat</samp></font>' by 22.
+<p>
+
+<li>
+<b>Time-based and geographical data</b> are sometimes encountered.  For
+an example, suppose that longitude/latitude (i.e. x/y) data are stored
+in Hour.minutesecond format, e.g. 12.2133 means hour 12, minute 21,
+second 33.  Gri doesn't read HMS format, but gawk can be told to:
+<p>
+
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "cat datafile.HMS |        \
+    awk '{                      \
+    split($1, hms, \".\");      \
+    h = hms[1];                 \
+    m = int(hms[2] / 100);      \
+    s = hms[2] - 100 * m;       \
+    x = h + m / 60 + s / 3600;  \
+    split($2, hms, \".\");      \
+    h = hms[1];                 \
+    m = int(hms[2] / 100);      \
+    s = hms[2] - 100 * m;       \
+    y = h + m / 60 + s / 3600;  \
+    print(x,y)                  \
+    }' | "
+    read columns x y
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+<b>Timeseries data</b> are often stored in formats that blend letters
+and numbers.  For one thing, using letters (e.g. `<font color="#82140F"><code>aug</code></font>') removes an
+ambiguity in numerically-based data.  (Example: 02/03/2000 means one
+thing to an American and another thing in the rest of the world.
+However, everybody agrees on what 2000-Feb-03 means.)  Suppose, for
+example, that we have data in a format such as
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+Tue_Jul_25_11:07:51 0.62
+Tue_Jul_25_11:22:51 0.59
+Tue_Jul_25_11:37:51 0.56    
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+(stored in a file called `<font color="#82140F"><samp>foo.dat</samp></font>' say) and we want a graph of the
+y-variable (0.62, 0.59, 0.56) versus x-variable, time expressed say as
+seconds in the day.  Then here is how that could be done:
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "cat foo.dat |\
+    sed -e 's/_/ /g' -e 's/:/ /g' |\
+    awk '{print ($4*3600+$5*60+$6, $7)}' |"
+read columns x y
+draw curve
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+Note that the actual day information is skipped in this example;
+seasoned `<font color="#82140F"><code>awk</code></font>' users could easily fill in the code to handle
+datasets spanning several days.
+</ol>
+<p>
+<!-- @node   Opening URLs, Postscript, Opening Pipes, Open -->
+<a name="OpeningURLs" ></a>
+<h4>9.3.28.3: Opening URLs</h4>
+
+
+Gri can open a URL, <em>if</em> you have the `<font color="#82140F"><code>wget</code></font>' program on your
+machine.  (`<font color="#82140F"><code>wget</code></font>' is available from the GNU website
+<a href="http://www.gnu.org/software/wget/">`<font color="#82140F"><code>http://www.gnu.org/software/wget/</code></font>'</a>.)
+<p>
+The URL must be enclosed in quotes (since otherwise, 
+Gri will interpret the `<font color="#82140F"><code>//</code></font>' sequence as indicating an old way
+of denoting comments).  For example,
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+open "http://gri.sourceforge.net/gridoc/examples/example1.dat"
+read columns x y
+show columns
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+If you don't have `<font color="#82140F"><code>wget</code></font>' installed on your machine, the above won't
+work, but you can always use another fetching program, with a system
+call, as in the following:
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+\url = "http://gri.sourceforge.net/gridoc/html/examples/example1.dat"
+open "lynx -dump \url |"
+read columns x y
+draw curve
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+
+
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+# Style sheet for Matlab
+# Copyright (c) 2002, Joakim Lübeck
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+style "Matlab" is
+written by "Joakim Lübeck <joa@maths.lth.se>"
+version is 0.93
+requires a2ps 4.13
+
+documentation is
+   "This style highlights function definitions and a limited"
+   "number of keywords, mostly control constructs, and is"
+   "therefore usable for many Matlab versions. Special care" 
+   "have been taken to distinguish string delimiters from the" 
+   "transpose operator (which is the same symbol) and to"
+   "recognize comments."
+end documentation
+
+first alphabet is
+   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+second alphabet is
+   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_0123456789"
+case sensitive
+
+keywords in Label_strong are
+   dbclear, dbcont, dbdown, dbmex, dbquit, dbstack, dbstatus,
+   dbstep, dbstop, dbtype, dbup
+end keywords
+
+keywords in Keyword_strong are
+   break, builtin, "case", catch, else, elseif, "end", error,
+   eval, evalc, evalin, feval, for, global, if, otherwise,
+   persistent, return, switch, try, warning, while
+end keywords
+
+sequences are
+   "%" Comment,
+   ' Plain String ' Plain
+      exceptions are
+         ''
+      end exceptions
+end sequences
+
+operators are
+   # Transpose
+   /[A-z0-9_]*[]A-Za-z0-9_.)}']'/,
+
+   ... \ldots,
+
+   # function without output arguments
+   (/(function)/
+      /([ \t]+)/
+      /([a-zA-z][a-zA-Z0-9_]*)/
+      \1 Keyword_strong, \2 Plain, \3 Label_strong),
+
+   # function with output arguments
+   (/(function)/
+      /([ \t]+[^=]+=[ \t]*)/
+      /([a-zA-z][a-zA-Z0-9_]*)/
+      \1 Keyword_strong, \2 Plain, \3 Label_strong)
+end operators
+
+optional keywords in Plain are
+   Inf \infty,
+   inf \infty,
+   pi  \pi
+end keywords
+
+optional operators are
+   ~   \not,
+   |   \vee,
+   &   \wedge,
+   ~=  \neq,
+   <=  \leq,
+   >=  \geq,
+   ==  \equiv
+end operators
+
+
+end style

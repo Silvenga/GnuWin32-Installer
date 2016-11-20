@@ -1,0 +1,241 @@
+#!/usr/bin/perl -w
+
+##############################################################################
+#                         pnmquant 
+##############################################################################
+#  By Bryan Henderson, San Jose CA; December 2001.
+#
+#  Contributed to the public domain by its author.
+##############################################################################
+
+use strict;
+use English;
+use Getopt::Long;
+#use File::Temp "tempfile";  # not available before Perl 5.8.1
+use File::Spec;
+use Fcntl ":seek";
+use Fcntl;  # gets open flags
+
+my ($TRUE, $FALSE) = (1,0);
+
+
+sub tempFile($) {
+
+# Here's what we'd do if we could expect Perl 5.6.1 or later, instead
+# of calling this subroutine:
+#    my ($file, $filename) = tempfile("pnmquant_XXXX", 
+#                                     SUFFIX=>".pnm", 
+#                                     DIR=>File::Spec->tmpdir())
+#                                     UNLINK=>$TRUE);
+    my ($suffix) = @_;
+    my $fileName;
+    local *file;  # For some inexplicable reason, must be local, not my
+    my $i;
+    $i = 0;
+    do {
+        $fileName = File::Spec->tmpdir() . "/pnmquant_" . $i++ . $suffix;
+    } until sysopen(*file, $fileName, O_RDWR|O_CREAT|O_EXCL);
+
+    return(*file, $fileName);
+}
+
+
+
+sub parseCommandLine(@) {
+
+    local @ARGV = @_;  # GetOptions takes input from @ARGV only
+
+    my %cmdline;
+
+    my $validOptions = GetOptions(\%cmdline,
+                                  "center",
+                                  "meancolor",
+                                  "meanpixel",
+                                  "spreadbrightness",
+                                  "spreadluminosity",
+                                  "floyd|fs!",
+                                  "quiet",
+                                  "plain");
+
+    if (!$validOptions) {
+        print(STDERR "Invalid option syntax.\n");
+        exit(1);
+    }
+    if (@ARGV > 2) {
+        print(STDERR "This program takes at most 2 arguments.  You specified ",
+              scalar(@ARGV), "\n");
+        exit(1);
+    } 
+    if (@ARGV < 1) {
+        print(STDERR 
+              "You must specify the number of colors as an argument.\n");
+        exit(1);
+    }
+    my $infile;
+    $cmdline{ncolors} = $ARGV[0];
+    
+    if (!($cmdline{ncolors} =~ m{ ^[[:digit:]]+$ }x ) || 
+        $cmdline{ncolors} == 0) {
+        print(STDERR 
+              "Number of colors argument '$cmdline{ncolors}' " .
+              "is not a positive integer.\n");
+        exit(1);
+    }
+
+    if (@ARGV > 1) {
+        $cmdline{infile} = $ARGV[1];
+    } else {
+        $cmdline{infile} = "-";
+    }
+
+    return(\%cmdline);
+}
+
+
+
+sub openSeekableAsStdin($) {
+    my ($infile) = @_;
+
+    # Open the input file $infile and connect it to Standard Input
+    # (assuming Standard Input is now open as the Perl file handle STDIN).
+    # If $infile is "-", that means just leave Standard Input alone.  But if
+    # Standard Input is not seekable, copy it to a temporary regular
+    # file and return a file handle for that.  I.e. the file handle we
+    # return is guaranteed to be seekable.
+
+    # Note: this all works only because STDIN is already set up on file
+    # descriptor 0.  Otherwise, open(STDIN, ...) would just create a brand
+    # new file handle named STDIN on some arbitrary file descriptor.
+    
+    if ($infile eq "-") {
+        my $seekWorked = seek(STDIN, 0, SEEK_SET);
+        if ($seekWorked) {
+            # STDIN is already as we need it.
+        } else {
+            # It isn't seekable, so we must copy it to a temporary regular file
+            # and return that as the input file.
+            
+            my ($inFh, $inFilename) = tempFile(".pnm");
+            if (!defined($inFh)) {
+                die("Unable to create temporary file.  Errno=$ERRNO\n");
+            }
+            unlink($inFilename) or
+                die("Unable to unlink temporary file.  Errno=$ERRNO\n");
+
+            while (<STDIN>) {
+                print($inFh $_);
+            }
+            seek($inFh, 0, SEEK_SET) 
+                or die("Seek of temporary input file failed!  " .
+                       "Errno = $ERRNO");
+            *INFH = *$inFh;  # Because open() rejects '<&$inFh' 
+            open(STDIN, "<&INFH");
+            tell(INFH);  # Avoids bogus "INFH is not referenced" warning
+        }
+    } else {
+        open(STDIN, "<", $infile) 
+            or die("Unable to open input file '$infile'.  Errno=$ERRNO");
+    }
+}
+
+
+
+sub makeColormap($$$$) {
+
+    my ($ncolors, $opt_meanpixel, $opt_meancolor, $opt_spreadluminosity) = @_;
+
+    # Make a colormap of $ncolors colors from the image on Standard Input.
+    # Put it in a temporary file and return its name.
+
+    my ($mapfileFh, $mapfileSpec) = tempFile(".pnm");
+
+    if (!defined($mapfileFh)) {
+        print(STDERR "Unable to create temporary file for colormap.  " .
+              "errno = $ERRNO\n");
+        exit(1);
+    }
+
+    my $averageOpt;
+    if (defined($opt_meanpixel)) {
+        $averageOpt = "-meanpixel";
+    } elsif (defined($opt_meancolor)) {
+        $averageOpt = "-meancolor";
+    } else {
+        $averageOpt = "-center";
+    }
+
+    my $spreadOpt;
+    if (defined($opt_spreadluminosity)) {
+        $spreadOpt = "-spreadluminosity";
+    } else {
+        $spreadOpt = "-spreadbrightness";
+    }
+
+    open(STDOUT, ">", $mapfileSpec);
+
+    my $maprc = system("pnmcolormap", $ncolors, $averageOpt, $spreadOpt);
+
+    if ($maprc != 0) {
+        print(STDERR "pnmcolormap failed, rc=$maprc\n");
+        exit(1);
+    } 
+    return $mapfileSpec;
+}
+
+
+
+sub remap($$$) {
+
+    my ($mapfileSpec, $opt_floyd, $opt_plain) = @_;
+
+    # Remap the image on Standard Input to Standard Output, using the colors
+    # from the colormap file named $mapfileSpec.
+
+    my @options;
+    @options = ();  # initial value
+
+    if ($opt_floyd) {
+        push(@options, "-floyd");
+    }
+    if ($opt_plain) {
+        push(@options, "-plain");
+    }
+    my $remaprc = system("pnmremap", "-mapfile=$mapfileSpec", @options);
+    
+    if ($remaprc != 0) {
+        print(STDERR "pnmremap failed, rc=$remaprc\n");
+        exit(1);
+    }
+}
+
+
+
+##############################################################################
+#                              MAIN PROGRAM
+##############################################################################
+
+my $cmdlineR = parseCommandLine(@ARGV);
+
+openSeekableAsStdin($cmdlineR->{infile}); 
+
+# Save Standard Output for our eventual output
+open(OLDOUT, ">&STDOUT");
+select(OLDOUT);  # avoids Perl bug where it says we never use STDOUT 
+
+
+my $mapfileSpec = makeColormap($cmdlineR->{ncolors}, 
+                               $cmdlineR->{meanpixel}, 
+                               $cmdlineR->{meancolor}, 
+                               $cmdlineR->{spreadluminosity});
+
+seek(STDIN, 0, SEEK_SET) 
+    or die("seek back to zero on input file failed.\n");
+
+
+open(STDOUT, ">&OLDOUT");
+
+remap($mapfileSpec, $cmdlineR->{floyd}, $cmdlineR->{plain});
+
+unlink($mapfileSpec) or
+    die("Unable to unlink map file.  Errno=$ERRNO");
+

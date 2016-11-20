@@ -1,0 +1,273 @@
+# Style sheet for mailfolder
+# Copyright (c) 1988, 89, 90, 91, 92, 93 Miguel Santana
+# Copyright (c) 1995, 96, 97, 98 Akim Demaille, Miguel Santana
+# $Id: mail.ssh,v 1.1.1.1.2.2 2007/12/29 01:58:30 mhatta Exp $
+#
+
+#
+# This file is part of a2ps.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+## 1.13 Jonathan Flynn
+# Added GMT date qualifier.
+## 1.12 Akim Demaille
+# Cleaned up some of the Strong_comment in order to have a better
+# support of --strip-level=1
+## 1.11 Akim Demaille
+# Handle `From: "Foo Bar" <my@email>'
+## 1.10 Akim Demaille
+# Aligned to 4.9.10 (order of sequences)
+## 1.9 Akim Demaille
+# Added Resent-*, and Precedence.
+## 1.8 Akim Demaille
+# Improved the author's tag
+
+style "Mail Folder" is
+
+written by "Akim Demaille <akim@freefriends.org>"
+version is 1.14
+requires a2ps version 4.12a
+
+documentation is
+  "To use from elm and others, it is better to specify samp(-g -Email)samp,"
+  "since the file sent to printer is no longer truly a mail folder."
+  "This style also suits to news.  samp(--strip)samp options are also useful"
+  "(they strip \"useless\" headers)."
+  ""
+  "Whenever the changes of encoding are clear, a2ps sets itself the"
+  "encoding for the parts concerned."
+  ""
+  "Tag 1 is the subject, and Tag 2 the author of the mail/news."
+  ""
+  "Note: This style sheet is _very_ difficult to write.  Please don't"
+  "report behavior you don't like.  Just send me improvements,"
+  "or write a Bison parser for mails."
+end documentation
+
+alphabets are
+   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz:_-"
+case sensitive
+
+# main () {
+#   int i;
+#   for (i = 160 ; i < 256 ; i++) {
+#     if (!((i - 160) % 5))
+#       printf ("\n  ");
+#     printf (" =%X \"\\x%x\", ", i, i);
+#   }
+#   putchar ('\n');
+# }
+optional operators are
+   =A0 "\xa0",  =A1 "\xa1",  =A2 "\xa2",  =A3 "\xa3",  =A4 "\xa4",
+   =A5 "\xa5",  =A6 "\xa6",  =A7 "\xa7",  =A8 "\xa8",  =A9 "\xa9",
+   =AA "\xaa",  =AB "\xab",  =AC "\xac",  =AD "\xad",  =AE "\xae",
+   =AF "\xaf",  =B0 "\xb0",  =B1 "\xb1",  =B2 "\xb2",  =B3 "\xb3",
+   =B4 "\xb4",  =B5 "\xb5",  =B6 "\xb6",  =B7 "\xb7",  =B8 "\xb8",
+   =B9 "\xb9",  =BA "\xba",  =BB "\xbb",  =BC "\xbc",  =BD "\xbd",
+   =BE "\xbe",  =BF "\xbf",  =C0 "\xc0",  =C1 "\xc1",  =C2 "\xc2",
+   =C3 "\xc3",  =C4 "\xc4",  =C5 "\xc5",  =C6 "\xc6",  =C7 "\xc7",
+   =C8 "\xc8",  =C9 "\xc9",  =CA "\xca",  =CB "\xcb",  =CC "\xcc",
+   =CD "\xcd",  =CE "\xce",  =CF "\xcf",  =D0 "\xd0",  =D1 "\xd1",
+   =D2 "\xd2",  =D3 "\xd3",  =D4 "\xd4",  =D5 "\xd5",  =D6 "\xd6",
+   =D7 "\xd7",  =D8 "\xd8",  =D9 "\xd9",  =DA "\xda",  =DB "\xdb",
+   =DC "\xdc",  =DD "\xdd",  =DE "\xde",  =DF "\xdf",  =E0 "\xe0",
+   =E1 "\xe1",  =E2 "\xe2",  =E3 "\xe3",  =E4 "\xe4",  =E5 "\xe5",
+   =E6 "\xe6",  =E7 "\xe7",  =E8 "\xe8",  =E9 "\xe9",  =EA "\xea",
+   =EB "\xeb",  =EC "\xec",  =ED "\xed",  =EE "\xee",  =EF "\xef",
+   =F0 "\xf0",  =F1 "\xf1",  =F2 "\xf2",  =F3 "\xf3",  =F4 "\xf4",
+   =F5 "\xf5",  =F6 "\xf6",  =F7 "\xf7",  =F8 "\xf8",  =F9 "\xf9",
+   =FA "\xfa",  =FB "\xfb",  =FC "\xfc",  =FD "\xfd",  =FE "\xfe",
+   =FF "\xff"
+end operators
+
+operators in Comment are
+  # I have seen some `Received:' on a single line...
+  # it has `by' followed by parentheses on the same line.
+  # So we have to protect the corresponding sequences to avoid
+  # getting the whole mail being recognized as part of the Received.
+  /^Received: .*by.*\\([^)]*\\)\n/
+end operators
+
+sequences are
+    /^>/ Plain Keyword,
+    # "\n" is specified to avoid it to be included in the Tag1
+    # (what would result in a ^J in the title).
+
+    ############################## The subject ##############################
+    /^Subject: / Keyword_strong (Label_strong + Tag1) "\n" Label_strong
+      exceptions are
+          (/=\\?(ISO|iso)-8859-[0-9]\\?Q\\?/ Invisible, "latin1" Encoding),
+	  /\\?=/ Invisible,
+          =A0 "\xa0",  =A1 "\xa1",  =A2 "\xa2",  =A3 "\xa3",  =A4 "\xa4",
+          =A5 "\xa5",  =A6 "\xa6",  =A7 "\xa7",  =A8 "\xa8",  =A9 "\xa9",
+          =AA "\xaa",  =AB "\xab",  =AC "\xac",  =AD "\xad",  =AE "\xae",
+          =AF "\xaf",  =B0 "\xb0",  =B1 "\xb1",  =B2 "\xb2",  =B3 "\xb3",
+          =B4 "\xb4",  =B5 "\xb5",  =B6 "\xb6",  =B7 "\xb7",  =B8 "\xb8",
+          =B9 "\xb9",  =BA "\xba",  =BB "\xbb",  =BC "\xbc",  =BD "\xbd",
+          =BE "\xbe",  =BF "\xbf",  =C0 "\xc0",  =C1 "\xc1",  =C2 "\xc2",
+          =C3 "\xc3",  =C4 "\xc4",  =C5 "\xc5",  =C6 "\xc6",  =C7 "\xc7",
+          =C8 "\xc8",  =C9 "\xc9",  =CA "\xca",  =CB "\xcb",  =CC "\xcc",
+          =CD "\xcd",  =CE "\xce",  =CF "\xcf",  =D0 "\xd0",  =D1 "\xd1",
+          =D2 "\xd2",  =D3 "\xd3",  =D4 "\xd4",  =D5 "\xd5",  =D6 "\xd6",
+          =D7 "\xd7",  =D8 "\xd8",  =D9 "\xd9",  =DA "\xda",  =DB "\xdb",
+          =DC "\xdc",  =DD "\xdd",  =DE "\xde",  =DF "\xdf",  =E0 "\xe0",
+          =E1 "\xe1",  =E2 "\xe2",  =E3 "\xe3",  =E4 "\xe4",  =E5 "\xe5",
+          =E6 "\xe6",  =E7 "\xe7",  =E8 "\xe8",  =E9 "\xe9",  =EA "\xea",
+          =EB "\xeb",  =EC "\xec",  =ED "\xed",  =EE "\xee",  =EF "\xef",
+          =F0 "\xf0",  =F1 "\xf1",  =F2 "\xf2",  =F3 "\xf3",  =F4 "\xf4",
+          =F5 "\xf5",  =F6 "\xf6",  =F7 "\xf7",  =F8 "\xf8",  =F9 "\xf9",
+          =FA "\xfa",  =FB "\xfb",  =FC "\xfc",  =FD "\xfd",  =FE "\xfe",
+          =FF "\xff"
+       end exceptions,
+
+    ############################## The author ##############################
+    # 4. "Foo Bar" <foo@fu.bar>
+    # 3. Foo Bar <foo@fu.bar>
+    # 2. foo@fu.bar (Foo Bar)
+    # 1. the rest
+
+    # 1. Default matching of the author.  Try to remove the escapes
+    /^From: / Keyword_strong (Label_strong + Tag2) "\n" Label_strong
+	exceptions are
+          /=\\?(ISO|iso)-8859-[0-9]\\?Q\\?/ Invisible,
+	  /\\?=/  Invisible,
+          =A0 "\xa0",  =A1 "\xa1",  =A2 "\xa2",  =A3 "\xa3",  =A4 "\xa4",
+          =A5 "\xa5",  =A6 "\xa6",  =A7 "\xa7",  =A8 "\xa8",  =A9 "\xa9",
+          =AA "\xaa",  =AB "\xab",  =AC "\xac",  =AD "\xad",  =AE "\xae",
+          =AF "\xaf",  =B0 "\xb0",  =B1 "\xb1",  =B2 "\xb2",  =B3 "\xb3",
+          =B4 "\xb4",  =B5 "\xb5",  =B6 "\xb6",  =B7 "\xb7",  =B8 "\xb8",
+          =B9 "\xb9",  =BA "\xba",  =BB "\xbb",  =BC "\xbc",  =BD "\xbd",
+          =BE "\xbe",  =BF "\xbf",  =C0 "\xc0",  =C1 "\xc1",  =C2 "\xc2",
+          =C3 "\xc3",  =C4 "\xc4",  =C5 "\xc5",  =C6 "\xc6",  =C7 "\xc7",
+          =C8 "\xc8",  =C9 "\xc9",  =CA "\xca",  =CB "\xcb",  =CC "\xcc",
+          =CD "\xcd",  =CE "\xce",  =CF "\xcf",  =D0 "\xd0",  =D1 "\xd1",
+          =D2 "\xd2",  =D3 "\xd3",  =D4 "\xd4",  =D5 "\xd5",  =D6 "\xd6",
+          =D7 "\xd7",  =D8 "\xd8",  =D9 "\xd9",  =DA "\xda",  =DB "\xdb",
+          =DC "\xdc",  =DD "\xdd",  =DE "\xde",  =DF "\xdf",  =E0 "\xe0",
+          =E1 "\xe1",  =E2 "\xe2",  =E3 "\xe3",  =E4 "\xe4",  =E5 "\xe5",
+          =E6 "\xe6",  =E7 "\xe7",  =E8 "\xe8",  =E9 "\xe9",  =EA "\xea",
+          =EB "\xeb",  =EC "\xec",  =ED "\xed",  =EE "\xee",  =EF "\xef",
+          =F0 "\xf0",  =F1 "\xf1",  =F2 "\xf2",  =F3 "\xf3",  =F4 "\xf4",
+          =F5 "\xf5",  =F6 "\xf6",  =F7 "\xf7",  =F8 "\xf8",  =F9 "\xf9",
+          =FA "\xfa",  =FB "\xfb",  =FC "\xfc",  =FD "\xfd",  =FE "\xfe",
+          =FF "\xff"
+       end exceptions,
+
+    # 2. foo@fu.bar (Foo Bar)
+    # Try to keep only the name, and not the adress in the tag
+    # We refuse the =, because I don't see how to translate them :(
+    # It is implemented as a sequence, because they have priority
+    # over operators, hence, here is the only place where we can
+    # override the following rule.
+    # Try not to include data that is after a `,'.
+    (/^(From: )/	# \1. The From
+     /([[:blank:]]*)/	# \2. Some blanks
+     /([^(]+\\()/	# \3. The email
+     /([^),]+)/		# \4. Name of the sender (between paren)
+     /(.*\\).*\n)/	# \5. End of line
+	\1 Keyword_strong, \2 Plain,
+	\3 Label_strong, \4 (Label_strong + Tag2), \5 Label_strong)
+	Label_strong // Plain,
+
+    # 3. Foo Bar <foo@fu.bar>
+    (/^(From: )/		# \1. The From
+     /([[:blank:]]*)/	# \2. Some blanks
+     /([^<=]+)/		# \3. Name (with no =)
+     /([[:blank:]]+)/	# \4. Blanks
+     /(<.+\n)/		# \5. email and end of line
+	\1 Keyword_strong, \2 Plain,
+	\3 (Label_strong + Tag2), \4 Label_strong, \5 Label_strong)
+	Label_strong // Plain,
+
+    # 4. "Foo Bar" <foo@fu.bar>
+    (/^(From: )/		# \1. The From
+     /([[:blank:]]*")/	# \2. Some blanks
+     /([^<=]+)/		# \3. Name (with no =)
+     /("[[:blank:]]+)/	# \4. Blanks
+     /(<.+\n)/		# \5. email and end of line
+	\1 Keyword_strong, \2 Plain,
+	\3 (Label_strong + Tag2), \4 Label_strong, \5 Label_strong)
+	Label_strong // Plain,
+
+    ######################## Others of interest ###########################
+    /^Apparently-To: / Comment_strong,
+    /^T[Oo]: / Comment_strong,
+    /^Date: / Comment_strong,
+    /^Organization: / Comment_strong,
+    /^Address: / Comment_strong,
+
+    ######################## Others NO interest ###########################
+    # Some headers with really poor interest.
+    /^Alternate-Recipient: / Comment,
+    /^Approved: / Comment,
+    /^Autoforwarded: / Comment,
+    /^Auto-Submitted: / Comment,
+    /^[Cc]ontent-[[:alnum:]-]*: / Comment,
+    # Catch the charset name, and switch to it
+    (/^Content-Type: .*charset="?([^;"$\n]*).*\n/
+        Comment, \1 (Invisible + Encoding)) Comment,
+    /^Conversion[[:alpha:]-]*: / Comment,
+    /^Delivery-Date: / Comment,
+    /^Distribution: / Comment,
+    /^Email-Version: / Comment,
+    /^Errors-To: / Comment,
+    /^>From 65535/ Comment,
+    /^Followup-To: / Comment,
+    /^Importance: / Comment,
+    /^In-[Rr]eply-[Tt]o: / Comment,
+    /^Lines: / Comment,
+    /^Mailer: / Comment,
+    /^Message-([Ii][Dd]|Type): / Comment,
+    /^Mime-[Vv]ersion: / Comment,
+    /^MIME-[Vv]ersion: / Comment,
+    /^Newsgroups: / Comment,
+    /^NNTP-Posting-Host: / Comment,
+    /^Nntp-Posting-Host: / Comment,
+    /^Organisation: / Comment,
+    /^Original-Encoded-Information-Types: / Comment,
+    /^Path: / Comment,
+    /^Precedence: / Comment,
+    /^Priority: / Comment,
+    /^Phone: / Comment,
+    /^Received: / Comment
+	closers are
+	  /(DST|EDT|GMT).*\n$/, /[+-][01][0-9]00.*\n$/,
+          # As a security, if there is a white line, then we've
+          # been skipping too much yet...
+          /^\n$/
+	end closers,
+    /^References: / Comment,
+    /^Reply-To: / Comment,
+    /^Resent-(Date|Message-Id|From|Sender): / Comment,
+    /^Return-Path: / Comment,
+    /^Return-Receipt-To: / Comment,
+    /^Sender: / Comment,
+    /^Sensitivity: / Comment,
+    /^Sent: / Comment,
+    /^Status: / Comment,
+    /^Telefax: / Comment,
+    /^Transport-Options: / Comment,
+    /^Ua-Content-Id: / Comment,
+    /^User-Agent: / Comment,
+    /^Via: / Comment,
+    /^Warnings-To: / Comment,
+    /^X-[^:]+: / Comment,
+    /^X400-[[:alpha:]-]*: / Comment,
+    /^Xref: / Comment
+end sequences
+end style

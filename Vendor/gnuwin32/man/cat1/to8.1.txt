@@ -1,0 +1,84 @@
+TO8(1)                                                   TO8(1)
+
+
+
+
+
+NAME
+       to8  -  Convert  a  24  bit RLE file to eight bits using
+       dithering.
+
+SYNOPSIS
+       to8 [ -g display_gamma ] [ -{iI} image_gamma ] [ -o out-
+       file ] [ infile ]
+
+DESCRIPTION
+       To8  Converts  an  image with 24 bit pixel values (eight
+       bits each of red, green and blue) to eight bits of color
+       using  a  dithered  color  map (the special color map is
+       automatically written into  the  output  file).   If  no
+       input  file  is  specified, to8 reads from stdin.  If no
+       output file is specified with -o it writes the result to
+       the standard output.
+
+       Other options allow control over the gamma, or contrast,
+       of the image.  The dithering process  assumes  that  the
+       incoming  image  has  a gamma of 1.0 (i.e., a 200 in the
+       input represents an intensity twice that of a 100.)   If
+       this  is not the case, the input values must be adjusted
+       before dithering via the -i or  -I  option.   The  input
+       file  may also specify the gamma of the image via a pic-
+       ture comment (see below).  The output display is assumed
+       to have a gamma of 2.5 (standard for color TV monitors).
+       This may be modified via the -g option if a display with
+       a different gamma is used.
+
+       To8  will  put  a  picture  comment into the output file
+       indicating the display gamma assumed in constructing the
+       dithering color map.
+
+OPTIONS
+       -i image_gamma
+              Specify the gamma (contrast) of the image.  A low
+              contrast image, suited for direct display without
+              compensation  on a high contrast monitor (as most
+              monitors are) will have a gamma of less than one.
+              The  default image gamma is 1.0.  Image gamma may
+              also be specified by a picture comment in the RLE
+              (5) file of the form image_gamma=gamma.  The com-
+              mand line argument will override the value in the
+              file if specified.
+
+       -I image_gamma
+              An  alternate  method  of  specifying  the  image
+              gamma, the number following -I is  the  gamma  of
+              the  display  for  which the image was originally
+              computed (and is therefore  1.0  divided  by  the
+              actual  gamma of the image).  Image display gamma
+              may also be specified by a picture comment in the
+              RLE  (5)  file  of  the form display_gamma=gamma.
+              The command line argument will override the value
+              in the file if specified.
+
+       -g display_gamma
+              Specify  the gamma of the X display monitor.  The
+              default value is 2.5, suitable for most color  TV
+              monitors  (this is the gamma value assumed by the
+              NTSC video standard).
+
+       -o outfile
+              If specified, the output will be written to  this
+              file.   If outfile is "-", or if it is not speci-
+              fied, the output will be written to the  standard
+              output stream.
+
+SEE ALSO
+       tobw(1),   getx11(1),   mcut(1),   rlequant(1),  urt(1),
+       dither(3), RLE(5).
+
+AUTHOR
+       Spencer Thomas
+
+
+
+1                        Month DD, YYYY                  TO8(1)

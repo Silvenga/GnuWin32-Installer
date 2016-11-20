@@ -1,0 +1,59 @@
+* Linux with libc6:
+  OK
+
+* Linux with libc5:
+  If you have egcs, including both <stddef.h> and <wchar.h> leads to warnings:
+
+/usr/include/wchar.h:62: warning: redefinition of `wint_t'
+/usr/lib/gcc-lib/i486-pc-linux-gnulibc1/egcs-2.91.66/include/stddef.h:280: warning: `wint_t' previously declared here
+
+  The warnings are harmless, since libutf8 will redefine this type anyway,
+  To get rid of the warnings, change line 54 in /usr/include/wchar.h:
+
+  /* FIXME: should this go into <stddef.h>???  */
+! #if 0
+  #define __need_wint_t
+  #include <stddef.h>
+  #else
+  /* Integral type unchanged by default argument promotions that can
+     hold any value corresponding to members of the extended character
+     set, as well as at least one value that does not correspond to any
+     member of the extended character set.  */
+  typedef unsigned int wint_t;
+  #endif
+
+to
+
+  /* FIXME: should this go into <stddef.h>???  */
+! #if (__GNUC__ == 2 && __GNUC_MINOR__ >= 8) || (__GNUC__ > 2)
+  #define __need_wint_t
+  #include <stddef.h>
+  #else
+  /* Integral type unchanged by default argument promotions that can
+     hold any value corresponding to members of the extended character
+     set, as well as at least one value that does not correspond to any
+     member of the extended character set.  */
+  typedef unsigned int wint_t;
+  #endif
+
+* Solaris 2.7:
+  OK
+
+* Solaris 2.6:
+  Normal library OK. Plugin cannot be built because of an incorrect prototype
+  for `wcstok' in /usr/include/wchar.h.
+
+* OSF/1 4.0d:
+  OK
+
+* Irix 6.5:
+  OK
+
+* HP-UX 10.20:
+  OK
+
+* AIX 4.2:
+  OK
+
+* FreeBSD 4.0:
+  OK

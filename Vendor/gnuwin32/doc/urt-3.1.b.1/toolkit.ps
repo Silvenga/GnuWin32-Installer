@@ -1,0 +1,5574 @@
+%!PS-Adobe-1.0
+%%Title: toolkit.mss
+%%DocumentFonts: (atend)
+%%Creator: Alpha 1 Development and Scribe 4(1400)-8
+%%CreationDate: 24 February 1987 14:32
+%%Pages: (atend)
+%%EndComments
+% PostScript Prelude for Scribe.
+/BS {/SV save def} def
+/ES {showpage SV restore} def
+/SC {setrgbcolor} def
+/RST {100 div} def
+/CVTXY {RST 792 sub abs exch RST exch} def
+/RDF {WFT findfont SLT 0 eq 
+  {SSZ scalefont}
+  {[SSZ 0 SLT sin SLT cos div SSZ mul SSZ 0 0]makefont}
+  ifelse
+  setfont} def
+/SLT 0 def
+/SI { /SLT exch def RDF } def
+/WFT /Courier def
+/SF { /WFT exch def RDF } def
+/SSZ 10 def
+/SS { /SSZ exch def RDF } def
+/MT { CVTXY moveto } def
+/XM {RST currentpoint exch pop moveto} def
+/UL {gsave newpath CVTXY moveto RST dup 2 div 0 exch rmoveto
+   setlinewidth RST 0 rlineto stroke grestore} def
+/PB {/PV save def CVTXY translate pop}def
+/PE {PV restore}def
+/SH{show}def
+/MSS {SSW RST 0 rmoveto} def
+/SNS { SSW add /SSW exch def MSS} def
+/MX {/SSW exch def SH MSS} def
+/M2 {SH MSS MSS} def
+/M {SH MSS} def
+/M+ {SH 1  SNS} def
+/M- {SH -1 SNS} def
+%%EndProlog
+%%Page: 0 1 
+BS
+0 SI
+15 SS 
+
+/Times-Bold SF
+22744 8205 MT
+(The)
+375 MX(Utah)
+M(Raster)
+M(Toolkit)SH
+10 SS 
+
+/Times-Roman SF
+27086 10411 MT
+(John)
+250 MX(W.)
+M(Peterson)SH
+27669 11516 MT
+(Rod)
+M(G.)
+M(Bogart)SH
+
+/Times-Italic SF
+29850 12621 MT
+(and)SH
+/Times-Roman SF
+26531 13726 MT
+(Spencer)
+M(W.)
+M(Thomas)SH
+8 SS 
+41106 15810 MT
+(1)SH
+10 SS 
+19693 16155 MT
+(University)
+M(of)
+M(Utah,)
+M(Department)
+M(of)
+M(Computer)
+M(Science)SH
+26489 17260 MT
+(Salt)
+M(Lake)
+M(City,)
+M(Utah)SH
+13 SS 
+/Times-Bold SF
+28181 28743 MT
+(Abstract)SH
+9 SS 
+/Times-Roman SF
+9617 31047 MT
+(The)
+228 MX(Utah)
+M(Raster)
+M(Toolkit)
+M(is)
+M(a)
+M(set)
+M(of)
+M(programs)
+M(for)
+M(manipulating)
+M(and)
+M(composing)
+M(raster)
+M(images.)
+M2(These)
+M(tools)
+M(are)
+M-(based)
+M(on)SH
+9000 32061 MT
+(the)
+248 MX(Unix)
+M(concepts)
+M(of)
+M(pipes)
+M+(and)
+M(filters,)
+M(and)
+M(operate)
+M(on)
+M(images)
+M(in)
+M(much)
+M(the)
+M(same)
+M(way)
+M(as)
+M(the)
+M(standard)
+M(Unix)
+M(tools)
+M(operate)SH
+9000 33075 MT
+(on)
+382 MX(textual)
+M(data.)
+M2(The)
+M(Toolkit)
+M(uses)
+M(a)
+M(special)
+M(run)
+M(length)
+M(encoding)
+M(\050RLE\051)
+M(format)
+M(for)
+M(storing)
+M(images)
+M(and)
+M-(interfacing)SH
+9000 34089 MT
+(between)
+304 MX(the)
+M(various)
+M(programs.)
+M2(This)
+M(reduces)
+M(the)
+M(disk)
+M(space)
+M(requirements)
+M+(for)
+M(picture)
+M(storage)
+M(and)
+M(provides)
+M(a)
+M(standard)SH
+9000 35103 MT
+(header)
+405 MX(containing)
+M(descriptive)
+M(information)
+M-(about)
+M(an)
+M(image.)
+M2(Some)
+M(of)
+M(the)
+M(tools)
+M(are)
+M(able)
+M(to)
+M(work)
+M(directly)
+M(with)
+M(the)SH
+9000 36117 MT
+(compressed)
+316 MX(picture)
+M(data,)
+M(increasing)
+M(their)
+M(efficiency.)
+633 MX(A)
+317 MX(library)
+M(of)
+M(C)
+M(routines)
+M(is)
+M(provided)
+M(for)
+M(reading)
+M(and)
+M(writing)
+M(the)SH
+9000 37131 MT
+(RLE)
+225 MX(image)
+M(format,)
+M(making)
+M(the)
+M(toolkit)
+M(easy)
+M(to)
+M(extend.)SH
+9617 39247 MT
+(This)
+397 MX(paper)
+M-(describes)
+M(the)
+M(individual)
+M(tools,)
+M(and)
+M(gives)
+M(several)
+M(examples)
+M(of)
+M(their)
+M(use)
+M(and)
+M(how)
+M(they)
+M(work)
+M(together.)SH
+9000 40261 MT
+(Additional)
+404 MX(topics)
+M(that)
+M(arise)
+M(in)
+M(combining)
+M+(images,)
+M(such)
+M(as)
+M(how)
+M(to)
+M(combine)
+M(color)
+M(table)
+M(information)
+M(from)
+M(multiple)SH
+9000 41275 MT
+(sources,)
+225 MX(are)
+M(also)
+M(discussed.)SH
+12 SS 
+/Times-Bold SF
+7200 48644 MT
+(1.)
+300 MX(Introduction)SH
+10 SS 
+/Times-Roman SF
+8200 49749 MT
+(Over)
+421 MX(the)
+M(past)
+M(several)
+M(years,)
+M(the)
+M(University)
+M-(of)
+M(Utah)
+M(Computer)
+M(Graphics)
+M(Lab)
+M(has)
+M(developed)
+M(several)
+M(tools)
+M(and)SH
+7200 50854 MT
+(techniques)
+256 MX(for)
+M(generating,)
+M(manipulating)
+M(and)
+M(storing)
+M(images.)
+514 MX(At)
+257 MX(first)
+M(this)
+M(was)
+M(done)
+M(in)
+M(a)
+M(somewhat)
+M(haphazard)
+M(manner)SH
+7200 51959 MT
+(-)
+332 MX(programs)
+M(would)
+M(generate)
+M(and)
+M(store)
+M(images)
+M(in)
+M(various)
+M(formats)
+M(\050often)
+M(dependent)
+M(on)
+M(particular)
+M(hardware\051)
+M(and)
+M(data)SH
+7200 53064 MT
+(was)
+407 MX(often)
+M(not)
+M(easily)
+M(interchanged)
+M(between)
+M(them.)
+M2(More)
+M(recently,)
+M(some)
+M(effort)
+M(has)
+M(been)
+M(made)
+M+(to)
+M(standardize)
+M(the)SH
+7200 54169 MT
+(image)
+363 MX(format,)
+M(develop)
+M(an)
+M(organized)
+M(set)
+M(of)
+M(tools)
+M(for)
+M(operating)
+M(on)
+M(the)
+M(images,)
+M(and)
+M(develop)
+M-(a)
+M(subroutine)
+M(library)
+M(to)SH
+7200 55274 MT
+(make)
+309 MX(extending)
+M(this)
+M(set)
+M(of)
+M(tools)
+M(easier.)
+M2(This)
+M(paper)
+M(is)
+M(about)
+M(the)
+M(result)
+M(of)
+M+(this)
+M(effort,)
+M(which)
+M(we)
+M(call)
+M(the)SH
+/Times-Italic SF
+49079 XM
+(Utah)
+M(Raster)SH
+7200 56379 MT
+(Toolkit.)SH
+/Times-Roman SF
+10902 XM
+(Using)
+M-(a)
+M(single)
+M(efficient)
+M(image)
+M(format,)
+M(the)
+M(toolkit)
+M(provides)
+M(a)
+M(number)
+M(of)
+M(programs)
+M-(for)
+M(performing)
+M(common)SH
+7200 57484 MT
+(operations)
+250 MX(on)
+M(images.)
+M2(These)
+M(are)
+M(in)
+M(turn)
+M(based)
+M(on)
+M(a)
+M(subroutine)
+M(library)
+M(for)
+M(reading)
+M(and)
+M(writing)
+M(the)
+M(images.)SH
+12 SS 
+/Times-Bold SF
+7200 61168 MT
+(2.)
+300 MX(Origins)SH
+10 SS 
+/Times-Roman SF
+8200 62273 MT
+(The)
+385 MX(idea)
+M(for)
+M(the)
+M(toolkit)
+M+(arose)
+M(while)
+M(we)
+M(were)
+M(developing)
+M(an)
+M(image)
+M(compositor.)
+M2(The)
+M(compositor)
+M(\050described)
+M(in)SH
+7200 63378 MT
+(detail)
+430 MX(in)
+M(section)
+M(4.1\051)
+M-(allows)
+M(images)
+M(to)
+M(be)
+M(combined)
+M(in)
+M(various)
+M(ways.)
+M2(We)
+M(found)
+M(that)
+M(a)
+M(number)
+M(of)
+M(simple)
+M(and)SH
+7200 64483 MT
+(independent)
+250 MX(operations)
+M(were)
+M(frequently)
+M(needed)
+M(before)
+M(images)
+M(could)
+M(be)
+M(composited)
+M(together.)SH
+8200 66690 MT
+(With)
+488 MX(the)
+M(common)
+M(image)
+M(format,)
+M(the)
+M(subroutine)
+M(library)
+M+(for)
+M(manipulating)
+M(it,)
+M(and)
+M(the)
+M(need)
+M(for)
+M(a)
+M(number)
+M(of)SH
+7200 67795 MT
+(independent)
+253 MX(tools,)
+M(the)
+M(idea)
+M(of)
+M(a)
+M("toolkit")
+M(of)
+M(image)
+M(manipulating)
+M-(programs)
+M(arose.)
+M2(These)
+M(tools)
+M(are)
+M(combined)
+M(using)
+M(the)SH
+10800 50 7200 70352 UL
+6 SS 
+8000 71691 MT
+(1)SH
+8 SS 
+8300 72000 MT
+(Originally)
+200 MX(presented)
+M(at)
+M(the)
+M(third)
+M(Usenix)
+M(Workshop)
+M(on)
+M(Graphics,)
+M(Monterey)
+M(California,)
+M(November)
+M(1986)SH
+ES
+%%Page: 1 2 
+BS
+0 SI
+10 SS 
+/Times-Bold SF
+30350 4270 MT
+(1)SH
+/Times-Roman SF
+7200 7886 MT
+(Unix)
+257 MX(shell,)
+M(operating)
+M(on)
+M(images)
+M(much)
+M(like)
+M(the)
+M(standard)
+M(Unix)
+M(programs)
+M(operate)
+M(on)
+M+(textual)
+M(data.)
+M2(For)
+M(example,)
+M(a)
+M(Unix)SH
+7200 8991 MT
+(user)
+250 MX(would)
+M(probably)
+M(use)
+M(the)
+M(sequence)
+M(of)
+M(commands:)SH
+
+/Courier-Bold SF
+14400 10517 MT
+(cat)
+600 MX(/etc/passwd)
+M(|)
+M(grep)
+M(Smith)
+M(|)
+M(sort)
+M(-t:)
+M(+4.0)
+M(|)
+M(lpr)SH
+/Times-Roman SF
+7200 12055 MT
+(to)
+259 MX(print)
+M(a)
+M(sorted)
+M(list)
+M(of)
+M(all)
+M(users)
+M(named)
+M("Smith")
+M(in)
+M(the)
+M-(system)
+M(password)
+M(file.)
+M2(Similarly,)
+M(the)
+M(Raster)
+M(Toolkit)
+M(user)
+M(might)SH
+7200 13160 MT
+(do)
+250 MX(something)
+M(like:)SH
+/Courier-Bold SF
+14400 14686 MT
+(cat)
+600 MX(image.rle)
+M(|)
+M(avg4)
+M(|)
+M(repos)
+M(-p)
+M(0)
+M(200)
+M(|)
+M(getfb)SH
+/Times-Roman SF
+7200 16224 MT
+(to)
+280 MX(downfilter)
+M(an)
+M(image)
+M(and)
+M(place)
+M(it)
+M(on)
+M(top)
+M(of)
+M(the)
+M(frame)
+M(buffer)
+M(screen.)
+M2(The)
+M+(idea)
+M(is)
+M(similar)
+M(to)
+M(a)
+M(method)
+M(developed)
+M(by)SH
+7200 17329 MT
+(Duff)
+250 MX([3])
+M(for)
+M(three)
+M(dimensional)
+M(rendering.)SH
+12 SS 
+/Times-Bold SF
+7200 21013 MT
+(3.)
+300 MX(The)
+M(RLE)
+M(format)SH
+10 SS 
+/Times-Roman SF
+8200 22118 MT
+(The)
+298 MX(basis)
+M(of)
+M(all)
+M(of)
+M(these)
+M(tools)
+M(is)
+M(a)
+M(Run)
+M(Length)
+M(Encoded)
+M(image)
+M(format)
+250 MX([8].)
+594 MX(This)
+297 MX(format)
+M(is)
+M(designed)
+M(to)
+M(provide)
+M(an)SH
+7200 23223 MT
+(efficient,)
+411 MX(device)
+M(independent)
+M(means)
+M(of)
+M(storing)
+M(multi-level)
+M(raster)
+M+(images.)
+M2(It)
+M(is)
+M(not)
+M(designed)
+M(for)
+M(binary)
+M(\050bitmap\051)SH
+7200 24328 MT
+(images.)
+546 MX(It)
+273 MX(is)
+M(built)
+M(on)
+M(several)
+M(basic)
+M(concepts.)
+M2(The)
+M(central)
+M(concept)
+M(is)
+M(the)SH
+/Times-Italic SF
+36401 XM
+(channel)SH
+/Times-Roman SF
+(.)
+M2(A)
+M(channel)
+M(corresponds)
+M-(to)
+M(a)
+M(single)SH
+7200 25433 MT
+(color,)
+269 MX(thus)
+M(there)
+M(are)
+M(normally)
+M+(separate)
+M(red,)
+M(green)
+M(and)
+M(blue)
+M(channels.)
+M2(Up)
+M(to)
+M(255)
+M(color)
+M(channels)
+M(are)
+M(available)
+M(for)
+M(use;)SH
+7200 26538 MT
+(one)
+372 MX(channel)
+M(is)
+M(reserved)
+M(for)
+M-(coverage)
+M(\050"alpha"\051)
+M(data.)
+M2(Although)
+M(the)
+M(format)
+M(supports)
+M(arbitrarily)
+M(deep)
+M(channels,)
+M(the)SH
+7200 27643 MT
+(current)
+431 MX(implementation)
+M+(is)
+M(restricted)
+M(to)
+M(8)
+M(bits)
+M(per)
+M(channel.)
+M2(An)
+M(RLE)
+M(file)
+M(is)
+M(treated)
+M(as)
+M(a)
+M(byte)
+M(stream,)
+M(making)
+M(it)SH
+7200 28748 MT
+(independent)
+250 MX(of)
+M(host)
+M(byte)
+M(ordering.)SH
+8200 30955 MT
+(Image)
+358 MX(data)
+M(is)
+M(stored)
+M(in)
+M(an)
+M(RLE)
+M(file)
+M-(in)
+M(a)
+M(scanline)
+M(form,)
+M(with)
+M(the)
+M(data)
+M(for)
+M(each)
+M(channel)
+M(of)
+M(the)
+M(scanline)
+M(grouped)SH
+7200 32060 MT
+(together.)
+590 MX(Runs)
+295 MX(of)
+M(identical)
+M(pixel)
+M(values)
+M(are)
+M(compressed)
+M+(into)
+M(a)
+M(count)
+M(and)
+M(a)
+M(value.)
+M2(However,)
+M(sequences)
+M(of)
+M(differing)SH
+7200 33165 MT
+(pixels)
+250 MX(are)
+M(also)
+M(stored)
+M(efficiently)
+M(\050i.e,)
+M(not)
+M(as)
+M(a)
+M(sequence)
+M(of)
+M(single)
+M(pixel)
+M(runs\051.)SH
+11 SS 
+/Times-Bold SF
+7200 36782 MT
+(3.1.)
+275 MX(The)
+M(RLE)
+M(header)SH
+10 SS 
+/Times-Roman SF
+8200 37887 MT
+(The)
+250 MX(file)
+M(header)
+M(contains)
+M(a)
+M(large)
+M(amount)
+M(of)
+M(information)
+M(about)
+M(the)
+M(image.)
+M2(This)
+M(includes:)SH
+
+/Symbol SF
+8990 39340 MT
+(\267)SH
+/Times-Roman SF
+9700 XM
+(The)
+M(size)
+M(and)
+M(position)
+M(on)
+M(the)
+M(screen,)SH
+/Symbol SF
+8990 41098 MT
+(\267)SH
+/Times-Roman SF
+9700 XM
+(The)
+259 MX(number)
+M(of)
+M(channels)
+M(saved)
+M(and)
+M(the)
+M-(number)
+M(of)
+M(bits)
+M(per)
+M(channel)
+M(\050currently,)
+M(only)
+M(eight)
+M(bits)
+M(per)
+M(channel)SH
+9700 42203 MT
+(is)
+250 MX(supported\051,)SH
+/Symbol SF
+8990 43961 MT
+(\267)SH
+/Times-Roman SF
+9700 XM
+(Several)
+302 MX(flags,)
+M(indicating:)
+M(how)
+M(the)
+M(background)
+M(should)
+M(be)
+M(handled,)
+M(whether)
+M(or)
+M(not)
+M(an)
+M(alpha)
+M(channel)
+M(was)SH
+9700 45066 MT
+(saved,)
+250 MX(if)
+M(picture)
+M(comments)
+M(were)
+M(saved,)SH
+/Symbol SF
+8990 46824 MT
+(\267)SH
+/Times-Roman SF
+9700 XM
+(The)
+M(size)
+M(and)
+M(number)
+M(of)
+M(channels)
+M(in)
+M(the)
+M(color)
+M(map,)
+M(\050if)
+M(the)
+M(color)
+M(map)
+M(is)
+M(supplied\051,)SH
+/Symbol SF
+8990 48582 MT
+(\267)SH
+/Times-Roman SF
+9700 XM
+(An)
+M(optional)
+M(background)
+M(color,)SH
+/Symbol SF
+8990 50340 MT
+(\267)SH
+/Times-Roman SF
+9700 XM
+(An)
+M(optional)
+M(color)
+M(map,)SH
+/Symbol SF
+8990 52098 MT
+(\267)SH
+/Times-Roman SF
+9700 XM
+(An)
+284 MX(optional)
+M(set)
+M(of)
+M-(comments.)
+M2(The)
+M(comment)
+M(block)
+M(contains)
+M(any)
+M(number)
+M(of)
+M(null-terminated)
+M(text)
+M(strings.)SH
+9700 53203 MT
+(These)
+453 MX(strings)
+M+(are)
+M(conventionally)
+M(of)
+M(the)
+M(form)
+M("name=value",)
+M(allowing)
+M(for)
+M(easy)
+M(retrieval)
+M(of)
+M(specific)SH
+9700 54308 MT
+(information.)SH
+11 SS 
+/Times-Bold SF
+7200 57925 MT
+(3.2.)
+275 MX(The)
+M(scanline)
+M(data)SH
+10 SS 
+/Times-Roman SF
+8200 59030 MT
+(The)
+297 MX(scanline)
+M(is)
+M(the)
+M(basic)
+M(unit)
+M(that)
+M(programs)
+M(read)
+M(and)
+M-(write.)
+M2(It)
+M(consists)
+M(of)
+M(a)
+M(sequence)
+M(of)
+M(operations,)
+M(such)
+M(as)SH
+/Times-Italic SF
+52139 XM
+(Run)SH
+/Times-Roman SF
+(,)SH
+/Times-Italic SF
+7200 60135 MT
+(SetChannel)SH
+/Times-Roman SF
+(,)
+444 MX(and)SH
+/Times-Italic SF
+14393 XM
+(Pixels)SH
+/Times-Roman SF
+(,)
+M(describing)
+M(the)
+M(actual)
+M(image.)
+M2(An)
+M+(image)
+M(is)
+M(stored)
+M(starting)
+M(at)
+M(the)
+M(lower)
+M(left)
+M(corner)
+M(and)SH
+7200 61240 MT
+(proceeding)
+263 MX(upwards)
+M(in)
+M(order)
+M(of)
+M(increasing)
+M(scanline)
+M(number.)
+M2(Each)
+M(operation)
+M(and)
+M(its)
+M-(associated)
+M(data)
+M(takes)
+M(up)
+M(an)
+M(even)SH
+7200 62345 MT
+(number)
+251 MX(of)
+M(bytes,)
+M(so)
+M(that)
+M(all)
+M(operations)
+M(begin)
+M(on)
+M(a)
+M(16)
+M(bit)
+M(boundary.)
+503 MX(This)
+252 MX(makes)
+M(the)
+M(implementation)
+M(more)
+M(efficient)
+M(on)SH
+7200 63450 MT
+(many)
+250 MX(architectures.)SH
+8200 65657 MT
+(Each)
+300 MX(operation)
+M(is)
+M(identified)
+M(by)
+M(an)
+M(8)
+M(bit)
+M(opcode,)
+M(and)
+M(may)
+M(have)
+M(one)
+M(or)
+M(more)
+M(operands.)
+599 MX(Single)
+299 MX(operand)
+M(operations)SH
+7200 66762 MT
+(fit)
+266 MX(into)
+M(a)
+M(single)
+M(16)
+M(bit)
+M(word)
+M(if)
+M(the)
+M(operand)
+M+(value)
+M(is)
+M(less)
+M(than)
+M(256.)
+M2(So)
+M(that)
+M(operand)
+M(values)
+M(are)
+M(not)
+M(limited)
+M(to)
+M(the)
+M(range)SH
+7200 67867 MT
+(0..255,)
+283 MX(each)
+M(operation)
+M(has)
+M(a)SH
+/Times-Italic SF
+18750 XM
+(long)SH
+/Times-Roman SF
+20810 XM
+(variant,)
+M-(in)
+M(which)
+M(the)
+M(byte)
+M(following)
+M(the)
+M(opcode)
+M(is)
+M(ignored)
+M(and)
+M(the)
+M(following)
+M(word)SH
+7200 68972 MT
+(is)
+307 MX(taken)
+M(as)
+M(a)
+M(16)
+M(bit)
+M+(quantity.)
+M2(The)
+M(long)
+M(variant)
+M(of)
+M(an)
+M(opcode)
+M(is)
+M(indicated)
+M(by)
+M(setting)
+M(the)
+M(bit)
+M(0x40)
+M(in)
+M(the)
+M(opcode)
+M(\050this)SH
+7200 70077 MT
+(allows)
+250 MX(for)
+M(64)
+M(opcodes,)
+M(of)
+M(which)
+M(6)
+M(have)
+M(been)
+M(used)
+M(so)
+M(far.\051)SH
+ES
+%%Page: 2 3 
+BS
+0 SI
+10 SS 
+/Times-Bold SF
+30350 4270 MT
+(2)SH
+/Times-Roman SF
+8200 7886 MT
+(The)
+250 MX(current)
+M(set)
+M(of)
+M(opcodes)
+M(include:)SH
+9000 9677 MT
+(SkipLines)SH
+18000 XM
+(Increment)
+M(the)SH
+/Times-Italic SF
+23776 XM
+(scanline)
+M(number)SH
+/Times-Roman SF
+30664 XM
+(by)
+M(the)
+M(operand)
+M(value,)
+M(terminating)
+M(the)
+M(current)
+M(scanline.)SH
+9000 11254 MT
+(SetColor)SH
+18000 XM
+(Set)
+M(the)SH
+/Times-Italic SF
+21000 XM
+(current)
+M(channel)SH
+/Times-Roman SF
+27610 XM
+(to)
+M(the)
+M(operand)
+M(value.)SH
+9000 12831 MT
+(SkipPixels)SH
+18000 XM
+(Skip)
+369 MX(over)
+M(pixels)
+M(in)
+M(the)
+M(current)
+M(scanline.)
+M2(Pixels)
+M(skipped)
+M(will)
+M(be)
+M-(left)
+M(in)
+M(the)
+M(background)SH
+18000 13936 MT
+(color.)SH
+9000 15513 MT
+(PixelData)SH
+18000 XM
+(Following)
+279 MX(this)
+M(opcode)
+M(is)
+M+(a)
+M(sequence)
+M(of)
+M(pixel)
+M(values.)
+M2(The)
+M(length)
+M(of)
+M(the)
+M(sequence)
+M(is)
+M(given)SH
+18000 16618 MT
+(by)
+250 MX(the)
+M(operand)
+M(value.)SH
+9000 18195 MT
+(Run)SH
+18000 XM
+(This)
+284 MX(is)
+M(the)
+M(only)
+M(two)
+M(operand)
+M(opcode.)
+M2(The)
+M(first)
+M(operand)
+M(is)
+M(the)
+M(length)
+M(\050)SH
+/Times-Italic SF
+(N)SH
+/Times-Roman SF
+(\051)
+M(of)
+M(the)
+M(run.)
+566 MX(The)SH
+8 SS 
+47918 18963 MT
+(2)SH
+10 SS 
+18000 19308 MT
+(second)
+371 MX(operand)
+M(is)
+M(the)
+M(pixel)
+M(value,)
+M(followed)
+M(by)
+M(a)
+M(filler)
+M(byte)
+M(if)
+M(necessary)SH
+48318 XM
+(.)
+744 MX(The)
+372 MX(next)SH
+/Times-Italic SF
+53333 XM
+(N)SH
+/Times-Roman SF
+18000 20413 MT
+(pixels)
+250 MX(in)
+M(the)
+M(scanline)
+M(are)
+M(set)
+M(to)
+M(the)
+M(given)
+M(pixel)
+M(value.)SH
+9000 21990 MT
+(EOF)SH
+18000 XM
+(This)
+263 MX(opcode)
+M(has)
+M(no)
+M(operand,)
+M(and)
+M(indicates)
+M(the)
+M(end)
+M(of)
+M(the)
+M(RLE)
+M-(file.)
+M2(It)
+M(is)
+M(provided)
+M(so)
+M(RLE)SH
+18000 23095 MT
+(files)
+300 MX(may)
+M(be)
+M(concatenated)
+M(together)
+M(and)
+M(still)
+M(be)
+M+(correctly)
+M(interpreted.)
+M2(It)
+M(is)
+M(not)
+M(required,)
+M(a)SH
+18000 24200 MT
+(physical)
+250 MX(end)
+M(of)
+M(file)
+M(also)
+M(indicates)
+M(the)
+M(end)
+M(of)
+M(the)
+M(RLE)
+M(data.)SH
+11 SS 
+/Times-Bold SF
+7200 27817 MT
+(3.3.)
+275 MX(Subroutine)
+M(Interface)SH
+10 SS 
+/Times-Roman SF
+8200 28922 MT
+(Two)
+377 MX(similar)
+M(subroutine)
+M(interfaces)
+M(are)
+M(provided)
+M(for)
+M(reading)
+M(and)
+M(writing)
+M(files)
+M(in)
+M(the)
+M-(RLE)
+M(format.)
+M2(Both)
+M(read)
+M(or)SH
+7200 30027 MT
+(write)
+288 MX(a)
+M(scanline)
+M(worth)
+M(of)
+M(data)
+M(at)
+M(a)
+M(time.)
+M2(A)
+M(simple)
+M("row")
+M(interface)
+M(communicates)
+M(in)
+M(terms)
+M(of)
+M(arrays)
+M(of)
+M(pixel)
+M+(values.)SH
+7200 31132 MT
+(It)
+308 MX(is)
+M(simple)
+M(to)
+M(use,)
+M(but)
+M(slower)
+M(than)
+M(the)
+M("raw")
+M-(interface,)
+M(which)
+M(uses)
+M(arrays)
+M(of)
+M("opcode")
+M(values)
+M(as)
+M(its)
+M(communication)SH
+7200 32237 MT
+(medium.)SH
+8200 34444 MT
+(In)
+443 MX(both)
+M(cases,)
+M(the)
+M(interface)
+M(must)
+M(be)
+M(initialized)
+M(by)
+M(calling)
+M(a)
+M(setup)
+M(function.)
+M2(The)
+M(two)
+M(types)
+M(of)
+M(calls)
+M+(may)
+M(be)SH
+7200 35549 MT
+(interleaved;)
+311 MX(for)
+M(example,)
+M(in)
+M(a)
+M(rendering)
+M(program,)
+M(the)
+M-(background)
+M(could)
+M(be)
+M(written)
+M(using)
+M(the)
+M("raw")
+M(interface,)
+M(while)SH
+7200 36654 MT
+(scanlines)
+369 MX(containing)
+M(image)
+M(data)
+M(could)
+M(be)
+M(converted)
+M(with)
+M(the)
+M("row")
+M(interface.)
+739 MX(The)
+370 MX(package)
+M(allows)
+M(multiple)
+M(RLE)SH
+7200 37759 MT
+(streams)
+273 MX(to)
+M(be)
+M(open)
+M(simultaneously,)
+M(as)
+M(is)
+M(necessary)
+M(for)
+M(use)
+M(in)
+M(a)
+M-(compositing)
+M(tool,)
+M(for)
+M(example.)
+M2(All)
+M(data)
+M(relevant)
+M(to)
+M(a)SH
+7200 38864 MT
+(particular)
+295 MX(RLE)
+M(stream)
+M(is)
+M(contained)
+M(in)
+M(a)
+M("globals")
+M(structure.)
+M2(This)
+M(structure)
+M(essentially)
+M(echoes)
+M(the)
+M+(information)
+M(in)
+M(the)SH
+7200 39969 MT
+(RLE)
+250 MX(header,)
+M(along)
+M(with)
+M(current)
+M(state)
+M(information)
+M(about)
+M(the)
+M(RLE)
+M(stream.)SH
+12 SS 
+/Times-Bold SF
+7200 43653 MT
+(4.)
+300 MX(The)
+M(tools)SH
+11 SS 
+7200 47270 MT
+(4.1.)
+275 MX(The)
+M(image)
+M(compositor)
+M(-)
+M(Comp)SH
+10 SS 
+/Courier-Bold SF
+8200 48375 MT
+(Comp)SH
+/Times-Roman SF
+10911 XM
+(implements)
+311 MX(an)
+M(image)
+M(compositor)
+M(based)
+M(on)
+M(the)
+M-(compositing)
+M(algorithms)
+M(presented)
+M(in)
+250 MX([6].)
+620 MX(The)
+310 MX(compositing)SH
+7200 49480 MT
+(operations)
+322 MX(are)
+M(based)
+M(on)
+M(the)
+M(presence)
+M(of)
+M(an)
+M(alpha)
+M(channel)
+M(in)
+M+(the)
+M(image.)
+M2(This)
+M(extra)
+M(channel)
+M(usually)
+M(defines)
+M(a)
+M(mask)SH
+7200 50585 MT
+(which)
+256 MX(represents)
+M(a)
+M(sort)
+M(of)
+M(a)
+M(cookie-cutter)
+M(for)
+M-(the)
+M(image.)
+M2(This)
+M(is)
+M(the)
+M(case)
+M(when)
+M(alpha)
+M(is)
+M(255)
+M(\050full)
+M(coverage\051)
+M(for)
+M(pixels)SH
+7200 51690 MT
+(inside)
+M-(the)
+M(shape,)
+M(zero)
+M(outside,)
+M(and)
+M(between)
+M(zero)
+M(and)
+M+(255)
+M(on)
+M(the)
+M(boundary.)
+M2(When)
+M(the)
+M(compositor)
+M(operates)
+M(on)
+M(images)SH
+7200 52795 MT
+(of)
+250 MX(the)
+M(cookie-cutter)
+M(style,)
+M(the)
+M(operations)
+M(behave)
+M(as)
+M(follows:)SH
+9000 54586 MT
+(A)SH
+/Times-Bold SF
+9972 XM
+(over)SH
+/Times-Roman SF
+12110 XM
+(B)
+M(\050the)
+M(default\051)SH
+18000 XM
+(The)
+268 MX(result)
+M(will)
+M(be)
+M-(the)
+M(union)
+M(of)
+M(the)
+M(two)
+M(image)
+M(shapes,)
+M(with)
+M(A)
+M(obscuring)
+M(B)
+M(in)
+M(the)
+M(region)
+M(of)SH
+18000 55691 MT
+(overlap.)SH
+9000 57268 MT
+(A)SH
+/Times-Bold SF
+9972 XM
+(atop)SH
+/Times-Roman SF
+12111 XM
+(B)SH
+18000 XM
+(The)
+370 MX(result)
+M(shape)
+M(is)
+M(the)
+M(same)
+M(as)
+M(image)
+M(B,)
+M(with)
+M(A)
+M(obscuring)
+M(B)
+M(where)
+M(the)
+M+(image)
+M(shapes)SH
+18000 58373 MT
+(overlap.)
+289 MX(\050Note)
+M(that)
+M(this)
+M(differs)
+M(from)
+M("over")
+M(because)
+M(the)
+M(portion)
+M(of)
+M-(A)
+M(outside)
+M(the)
+M(shape)
+M(of)SH
+18000 59478 MT
+(B)
+250 MX(will)
+M(not)
+M(be)
+M(in)
+M(the)
+M(result)
+M(image.\051)SH
+9000 61055 MT
+(A)SH
+/Times-Bold SF
+9972 XM
+(in)SH
+/Times-Roman SF
+11056 XM
+(B)SH
+18000 XM
+(The)
+279 MX(result)
+M(is)
+M(simply)
+M(the)
+M(image)
+M(A)
+M(cut)
+M(by)
+M(the)
+M(shape)
+M(of)
+M(B.)
+M(None)
+M+(of)
+M(the)
+M(image)
+M(data)
+M(of)
+M(B)
+M(will)SH
+18000 62160 MT
+(be)
+250 MX(in)
+M(the)
+M(result.)SH
+9000 63737 MT
+(A)SH
+/Times-Bold SF
+9972 XM
+(out)SH
+/Times-Roman SF
+11611 XM
+(B)SH
+18000 XM
+(The)
+M(result)
+M(image)
+M(is)
+M(image)
+M(A)
+M(with)
+M(the)
+M(shape)
+M(of)
+M(B)
+M(cut)
+M(out.)SH
+9000 65314 MT
+(A)SH
+/Times-Bold SF
+9972 XM
+(xor)SH
+/Times-Roman SF
+11666 XM
+(B)SH
+18000 XM
+(The)
+377 MX(result)
+M(is)
+M(the)
+M(image)
+M(data)
+M(from)
+M(both)
+M(images)
+M(that)
+M(is)
+M(outside)
+M(the)
+M(overlap)
+M(region.)
+M2(The)SH
+18000 66419 MT
+(overlap)
+250 MX(region)
+M(will)
+M(be)
+M(blank.)SH
+9000 67996 MT
+(A)SH
+/Times-Bold SF
+9972 XM
+(plus)SH
+/Times-Roman SF
+12001 XM
+(B)SH
+18000 XM
+(The)
+263 MX(result)
+M(is)
+M(just)
+M(the)
+M(sum)
+M(of)
+M(the)
+M(image)
+M(data.)
+M2(This)
+M(operation)
+M+(is)
+M(actually)
+M(independent)
+M(of)
+M(the)SH
+10800 50 7200 70352 UL
+6 SS 
+8000 71691 MT
+(2)SH
+8 SS 
+8300 72000 MT
+(E.g.,)
+200 MX(a)
+M(16)
+M(bit)
+M(pixel)
+M(value)
+M(would)
+M(not)
+M(need)
+M(a)
+M(filler)
+M(byte.)SH
+ES
+%%Page: 3 4 
+BS
+0 SI
+10 SS 
+/Times-Bold SF
+30350 4270 MT
+(3)SH
+/Times-Roman SF
+18000 7886 MT
+(alpha)
+250 MX(channels.)SH
+8200 9225 MT
+(The)
+325 MX(alpha)
+M(channel)
+M(can)
+M(also)
+M(represent)
+M(a)
+M(semi-transparent)
+M(mask)
+M(for)
+M(the)
+M(image.)
+M2(It)
+M(would)
+M(be)
+M-(similar)
+M(to)
+M(the)
+M(cookie-)SH
+7200 10330 MT
+(cutter)
+272 MX(mask,)
+M(except)
+M(the)
+M(interior)
+M(of)
+M(the)
+M(shape)
+M(would)
+M(have)
+M(alpha)
+M(values)
+M(that)
+M(represent)
+M(partial)
+M(coverage;)
+M+(e.g.)
+M(128)
+M(is)
+M(half)SH
+7200 11435 MT
+(coverage.)
+776 MX(When)
+388 MX(one)
+M(of)
+M(the)
+M(images)
+M(to)
+M-(be)
+M(composited)
+M(is)
+M(a)
+M(semi-transparent)
+M(mask,)
+M(the)
+M(following)
+M(operations)
+M(have)SH
+7200 12540 MT
+(useful)
+250 MX(results:)SH
+9000 14331 MT
+(Semi-transparent)
+M(A)SH
+/Times-Bold SF
+17054 XM
+(over)SH
+/Times-Roman SF
+19192 XM
+(B)SH
+18000 15436 MT
+(The)
+445 MX(image)
+M(data)
+M(of)
+M(B)
+M(will)
+M(be)
+M(blended)
+M(with)
+M(that)
+M(of)
+M(A)
+M(in)
+M-(the)
+M(semi-transparent)
+M(overlap)SH
+18000 16541 MT
+(region.)
+500 MX(The)
+250 MX(resulting)
+M(alpha)
+M(channel)
+M(is)
+M(as)
+M(transparent)
+M(as)
+M(that)
+M(of)
+M(image)
+M(B.)SH
+9000 18118 MT
+(A)SH
+/Times-Bold SF
+9972 XM
+(in)SH
+/Times-Roman SF
+11056 XM
+(Semi-transparent)
+M(B)SH
+18000 19223 MT
+(The)
+271 MX(image)
+M(data)
+M(of)
+M(A)
+M(is)
+M(scaled)
+M(by)
+M(the)
+M(mask)
+M(of)
+M(B)
+M(in)
+M(the)
+M(overlap)
+M(region.)
+541 MX(The)
+270 MX(alpha)
+M(channel)SH
+18000 20328 MT
+(is)
+250 MX(the)
+M(same)
+M(as)
+M(the)
+M(semi-transparent)
+M(mask)
+M(of)
+M(B.)SH
+8200 21667 MT
+(If)
+337 MX(the)
+M(picture)
+M+(to)
+M(be)
+M(composited)
+M(doesn't)
+M(have)
+M(an)
+M(alpha)
+M(channel)
+M(present,)
+M(comp)
+M(assumes)
+M(an)
+M(alpha)
+M(of)
+M(255)
+M(\050i.e.,)
+M(full)SH
+7200 22772 MT
+(coverage\051)
+250 MX(for)
+M(non-background)
+M(pixels)
+M(and)
+M(an)
+M(alpha)
+M(of)
+M(zero)
+M(for)
+M(background)
+M(pixels.)SH
+8200 24979 MT
+(Comp)
+316 MX(is)
+M(able)
+M(to)
+M(take)
+M(advantage)
+M(of)
+M-(the)
+M(size)
+M(information)
+M(for)
+M(the)
+M(two)
+M(images)
+M(being)
+M(composited.)
+M2(For)
+M(example,)
+M(if)
+M(a)SH
+7200 26084 MT
+(small)
+323 MX(picture)
+M(is)
+M(being)
+M(composited)
+M(over)
+M(a)
+M(large)
+M+(backdrop,)
+M(the)
+M(actual)
+M(compositing)
+M(arithmetic)
+M(is)
+M(only)
+M(performed)
+M(on)
+M(a)SH
+7200 27189 MT
+(small)
+423 MX(portion)
+M(of)
+M(the)
+M(image.)
+M2(By)
+M(looking)
+M(at)
+M-(the)
+M(image)
+M(size)
+M(in)
+M(the)
+M(RLE)
+M(header,)
+M(comp)
+M(performs)
+M(the)
+M(compositing)SH
+7200 28294 MT
+(operation)
+257 MX(only)
+M(where)
+M(the)
+M(images)
+M(overlap.)
+M2(For)
+M(the)
+M(rest)
+M(of)
+M(the)
+M(image)
+M(the)
+M(backdrop)
+M(is)
+M(copied)
+M(\050or)
+M(not)
+M+(copied,)
+M(depending)SH
+7200 29399 MT
+(on)
+260 MX(the)
+M(compositing)
+M(operation\051.)
+M2(The)
+M("raw")
+M(RLE)
+M(read)
+M(and)
+M(write)
+M(routines)
+M(are)
+M(used)
+M(to)
+M(perform)
+M-(this)
+M(copy)
+M(operation,)
+M(thus)SH
+7200 30504 MT
+(avoiding)
+250 MX(the)
+M(cost)
+M(of)
+M(compressing)
+M(and)
+M(expanding)
+M(the)
+M(backdrop)
+M(as)
+M(well.)SH
+11 SS 
+/Times-Bold SF
+7200 34121 MT
+(4.2.)
+275 MX(Basic)
+M(image)
+M(composition)
+M(-)
+M(Repos)
+M(and)
+M(Crop)SH
+10 SS 
+/Courier-Bold SF
+8200 35226 MT
+(Repos)SH
+/Times-Roman SF
+11567 XM
+(and)SH
+/Courier-Bold SF
+13378 XM
+(crop)SH
+/Times-Roman SF
+16145 XM
+(are)
+367 MX(the)
+M+(basic)
+M(tools)
+M(for)
+M(positioning)
+M(and)
+M(arranging)
+M(images)
+M(to)
+M(be)
+M(fed)
+M(to)
+M(the)
+M(compositor.)
+M2(Crop)SH
+7200 36331 MT
+(simply)
+360 MX(throws)
+M(away)
+M(all)
+M(parts)
+M(of)
+M(the)
+M(image)
+M(falling)
+M(outside)
+M(the)
+M(rectangle)
+M(specified.)
+718 MX(Repos)
+359 MX(positions)
+M(an)
+M(image)
+M(to)
+M(a)SH
+7200 37436 MT
+(specific)
+326 MX(location)
+M(on)
+M(the)
+M(screen,)
+M(or)
+M+(moves)
+M(it)
+M(by)
+M(an)
+M(incremental)
+M(amount.)
+M2(Repos)
+M(does)
+M(not)
+M(have)
+M(to)
+M(modify)
+M(any)
+M(of)
+M(the)SH
+7200 38541 MT
+(image)
+270 MX(data,)
+M(it)
+M(simply)
+M(changes)
+M(the)
+M(position)
+M(specification)
+M(in)
+M(the)
+M-(RLE)
+M(header.)
+M2(In)
+M(order)
+M(to)
+M(simplify)
+M(the)
+M(code,)
+M(the)
+M(Raster)SH
+7200 39646 MT
+(Toolkit)
+250 MX(does)
+M(not)
+M(allow)
+M(negative)
+M(pixel)
+M(coordinates)
+M(in)
+M(images.)SH
+11 SS 
+/Times-Bold SF
+7200 43263 MT
+(4.3.)
+275 MX(Changing)
+M(image)
+M(orientation)
+M(and)
+M(size)
+M(-)
+M(Flip,)
+M(Fant)
+M(and)
+M(Avg4)SH
+10 SS 
+/Times-Roman SF
+8200 44368 MT
+(Two)
+349 MX(tools)
+M(exist)
+M(for)
+M(changing)
+M(the)
+M(orientation)
+M(of)
+M(an)
+M(image)
+M+(on)
+M(the)
+M(screen.)SH
+/Courier-Bold SF
+38392 XM
+(Flip)SH
+/Times-Roman SF
+41142 XM
+(rotates)
+M(an)
+M(image)
+M(by)
+M(90)
+M(degrees)SH
+7200 45473 MT
+(right)
+258 MX(or)
+M(left,)
+M(turns)
+M(an)
+M-(image)
+M(upside)
+M(down,)
+M(or)
+M(reverse)
+M(it)
+M(from)
+M(right)
+M(to)
+M(left.)SH
+/Courier-Bold SF
+36562 XM
+(Fant)SH
+/Times-Roman SF
+39219 XM
+(rotates)
+M(an)
+M(image)
+M(an)
+M(arbitrary)
+M(number)SH
+7200 46578 MT
+(of)
+250 MX(degrees)
+M(from)
+M(-45)
+M(to)
+M(45.)
+M2(In)
+M(order)
+M(to)
+M(get)
+M(rotation)
+M(beyond)
+M(-45)
+M(to)
+M(45,)
+M(flip)
+M(and)
+M(fant)
+M(can)
+M(be)
+M(combined,)
+M(for)
+M(example:)SH
+/Courier-Bold SF
+14400 48104 MT
+(flip)
+600 MX(-r)
+M(<)
+M(upright.rle)
+M(|)
+M(fant)
+M(-a)
+M(10)
+M(>)
+M(rotated.rle)SH
+/Times-Roman SF
+7200 49642 MT
+(rotates)
+293 MX(an)
+M(image)
+M(100)
+M(degrees.)
+M2(Fant)
+M(is)
+M(also)
+M(able)
+M(to)
+M+(scale)
+M(images)
+M(by)
+M(an)
+M(arbitrary)
+M(amount)
+M(in)
+M(X)
+M(and)
+M(Y.)
+M(A)
+M(common)
+M(use)SH
+7200 50747 MT
+(for)
+395 MX(this)
+M(is)
+M(to)
+M(stretch)
+M(or)
+M(shrink)
+M(an)
+M(image)
+M(to)
+M(correct)
+M-(for)
+M(the)
+M(aspect)
+M(ratio)
+M(of)
+M(a)
+M(particular)
+M(frame)
+M(buffer.)
+M(Many)
+M(frame)SH
+7200 51852 MT
+(buffers)
+387 MX(designed)
+M(for)
+M(use)
+M(with)
+M(standard)
+M(video)
+M(hardware)
+M(display)
+M+(a)
+M(picture)
+M(of)
+M(512x480)
+M(pixels)
+M(on)
+M(a)
+M(screen)
+M(with)
+M(the)SH
+7200 52957 MT
+(proportions)
+293 MX(4:3,)
+M(resulting)
+M(in)
+M(an)
+M(overall)
+M(pixel)
+M(aspect)
+M(ratio)
+M(of)
+M(6:5.)
+M2(If)
+M-(the)
+M(picture)SH
+/Courier-Bold SF
+39088 XM
+(kloo.rle)SH
+/Times-Roman SF
+44180 XM
+(is)
+M(digitized)
+M(or)
+M(computed)SH
+7200 54062 MT
+(assuming)
+250 MX(a)
+M(1:1)
+M(aspect)
+M(ratio)
+M(\050square)
+M(pixels\051,)
+M(the)
+M(command:)SH
+/Courier-Bold SF
+14400 55588 MT
+(cat)
+600 MX(kloo.rle)
+M(|)
+M(fant)
+M(-s)
+M(1.0)
+M(1.2)
+M(|)
+M(getfb)SH
+/Times-Roman SF
+7200 57126 MT
+(correctly)
+429 MX(displays)
+M(the)
+M+(image)
+M(on)
+M(a)
+M(frame)
+M(buffer)
+M(with)
+M(a)
+M(6:5)
+M(aspect)
+M(ratio.)
+M2(Fant)
+M(is)
+M(implemented)
+M(using)
+M(a)
+M(two-pass)SH
+7200 58231 MT
+(subpixel)
+283 MX(sampling)
+M(algorithm)
+250 MX([4].)
+566 MX(This)
+283 MX(algorithm)
+M(performs)
+M(the)
+M(spatial)
+M(transform)
+M(\050rotate)
+M(and/or)
+M(scale\051)
+M(first)
+M(on)
+M(row)
+M(by)SH
+7200 59336 MT
+(row)
+277 MX(basis,)
+M(then)
+M(on)
+M(a)
+M(column)
+M+(by)
+M(column)
+M(basis.)
+M2(Because)
+M(the)
+M(transformation)
+M(is)
+M(done)
+M(on)
+M(a)
+M(subpixel)
+M(level,)
+M(fant)
+M(does)
+M(not)SH
+7200 60441 MT
+(introduce)
+250 MX(aliasing)
+M(artifacts)
+M(into)
+M(the)
+M(image.)SH
+/Courier-Bold SF
+8200 62648 MT
+(Avg4)SH
+/Times-Roman SF
+10866 XM
+(downfilters)
+266 MX(an)
+M(RLE)
+M(image)
+M(into)
+M(a)
+M(resulting)
+M(image)
+M-(of)
+M(1/4th)
+M(the)
+M(size,)
+M(by)
+M(simply)
+M(averaging)
+M(four)
+M(pixel)
+M(values)
+M(in)SH
+7200 63753 MT
+(the)
+251 MX(input)
+M(image)
+M(to)
+M(produce)
+M(a)
+M(single)
+M(pixel)
+M(in)
+M(the)
+M(output.)
+M2(If)
+M(the)
+M(original)
+M(image)
+M(does)
+M+(not)
+M(contain)
+M(an)
+M(alpha)
+M(channel,)
+M(avg4)SH
+7200 64858 MT
+(creates)
+366 MX(one)
+M(by)
+M(counting)
+M(the)
+M(number)
+M(of)
+M(non-zero)
+M-(pixels)
+M(in)
+M(each)
+M(group)
+M(of)
+M(four)
+M(input)
+M(pixels)
+M(and)
+M(using)
+M(the)
+M(count)
+M(to)SH
+7200 65963 MT
+(produce)
+317 MX(a)
+M(coverage)
+M(value.)
+M2(While)
+M(the)
+M(alpha)
+M(channel)
+M(produced)
+M(this)
+M(way)
+M(is)
+M(crude)
+M(\050only)
+M(four)
+M(levels)
+M(of)
+M(coverage\051)
+M(it)
+M(is)SH
+7200 67068 MT
+(enough)
+401 MX(to)
+M(make)
+M(a)
+M(noticeable)
+M(improvement)
+M(in)
+M(the)
+M(edges)
+M(of)
+M(composited)
+M(images.)
+801 MX(One)
+400 MX(use)
+M(for)
+M(avg4)
+M(is)
+M(to)
+M(provide)SH
+7200 68173 MT
+(anti-aliasing)
+253 MX(for)
+M(rendering)
+M+(programs)
+M(that)
+M(perform)
+M(no)
+M(anti-aliasing)
+M(of)
+M(their)
+M(own.)
+M2(For)
+M(example,)
+M(suppose)SH
+/Courier-Bold SF
+48279 XM
+(huge.rle)SH
+/Times-Roman SF
+53333 XM
+(is)SH
+7200 69278 MT
+(a)
+250 MX(4k)
+M(x)
+M(4k)
+M(pixel)
+M(image)
+M(rendered)
+M(without)
+M(anti)
+M(aliasing)
+M(and)
+M(without)
+M(an)
+M(alpha)
+M(channel.)
+M2(Executing)
+M(the)
+M(commands:)SH
+/Courier-Bold SF
+14400 70804 MT
+(cat)
+600 MX(huge.rle)
+M(|)
+M(avg4)
+M(|)
+M(avg4)
+M(|)
+M(avg4)
+M(>)
+M(small.rle)SH
+ES
+%%Page: 4 5 
+BS
+0 SI
+10 SS 
+/Times-Bold SF
+30350 4270 MT
+(4)SH
+/Times-Roman SF
+7200 7886 MT
+(produces)
+250 MX(an)
+M(image)SH
+/Courier-Bold SF
+14948 XM
+(small.rle)SH
+/Times-Roman SF
+20598 XM
+(with)
+M(64)
+M(\0508x8\051)
+M(samples)
+M(per)
+M(pixel)
+M(and)
+M(an)
+M(alpha)
+M(channel)
+M(with)
+M(smooth)
+M(edges.)SH
+8200 10093 MT
+(Images)
+287 MX(generated)
+M(from)
+M(this)
+M-(approach)
+M(are)
+M(as)
+M(good)
+M(as)
+M(those)
+M(produced)
+M(by)
+M(direct)
+M(anti-aliasing)
+M(algorithms)
+M(such)
+M(as)
+M(the)SH
+7200 11198 MT
+(A-buffer)
+250 MX([2].)
+683 MX(However,)
+342 MX(a)
+M(properly)
+M(implemented)
+M(A-buffer)
+M(renderer)
+M(produces)
+M(images)
+M(nearly)
+M(an)
+M(order)
+M(of)
+M(magnitude)SH
+7200 12303 MT
+(faster.)SH
+11 SS 
+/Times-Bold SF
+7200 15920 MT
+(4.4.)
+275 MX(Color)
+M(map)
+M(manipulation)
+M(-)
+M(Ldmap)
+M(and)
+M(Applymap)SH
+10 SS 
+/Times-Roman SF
+8200 17025 MT
+(As)
+300 MX(mentioned)
+M(previously,)
+M(RLE)
+M(files)
+M(may)
+M(optionally)
+M(contain)
+M(a)
+M(color)
+M(map)
+M(for)
+M(the)
+M(image.)SH
+/Courier-Bold SF
+44139 XM
+(Ldmap)SH
+/Times-Roman SF
+47438 XM
+(is)
+M-(used)
+M(to)
+M(create)SH
+7200 18130 MT
+(or)
+M(modify)
+M(a)
+M(color)
+M(map)
+M(within)
+M(an)
+M(RLE)
+M(file.)
+M2(Ldmap)
+M(is)
+M(able)
+M(to)
+M(create)
+M(some)
+M+(standard)
+M(color)
+M(maps,)
+M(such)
+M(as)
+M(linear)
+M(maps)SH
+7200 19235 MT
+(with)
+291 MX(various)
+M(ramps,)
+M(or)
+M(maps)
+M(with)
+M(various)
+M-(gamma)
+M(corrections.)
+M2(Color)
+M(maps)
+M(may)
+M(also)
+M(be)
+M(read)
+M(from)
+M(a)
+M(simple)
+M(text)
+M(file)SH
+7200 20340 MT
+(format,)
+316 MX(or)
+M(taken)
+M(from)
+M(other)
+M(RLE)
+M+(files.)
+M2(Ldmap)
+M(also)
+M(performs)SH
+/Times-Italic SF
+32511 XM
+(map)
+M(composition)SH
+/Times-Roman SF
+(,)
+M(where)
+M(one)
+M(color)
+M(map)
+M(is)
+M(used)
+M(as)
+M(in)SH
+7200 21445 MT
+(index)
+456 MX(into)
+M(the)
+M-(other.)
+M2(An)
+M(example)
+M(use)
+M(for)
+M(this)
+M(is)
+M(to)
+M(apply)
+M(a)
+M(gamma)
+M(correction)
+M(to)
+M(an)
+M(image)
+M(already)
+M(having)
+M(a)SH
+7200 22550 MT
+(non-linear)
+250 MX(map.)SH
+/Courier-Bold SF
+8200 24757 MT
+(Applymap)SH
+/Times-Roman SF
+13326 XM
+(applies)
+326 MX(the)
+M(color)
+M(map)
+M(in)
+M(an)
+M(rle)
+M(file)
+M(to)
+M(the)
+M(pixel)
+M(values)
+M(in)
+M(the)
+M(file.)
+653 MX(For)
+327 MX(example,)
+M(if)
+M(the)
+M(color)
+M(map)
+M(in)SH
+/Courier-Bold SF
+7200 25862 MT
+(kloo.rle)SH
+/Times-Roman SF
+12250 XM
+(contained)
+250 MX(a)
+M(color)
+M(map)
+M(with)
+M(the)
+M(entries)
+M(\050for)
+M(the)
+M(red)
+M(channel\051:)SH
+/Courier-Bold SF
+9600 27641 MT
+(Index)
+1800 MX(Red)
+600 MX(color)
+M(map)SH
+12000 28772 MT
+(0:)
+3600 MX(5)SH
+12000 29903 MT
+(1:)
+M(7)SH
+12000 31034 MT
+(2:)
+M(9)SH
+/Times-Roman SF
+8200 33241 MT
+(Then)
+416 MX(a)
+M(\050red)
+M(channel\051)
+M(pixel)
+M-(value)
+M(of)
+M(zero)
+M(would)
+M(be)
+M(displayed)
+M(with)
+M(an)
+M(intensity)
+M(of)
+M(five)
+M(\050assuming)
+M(the)
+M(display)SH
+7200 34346 MT
+(program)
+250 MX(used)
+M(the)
+M(color)
+M(map)
+M(in)SH
+/Courier-Bold SF
+19698 XM
+(kloo.rle)SH
+/Times-Roman SF
+(\051.)
+M2(When)
+M(kloo.rle)
+M(is)
+M(passed)
+M(through)
+M(applymap,)SH
+/Courier-Bold SF
+14400 35872 MT
+(cat)
+600 MX(kloo.rle)
+M(|)
+M(applymap)
+M(>)
+M(kloo2.rle)SH
+/Times-Roman SF
+7200 37410 MT
+(pixels)
+302 MX(that)
+M(had)
+M(a)
+M(value)
+M(of)
+M(zero)
+M+(in)SH
+/Courier-Bold SF
+20893 XM
+(kloo.rle)SH
+/Times-Roman SF
+25996 XM
+(now)
+M(have)
+M(a)
+M(value)
+M(of)
+M(five)
+M(in)SH
+/Courier-Bold SF
+37503 XM
+(kloo2.rle)SH
+/Times-Roman SF
+(,)
+M(pixel)
+M(values)
+M(of)
+M(one)
+M(would)SH
+7200 38515 MT
+(now)
+258 MX(be)
+M(seven,)
+M(etc.)
+M2(When)
+M(displaying)
+M(the)
+M(images)
+M(on)
+M(a)
+M(frame)
+M(buffer,)SH
+/Courier-Bold SF
+34242 XM
+(kloo2.rle)SH
+/Times-Roman SF
+39900 XM
+(appears)
+M(the)
+M(same)
+M(with)
+M(a)
+M(linear)
+M(map)SH
+7200 39620 MT
+(loaded)
+250 MX(as)SH
+/Courier-Bold SF
+11199 XM
+(kloo.rle)SH
+/Times-Roman SF
+16249 XM
+(does)
+M(with)
+M(its)
+M(special)
+M(color)
+M(map)
+M(loaded.)SH
+8200 41827 MT
+(One)
+421 MX(use)
+M(for)
+M+(these)
+M(tools)
+M(is)
+M(merging)
+M(images)
+M(with)
+M(different)
+M(compensation)
+M(tables.)
+M2(For)
+M(example,)
+M(suppose)
+M(image)SH
+/Courier-Bold SF
+7200 42932 MT
+(gam.rle)SH
+/Times-Roman SF
+11717 XM
+(was)
+317 MX(computed)
+M(so)
+M(that)
+M(it)
+M(requires)
+M(a)
+M(gamma)
+M(corrected)
+M(color)
+M-(table)
+M(\050stored)
+M(in)
+M(the)
+M(RLE)
+M(file\051)
+M(to)
+M(be)
+M(loaded)
+M(to)SH
+7200 44037 MT
+(look)
+303 MX(correct)
+M(on)
+M(a)
+M(particular)
+M(monitor,)
+M+(and)
+M(image)SH
+/Courier-Bold SF
+26762 XM
+(lin.rle)SH
+/Times-Roman SF
+31266 XM
+(was)
+M(computed)
+M(with)
+M(the)
+M(gamma)
+M(correction)
+M(already)
+M(taken)SH
+7200 45142 MT
+(into)
+275 MX(consideration)
+M(\050so)
+M(it)
+M(looks)
+M(correct)
+M(with)
+M(a)
+M(linear)
+M(color)
+M(table)
+M(loaded\051.)
+M2(If)
+M(these)
+M(two)
+M(images)
+M(are)
+M(composited)
+M(together)SH
+7200 46247 MT
+(without)
+264 MX(taking)
+M(into)
+M+(consideration)
+M(these)
+M(differences,)
+M(the)
+M(results)
+M(aren't)
+M(correct)
+M(\050part)
+M(of)
+M(the)
+M(resulting)
+M(image)
+M(is)
+M(either)
+M(too)SH
+7200 47352 MT
+(dim)
+250 MX(or)
+M(washed)
+M(out\051.)
+M2(However,)
+M(we)
+M(can)
+M(use)
+M(applymap)
+M(to)
+M("normalize")
+M(the)
+M(two)
+M(images)
+M(to)
+M(using)
+M(a)
+M(linear)
+M(map)
+M(with:)SH
+/Courier-Bold SF
+9600 48878 MT
+(cat)
+600 MX(gam.rle)
+M(|)
+M(applymap)
+M(|)
+M(comp)
+M(-)
+M(lin.rle)
+M(|)
+M(ldmap)
+M(-l)
+M(>)
+M(result.rle)SH
+11 SS 
+/Times-Bold SF
+7200 52495 MT
+(4.5.)
+550 MX(Generating)
+275 MX(backgrounds)SH
+10 SS 
+/Times-Roman SF
+8200 53600 MT
+(Unlike)
+290 MX(most)
+M(of)
+M(the)
+M(toolkit)
+M(programs)
+M(which)
+M(act)
+M(as)
+M(filters,)SH
+/Courier-Bold SF
+31237 XM
+(background)SH
+/Times-Roman SF
+37527 XM
+(just)
+M(produces)
+M(output.)
+578 MX(Background)
+289 MX(either)SH
+7200 54705 MT
+(produces)
+281 MX(a)
+M+(simple)
+M(flat)
+M(field,)
+M(or)
+M(it)
+M(produces)
+M(a)
+M(field)
+M(with)
+M(pixel)
+M(intensities)
+M(ramped)
+M(in)
+M(the)
+M(vertical)
+M(direction.)
+M2(Most)
+M(often)SH
+7200 55810 MT
+(background)
+436 MX(is)
+M(used)
+M(simply)
+M(to)
+M(provide)
+M(a)
+M-(colored)
+M(backdrop)
+M(for)
+M(an)
+M(image.)
+M2(Background)
+M(is)
+M(another)
+M(example)
+M(of)
+M(a)SH
+7200 56915 MT
+(program)
+365 MX(that)
+M(takes)
+M+(advantage)
+M(of)
+M(the)
+M("raw")
+M(RLE)
+M(facilities.)
+M2(Rather)
+M(than)
+M(generating)
+M(the)
+M(scanlines)
+M(and)
+M(compressing)SH
+7200 58020 MT
+(them,)
+250 MX(background)
+M(simply)
+M(generates)
+M(the)
+M(opcodes)
+M(required)
+M(to)
+M(produce)
+M(each)
+M(scanline.)SH
+11 SS 
+/Times-Bold SF
+7200 61637 MT
+(4.6.)
+550 MX(Converting)
+275 MX(full)
+M(RGB)
+M(images)
+M(to)
+M(eight)
+M(bits)
+M(-)
+M(to8)
+M(and)
+M(tobw)SH
+10 SS 
+/Times-Roman SF
+8200 62742 MT
+(Although)
+278 MX(most)
+M(of)
+M(the)
+M(time)
+M(we)
+M(prefer)
+M(to)
+M(work)
+M(with)
+M(full)
+M(24)
+M(bit)
+M(per)
+M(pixel)
+M(images,)
+M(\05032)
+M(bits)
+M-(with)
+M(alpha\051)
+M(we)
+M(often)
+M(need)SH
+7200 63847 MT
+(the)
+280 MX(images)
+M(represented)
+M+(with)
+M(eight)
+M(bits)
+M(per)
+M(pixel.)
+M2(Many)
+M(inexpensive)
+M(frame)
+M(buffers)
+M(\050such)
+M(as)
+M(the)
+M(AED)
+M(512\051)
+M(and)
+M(many)SH
+7200 64952 MT
+(personal)
+250 MX(color)
+M(workstations)
+M(\050VaxStation)
+M(GPX,)
+M(Color)
+M(Apollos)
+M(and)
+M(Suns\051)
+M(are)
+M(equipped)
+M(with)
+M(eight)
+M(bit)
+M(displays.)SH
+/Courier-Bold SF
+8200 67159 MT
+(To8)SH
+/Times-Roman SF
+10282 XM
+(converts)
+282 MX(a)
+M(24)
+M(bit)
+M(image)
+M(to)
+M(an)
+M(eight)
+M(bit)
+M(image)
+M(by)
+M(applying)
+M(a)
+M(dither)
+M(matrix)
+M(to)
+M-(the)
+M(pixels.)
+M2(This)
+M(basically)
+M(trades)SH
+7200 68264 MT
+(spatial)
+399 MX(resolution)
+M(for)
+M(color)
+M(resolution.)
+M2(The)
+M(resulting)
+M(image)
+M(has)
+M(eight)
+M(bits)
+M(of)
+M(data)
+M(per)
+M(pixel,)
+M(and)
+M(also)
+M+(contains)
+M(a)SH
+7200 69369 MT
+(special)
+344 MX(color)
+M(map)
+M(for)
+M(displaying)
+M(the)
+M(dithered)
+M(image)
+M(\050since)
+M(most)
+M(eight)
+M(bit)
+M-(frame)
+M(buffers)
+M(still)
+M(use)
+M(24)
+M(bit)
+M(wide)
+M(color)SH
+7200 70474 MT
+(table)
+250 MX(entries\051.)SH
+ES
+%%Page: 5 6 
+BS
+0 SI
+10 SS 
+/Times-Bold SF
+30350 4270 MT
+(5)SH
+/Courier-Bold SF
+8200 7886 MT
+(Tobw)SH
+/Times-Roman SF
+10872 XM
+(converts)
+272 MX(a)
+M(picture)
+M(from)
+M(24)
+M(bits)
+M(of)
+M(red,)
+M(green,)
+M(and)
+M+(blue)
+M(to)
+M(an)
+M(eight)
+M(bit)
+M(gray)
+M(level)
+M(image.)
+M2(It)
+M(uses)
+M(the)
+M(standard)SH
+7200 8991 MT
+(television)
+250 MX(YIQ)
+M(transformation)
+M(of)SH
+/Times-Italic SF
+9200 10695 MT
+(graylevel)SH
+/Symbol SF
+13071 XM
+(=)SH
+/Times-Roman SF
+13770 XM
+(0.35)SH
+/Symbol SF
+15670 XM
+(\264)SH
+/Times-Italic SF
+16369 XM
+(red)SH
+/Symbol SF
+17852 XM
+(+)SH
+/Times-Roman SF
+18551 XM
+(0.55)SH
+/Symbol SF
+20451 XM
+(\264)SH
+/Times-Italic SF
+21150 XM
+(green)SH
+/Symbol SF
+23577 XM
+(+)SH
+/Times-Roman SF
+24276 XM
+(0.10)SH
+/Symbol SF
+26176 XM
+(\264)SH
+/Times-Italic SF
+26875 XM
+(blue.)SH
+/Times-Roman SF
+7200 12285 MT
+(These)
+274 MX(images)
+M(are)
+M(often)
+M(preferred)
+M(when)
+M(displaying)
+M(the)
+M-(image)
+M(on)
+M(an)
+M(eight)
+M(bit)
+M(frame)
+M(buffer)
+M(and)
+M(shading)
+M(information)
+M(is)SH
+7200 13390 MT
+(more)
+250 MX(important)
+M(than)
+M(color.)SH
+12 SS 
+/Times-Bold SF
+7200 17074 MT
+(5.)
+600 MX(Interfacing)
+300 MX(to)
+M(the)
+M(RLE)
+M(toolkit)SH
+10 SS 
+/Times-Roman SF
+8200 18179 MT
+(In)
+451 MX(order)
+M(to)
+M(display)
+M(RLE)
+M(images,)
+M(a)
+M(number)
+M(of)
+M(programs)
+M(are)
+M(provided)
+M(for)
+M(displaying)
+M(the)
+M(pictures)
+M(on)
+M+(various)SH
+7200 19284 MT
+(devices.)
+632 MX(These)
+316 MX(display)
+M(programs)
+M(all)
+M(read)
+M(from)
+M(standard)
+M(input,)
+M(so)
+M-(they)
+M(are)
+M(conveniently)
+M(used)
+M(as)
+M(the)
+M(end)
+M(of)
+M(a)
+M(raster)SH
+7200 20389 MT
+(toolkit)
+377 MX(pipeline.)
+M2(The)
+M(original)
+M(display)
+M+(program,)SH
+/Courier-Bold SF
+27118 XM
+(getfb)SH
+/Times-Roman SF
+(,)
+M(displays)
+M(images)
+M(on)
+M(our)
+M(ancient)
+M(Grinnell)
+M(GMR-27)
+M(frame)SH
+7200 21494 MT
+(buffer.)
+500 MX(Many)
+250 MX(display)
+M(programs)
+M(have)
+M(since)
+M(been)
+M(developed:)SH
+/Courier-Bold SF
+9000 23285 MT
+(getcx)SH
+/Times-Roman SF
+18000 XM
+(displays)
+M(images)
+M(on)
+M(a)
+M(Chromatics)
+M(CX1500)SH
+/Courier-Bold SF
+9000 24862 MT
+(getiris)SH
+/Times-Roman SF
+18000 XM
+(displays)
+M(an)
+M(image)
+M(on)
+M(an)
+M(Iris)
+M(workstation)
+M(\050via)
+M(ethernet\051)SH
+/Courier-Bold SF
+9000 26439 MT
+(getX)SH
+/Times-Roman SF
+18000 XM
+(for)
+M(the)
+M(X)
+M(window)
+M(system)SH
+/Courier-Bold SF
+9000 28016 MT
+(getap)SH
+/Times-Roman SF
+18000 XM
+(for)
+M(the)
+M(Apollo)
+M(display)
+M(manager)SH
+/Courier-Bold SF
+9000 29593 MT
+(gethp)SH
+/Times-Roman SF
+18000 XM
+(for)
+M(the)
+M(Hewlett-Packard)
+M(Series)
+M(300)
+M(workstation)
+M(color)
+M(display)SH
+8 SS 
+38804 30825 MT
+(3)SH
+10 SS 
+/Courier-Bold SF
+9000 31170 MT
+(rletops)SH
+/Times-Roman SF
+18000 XM
+(converts)
+M(an)
+M(RLE)
+M(file)
+M(to)
+M(gray-level)
+M(PostScript)
+M(output)SH
+8200 32509 MT
+(The)SH
+/Courier-Bold SF
+10092 XM
+(getX)SH
+/Times-Roman SF
+(,)SH
+/Courier-Bold SF
+13079 XM
+(getap)SH
+/Times-Roman SF
+16415 XM
+(and)SH
+/Courier-Bold SF
+18195 XM
+(gethp)SH
+/Times-Roman SF
+21531 XM
+(programs)
+336 MX(automatically)
+M(perform)
+M(the)
+M(dithering)
+M(required)
+M(to)
+M(convert)
+M(a)
+M(24)
+M(bit)
+M(RLE)SH
+7200 33614 MT
+(image)
+318 MX(to)
+M(eight)
+M(bits)
+M(\050for)
+M(color)
+M+(nodes\051)
+M(or)
+M(one)
+M(bit)
+M(\050for)
+M(bitmapped)
+M(workstations\051.)
+M2(Since)
+M(all)
+M(of)
+M(these)
+M(workstations)
+M(have)SH
+7200 34719 MT
+(high)
+457 MX(resolution)
+M(\0501Kx1K\051)
+M(displays,)
+M(the)
+M(trade)
+M(of)
+M(spatial)
+M-(resolution)
+M(for)
+M(color)
+M(resolution)
+M(produces)
+M(very)
+M(acceptable)SH
+7200 35824 MT
+(results.)
+842 MX(Even)
+421 MX(on)
+M(bitmapped)
+M(displays)
+M(the)
+M(image)
+M(quality)
+M(is)
+M(good)
+M(enough)
+M(to)
+M(get)
+M(a)
+M(reasonable)
+M(idea)
+M(of)
+M(an)
+M+(image's)SH
+7200 36929 MT
+(appearance.)SH
+8200 39136 MT
+(Two)
+336 MX(programs,)SH
+/Courier-Bold SF
+14731 XM
+(painttorle)SH
+/Times-Roman SF
+21066 XM
+(and)SH
+/Courier-Bold SF
+22845 XM
+(rletopaint)SH
+/Times-Roman SF
+29180 XM
+(are)
+M-(supplied)
+M(to)
+M(convert)
+M(MacPaint)
+M(images)
+M(to)
+M(RLE)
+M(files.)
+M2(This)SH
+7200 40241 MT
+(offers)
+250 MX(a)
+M(simple)
+M(way)
+M(to)
+M(add)
+M(text)
+M(or)
+M(graphic)
+M(annotation)
+M(to)
+M(an)
+M(RLE)
+M(image)
+M(\050although)
+M(the)
+M(resolution)
+M(is)
+M(somewhat)
+M(low\051.)SH
+12 SS 
+/Times-Bold SF
+7200 43925 MT
+(6.)
+600 MX(Examples)SH
+10 SS 
+/Times-Roman SF
+8200 45030 MT
+(A)
+300 MX(typical)
+M(use)
+M(for)
+M(the)
+M(toolkit)
+M(is)
+M(to)
+M(take)
+M(an)
+M(image)
+M(generated)
+M(with)
+M(a)
+M+(rendering)
+M(program,)
+M(add)
+M(a)
+M(background)
+M(to)
+M(it,)
+M(and)SH
+7200 46135 MT
+(display)
+250 MX(the)
+M(result)
+M(on)
+M(a)
+M(frame)
+M(buffer:)SH
+/Courier-Bold SF
+9600 47661 MT
+(rlebg)
+600 MX(250)
+M(250)
+M(250)
+M(-v)
+M(|)
+M(comp)
+M(image.rle)
+M(-)
+M(|)
+M(getfb)SH
+/Times-Roman SF
+8200 49868 MT
+(What)
+250 MX(follows)
+M(are)
+M(some)
+M(more)
+M(elaborate)
+M(applications:)SH
+11 SS 
+/Times-Bold SF
+7200 53485 MT
+(6.1.)
+550 MX(Making)
+275 MX(fake)
+M(shadows)SH
+10 SS 
+/Times-Roman SF
+8200 54590 MT
+(In)
+465 MX(this)
+M(exercise)
+M(we)
+M(take)
+M(the)
+M(dart)
+M(\050Figure)
+M(6-1a\051)
+M(and)
+M(stick)
+M(it)
+M(into)
+M(the)
+M(infamous)
+M(mandrill,)
+M(making)
+M(a)
+M(nice)
+M-(\050but)SH
+7200 55695 MT
+(completely)
+250 MX(fake\051)
+M(shadow)
+M(along)
+M(the)
+M(way.)SH
+8200 57902 MT
+(First)
+344 MX(the)
+M(image)
+M(of)
+M(the)
+M(dart)
+M(is)
+M(rotated)
+M(by)
+M(90)
+M(degrees)
+M(\050using)SH
+/Courier-Bold SF
+32437 XM
+(rleflip)
+695 MX(-l)SH
+/Times-Roman SF
+38877 XM
+(and)
+345 MX(then)
+M(stretched)
+M(in)
+M(the)
+M(X)
+M(direction)SH
+7200 59007 MT
+(\050using)SH
+/Courier-Bold SF
+10023 XM
+(fant)
+673 MX(-s)
+M(1.3)
+M(1.0)SH
+/Times-Roman SF
+(\051)
+323 MX(to)
+M(another)
+M(image)
+M(we)
+M(can)
+M(use)
+M(as)
+M(a)
+M(shadow)
+M(template,)
+M(figure)
+M(6-1b.)
+M2(Then)
+M-(we)
+M(take)
+M(this)SH
+7200 60112 MT
+(image,)SH
+/Courier-Bold SF
+10144 XM
+(dart_stretch_rot.rle)SH
+/Times-Roman SF
+(,)
+250 MX(and)
+M(do:)SH
+/Courier-Bold SF
+9600 61638 MT
+(rlebg)
+600 MX(0)
+M(0)
+M(0)
+M(175)
+M(\134)SH
+11400 62769 MT
+(|)
+M(comp)
+M(-o)
+M(in)
+M(-)
+M(dart_stretch_rot.rle)
+M(>)
+M(dart_shadow.rle)SH
+/Times-Roman SF
+8200 64976 MT
+(This)
+250 MX(operation)
+M(uses)
+M(the)
+M(stretched)
+M(dart)
+M(as)
+M(a)
+M(cookie-cutter,)
+M(and)
+M(the)
+M(shape)
+M(is)
+M(cut)
+M(out)
+M(of)
+M(a)
+M+(black)
+M(image,)
+M(with)
+M(a)
+M(coverage)SH
+7200 66081 MT
+(mask)
+347 MX(\050alpha)
+M(channel\051)
+M(of)
+M(175.)
+M2(Thus)
+M(when)
+M(we)
+M(composite)
+M(the)
+M(shadow)
+M(\050figure)
+M-(6-2a\051)
+M(over)
+M(the)
+M(mandrill)
+M(image,)
+M(it)
+M(lets)SH
+7200 67186 MT
+(32%)
+250 MX(of)
+M(the)
+M(mandrill)
+M(through)
+M(\050\050255)
+M(-)
+M(175\051)
+M(/)
+M(255)
+M(=)
+M(32%\051)
+M(with)
+M(the)
+M(rest)
+M(being)
+M(black.)SH
+10800 50 7200 70352 UL
+6 SS 
+8000 71691 MT
+(3)SH
+8 SS 
+/Courier-Bold SF
+8300 72000 MT
+(Rletops)SH
+/Times-Roman SF
+11860 XM
+(was)
+200 MX(used)
+M(to)
+M(produce)
+M(the)
+M(figures)
+M(in)
+M(this)
+M(paper.)SH
+ES
+%%Page: 6 7 
+BS
+0 SI
+10 SS 
+/Times-Bold SF
+30350 4270 MT
+(6)SH
+/Times-Italic SF
+25863 29905 MT
+(pics/dart_and_strtch.ps)SH
+/Times-Bold SF
+17213 31515 MT
+(Figure)
+250 MX(6-1:)
+750 MX(a:)SH
+/Times-Roman SF
+23795 XM
+(Original)
+250 MX(dart)
+M(image.)SH
+/Times-Bold SF
+32127 XM
+(b:)SH
+/Times-Roman SF
+33266 XM
+(Rotated)
+M(and)
+M(stretched)
+M(dart.)SH
+/Times-Italic SF
+23697 55325 MT
+(pics/dart_shadow_and_monkey.ps)SH
+/Times-Bold SF
+17116 56935 MT
+(Figure)
+M(6-2:)
+750 MX(a:)SH
+/Times-Roman SF
+23698 XM
+(Dart)
+250 MX(shadow)
+M(mask.)SH
+/Times-Bold SF
+31641 XM
+(b:)SH
+/Times-Roman SF
+32780 XM
+(Resulting)
+M(skewered)
+M(baboon.)SH
+8200 59142 MT
+(Now)
+363 MX(all)
+M(we)
+M(have)
+M(left)
+M(to)
+M(do)
+M(is)
+M(to)
+M+(composite)
+M(the)
+M(dart)
+M(and)
+M(the)
+M(shadow)
+M(over)
+M(the)
+M(mandrill)
+M(image,)
+M(and)
+M(the)
+M(result)
+M(is)SH
+7200 60247 MT
+(figure)
+303 MX(6-2b.)
+M2(Note)
+M(that)
+M(since)
+M(the)
+M(original)
+M(dart)
+M(image)
+M-(was)
+M(properly)
+M(anti-aliased,)
+M(no)
+M(aliasing)
+M(artifacts)
+M(were)
+M(introduced)SH
+7200 61352 MT
+(in)
+250 MX(the)
+M(final)
+M(image.)SH
+11 SS 
+/Times-Bold SF
+7200 64969 MT
+(6.2.)
+550 MX(Cutting)
+275 MX(holes)SH
+10 SS 
+/Times-Roman SF
+8200 66074 MT
+(In)
+280 MX(this)
+M(example)
+M(we)
+M(start)
+M(out)
+M+(out)
+M(with)
+M(a)
+M(single)
+M(bullet)
+M(hole,)
+M(created)
+M(with)
+M(the)
+M(same)
+M(modelling)
+M(package)
+M(that)
+M(produced)SH
+8 SS 
+10477 66842 MT
+(4)SH
+10 SS 
+7200 67187 MT
+(the)
+250 MX(dart.)SH
+11377 XM
+(First)
+M(the)
+M(hole)
+M(\050which)
+M(originally)
+M(filled)
+M(the)
+M(screen\051)
+M(is)
+M(downfiltered)
+M(to)
+M(a)
+M(small)
+M(size,)
+M(with)SH
+10800 50 7200 70352 UL
+6 SS 
+8000 71691 MT
+(4)SH
+8 SS 
+8300 72000 MT
+(The)
+200 MX(bullet)
+M(hole)
+M(was)
+M(modeled)
+M(with)
+M(cubic)
+M(B-splines.)
+M2(Normal)
+M(people)
+M(probably)
+M(would)
+M(have)
+M(painted)
+M(something)
+M(like)
+M(this...)SH
+ES
+%%Page: 7 8 
+BS
+0 SI
+10 SS 
+/Times-Bold SF
+30350 4270 MT
+(7)SH
+/Courier-Bold SF
+9600 7874 MT
+(avg4)
+600 MX(<)
+M(big_hole.rle)
+M(|)
+M(avg4)
+M(|)
+M(avg4)
+M(>)
+M(smallhole.rle)SH
+/Times-Italic SF
+23474 31684 MT
+(pics/bullet_holes_and_shot_turb.ps)SH
+/Times-Bold SF
+17601 33294 MT
+(Figure)
+250 MX(6-3:)
+750 MX(a:)SH
+/Times-Roman SF
+24183 XM
+(A)
+250 MX(set)
+M(of)
+M(bullet)
+M(holes.)SH
+/Times-Bold SF
+32738 XM
+(b:)SH
+/Times-Roman SF
+33877 XM
+(A)
+M(shot-up)
+M(turbine)
+M(blade.)SH
+8200 35501 MT
+(Now)
+M(by)
+M(invoking)SH
+/Courier-Bold SF
+15450 XM
+(repos)SH
+/Times-Roman SF
+18700 XM
+(and)SH
+/Courier-Bold SF
+20394 XM
+(comp)SH
+/Times-Roman SF
+23044 XM
+(several)
+M(times)
+M(in)
+M(a)
+M(row,)
+M(a)
+M(set)
+M(of)
+M(shots)
+M(is)
+M(built)
+M(up)
+M(\050Figure)
+M(6-3a\051)SH
+8200 37708 MT
+(To)
+326 MX(shoot)
+M(up)
+M(the)
+M(turbine)
+M(blade,)
+M(the)SH
+/Times-Italic SF
+22453 XM
+(atop)SH
+/Times-Roman SF
+24557 XM
+(operator)
+M-(of)
+M(comp)
+M(is)
+M(used.)
+M2(This)
+M(works)
+M(much)
+M(like)SH
+/Times-Italic SF
+44888 XM
+(over)SH
+/Times-Roman SF
+(,)
+M(except)
+M(the)
+M(bullet)SH
+7200 38813 MT
+(holes)
+309 MX(outside)
+M(of)
+M(the)
+M(turbine)
+M+(blade)
+M(don't)
+M(appear)
+M(in)
+M(the)
+M(resulting)
+M(image)
+M(\050Figure)
+M(6-3b\051)
+M(Note)
+M(how)
+M(the)
+M(top)
+M(left)
+M(corner)
+M(is)SH
+7200 39918 MT
+(just)
+250 MX(grazed.)SH
+8200 42125 MT
+(But)
+266 MX(there's)
+M(still)
+M(one)
+M(catch.)
+M2(Suppose)
+M-(we)
+M(want)
+M(to)
+M(display)
+M(the)
+M(shot-up)
+M(turbine)
+M(blade)
+M(over)
+M(a)
+M(background)
+M(of)
+M(some)
+M(sort.)SH
+7200 43230 MT
+(We)
+335 MX(want)
+M(to)
+M(be)
+M(see)
+M+(the)
+M(background)
+M(through)
+M(the)
+M(holes.)
+M2(To)
+M(do)
+M(this)
+M(we)
+M(come)
+M(up)
+M(with)
+M(another)
+M(mask)
+M(to)
+M(cut)
+M(away)
+M(the)SH
+7200 44335 MT
+(centers)
+250 MX(of)
+M(the)
+M(bullet)
+M(holes)
+M(already)
+M(on)
+M(the)
+M(turbine)
+M(blade)
+M(so)
+M(we)
+M(can)
+M(see)
+M(through)
+M(them)
+M(\050Figure)
+M(6-4a\051.)SH
+/Times-Italic SF
+23503 68145 MT
+(pics/center_masks_and_fin_turb.ps)SH
+/Times-Bold SF
+18630 69755 MT
+(Figure)
+M(6-4:)
+750 MX(a:)SH
+/Times-Roman SF
+25212 XM
+(Cut-away)
+250 MX(masks)
+M(for)
+M(the)
+M(bullet)
+M(hole)
+M(centers.)SH
+/Times-Bold SF
+28183 70860 MT
+(b:)SH
+/Times-Roman SF
+29322 XM
+(Finished)
+M(turbine)
+M(blade)SH
+ES
+%%Page: 8 9 
+BS
+0 SI
+10 SS 
+/Times-Bold SF
+30350 4270 MT
+(8)SH
+/Times-Roman SF
+7200 7886 MT
+(Now)
+250 MX(we)
+M(can)
+M(see)
+M(through)
+M(the)
+M(blade)
+M(\050Figure)
+M(6-4b\051.)SH
+11 SS 
+/Times-Bold SF
+7200 11503 MT
+(6.3.)
+550 MX(Integrating)
+275 MX(digitized)
+M(data)SH
+10 SS 
+/Times-Roman SF
+8200 12608 MT
+(In)
+277 MX(this)
+M(example,)
+M(we)
+M(take)
+M(a)
+M(raw)
+M(digitized)
+M(negative)
+M(and)
+M(turn)
+M(it)
+M(into)
+M(a)
+M-(useful)
+M(frame)
+M(buffer)
+M(image.)
+M2(Figure)
+M(6-5a)
+M(shows)SH
+7200 13713 MT
+(the)
+285 MX(original)
+M(image)
+M(from)
+M(the)
+M(scanner.)
+M2(First)
+M(the)
+M(image)
+M(is)
+M(cropped)
+M(to)
+M(remove)
+M(the)
+M(excess)
+M(digitized)
+M+(portion,)
+M(then)
+M(rotated)SH
+7200 14818 MT
+(into)
+250 MX(place)
+M(with)SH
+/Courier-Bold SF
+13394 XM
+(flip)
+600 MX(-r)SH
+/Times-Roman SF
+(,)
+250 MX(resulting)
+M(in)
+M(Figure)
+M(6-5b.)SH
+/Times-Italic SF
+24559 38628 MT
+(pics/scanned_and_cropped.ps)SH
+/Times-Bold SF
+15589 40238 MT
+(Figure)
+M(6-5:)
+750 MX(a:)SH
+/Times-Roman SF
+22171 XM
+(The)
+250 MX(raw)
+M(digitized)
+M(negative.)SH
+/Times-Bold SF
+33613 XM
+(b:)SH
+/Times-Roman SF
+34752 XM
+(Cropped)
+M(and)
+M(rotated)
+M(image)SH
+8200 42445 MT
+(To)
+334 MX(get)
+M(the)
+M(image)
+M(to)
+M(appear)
+M(as)
+M(a)
+M(positive)
+M(on)
+M(the)
+M(frame)
+M(buffer,)
+M-(a)
+M(negative)
+M(linear)
+M(color)
+M(map)
+M(\050stored)
+M(as)
+M(text)
+M(file\051)
+M(is)SH
+7200 43550 MT
+(loaded,)
+438 MX(then)
+M(this)
+M(is)
+M(composed)
+M(with)
+M(a)
+M(gamma)
+M(correction)
+M(map)
+M+(of)
+M(2.2,)
+M(and)
+M(finally)
+M(applied)
+M(to)
+M(the)
+M(pixels)
+M(with)
+M(the)SH
+7200 44655 MT
+(command:)SH
+/Courier-Bold SF
+9600 46181 MT
+(ldmap)
+600 MX(-f)
+M(neg.cmap)
+M(<)
+M(neg_pahriah.rle)
+M(|)
+M(ldmap)
+M(-a)
+M(-g)
+M(2.2)
+M(\134)SH
+11400 47312 MT
+(|)
+M(applymap)
+M(>)
+M(pahriah.rle)SH
+/Times-Roman SF
+7200 48850 MT
+(The)
+250 MX(result,)
+M(Figure)
+M(6-6)
+M(now)
+M(appears)
+M(correct)
+M(with)
+M(a)
+M(linear)
+M(color)
+M(map)
+M(loaded.)SH
+12 SS 
+/Times-Bold SF
+7200 52534 MT
+(7.)
+300 MX(Future)
+M(Work)SH
+10 SS 
+/Times-Roman SF
+8200 53639 MT
+(Needless)
+276 MX(to)
+M(say,)
+M(a)
+M(project)
+M(such)
+M(as)
+M(the)
+M(Raster)
+M-(Toolkit)
+M(is)
+M(open)
+M(ended)
+M(in)
+M(nature,)
+M(and)
+M(new)
+M(tools)
+M(are)
+M(easily)
+M(added.)
+M2(For)SH
+7200 54744 MT
+(example,)
+266 MX(most)
+M(of)
+M(the)
+M(tools)
+M(we)
+M(have)
+M(developed)
+M(to)
+M(date)
+M(deal)
+M(with)
+M+(image)
+M(synthesis)
+M(and)
+M(composition,)
+M(primarily)
+M(because)SH
+7200 55849 MT
+(that)
+326 MX(is)
+M(our)
+M-(research)
+M(orientation.)
+M2(Additional)
+M(tools)
+M(could)
+M(be)
+M(added)
+M(to)
+M(assist)
+M(work)
+M(in)
+M(areas)
+M(such)
+M(as)
+M(vision)
+M(research)
+M(or)SH
+7200 56954 MT
+(image)
+250 MX(processing)
+M(\050for)
+M(examples,)
+M(see)
+M([1,)
+M(7]\051.)SH
+8200 59161 MT
+(Another)
+513 MX(interesting)
+M+(application)
+M(would)
+M(be)
+M(a)
+M(visual)
+M("shell")
+M(for)
+M(invoking)
+M(the)
+M(tools.)
+M2(Currently,)
+M(arguments)
+M(to)SH
+7200 60266 MT
+(programs)
+348 MX(like)SH
+/Courier-Bold SF
+13173 XM
+(crop)SH
+/Times-Roman SF
+15921 XM
+(and)SH
+/Courier-Bold SF
+17713 XM
+(repos)SH
+/Times-Roman SF
+21061 XM
+(are)
+M(specified)
+M(by)
+M(tediously)
+M(finding)
+M-(the)
+M(numbers)
+M(with)
+M(the)
+M(frame)
+M(buffer)
+M(cursor)
+M(and)SH
+7200 61371 MT
+(then)
+260 MX(typing)
+M(them)
+M(into)
+M(a)
+M(shell.)
+M2(The)
+M(visual)
+M(shell)
+M(would)
+M(allow)
+M(the)
+M(various)
+M(toolkit)
+M(operations)
+M(to)
+M(be)
+M+(interactively)
+M(selected)SH
+7200 62476 MT
+(from)
+354 MX(a)
+M(menu.)
+M2(Such)
+M(a)
+M(shell)
+M(could)
+M(probably)
+M(work)
+M(directly)
+M(with)
+M(an)
+M(existing)
+M(workstation)
+M-(window)
+M(system)
+M(such)
+M(as)
+M(X)SH
+7450 63581 MT
+([5])
+250 MX(to)
+M(provide)
+M(a)
+M(friendly)
+M(environment)
+M(for)
+M(using)
+M(the)
+M(toolkit.)SH
+12 SS 
+/Times-Bold SF
+7200 67265 MT
+(8.)
+300 MX(Conclusions)SH
+10 SS 
+/Times-Roman SF
+8200 68370 MT
+(The)
+297 MX(Raster)
+M(Toolkit)
+M(provides)
+M(a)
+M(flexible,)
+M(simple)
+M(and)
+M(easily)
+M(extended)
+M(set)
+M(of)
+M+(tools)
+M(for)
+M(anybody)
+M(working)
+M(with)
+M(images)SH
+7200 69475 MT
+(in)
+275 MX(a)
+M(Unix-based)
+M(environment.)
+M2(We)
+M(have)
+M(ported)
+M(the)
+M(toolkit)
+M(to)
+M(a)
+M(wide)
+M(variety)
+M(of)
+M(Unix)
+M(systems,)
+M-(including)
+M(Gould)
+M(UTX,)SH
+7200 70580 MT
+(HP-UX,)
+333 MX(Sun)
+M(Unix,)
+M(Apollo)
+M(Domain/IX,)
+M(4.2)
+M(and)
+M(4.3)
+M(BSD,)
+M(etc.)
+M2(The)
+M(common)
+M(interfaces)
+M+(of)
+M(the)
+M(RLE)
+M(format)
+M(and)
+M(the)SH
+7200 71685 MT
+(subroutine)
+250 MX(library)
+M(make)
+M(it)
+M(easy)
+M(to)
+M(interface)
+M(the)
+M(toolkit)
+M(to)
+M(a)
+M(wide)
+M(variety)
+M(of)
+M(image)
+M(sources)
+M(and)
+M(displays.)SH
+ES
+%%Page: 9 10 
+BS
+0 SI
+10 SS 
+/Times-Bold SF
+30350 4270 MT
+(9)SH
+/Times-Italic SF
+26335 29905 MT
+(pics/pahriah_final.ps)SH
+/Times-Bold SF
+19448 31515 MT
+(Figure)
+250 MX(6-6:)SH
+/Times-Roman SF
+24947 XM
+(Final)
+M(image)
+M(of)
+M(the)
+M(old)
+M(Pahriah)
+M(ghost)
+M(town)SH
+ES
+%%Page: 10 11 
+BS
+0 SI
+10 SS 
+/Times-Bold SF
+30100 4270 MT
+(10)SH
+12 SS 
+7200 8004 MT
+(9.)
+300 MX(Acknowledgments)SH
+10 SS 
+/Times-Roman SF
+8200 9109 MT
+(This)
+389 MX(work)
+M(was)
+M(supported)
+M(in)
+M(part)
+M(by)
+M(the)
+M(National)
+M(Science)
+M(Foundation)
+M(\050DCR-8203692)
+M-(and)
+M(DCR-8121750\051,)
+M(the)SH
+7200 10214 MT
+(Defense)
+428 MX(Advanced)
+M(Research)
+M(Projects)
+M+(Agency)
+M(\050DAAK11-84-K-0017\051,)
+M(the)
+M(Army)
+M(Research)
+M(Office)
+M(\050DAAG29-81-)SH
+7200 11319 MT
+(K-0111\051,)
+627 MX(and)
+M(the)
+M(Office)
+M-(of)
+M(Naval)
+M(Research)
+M(\050N00014-82-K-0351\051.)
+M2(All)
+M(opinions,)
+M(findings,)
+M(conclusions)
+M(or)SH
+7200 12424 MT
+(recommendations)
+273 MX(expressed)
+M(in)
+M(this)
+M(document)
+M(are)
+M(those)
+M(of)
+M(the)
+M(authors)
+M(and)
+M(do)
+M(not)
+M+(necessarily)
+M(reflect)
+M(the)
+M(views)
+M(of)
+M(the)SH
+7200 13529 MT
+(sponsoring)
+250 MX(agencies.)SH
+ES
+%%Page: 11 12 
+BS
+0 SI
+10 SS 
+/Times-Bold SF
+30100 4270 MT
+(11)SH
+13 SS 
+27568 8071 MT
+(References)SH
+10 SS 
+/Times-Roman SF
+7200 10444 MT
+([1])SH
+10200 XM
+(Burt,)
+250 MX(Peter)
+M(J,)
+M(and)
+M(Adelson,)
+M(Edward)
+M(H.)SH
+10200 11549 MT
+(A)
+M(Multiresolution)
+M(Spline)
+M(With)
+M(Application)
+M(to)
+M(Image)
+M(Mosaics.)SH
+/Times-Italic SF
+10200 12654 MT
+(ACM)
+M(Transactions)
+M(on)
+M(Graphics)SH
+/Times-Roman SF
+23256 XM
+(2\0504\051:217-236,)
+M(October,)
+M(1983.)SH
+7200 14445 MT
+([2])SH
+10200 XM
+(Carpenter,)
+M(Loren.)SH
+10200 15550 MT
+(The)
+M(A-Buffer,)
+M(An)
+M(Antialiased)
+M(Hidden)
+M(Surface)
+M(Method.)SH
+/Times-Italic SF
+10200 16655 MT
+(Computer)
+M(Graphics)SH
+/Times-Roman SF
+18422 XM
+(18\0503\051:103,)
+M(July,)
+M(1984.)SH
+10200 17760 MT
+(Proceedings)
+M(of)
+M(SIGGRAPH)
+M(84.)SH
+7200 19551 MT
+([3])SH
+10200 XM
+(Duff,)
+M(Tom.)SH
+10200 20656 MT
+(Compositing)
+M(3-D)
+M(Rendered)
+M(Images.)SH
+/Times-Italic SF
+10200 21761 MT
+(Computer)
+M(Graphics)SH
+/Times-Roman SF
+18422 XM
+(19\0503\051:41,)
+M(July,)
+M(1985.)SH
+10200 22866 MT
+(Proceedings)
+M(of)
+M(SIGGRAPH)
+M(85.)SH
+7200 24657 MT
+([4])SH
+10200 XM
+(Fant,)
+M(Karl)
+M(M.)SH
+10200 25762 MT
+(A)
+M(Nonaliasing,)
+M(Real-Time,)
+M(Spatial)
+M(Transform.)SH
+/Times-Italic SF
+10200 26867 MT
+(IEEE)
+M(Computer)
+M(Graphics)
+M(and)
+M(Applications)SH
+/Times-Roman SF
+27894 XM
+(6\0501\051:71,)
+M(January,)
+M(1986.)SH
+7200 28658 MT
+([5])SH
+10200 XM
+(Gettys,)
+M(Jim,)
+M(Newman,)
+M(Ron,)
+M(and)
+M(Fera,)
+M(Tony)
+M(D.)SH
+/Times-Italic SF
+10200 29763 MT
+(Xlib)
+M(-)
+M(C)
+M(Language)
+M(X)
+M(Interface,)
+M(Protocol)
+M(Version)
+M(10)SH
+/Times-Roman SF
+(.)SH
+10200 30868 MT
+(Technical)
+M(Report,)
+M(MIT)
+M(Project)
+M(Athena,)
+M(January,)
+M(1986.)SH
+7200 32659 MT
+([6])SH
+10200 XM
+(Porter,)
+M(Thomas)
+M(and)
+M(Duff,)
+M(Tom.)SH
+10200 33764 MT
+(Compositing)
+M(Digital)
+M(Images.)SH
+/Times-Italic SF
+10200 34869 MT
+(Computer)
+M(Graphics)SH
+/Times-Roman SF
+18422 XM
+(18\0503\051:253,)
+M(July,)
+M(1984.)SH
+10200 35974 MT
+(Proceedings)
+M(of)
+M(SIGGRAPH)
+M(84.)SH
+7200 37765 MT
+([7])SH
+10200 XM
+(Stockham,)
+M(Thomas)
+M(G.)SH
+10200 38870 MT
+(Image)
+M(Processing)
+M(in)
+M(the)
+M(Context)
+M(of)
+M(a)
+M(Visual)
+M(Model.)SH
+/Times-Italic SF
+10200 39975 MT
+(Proceedings)
+M(of)
+M(the)
+M(IEEE)SH
+/Times-Roman SF
+20365 XM
+(60\0507\051:828-842,)
+M(July,)
+M(1972.)SH
+7200 41766 MT
+([8])SH
+10200 XM
+(Thomas,)
+M(Spencer)
+M(W.)SH
+/Times-Italic SF
+10200 42871 MT
+(Design)
+M(of)
+M(the)
+M(Utah)
+M(RLE)
+M(Format)SH
+/Times-Roman SF
+(.)SH
+10200 43976 MT
+(Technical)
+M(Report)
+M(86-15,)
+M(Alpha_1)
+M(Project,)
+M(CS)
+M(Department,)
+M(University)
+M(of)
+M(Utah,)
+M(November,)
+M(1986.)SH
+ES
+%%Page: i 13 
+BS
+0 SI
+10 SS 
+/Times-Bold SF
+30461 4270 MT
+(i)SH
+12 SS 
+26033 8004 MT
+(Table)
+300 MX(of)
+M(Contents)SH
+11 SS 
+8850 9172 MT
+(1.)
+275 MX(Introduction)SH
+53450 XM
+(0)SH
+8850 10340 MT
+(2.)
+M(Origins)SH
+53450 XM
+(0)SH
+8850 11508 MT
+(3.)
+M(The)
+M(RLE)
+M(format)SH
+53450 XM
+(1)SH
+10 SS 
+10700 12588 MT
+(3.1.)
+250 MX(The)
+M(RLE)
+M(header)SH
+53500 XM
+(1)SH
+10700 13668 MT
+(3.2.)
+M(The)
+M(scanline)
+M(data)SH
+53500 XM
+(1)SH
+10700 14748 MT
+(3.3.)
+M(Subroutine)
+M(Interface)SH
+53500 XM
+(2)SH
+11 SS 
+8850 15916 MT
+(4.)
+275 MX(The)
+M(tools)SH
+53450 XM
+(2)SH
+10 SS 
+10700 16996 MT
+(4.1.)
+250 MX(The)
+M(image)
+M(compositor)
+M(-)
+M(Comp)SH
+53500 XM
+(2)SH
+10700 18076 MT
+(4.2.)
+M(Basic)
+M(image)
+M(composition)
+M(-)
+M(Repos)
+M(and)
+M(Crop)SH
+53500 XM
+(3)SH
+10700 19156 MT
+(4.3.)
+M(Changing)
+M(image)
+M(orientation)
+M(and)
+M(size)
+M(-)
+M(Flip,)
+M(Fant)
+M(and)
+M(Avg4)SH
+53500 XM
+(3)SH
+10700 20236 MT
+(4.4.)
+M(Color)
+M(map)
+M(manipulation)
+M(-)
+M(Ldmap)
+M(and)
+M(Applymap)SH
+53500 XM
+(4)SH
+10700 21316 MT
+(4.5.)
+M2(Generating)
+M(backgrounds)SH
+53500 XM
+(4)SH
+10700 22396 MT
+(4.6.)
+M2(Converting)
+M(full)
+M(RGB)
+M(images)
+M(to)
+M(eight)
+M(bits)
+M(-)
+M(to8)
+M(and)
+M(tobw)SH
+53500 XM
+(4)SH
+11 SS 
+8850 23564 MT
+(5.)
+550 MX(Interfacing)
+275 MX(to)
+M(the)
+M(RLE)
+M(toolkit)SH
+53450 XM
+(5)SH
+8850 24732 MT
+(6.)
+M2(Examples)SH
+53450 XM
+(5)SH
+10 SS 
+10700 25812 MT
+(6.1.)
+500 MX(Making)
+250 MX(fake)
+M(shadows)SH
+53500 XM
+(5)SH
+10700 26892 MT
+(6.2.)
+M2(Cutting)
+M(holes)SH
+53500 XM
+(6)SH
+10700 27972 MT
+(6.3.)
+M2(Integrating)
+M(digitized)
+M(data)SH
+53500 XM
+(8)SH
+11 SS 
+8850 29140 MT
+(7.)
+275 MX(Future)
+M(Work)SH
+53450 XM
+(8)SH
+8850 30308 MT
+(8.)
+M(Conclusions)SH
+53450 XM
+(8)SH
+8850 31476 MT
+(9.)
+M(Acknowledgments)SH
+52900 XM
+(10)SH
+ES
+%%Trailer
+%%Pages: 13 
+%%DocumentFonts: Times-Roman Times-Bold Times-Italic Courier-Bold Symbol

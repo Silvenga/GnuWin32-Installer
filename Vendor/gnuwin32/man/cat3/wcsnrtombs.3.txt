@@ -1,0 +1,84 @@
+WCSNRTOMBS(3)      Linux Programmer's Manual      WCSNRTOMBS(3)
+
+
+
+
+
+NAME
+       wcsnrtombs - convert a wide character string to a multi-
+       byte string
+
+SYNOPSIS
+       #include <wchar.h>
+
+       size_t wcsnrtombs (char* dest, const wchar_t** src, size_t nwc,
+                          size_t len, mbstate_t* ps);
+
+DESCRIPTION
+       The wcsnrtombs function is like the wcsrtombs  function,
+       except  that  the  number  of wide characters to be con-
+       verted, starting at *src, is limited to nwc.
+
+       If dest is not a NULL pointer, the  wcsnrtombs  function
+       converts at most nwc wide characters from the wide-char-
+       acter string *src to  a  multibyte  string  starting  at
+       dest.  At  most len bytes are written to dest. The shift
+       state *ps is updated. The conversion is effectively per-
+       formed  by  repeatedly calling wcrtomb(dest,*src,ps), as
+       long as this call succeeds, and then  incrementing  dest
+       by the number of bytes written and *src by one. The con-
+       version can stop for three reasons:
+
+       1. A wide character has been encountered that can not be
+       represented  as  a  multibyte sequence (according to the
+       current locale). In this case *src is left  pointing  to
+       the  invalid  wide  character, (size_t)(-1) is returned,
+       and errno is set to EILSEQ.
+
+       2. nwc  wide  characters  have  been  converted  without
+       encountering a L'\0', or the length limit forces a stop.
+       In this case *src is left  pointing  to  the  next  wide
+       character to be converted, and the number of bytes writ-
+       ten to dest is returned.
+
+       3. The wide-character string has  been  completely  con-
+       verted,  including  the terminating L'\0' (which has the
+       side effect of bringing back *ps to the initial  state).
+       In  this  case  *src  is  set to NULL, and the number of
+       bytes written to dest, excluding  the  terminating  '\0'
+       byte, is returned.
+
+       If dest is NULL, len is ignored, and the conversion pro-
+       ceeds as above, except that the converted bytes are  not
+       written  out  to  memory, and that no destination length
+       limit exists.
+
+       In both of the above cases, if ps is a NULL  pointer,  a
+       static  anonymous  state  only  known  to the wcsnrtombs
+       function is used instead.
+
+       The programmer must ensure that there  is  room  for  at
+       least len bytes at dest.
+
+RETURN VALUE
+       The wcsnrtombs function returns the number of bytes that
+       make up the converted part of  multibyte  sequence,  not
+       including  the terminating null byte.  If a wide charac-
+       ter  was  encountered  which  could  not  be  converted,
+       (size_t)(-1) is returned, and errno set to EILSEQ.
+
+CONFORMING TO
+       This function is a GNU extension.
+
+SEE ALSO
+       wcsrtombs(3), iconv(3)
+
+NOTES
+       The behaviour of wcsnrtombs depends on the LC_CTYPE cat-
+       egory of the current locale.
+
+       Passing NULL as ps is not multi-thread safe.
+
+
+
+GNU                      July 25, 1999            WCSNRTOMBS(3)

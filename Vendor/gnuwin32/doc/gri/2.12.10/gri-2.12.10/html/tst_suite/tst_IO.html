@@ -1,0 +1,104 @@
+<html>
+<head>
+<title>../../../gri-2.12.10-src/doc/tst_suite/tst_IO.gri</title>
+</head>
+<body bgcolor="#FFFFFF">
+<i># This html document was prepared by gri2html based on the Gri script named</i>
+<br><i>#    <a href="../../../gri-2.12.10-src/doc/tst_suite/tst_IO.gri">../../../gri-2.12.10-src/doc/tst_suite/tst_IO.gri</a></i>
+<br># <i>Gri is available for free at <a href="http://gri.sourceforge.net">http://gri.sourceforge.net</a></i>
+<pre>
+show <font color=#2F4F4F>"doc/tst_suite/tst_IO.gri      ..."</font> ...
+
+<font color=#B22222># Test some I/O features.  NOTE: this will make _no_ sense</font>
+<font color=#B22222># to you unless you have a look at the test files!</font>
+
+<font color=#B22222># Read columns from file with newline at the end ...</font>
+open tst_IO_1.dat
+read columns x y
+close
+assert {<font color=#9400D3>rpn</font> <font color=#006400>..num_col_data..</font> 2 ==}      <font color=#2F4F4F>" failed test 1-a"</font>
+assert {<font color=#9400D3>rpn</font> x 0 @  1 ==}                <font color=#2F4F4F>" failed test 1-b"</font>
+assert {<font color=#9400D3>rpn</font> x 1 @  2 ==}                <font color=#2F4F4F>" failed test 1-c"</font>
+assert {<font color=#9400D3>rpn</font> y 0 @ 11 ==}                <font color=#2F4F4F>" failed test 1-d"</font>
+assert {<font color=#9400D3>rpn</font> y 1 @ 22 ==}                <font color=#2F4F4F>" failed test 1-e"</font>
+
+<font color=#B22222># ... as above, but from a file without newline at the end.</font>
+open tst_IO_2.dat
+read columns x y
+close
+assert {<font color=#9400D3>rpn</font> <font color=#006400>..num_col_data..</font> 2 ==}      <font color=#2F4F4F>" failed test 2-a"</font>
+assert {<font color=#9400D3>rpn</font> x 0 @  1 ==}                <font color=#2F4F4F>" failed test 2-b"</font>
+assert {<font color=#9400D3>rpn</font> x 1 @  2 ==}                <font color=#2F4F4F>" failed test 2-c"</font>
+assert {<font color=#9400D3>rpn</font> y 0 @ 11 ==}                <font color=#2F4F4F>" failed test 2-d"</font>
+assert {<font color=#9400D3>rpn</font> y 1 @ 22 ==}                <font color=#2F4F4F>" failed test 2-e"</font>
+
+<font color=#B22222># Read a line into a synonym.</font>
+open tst_IO_1.dat
+read line<font color=#0000EE> \s
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\s" "1 11" =</font>=}             " failed test 3-a"</font>
+read line<font color=#0000EE> \s
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\s" "2 22" =</font>=}             " failed test 3-b"</font>
+close
+open tst_IO_2.dat
+read line<font color=#0000EE> \s
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\s" "1 11" =</font>=}             " failed test 3-c"</font>
+read line<font color=#0000EE> \s
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\s" "2 22" =</font>=}             " failed test 3-d"</font>
+close
+
+<font color=#B22222># Read variable/synonym, in various orders.</font>
+open tst_IO_1.dat
+read<font color=#CDAD00> .a.</font><font color=#CDAD00> .b.</font>
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .a.</font>  1 ==}                  <font color=#2F4F4F>" failed test 4-a"</font>
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .b.</font> 11 ==}                  <font color=#2F4F4F>" failed test 4-b"</font>
+read<font color=#0000EE> \a</font><font color=#0000EE> \b
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\a"  "2" =</font>=}               " failed test 4-c"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\b" "22" =</font>=}               " failed test 4-d"</font>
+rewind
+read<font color=#CDAD00> .a.</font><font color=#0000EE> \b
+</font>assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .a.</font>  1 ==}                  <font color=#2F4F4F>" failed test 4-e"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\b" "11" =</font>=}               " failed test 4-f"</font>
+read<font color=#0000EE> \a<font</font> color=#CDAD00> .b.</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\a" "2" =</font>=}                " failed test 4-g"</font>
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .b.</font>  22  ==}                <font color=#2F4F4F>" failed test 4-h"</font>
+close
+open tst_IO_2.dat
+read<font color=#CDAD00> .a.</font><font color=#CDAD00> .b.</font>
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .a.</font>  1 ==}                  <font color=#2F4F4F>" failed test 4-i"</font>
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .b.</font> 11 ==}                  <font color=#2F4F4F>" failed test 4-j"</font>
+read<font color=#0000EE> \a</font><font color=#0000EE> \b
+</font>assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\a"  "2" =</font>=}               " failed test 4-k"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\b" "22" =</font>=}               " failed test 4-l"</font>
+rewind
+read<font color=#CDAD00> .a.</font><font color=#0000EE> \b
+</font>assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .a.</font>  1 ==}                  <font color=#2F4F4F>" failed test 4-m"</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\b" "11" =</font>=}               " failed test 4-n"</font>
+read<font color=#0000EE> \a<font</font> color=#CDAD00> .b.</font>
+assert {<font color=#9400D3>rpn</font> <font color=#2F4F4F>"<font color=#0000EE>\a" "2" =</font>=}                " failed test 4-o"</font>
+assert {<font color=#9400D3>rpn</font><font color=#CDAD00> .b.</font>  22  ==}                <font color=#2F4F4F>" failed test 4-p"</font>
+close
+
+<font color=#9400D3>if</font> 0				<font color=#B22222># NOTE: change to 1 do some non-assert tests</font>
+    <font color=#B22222># Grids</font>
+    open tst_IO_1.dat
+    read grid x
+    show grid
+    close
+    open tst_IO_2.dat
+    read grid x
+    show grid
+    close
+    open tst_IO_1.dat
+    read grid y
+    show grid
+    close
+    open tst_IO_2.dat
+    read grid y
+    show grid
+    close
+<font color=#9400D3>end if</font>
+
+show <font color=#2F4F4F>" passed"</font>
+</pre>
+</body>
+</html>

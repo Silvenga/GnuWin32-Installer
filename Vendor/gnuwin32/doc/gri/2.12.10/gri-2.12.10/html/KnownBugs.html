@@ -1,0 +1,154 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Gri: bugs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"></head>
+<body bgcolor="#FFFFFF" text="#000000" link="#0000EE" vlink="#551A8B" alink="FF0000">
+<!-- newfile KnownBugs.html "Gri: bugs" "Gri Bugs" --> 
+
+<!-- @node   Known Bugs, Reporting Bugs, Bugs, Bugs -->
+<a name="KnownBugs" ></a>
+
+<img src="./resources/top_banner.gif" alt="navigation map" usemap="#navigate_top" border="0">
+<table summary="top banner" border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td width="150" valign="top">
+<font size=-1>
+<br>
+Chapters:
+<br>
+&nbsp;&nbsp;<a href="Introduction.html">1: Introduction</a><br>
+&nbsp;&nbsp;<a href="SimpleExample.html">2: Simple example</a><br>
+&nbsp;&nbsp;<a href="InvokingGri.html">3: Invocation</a><br>
+&nbsp;&nbsp;<a href="GettingMoreControl.html">4: Finer Control</a><br>
+&nbsp;&nbsp;<a href="X-Y.html">5: X-Y Plots</a><br>
+&nbsp;&nbsp;<a href="ContourPlots.html">6: Contour Plots</a><br>
+&nbsp;&nbsp;<a href="Images.html">7: Image Plots</a><br>
+&nbsp;&nbsp;<a href="Examples.html">8: Examples</a><br>
+&nbsp;&nbsp;<a href="Commands.html">9: Gri Commands</a><br>
+&nbsp;&nbsp;<a href="Programming.html">10: Programming</a><br>
+&nbsp;&nbsp;<a href="Environment.html">11: Environment</a><br>
+&nbsp;&nbsp;<a href="Emacs.html">12: Emacs Mode</a><br>
+&nbsp;&nbsp;<a href="History.html">13: History</a><br>
+&nbsp;&nbsp;<a href="Installation.html">14: Installation</a><br>
+&nbsp;&nbsp;<a href="Bugs.html">15: Gri Bugs</a><br>
+&nbsp;&nbsp;<a href="TestSuite.html">16: Test Suite</a><br>
+&nbsp;&nbsp;<a href="GriInThePress.html">17: Gri in Press</a><br>
+&nbsp;&nbsp;<a href="Acknowledgments.html">18: Acknowledgments</a><br>
+&nbsp;&nbsp;<a href="License.html">19: License</a><br>
+<br>
+Indices:<br>
+&nbsp;&nbsp;<a href="ConceptIndex.html"><i>Concepts</i></a><br>
+&nbsp;&nbsp;<a href="CommandIndex.html"><i>Commands</i></a><br>
+&nbsp;&nbsp;<a href="BuiltinIndex.html"><i>Variables</i></a><br>
+</font>
+<td width="500" valign="top">
+<map name="navigate_top">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Bugs.html#Bugs" shape="rect" coords="516,2,532,24" href="Bugs.html#Bugs">
+<area alt="Gri: bugs" shape="rect" coords="557,2,573,24" href="Bugs.html">
+<area alt="Gri: bugs" shape="rect" coords="581,2,599,24" href="ReportingBugs.html">
+</map>
+<map name="navigate_bottom">
+<area alt="index.html#Top" shape="rect" coords="5,2,218,24" href="index.html#Top">
+<area alt="Gri: bugs" shape="rect" coords="581,2,599,24" href="ReportingBugs.html">
+</map>
+<h2>15.1: Known bugs</h2>
+
+
+The ultimate reference for Gri bugs is the development website
+<a href="http://gri.sourceforge.net">`<font color="#82140F"><code>http://gri.sourceforge.net</code></font>'</a>, which has a powerful bug-tracking
+facility at
+<a href="http://sourceforge.net/tracker/?atid=105511&amp;group_id=5511&amp;func=browse">`<font color="#82140F"><code>http://sourceforge.net/tracker/?atid=105511&amp;group_id=5511&amp;func=browse</code></font>'</a>
+that permits you to view bugs that have been fixed and bugs that still
+exist, and that also lets you report bugs.
+<p>
+A summary of some known bugs, some reported on the development site
+and some not, follows.
+<p>
+<ul>
+<p>
+<li>
+The PDF version of the manual, created by `<font color="#82140F"><code>make gri.pdf</code></font>', won't
+work unless the following patch is applied to one of the files of
+TexInfo, version 1999-03-26.17.  (This patch entered the official TeX
+sources in April 2001.)
+<p>
+<TABLE SUMMARY="Example" BORDER="0" BGCOLOR="#efefef" WIDTH="100%">
+<TR>
+<TD>
+<PRE>
+<font color="#82140F">
+*** /usr/share/texmf/pdftex/texinfo/pdftexinfo.tex	Wed Dec 20 11:54:04 2000
+--- /usr/share/texmf/pdftex/texinfo/pdftexinfo.tex~	Mon Mar 29 06:17:02 1999
+***************
+*** 5481,5487 ****
+        \fi
+      \endgroup
+    \else
+!     \centerline{\pdfimage {#1.pdf}}%
+    \fi
+  }
+  
+--- 5481,5487 ----
+        \fi
+      \endgroup
+    \else
+!     \centerline{\pdfimage #1.pdf}%
+    \fi
+  }
+</font></PRE>
+</TD>
+</TR>
+</TABLE>
+<p>
+<li>
+The EPSF bounding-box defaults to an 8.5 by 11 inch page, if
+`<font color="#82140F"><code>-no_bounding_box</code></font>' is specified on the commandline 
+(see <a href="InvokingGri.html#InvokingGri">Invoking Gri</a>).  It should probably know about more
+paper sizes.
+<li>
+`<font color="#82140F"><code>draw contour labels nowhiteunder</code></font>' does not break the line under
+the label, as it should.
+<li>
+`<font color="#82140F"><code>reorder columns</code></font>' is slow because it uses a bubble-sort.
+<li>
+Support for `<font color="#82140F"><code>netCDF</code></font>' binary files is limited, e.g. (1) consistency
+of grid x/y/data is not checked as it is in ascii/binary formats; (2)
+Gri cannot read image data; (3) `<font color="#82140F"><code>set input data window</code></font>' has no
+effect: use `<font color="#82140F"><code>set clip</code></font>' instead; and (4) Gri cannot output to
+`<font color="#82140F"><code>netCDF</code></font>' files.
+<li>
+Errors sometimes report inaccurate line numbers.  (E.G.: errors inside
+newcommands report wrong line numbers if continued lines are present
+before the bad line.)
+<li>
+Images in rasterfile format: only mapless images permitted.
+<li>
+In an `<font color="#82140F"><code>insert</code></font>'ed file, `<font color="#82140F"><code>read</code></font>' commands which expect input from
+the commandfile, as opposed to a datafile, do not work.
+<li>
+The string size rpnfunctions `<font color="#82140F"><code>ascent("string")</code></font>' and
+`<font color="#82140F"><code>descent("string")</code></font>' are inaccurate.
+<li>
+Commands in the false part of `<font color="#82140F"><code>if</code></font>' statements are
+not checked for proper syntax.  All commands in false parts of `<font color="#82140F"><code>if</code></font>'
+statements are simply skipped, except for `<font color="#82140F"><code>end if</code></font>' or `<font color="#82140F"><code>else [if]</code></font>'.
+<li>
+Clipped lines should extend as far as the axis frame, but they don't.
+Gri only draws line segments which connect two points each of which is
+inside the axis frame.  Workaround: use `<font color="#82140F"><code>set clip postscript</code></font>'
+instead of `<font color="#82140F"><code>set clip</code></font>'.
+<li>
+Aesthetics (y-axes): labels are sometimes ugly because they are
+right-justified, and the number of decimal points is not necessarily
+uniform in all labels.  Workaround: Set the format yourself (example:
+`<font color="#82140F"><code>set y format %.1f</code></font>').
+</ul>
+<p>
+
+</table>
+<img src="./resources/bottom_banner.gif" alt="navigation map" usemap="#navigate_bottom" border="0">
+
+</body>
+</html>

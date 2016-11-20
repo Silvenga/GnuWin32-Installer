@@ -1,0 +1,282 @@
+<div class="node">
+<p><hr>
+<a name="Top"></a>Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+<br>
+</div>
+
+<h2 class="unnumbered">Top</h2>
+
+<html lang="en">
+<head>
+<title>`which': show full path of commands</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="`which': show full path of commands">
+<meta name="generator" content="makeinfo 4.7">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc { font-variant:small-caps }
+  span.roman { font-family: serif; font-weight: normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">`which': show full path of commands</h1>
+<ul class="menu">
+<li><a accesskey="1" href="#Which-Program">Which Program</a>:                The <span class="command">which</span> Program
+<li><a accesskey="2" href="#Invoking-Which">Invoking Which</a>:               How to invoke <span class="command">which</span>
+<li><a accesskey="3" href="#Option-Summary">Option Summary</a>:               Overview of commandline options
+<li><a accesskey="4" href="#Return-Value">Return Value</a>: 		The return value of <span class="command">which</span>
+<li><a accesskey="5" href="#Example">Example</a>: 			Examples of invokation
+<li><a accesskey="6" href="#Bugs">Bugs</a>: 			Known bugs
+<li><a accesskey="7" href="#See-Also">See Also</a>: 			Related UNIX commands
+<li><a accesskey="8" href="#Index">Index</a>:                        Index
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Which-Program"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Invoking-Which">Invoking Which</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">1 The <span class="command">which</span> Program</h2>
+
+<p><a name="index-Description-of-_0040command_007bwhich_007d-1"></a>
+<!-- !BEGIN DESCRIPTION -->
+<span class="command">Which</span> takes one or more arguments. For each of its arguments
+it prints to stdout the full path of the executables
+that would have been executed when this argument had been
+entered at the shell prompt. It does this by searching
+for an executable or script in the directories listed in
+the environment variable <span class="env">PATH</span> using the same algorithm as <span class="command">bash(1)</span>. 
+<!-- !END DESCRIPTION -->
+
+<div class="node">
+<p><hr>
+<a name="Invoking-Which"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Option-Summary">Option Summary</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Which-Program">Which Program</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">2 Invoking <span class="command">which</span></h2>
+
+<p><a name="index-Invoking-_0040command_007bwhich_007d-2"></a><a name="index-Synopsis-3"></a>
+The synopsis to invoke <span class="command">which</span> is
+
+<!-- !BEGIN SYNOPSIS -->
+<pre class="example">     which [options] [--] programname [...]
+</pre>
+   <!-- !END SYNOPSIS -->
+<ul class="menu">
+<li><a accesskey="1" href="#Option-Summary">Option Summary</a>:         Option summary
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Option-Summary"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Return-Value">Return Value</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invoking-Which">Invoking Which</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">3 Option Summary</h2>
+
+<p><a name="index-Options_002c-command-line-4"></a><a name="index-Command-line-Options-5"></a><a name="index-Overview-of-command-line-options-6"></a>
+<!-- !BEGIN OPTIONS -->
+     
+<a name="index-_0040option_007b_002d_002dall_007d-7"></a>
+<a name="index-_0040option_007b_002da_007d-8"></a>
+<dl><dt><span class="samp">--all</span><dt><span class="samp">-a</span><dd>Print all matching executables in <span class="env">PATH</span>, not just the first.
+
+     <p><a name="index-_0040option_007b_002d_002dread_002dalias_007d-9"></a><a name="index-_0040option_007b_002di_007d-10"></a><br><dt><span class="samp">--read-alias</span><dt><span class="samp">-i</span><dd>Read aliases from stdin, reporting matching ones on
+stdout. This is useful in combination with using an
+alias for which itself. For example<br>
+<code>alias which='alias | which -i'</code>.
+
+     <p><a name="index-_0040option_007b_002d_002dskip_002dalias_007d-11"></a><br><dt><span class="samp">--skip-alias</span><dd>Ignore option <span class="option">--read-alias</span>, if any. This is useful to
+explicity search for normal binaries, while using
+the <span class="option">--read-alias</span> option in an alias or function for which.
+
+     <p><a name="index-_0040option_007b_002d_002dread_002dfunctions_007d-12"></a><br><dt><span class="samp">--read-functions</span><dd>Read shell function definitions from stdin, reporting matching
+ones on stdout. This is useful in combination with using a shell
+function for which itself.  For example:<br>
+<code>which() { declare -f | which --read-functions $@ }<br>export -f which</code>
+
+     <p><a name="index-_0040option_007b_002d_002dskip_002dfunctions_007d-13"></a><br><dt><span class="samp">--skip-functions</span><dd>Ignore option <span class="option">--read-functions</span>, if any. This is useful to
+explicity search for normal binaries, while using
+the <span class="option">--read-functions</span> option in an alias or function for which.
+
+     <p><a name="index-_0040option_007b_002d_002dskip_002ddot_007d-14"></a><br><dt><span class="samp">--skip-dot</span><dd>Skip directories in <span class="env">PATH</span> that start with a dot.
+
+     <p><a name="index-_0040option_007b_002d_002dskip_002dtilde_007d-15"></a><br><dt><span class="samp">--skip-tilde</span><dd>Skip directories in <span class="env">PATH</span> that start with a tilde and
+executables which reside in the <span class="env">HOME</span> directory.
+
+     <p><a name="index-_0040option_007b_002d_002dshow_002ddot_007d-16"></a><br><dt><span class="samp">--show-dot</span><dd>If a directory in <span class="env">PATH</span> starts with a dot and a matching
+executable was found for that path, then print
+"./programname" rather than the full path.
+
+     <p><a name="index-_0040option_007b_002d_002dshow_002dtilde_007d-17"></a><br><dt><span class="samp">--show-tilde</span><dd>Output a tilde when a directory matches the <span class="env">HOME</span>
+directory. This option is ignored when which is
+invoked as root.
+
+     <p><a name="index-_0040option_007b_002d_002dtty_002donly_007d-18"></a><br><dt><span class="samp">--tty-only</span><dd>Stop processing options on the right if not on tty.
+
+     <p><a name="index-_0040option_007b_002d_002dversion_007d-19"></a><a name="index-_0040option_007b_002dv_007d-20"></a><a name="index-_0040option_007b_002dV_007d-21"></a><br><dt><span class="samp">--version, -v, -V</span><dd>Print version information on standard output then exit
+successfully.
+
+     <p><a name="index-_0040option_007b_002d_002dhelp_007d-22"></a><br><dt><span class="samp">--help</span><dd>Print usage information on standard output then exit
+successfully.
+
+   </dl>
+   <!-- !END OPTIONS -->
+
+<div class="node">
+<p><hr>
+<a name="Return-Value"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Example">Example</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Option-Summary">Option Summary</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">4 Return Value</h2>
+
+<p><a name="index-Return-value-of-_0040command_007bwhich_007d-23"></a>
+<!-- !BEGIN RETURNVALUE -->
+<span class="command">Which</span> returns the number of failed arguments, or -1 when
+no <span class="file">programname</span> was given. 
+<!-- !END RETURNVALUE -->
+
+<div class="node">
+<p><hr>
+<a name="Example"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Bugs">Bugs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Return-Value">Return Value</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">5 Example</h2>
+
+<p><a name="index-Examples-24"></a><a name="index-aliases_002c-handling-of-25"></a>
+<!-- !BEGIN EXAMPLE -->
+The recommended way to use this utility is by adding an alias (C shell)
+or shell function (Bourne shell) for <span class="command">which</span> like the following:
+
+   <p>[ba]sh:
+
+<pre class="example">     which ()
+     {
+       (alias; declare -f) | /usr/bin/which --tty-only --read-alias --read-functions --show-tilde --show-dot $@
+     }
+     export -f which
+</pre>
+   <p>[t]csh:
+
+<pre class="example">     alias which 'alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde'
+</pre>
+   <p class="noindent">This will print the readable ~/ and ./ when starting which
+from your prompt, while still printing the full path when
+used from a script:
+
+<pre class="example">     &gt; which q2
+     ~/bin/q2
+     &gt; echo `which q2`
+     /home/carlo/bin/q2
+</pre>
+   <!-- !END EXAMPLE -->
+<div class="node">
+<p><hr>
+<a name="Bugs"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#See-Also">See Also</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Example">Example</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">6 Bugs</h2>
+
+<p><a name="index-Bugs_002c-known-26"></a>
+<!-- !BEGIN BUGS -->
+The <span class="env">HOME</span> directory is determined by looking for the <span class="env">HOME</span>
+environment variable, which aborts when this variable
+doesn't exist.  <span class="command">Which</span> will consider two equivalent directories
+to be different when one of them contains a path
+with a symbolic link. 
+<!-- !END BUGS -->
+
+<div class="node">
+<p><hr>
+<a name="See-Also"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Index">Index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Bugs">Bugs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">7 See Also</h2>
+
+<!-- !BEGIN SEEALSO -->
+<p><span class="command">bash(1)</span>
+<!-- !END SEEALSO -->
+
+<div class="node">
+<p><hr>
+<a name="Index"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#See-Also">See Also</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<!-- node-name,    next,  previous,       up -->
+<h2 class="unnumbered">Index</h2>
+
+<ul class="index-cp" compact>
+<li><a href="#index-_0040option_007b_002d_002dall_007d-7"><span class="option">--all</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002d_002dhelp_007d-22"><span class="option">--help</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002d_002dread_002dalias_007d-9"><span class="option">--read-alias</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002d_002dread_002dfunctions_007d-12"><span class="option">--read-functions</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002d_002dshow_002ddot_007d-16"><span class="option">--show-dot</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002d_002dshow_002dtilde_007d-17"><span class="option">--show-tilde</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002d_002dskip_002dalias_007d-11"><span class="option">--skip-alias</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002d_002dskip_002ddot_007d-14"><span class="option">--skip-dot</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002d_002dskip_002dfunctions_007d-13"><span class="option">--skip-functions</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002d_002dskip_002dtilde_007d-15"><span class="option">--skip-tilde</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002d_002dtty_002donly_007d-18"><span class="option">--tty-only</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002d_002dversion_007d-19"><span class="option">--version</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002da_007d-8"><span class="option">-a</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002di_007d-10"><span class="option">-i</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002dv_007d-20"><span class="option">-v</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-_0040option_007b_002dV_007d-21"><span class="option">-V</span></a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-aliases_002c-handling-of-25">aliases, handling of</a>: <a href="#Example">Example</a></li>
+<li><a href="#index-Bugs_002c-known-26">Bugs, known</a>: <a href="#Bugs">Bugs</a></li>
+<li><a href="#index-Command-line-Options-5">Command line Options</a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-Description-of-_0040command_007bwhich_007d-1">Description of <span class="command">which</span></a>: <a href="#Which-Program">Which Program</a></li>
+<li><a href="#index-Examples-24">Examples</a>: <a href="#Example">Example</a></li>
+<li><a href="#index-Invoking-_0040command_007bwhich_007d-2">Invoking <span class="command">which</span></a>: <a href="#Invoking-Which">Invoking Which</a></li>
+<li><a href="#index-Options_002c-command-line-4">Options, command line</a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-Overview-of-command-line-options-6">Overview of command line options</a>: <a href="#Option-Summary">Option Summary</a></li>
+<li><a href="#index-Return-value-of-_0040command_007bwhich_007d-23">Return value of <span class="command">which</span></a>: <a href="#Return-Value">Return Value</a></li>
+<li><a href="#index-Synopsis-3">Synopsis</a>: <a href="#Invoking-Which">Invoking Which</a></li>
+</ul>
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Top" href="#Top">Top</a>
+<li><a name="toc_Which-Program" href="#Which-Program">1 The <span class="command">which</span> Program</a>
+<li><a name="toc_Invoking-Which" href="#Invoking-Which">2 Invoking <span class="command">which</span></a>
+<li><a name="toc_Option-Summary" href="#Option-Summary">3 Option Summary</a>
+<li><a name="toc_Return-Value" href="#Return-Value">4 Return Value</a>
+<li><a name="toc_Example" href="#Example">5 Example</a>
+<li><a name="toc_Bugs" href="#Bugs">6 Bugs</a>
+<li><a name="toc_See-Also" href="#See-Also">7 See Also</a>
+<li><a name="toc_Index" href="#Index">Index</a>
+</li></ul>
+</div>
+
+</body></html>
+

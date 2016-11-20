@@ -1,0 +1,149 @@
+GIFCOMPOSE(1)                                                    GIFCOMPOSE(1)
+
+
+
+NAME
+       gifcompose - a GIF compositor
+
+SYNOPSIS
+       gifcompose [-v] <specfile
+
+DESCRIPTION
+       The gifcompose tool takes a series of text lines and
+       interprets them as commands to do pasteup operations.
+       Text directives may be generators, modifiers, target
+       operations and comments.
+
+       Generators
+
+
+       gif<name>
+           Paste in <name>.gif
+
+       raw <name> <width> <height>
+           Paste in the given raw-format file (no suffix sup-
+           plied). Raw format is a stream of 8-bit indices into
+           the EGA color map. Accordingly, the width and height
+           must be specified, and the source must be exactly
+           width times height bytes long.
+
+       rgb <name> <width> <height>
+           Paste in the given RGB-format file (no suffix sup-
+           plied). Raw format is a stream of 24-bit color val-
+           ues.  Accordingly, the width and height must be
+           specified, and the source must be exactly 3 times
+           width times height bytes long.
+
+       rle <name>
+           Paste in the given RLE-format file (no suffix sup-
+           plied). This converts the Utah Raster Kit format to
+           GIF.
+
+       text <text> [foreground <index>] [color <r> <g> <b>]
+           Copy 8x8 monospace font, with transparent background
+           and index 1 as foreground. If the text string con-
+           tains whitespaces, they must be escaped or the
+           string must be quoted (shell conventions).
+
+           The optional suffix `foreground <n>' sets the fore-
+           ground color index. The optional suffix `color <r>
+           <g> <b>' sets the RGB color to be used for the fore-
+           ground index.
+
+       Each generator operation may be followed by any combina-
+       tion of the following modifiers.
+
+       Modifiers
+
+
+       at <x> <y>
+           Place the image at the given (upper-left-hand-cor-
+           ner) coordinates in the pasted-up result.
+
+       clip <name> <top-x> <top-y> <bottom-x> <bottom-y>
+           Clip image using the given rectange, paste it onto.
+
+       xflip
+           Flip the image around the X axis before placing it.
+
+       yflip
+           Flip the image around the Y axis before placing it.
+
+       left
+           Rotate the image 90 degrees counterclockwise before
+           placing it.
+
+       right
+           Rotate the image 90 degrees clockwise before placing
+           it.
+
+       Target Operations
+
+
+       screen size <x-size> <y-size>
+          Set the global screen size of the final image.
+
+       screen position <x> <y>
+          Set the global screen position of the final image.
+
+       Comments
+
+       Comments or comment lines may be preceded with `#' and
+       will be ignored.
+
+OPTIONS
+       -v  Emit a report on each composition action to stderr
+           as it happens.
+
+DIAGNOSTICS
+       Unknown screen operation
+           Valid screen operations are: size & position.
+
+       Unknown operator
+           Allowed operators are: at, clip, xflip, yflip, left
+           & right.
+
+FILES
+       comp$$
+           Work Directory.
+
+       tmp$$, btmp$$
+           Work Files.
+
+COPYRIGHT
+       The GIFLIB distribution is Copyright (c) 1997  Eric S.
+       Raymond
+
+CAVEATS
+       Memory required is proportional to the size of the
+       largest pasted image.
+
+BUGS
+       The suffix sequence `left left' sometimes mysteriously
+       fails to work, probably due to some restriction in gif-
+       flip.
+
+       No support for resizing or odd-angle rotations yet.
+
+       The `color' suffix of text is a no-op, because the
+       present version of gifovly throws away color tables.
+
+       Error checking is rudimentary.
+
+SEE ALSO
+       gif2bgi(1), gif2epsn(1), gif2herc(1), gif2iris(1),
+       gif2ps(1), gif2rgb(1), gif2rle(1), gif2x11(1),
+       gifasm(1), gifbg(1), gifburst(1), gifclip(1), gif-
+       clrmp(1), gifcolor(1), gifcomb(1), giffiltr(1), gif-
+       fix(1), gifflip(1), gifhisto(1), gifinter(1),
+       gifinto(1), gifovly(1), gifpos(1), gifrotat(1), gifr-
+       size(1), gifspnge(1), giftext(1), gifwedge(1),
+       icon2gif(1), raw2gif(1), rgb2gif(1), rle2gif(1),
+       text2gif(1)
+
+AUTHOR
+       Eric S. Raymond <esr@snark.thyrsus.com>
+
+
+
+3rd Berkeley Distribution                                        GIFCOMPOSE(1)

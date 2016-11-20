@@ -1,0 +1,274 @@
+.\" -*- nroff -*-
+.\" Copyright (c) 2003 Richard Russon
+.\" Copyright (c) 2003 Szabolcs Szakacsits
+.\" All Rights Reserved.
+.\" This file may be copied under the terms of the GNU Public License.
+.\"
+.TH NTFSCLONE 8 "Oct 2003" "ntfsprogs version 1.9.0"
+.SH NAME
+ntfsclone \- Efficiently clone an NTFS filesystem
+.SH SYNOPSIS
+.B ntfsclone
+[
+.B \-fhm
+] 
+.B \-o 
+[ 
+.I FILE 
+| 
+.B \- 
+]
+.B device
+.br
+.B ntfsclone
+[
+.B \-fhm
+] 
+.B \-O 
+.I FILE 
+.B device
+.SH DESCRIPTION
+.B ntfsclone
+will efficiently clone (copy, save, backup, restore) an NTFS filesystem to a 
+sparse file, device (partition) or standard output. 
+It works at disk sector level and
+copies only the used data. Unused disk space becomes zero (cloning to 
+sparse file), left unchanged (cloning to a disk/partition) or 
+filled with zeros (cloning to standard output).
+
+.B ntfsclone
+can be useful to make backups, an exact snapshot of an NTFS filesystem
+and restore it later on, or for developers to test NTFS read/write
+functionality, troubleshot/investigate users' issues using the clone
+without the risk of destroying the original filesystem.
+
+The clone is an exact copy of the original
+NTFS filesystem from sector to sector thus it can be also mounted
+just like the original NTFS filesystem.
+For example if you clone to a file and the kernel has loopback device and
+NTFS support then the file can be mounted as
+.RS
+.sp
+.B   mount \-t ntfs \-o loop ntfsclone.img /mnt/ntfsclone
+.SH SPARSE FILES
+A file is sparse if it has unallocated blocks (holes). The reported size of such 
+files are always higher than the disk space consumed by them.
+The
+.BR du
+command can tell the real disk space used by a sparse file.
+The holes are always read as zeros. All major Linux filesystem like,
+ext2, ext3, reiserfs, Reiser4, JFS and XFS, supports
+sparse files but for example the ISO 9600 CD-ROM filesystem doesn't.
+.SH HANDLING LARGE SPARSE FILES
+As of today Linux provides inadequate support for managing (tar, 
+cp, gzip, gunzip, bzip2, bunzip2, cat, etc) large sparse files. 
+The only main Linux filesystem
+having support for efficient sparse file handling is XFS by the 
+XFS_IOC_GETBMAPX 
+.BR ioctl\fR.
+However none of the common utility supports it.
+This means when you tar, cp, gzip, bzip2, etc a large sparse file 
+they will always read the entire file, even if you use the "sparse support" 
+options. 
+
+.BR bzip2 
+compresses large sparse files much better than 
+.BR gzip 
+but it does so 
+also much slower. Moreover neither of them handles large sparse
+files efficiently during uncompression from disk space usage point 
+of view. A possible workaround is if you pipe the uncompressed 
+stream through 
+.BR cp\fR,
+for example this way,
+.RS
+.sp
+.B bunzip2 \-c image.bz2 | cp \-\-sparse=always /proc/self/fd/0 image
+.sp
+.RE
+At present the most efficient way, both speed and space-wise, to
+compress and uncompress large sparse files by common tools 
+is using 
+.BR tar 
+with the options 
+.B \-S 
+(handle sparse files "efficiently") and
+.B \-j 
+(filter the archive through bzip2). Altough
+.BR tar
+still reads and analyses the entire file, it doesn't pass on the
+large data blocks having only zeros to filters and it also avoids
+writing large amount of zeros to the disk needlessly. But since
+.BR tar
+can't create an archive from the standard input, you can't do this
+in-place by just reading 
+.BR ntfsclone
+standard output.
+.SH METADATA-ONLY CLONING
+One of the features of
+.BR ntfsclone
+is it can also save only the NTFS metadata using the option
+.B \-m
+or
+.B \-\-metadata
+and the clone still will be
+mountable. In this case all non-metadata file content will be lost and
+reading them back will result always zeros.
+
+The metadata-only image can be compressed very
+well, usually to not more than 1-3 MB thus it's relatively easy to transfer
+it for investigation to NTFS experts.
+
+In this mode of ntfsclone,
+.B NONE 
+of the user's data is saved, including the resident user's data
+embedded into metadata. All is filled with zeros.
+Moreover all the file timestamps, deleted and unused spaces inside
+the metadata are filled with zeros. Thus this mode is inappropriate
+for example for forensic analyses.
+
+Please note, filenames are not wiped out. They might contain
+sensitive information, so think twice before sending such an
+image to anybody.
+.SH OPTIONS
+Below is a summary of all the options that
+.B ntfsclone
+accepts.  All options have two equivalent names.  The short name is preceded by
+.BR \-
+and the long name is preceded by
+.BR \-\- .
+Any single letter options, that don't take an argument, can be combined into a
+single command, e.g.
+.BR \-fm
+is equivalent to
+.BR "\-f \-m" .
+.TP
+.BI "\-o, \-\-output " FILE
+Clone NTFS to the non-existent 
+.I FILE\fR. If 
+.I FILE 
+is '-' then clone to the 
+standard output.
+.TP
+.BI "\-O, \-\-overwrite " FILE
+Clone NTFS to 
+.I FILE\fR, overwriting if exists.
+.TP
+.B \-m, \-\-metadata
+Clone 
+.B ONLY METADATA
+(for NTFS experts). Moreover only cloning to a file is allowed.
+You can't metadata-only clone to a device or standard output.
+.TP
+.B \-f, \-\-force
+Forces ntfsclone to proceed, overriding some safety checks. 
+You can use this parameter multiply times if you want 
+to overcome every single safety checks.
+.TP
+.B \-h, \-\-help
+Show a list of options with a brief description of each one.
+.SH EXAMPLES
+Cloning (save, backup) an NTFS volume to a non-existent file
+.RS
+.sp
+.B ntfsclone \-\-output ntfs.img /dev/hda1
+.sp
+.RE
+Restoring a clone image to its original partition
+.RS
+.sp
+.B ntfsclone \-\-overwrite /dev/hda1 ntfs.img 
+.sp
+.RE
+Space and speed-wise the most efficient way to compress a clone image
+.RS
+.sp
+.B tar \-cjSf ntfs.img.tar.bz2 ntfs.img
+.sp
+.RE
+Uncompressing a 
+.BR tar 
+archived clone image 
+.RS
+.sp
+.B tar \-xjSf ntfs.img.tar.bz2
+.sp
+.RE
+In-place compressing an NTFS volume. Note, gzip is faster usually 
+at least 2-4  times but it creates also bigger compressed files.
+.RS
+.sp
+.B ntfsclone \-\-output ntfs.img /dev/hda1 | bzip2 \-c > ntfs.img.bz2
+.sp
+.RE
+Restoring an NTFS volume from a compressed image
+.RS
+.sp
+.B bunzip2 \-c ntfs.img.bz2 | dd of=/dev/hda1
+.sp
+.RE
+Backup an NTFS volume to a remote host, using
+.BR ssh
+default compression. 
+.RS
+.sp
+.B ntfsclone \-o \- /dev/hda1 | ssh \-C host 'bzip \-c9 > ntfs.img.bz2'
+.sp
+.RE
+Clone an NTFS volume to a remote host, using
+.BR ssh
+default compression (type everything in one line).
+.RS
+.sp
+.B ntfsclone \-o \- /dev/hda1 | \\\\
+.br
+.B ssh \-C host 'cat | cp \-\-sparse=always /proc/self/fd/0 ntfs.img'
+.sp
+.RE
+Clone a remote NTFS volume to the local filesystem via 
+.BR ssh
+using a custom compression level (type everything in one line).
+Speed-wise the optimal compression level depends on your network, 
+disk and CPU speed, saturation.
+.RS
+.sp
+.B ssh  host 'ntfsclone \-o \- /dev/hda1 | gzip \-2c' | \\\\
+.br
+.B gunzip \-c | cp \-\-sparse=always /proc/self/fd/0 ntfs.img
+.sp
+.RE
+Pack NTFS metadata for NTFS experts
+.RS
+.sp
+.B ntfsclone \-\-metadata \-\-output ntfsmeta.img /dev/hda1
+.br
+.B tar \-cjSf ntfsmeta.img.tar.bz2 ntfsmeta.img
+.SH BUGS
+This program has no known bugs.  If you find one, please send an email to
+.nh
+<linux-ntfs-dev@lists.sourceforge.net>.
+
+Sometimes it might appear ntfsclone froze if the clone is on ReiserFS 
+and even CTRL-C won't stop it. This is not a bug in ntfsclone, however
+it's due to ReiserFS being extremely inefficient creating large 
+sparse files and not handling signals during this operation. This
+ReiserFS problem was improved in kernel 2.4.22.
+XFS, JFS and ext3 don't have this problem.
+.hy
+.SH AUTHOR
+.B ntfsclone
+was written by Szabolcs Szakacsits <szaka@sienet.hu>.
+.SH AVAILABILITY
+.B ntfsclone
+is part of the ntfsprogs package and is available from
+.br
+.nh
+http://linux\-ntfs.sourceforge.net/downloads.html
+.hy
+.SH SEE ALSO
+.BR ntfsresize (8)
+.BR ntfsprogs (8)
+.BR xfs_copy (8)
+.BR debugreiserfs (8)
+.BR e2image (8)
+

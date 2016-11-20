@@ -1,0 +1,131 @@
+<!-- Creator     : groff version 1.20.1 -->
+<!-- CreationDate: Sat Jan 10 14:35:47 2009 -->
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta name="generator" content="groff -Thtml, see www.gnu.org">
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
+<meta name="Content-Style" content="text/css">
+<style type="text/css">
+       p       { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       pre     { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       table   { margin-top: 0; margin-bottom: 0; vertical-align: top }
+       h1      { text-align: center }
+</style>
+<title>pic-14.html</title>
+
+</head>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-13.html">prev</a> | <a href="pic-15.html">next</a> | <a href="pic.html">top</a> ]
+<hr>
+
+
+<h2>14. Macros
+<a name="14. Macros"></a>
+</h2>
+
+
+<p style="margin-top: 1em">You can define macros in
+<b>pic</b>, with up to 32 arguments (up to 16 on EBCDIC
+platforms). This is useful for diagrams with repetitive
+parts. In conjunction with the scope rules for block
+composites, it effectively gives you the ability to write
+functions.</p>
+
+<p style="margin-top: 1em">The syntax is</p>
+
+<p style="margin-left:10%; margin-top: 1em"><b>define</b>
+<i>name</i> <b>{</b> <i>replacement text</i> <b>}</b></p>
+
+<p style="margin-top: 1em">This defines <i>name</i> as a
+macro to be replaced by the replacement text (not including
+the braces). The macro may be called as</p>
+
+
+<p style="margin-left:10%; margin-top: 1em"><i>name</i><b>(</b><i>arg1,
+arg2, ... argn</i><b>)</b></p>
+
+<p style="margin-top: 1em">The arguments (if any) are
+substituted for tokens <b>$1</b>, <b>$2</b> ... <b>$n</b>
+appearing in the replacement text.</p>
+
+<p style="margin-top: 1em">As an example of macro use,
+consider this:</p>
+<pre style="margin-left:10%; margin-top: 1em">.PS
+# Plot a single jumper in a box, $1 is the on-off state.
+define jumper { [
+    shrinkfactor = 0.8;
+    Outer: box invis wid 0.45 ht 1;
+
+    # Count on end ] to reset these
+    boxwid = Outer.wid * shrinkfactor / 2;
+    boxht  = Outer.ht  * shrinkfactor / 2;
+
+    box fill (!$1) with .s at center of Outer;
+    box fill ($1)  with .n at center of Outer;
+] }
+
+# Plot a block of six jumpers.
+define jumperblock {
+    jumper($1);
+    jumper($2);
+    jumper($3);
+    jumper($4);
+    jumper($5);
+    jumper($6);
+
+    jwidth  = last [].Outer.wid;
+    jheight = last [].Outer.ht;
+
+    box with .nw at 6th last [].nw wid 6*jwidth ht jheight;
+
+    # Use {} to avoid changing position from last box draw.
+    # This is necessary so move in any direction works as expected
+    {&quot;Jumpers in state $1$2$3$4$5$6&quot; at last box .s + (0,-0.2);}
+}
+
+
+# Sample macro invocations.
+jumperblock(1,1,0,0,1,0);
+move;
+jumperblock(1,0,1,0,1,1);
+.PE</pre>
+
+
+<p style="margin-top: 1em">It yields the following:</p>
+
+<p align="center" style="margin-top: 1em">Figure 14-1:
+Sample use of a macro</p>
+
+<p style="margin-top: 1em">This macro example illustrates
+how you can combine [], brace grouping, and variable
+assignment to write true functions.</p>
+
+<p style="margin-top: 1em">One detail the example above
+does not illustrate is the fact that macro argument parsing
+is not token-oriented. If you call
+<b>jumper(&nbsp;1&nbsp;)</b>, the value of $1 is
+<b>&quot;&nbsp;1&nbsp;&quot;</b>. You could even call
+<b>jumper(big&nbsp;string)</b> to give $1 the value
+<b>&quot;big&nbsp;string&quot;</b>.</p>
+
+<p style="margin-top: 1em">If you want to pass in a
+coordinate pair, you can avoid getting tripped up by the
+comma by wrapping the pair in parentheses.</p>
+
+<p style="margin-top: 1em">Macros persist through pictures.
+To undefine a macro, say <b>undef</b> <i>name</i>; for
+example,</p>
+
+<pre style="margin-left:10%; margin-top: 1em">undef jumper
+undef jumperblock</pre>
+
+
+<p style="margin-top: 1em">would undefine the two macros in
+the jumper block example.</p>
+<hr>
+<a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-html401-blue" alt="Valid HTML 4.01 Transitional" height="31" width="88"></a>
+[ <a href="pic-13.html">prev</a> | <a href="pic-15.html">next</a> | <a href="pic.html">top</a> ]
+<hr>

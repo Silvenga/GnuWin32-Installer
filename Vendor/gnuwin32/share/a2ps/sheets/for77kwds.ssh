@@ -1,0 +1,144 @@
+# Style sheet for Fortran 77 keywords
+# last modified 19990520
+
+#  While it is advised to print "using" the larger set of Fortran
+#  90/95 keywords, the handling of legacy code is done better
+#  with this almost pure Fortran 77 set.
+
+#
+# This file is part of a2ps.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+style "Fortran 77 Keywords" is
+
+written by "Denis Girou <Denis.Girou@idris.fr>, Alexander Mai <st002279@hrzpub.tu-darmstadt.de>"
+version is 0.60
+requires a2ps version 4.12a
+
+documentation is
+  "This sheet implements only Fortran 77 keywords, and avoids implementing"
+  "comments support. This is to allow for implementation of either fixed"
+  "or free source form."
+  ""
+  "See the documentation of the style sheet code(fortran)code for more details."
+end documentation
+
+first alphabet is
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+second alphabet is
+  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_"
+
+# 'case insensitive' is default but set here explicitly
+case insensitive
+
+# "call" is missing by intention here; see below
+keywords in Keyword_strong are
+  assign,
+  backspace, block,
+  character, close, continue, common, complex,
+  data, dimension, /double *precision/, do,
+  entry, equivalence, external, else, /else *if/, "end", endfile, /end *if/,
+  format,
+  /go *to/,
+  if, implicit, inquire, integer, intrinsic,
+  logical,
+  none,
+  open,
+  parameter, pause, print,
+  read, real, return, rewind,
+  save, sequence, stop,
+  then,
+  write
+end keywords
+
+
+# intrinsics and others
+# I'd like to switch to 'Keyword' instead of 'Keyword_strong' here ?!
+keywords in Keyword_strong are
+  abs, acos, aimag, alog10, amax0, amax1, amin0, amin1, amod, anint,
+     asin, atan, atan2,
+  cabs, ccos, cexp, clog, cmplx, conjg, cos, cosh, csin, csqrt,
+  dabs, dacos, dasin, datan, datan2, dble, dcos, dcosh, ddim,
+     dexp, dim, dint, dlog, dlog10, dmax0, dmax1, dmin0, dmin1, dmod,
+     dprod, dsign, dsin, dsqrt, dtan, dtanh,
+  exp,
+  float, fmt,
+  ichar, idim, idint, ifix, index, int, isign,
+  len, lge, lgt, lle, llt, log, log10,
+  max, max0, max1, min, min0, min1, mod,
+  real,
+  sign, sin, sngl, sqrt,
+  tan, tanh
+end keywords
+
+
+# Named parameters for built-in commands
+
+keywords in Keyword are
+  formatted, unformatted, unit
+end keywords
+
+# Fortran operators
+operators in Keyword_strong are
+  .not., .or., .and., .ge., .gt., .lt., .le., .eq., .ne., .eqv., .neqv.
+end operators
+
+optional operators are
+    .not.  \not,
+    .or.   \vee,
+    .and.  \wedge,
+    .ge.   \geq,
+    .gt.   >,
+    .lt.   <,
+    .le.   \leq,
+    .eq.   \equiv,
+    .ne.   \neq,
+    .eqv.  \equiv,
+    .neqv. \neq
+end operators
+
+
+# Implementation of highlighting of procedures etc.
+operators in Plain are
+  # labelled entities: program, subroutine and function
+  (# 1. The keyword
+   /(program|subroutine|function)/
+   # 2. Spaces
+   /([[:space:]]+)/
+   # 3. The label
+   /([^[:space:](]+)/
+   \1 Keyword_strong, \2, \3 Label_strong),
+
+  # Subroutine calls
+  ( # 1. The keyword
+   /(call)/
+    # 2. Spaces
+   /([[:space:]]+)/
+    # 3. The label
+   /([^[:space:](]+)/
+   \1 Keyword_strong, \2, \3 Label)
+end operators
+
+
+# Strings
+sequences are
+   C-char,
+   C-string
+end sequences
+
+end style

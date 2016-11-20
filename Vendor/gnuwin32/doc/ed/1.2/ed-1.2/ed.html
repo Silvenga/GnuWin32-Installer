@@ -1,0 +1,1384 @@
+<html lang="en">
+<head>
+<title>GNU `ed' Manual</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="GNU `ed' Manual">
+<meta name="generator" content="makeinfo 4.7">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<!--
+Copyright (C) 1993, 2006, 2007, 2008, 2009
+Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.-->
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc { font-variant:small-caps }
+  span.roman { font-family: serif; font-weight: normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">GNU `ed' Manual</h1>
+   <div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Top" href="#Top">The GNU ed line editor</a>
+<li><a name="toc_Overview" href="#Overview">1 Overview</a>
+<li><a name="toc_Introduction-to-Line-Editing" href="#Introduction-to-Line-Editing">2 Introduction to Line Editing</a>
+<li><a name="toc_Invoking-Ed" href="#Invoking-Ed">3 Invoking Ed</a>
+<li><a name="toc_Line-Addressing" href="#Line-Addressing">4 Line Addressing</a>
+<li><a name="toc_Regular-Expressions" href="#Regular-Expressions">5 Regular Expressions</a>
+<li><a name="toc_Commands" href="#Commands">6 Commands</a>
+<li><a name="toc_Limitations" href="#Limitations">7 Limitations</a>
+<li><a name="toc_Diagnostics" href="#Diagnostics">8 Diagnostics</a>
+<li><a name="toc_GNU-Free-Documentation-License" href="#GNU-Free-Documentation-License">9 GNU Free Documentation License</a>
+</li></ul>
+</div>
+
+
+
+<div class="node">
+<p><hr>
+<a name="Top"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+<br>
+</div>
+
+<h2 class="unnumbered">The GNU ed line editor</h2>
+
+<p>This manual is for GNU ed (version 1.2, 31 January 2009).
+
+   <pre class="sp">
+
+</pre>
+GNU ed is an 8-bit clean, more or less POSIX-compliant implementation of
+the standard Unix line editor. These days, full-screen editors have
+rendered <span class="command">ed</span> mostly of historical interest. Nonetheless, it
+appeals to a handful of aging programmers who still believe that &ldquo;Small
+is Beautiful&rdquo;.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Overview">Overview</a>:                        Overview of the <span class="command">ed</span> command
+<li><a accesskey="2" href="#Introduction-to-Line-Editing">Introduction to Line Editing</a>:    Getting started with GNU <span class="command">ed</span>
+<li><a accesskey="3" href="#Invoking-Ed">Invoking Ed</a>:                     Command line interface
+<li><a accesskey="4" href="#Line-Addressing">Line Addressing</a>:                 Specifying lines/ranges in the buffer
+<li><a accesskey="5" href="#Regular-Expressions">Regular Expressions</a>:             Patterns for selecting text
+<li><a accesskey="6" href="#Commands">Commands</a>:                        Commands recognized by GNU <span class="command">ed</span>
+<li><a accesskey="7" href="#Limitations">Limitations</a>:                     Intrinsic limits of GNU <span class="command">ed</span>
+<li><a accesskey="8" href="#Diagnostics">Diagnostics</a>:                     GNU <span class="command">ed</span> error handling
+<li><a accesskey="9" href="#GNU-Free-Documentation-License">GNU Free Documentation License</a>:  How you can copy and share this manual
+
+   </ul>
+
+   <pre class="sp">
+
+</pre>
+Copyright &copy; 1993, 2006, 2007, 2008, 2009
+Free Software Foundation, Inc.
+
+   <p>Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+
+<div class="node">
+<p><hr>
+<a name="Overview"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Introduction-to-Line-Editing">Introduction to Line Editing</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">1 Overview</h2>
+
+<p><span class="command">ed</span> is a line-oriented text editor. It is used to create,
+display, modify and otherwise manipulate text files. <span class="command">red</span> is a
+restricted <span class="command">ed</span>: it can only edit files in the current directory
+and cannot execute shell commands.
+
+   <p>If invoked with a <var>file</var> argument, then a copy of <var>file</var> is read
+into the editor's buffer. Changes are made to this copy and not directly
+to <var>file</var> itself. Upon quitting <span class="command">ed</span>, any changes not
+explicitly saved with a <span class="samp">w</span> command are lost.
+
+   <p>Editing is done in two distinct modes: <dfn>command</dfn> and <dfn>input</dfn>. 
+When first invoked, <span class="command">ed</span> is in command mode. In this mode
+commands are read from the standard input and executed to manipulate the
+contents of the editor buffer. A typical command might look like:
+
+<pre class="example">     ,s/<var>old</var>/<var>new</var>/g
+</pre>
+   <p>which replaces all occurences of the string <var>old</var> with <var>new</var>.
+
+   <p>When an input command, such as <span class="samp">a</span> (append), <span class="samp">i</span> (insert) or
+<span class="samp">c</span> (change), is given, <span class="command">ed</span> enters input mode. This is the
+primary means of adding text to a file. In this mode, no commands are
+available; instead, the standard input is written directly to the editor
+buffer. A <dfn>line</dfn> consists of the text up to and including a
+&lt;newline&gt; character. Input mode is terminated by entering a single
+period (<span class="samp">.</span>) on a line.
+
+   <p>All <span class="command">ed</span> commands operate on whole lines or ranges of lines;
+e.g., the <span class="samp">d</span> command deletes lines; the <span class="samp">m</span> command moves
+lines, and so on. It is possible to modify only a portion of a line by
+means of replacement, as in the example above. However even here, the
+<span class="samp">s</span> command is applied to whole lines at a time.
+
+   <p>In general, <span class="command">ed</span> commands consist of zero or more line
+addresses, followed by a single character command and possibly
+additional parameters; i.e., commands have the structure:
+
+<pre class="example">     [<var>address</var> [,<var>address</var>]]<var>command</var>[<var>parameters</var>]
+</pre>
+   <p>The <var>address</var>es indicate the line or range of lines to be affected
+by the command. If fewer addresses are given than the command accepts,
+then default addresses are supplied.
+
+<div class="node">
+<p><hr>
+<a name="Introduction-to-Line-Editing"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Invoking-Ed">Invoking Ed</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">2 Introduction to Line Editing</h2>
+
+<p><span class="command">ed</span> was created, along with the Unix operating system, by Ken
+Thompson and Dennis Ritchie. It is the refinement of its more complex,
+programmable predecessor, <cite>QED</cite>, to which Thompson and Ritchie had
+already added pattern matching capabilities (see <a href="#Regular-Expressions">Regular Expressions</a>).
+
+   <p>For the purposes of this tutorial, a working knowledge of the Unix shell
+<span class="command">sh</span> (see <a href="bash.html#Bash">Bash (The GNU Bash Reference Manual)</a>) and
+the Unix file system is recommended, since <span class="command">ed</span> is designed to
+interact closely with them.
+
+   <p>The principal difference between line editors and display editors is
+that display editors provide instant feedback to user commands, whereas
+line editors require sometimes lengthy input before any effects are
+seen. The advantage of instant feedback, of course, is that if a mistake
+is made, it can be corrected immediately, before more damage is done. 
+Editing in <span class="command">ed</span> requires more strategy and forethought; but if
+you are up to the task, it can be quite efficient.
+
+   <p>Much of the <span class="command">ed</span> command syntax is shared with other Unix
+utilities.
+
+   <p>As with the shell, &lt;RETURN&gt; (the carriage-return key) enters a line
+of input. So when we speak of &ldquo;entering&rdquo; a command or some text in
+<span class="command">ed</span>, &lt;RETURN&gt; is implied at the end of each line. Prior to
+typing &lt;RETURN&gt;, corrections to the line may be made by typing
+either &lt;BACKSPACE&gt; (sometimes labeled &lt;DELETE&gt; or &lt;DEL&gt;) to
+erase characters backwards, or &lt;CONTROL&gt;-u (i.e., hold the CONTROL
+key and type u) to erase the whole line.
+
+   <p>When <span class="command">ed</span> first opens, it expects to be told what to do but
+doesn't prompt us like the shell. So let's begin by telling <span class="command">ed</span>
+to do so with the &lt;P&gt; (<dfn>prompt</dfn>) command:
+
+<pre class="example">     $ ed
+     P
+     *
+</pre>
+   <p>By default, <span class="command">ed</span> uses asterisk (<span class="samp">*</span>) as command prompt to
+avoid confusion with the shell command prompt (<span class="samp">$</span>).
+
+   <p>We can run Unix shell (<span class="command">sh</span>) commands from inside <span class="command">ed</span>
+by prefixing them with &lt;!&gt; (exclamation mark, aka &ldquo;bang&rdquo;). For
+example:
+
+<pre class="example">     *!date
+     Mon Jun 26 10:08:41 PDT 2006
+     !
+     *!for s in hello world; do echo $s; done
+     hello
+     world
+     !
+     *
+</pre>
+   <p>So far, this is no different from running commands in the Unix shell. 
+But let's say we want to edit the output of a command, or save it to a
+file. First we must capture the command output to a temporary location
+called a <dfn>buffer</dfn> where <span class="command">ed</span> can access it. This is done
+with <span class="command">ed</span>'s &lt;r&gt; command (mnemonic: <dfn>read</dfn>):
+
+<pre class="example">     *r !cal
+     143
+     *
+</pre>
+   <p>Here <span class="command">ed</span> is telling us that it has just read 143 characters
+into the editor buffer - i.e., the output of the <span class="command">cal</span> command,
+which prints a simple ASCII calendar. To display the buffer contents we
+issue the &lt;p&gt; (<dfn>print</dfn>) command (not to be confused with the
+prompt command, which is uppercase!). To indicate the range of lines in
+the buffer that should be printed, we prefix the command with &lt;,&gt;
+(comma) which is shorthand for &ldquo;the whole buffer&rdquo;:
+
+<pre class="example">     *,p
+        September 2006
+     Mo Tu We Th Fr Sa Su
+                  1  2  3
+      4  5  6  7  8  9 10
+     11 12 13 14 15 16 17
+     18 19 20 21 22 23 24
+     25 26 27 28 29 30
+     
+     *
+</pre>
+   <p>Now let's write the buffer contents to a file named <code>junk</code> with the
+&lt;w&gt; (<dfn>write</dfn>) command. Again, we use the &lt;,&gt; prefix to
+indicate that it's the whole buffer we want:
+
+<pre class="example">     *,w junk
+     143
+     *
+</pre>
+   <p>Need we say? It's good practice to frequently write the buffer contents,
+since unwritten changes to the buffer will be lost when we exit
+<span class="command">ed</span>.
+
+   <p>The sample sessions below illustrate some basic concepts of line editing
+with <span class="command">ed</span>. We begin by creating a file, <span class="samp">sonnet</span>, with some
+help from Shakespeare. As with the shell, all input to <span class="command">ed</span> must
+be followed by a &lt;newline&gt; character. Comments begin with a <span class="samp">#</span>.
+
+<pre class="example">     $ ed
+     # The `a' command is for appending text to the editor buffer.
+     a
+     No more be grieved at that which thou hast done.
+     Roses have thorns, and filvers foutians mud.
+     Clouds and eclipses stain both moon and sun,
+     And loathsome canker lives in sweetest bud.
+     .
+     # Entering a single period on a line returns <span class="command">ed</span> to command mode.
+     # Now write the buffer to the file <span class="samp">sonnet</span> and quit:
+     w sonnet
+     183
+     # <span class="command">ed</span> reports the number of characters written.
+     q
+     $ ls -l
+     total 2
+     -rw-rw-r--    1 alm           183 Nov 10 01:16 sonnet
+     $
+</pre>
+   <p>In the next example, some typos are corrected in the file <span class="samp">sonnet</span>.
+
+<pre class="example">     $ ed sonnet
+     183
+     # Begin by printing the buffer to the terminal with the <span class="samp">p</span> command.
+     # The `,' means ``all lines.''
+     ,p
+     No more be grieved at that which thou hast done.
+     Roses have thorns, and filvers foutians mud.
+     Clouds and eclipses stain both moon and sun,
+     And loathsome canker lives in sweetest bud.
+     # Select line 2 for editing.
+     2
+     Roses have thorns, and filvers foutians mud.
+     # Use the substitute command, <span class="samp">s</span>, to replace `filvers' with `silver',
+     # and print the result.
+     s/filvers/silver/p
+     Roses have thorns, and silver foutians mud.
+     # And correct the spelling of `fountains'.
+     s/utia/untai/p
+     Roses have thorns, and silver fountains mud.
+     w sonnet
+     183
+     q
+     $
+</pre>
+   <p>Since <span class="command">ed</span> is line-oriented, we have to tell it which line, or
+range of lines we want to edit. In the above example, we do this by
+specifying the line's number, or sequence in the buffer. Alternatively,
+we could have specified a unique string in the line, e.g.,
+<span class="samp">/filvers/</span>, where the <span class="samp">/</span>s delimit the string in question. 
+Subsequent commands affect only the selected line, a.k.a. the
+<dfn>current</dfn> line. Portions of that line are then replaced with the
+substitute command, whose syntax is <span class="samp">s/</span><var>old</var><span class="samp">/</span><var>new</var><span class="samp">/</span>.
+
+   <p>Although <span class="command">ed</span> accepts only one command per line, the print
+command <span class="samp">p</span> is an exception, and may be appended to the end of most
+commands.
+
+   <p>In the next example, a title is added to our sonnet.
+
+<pre class="example">     $ ed sonnet
+     183
+     a
+      Sonnet #50
+     .
+     ,p
+     No more be grieved at that which thou hast done.
+     Roses have thorns, and silver fountains mud.
+     Clouds and eclipses stain both moon and sun,
+     And loathsome canker lives in sweetest bud.
+      Sonnet #50
+     # The title got appended to the end; we should have used `0a'
+     # to append ``before the first line.''
+     # Move the title to its proper place.
+     5m0p
+      Sonnet #50
+     # The title is now the first line, and the current line has been
+     # set to this line as well.
+     ,p
+      Sonnet #50
+     No more be grieved at that which thou hast done.
+     Roses have thorns, and silver fountains mud.
+     Clouds and eclipses stain both moon and sun,
+     And loathsome canker lives in sweetest bud.
+     wq sonnet
+     195
+     $
+</pre>
+   <p>When <span class="command">ed</span> opens a file, the current line is initially set to the
+last line of that file. Similarly, the move command <span class="samp">m</span> sets the
+current line to the last line moved.
+
+   <p>In summary:
+
+   <p>Structurally,
+Related programs or routines are <span class="command">vi (1)</span>, <span class="command">sed (1)</span>,
+<span class="command">regex (3)</span>,  <span class="command">sh (1)</span>. Relevant documents
+are:
+
+   <blockquote>
+Unix User's Manual Supplementary Documents: 12 &mdash; 13
+</blockquote>
+
+   <blockquote>
+B. W. Kernighan and P. J. Plauger: &ldquo;Software Tools in Pascal&rdquo;,
+Addison-Wesley, 1981. 
+</blockquote>
+
+<div class="node">
+<p><hr>
+<a name="Invoking-Ed"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Line-Addressing">Line Addressing</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Introduction-to-Line-Editing">Introduction to Line Editing</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">3 Invoking Ed</h2>
+
+<p>The format for running <span class="command">ed</span> is:
+
+<pre class="example">     ed [<var>options</var>] [<var>file</var>]
+     red [<var>options</var>] [<var>file</var>]
+</pre>
+   <p><var>file</var> specifies the name of a file to read. If <var>file</var> is
+prefixed with a bang (!), then it is interpreted as a shell command. In
+this case, what is read is the standard output of <var>file</var> executed
+via <span class="command">sh (1)</span>. To read a file whose name begins with a bang,
+prefix the name with a backslash (<kbd>\</kbd>). The default filename is set
+to <var>file</var> only if it is not prefixed with a bang.
+
+   <p><span class="command">ed</span> supports the following options:
+
+     <dl>
+<dt><code>--help</code><dt><code>-h</code><dd>Print an informative help message describing the options and exit.
+
+     <br><dt><code>--version</code><dt><code>-V</code><dd>Print the version number of <span class="command">ed</span> on the standard output and exit.
+
+     <br><dt><code>--loose-exit-status</code><dt><code>-l</code><dd>Do not exit with bad status if a command happens to "fail" (for example
+if a substitution command finds nothing to replace). This can be useful
+when <span class="command">ed</span> is invoked as the editor for crontab.
+
+     <br><dt><code>--prompt=</code><var>string</var><dt><code>-p </code><var>string</var><dd>Specifies a command prompt. This may be toggled on and off with the
+<span class="samp">P</span> command.
+
+     <br><dt><code>--quiet</code><dt><code>--silent</code><dt><code>-s</code><dd>Suppresses diagnostics. This should be used if <span class="command">ed</span>'s standard
+input is from a script.
+
+     <br><dt><code>--traditional</code><dt><code>-G</code><dd>Forces backwards compatibility. This affects the behavior of the
+<span class="command">ed</span> commands <span class="samp">G</span>, <span class="samp">V</span>, <span class="samp">f</span>, <span class="samp">l</span>, <span class="samp">m</span>,
+<span class="samp">t</span> and <span class="samp">!!</span>. If the default behavior of these commands does
+not seem familiar, then try invoking <span class="command">ed</span> with this switch.
+
+     <br><dt><code>--verbose</code><dt><code>-v</code><dd>Verbose mode. This may be toggled on and off with the <span class="samp">H</span> command.
+
+   </dl>
+
+<div class="node">
+<p><hr>
+<a name="Line-Addressing"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Regular-Expressions">Regular Expressions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invoking-Ed">Invoking Ed</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">4 Line Addressing</h2>
+
+<p>An address represents the number of a line in the buffer. <span class="command">ed</span>
+maintains a <dfn>current address</dfn> which is typically supplied to
+commands as the default address when none is specified. When a file is
+first read, the current address is set to the last line of the file. In
+general, the current address is set to the last line affected by a
+command.
+
+   <p>A line address is constructed from one of the bases in the list below,
+optionally followed by a numeric offset. The offset may include any
+combination of digits, operators (i.e., <span class="samp">+</span> and <span class="samp">-</span>) and
+whitespace. Addresses are read from left to right, and their values may
+be absolute or relative to the current address.
+
+   <p>One exception to the rule that addresses represent line numbers is the
+address <span class="samp">0</span> (zero). This means &ldquo;before the first line,&rdquo; and is
+valid wherever it makes sense.
+
+   <p>An address range is two addresses separated either by a comma or
+semicolon. The value of the first address in a range cannot exceed the
+value of the the second. If only one address is given in a range, then
+the second address is set to the given address. If an <var>n</var>-tuple of
+addresses is given where <var>n</var> &gt; 2, then the corresponding range is
+determined by the last two addresses in the <var>n</var>-tuple. If only one
+address is expected, then the last address is used.
+
+   <p>Each address in a comma-delimited range is interpreted relative to the
+current address. In a semicolon-delimited range, the first address is
+used to set the current address, and the second address is interpreted
+relative to the first.
+
+   <p>The following address symbols are recognized.
+
+     <dl>
+<dt><code>.</code><dd>The current line (address) in the buffer.
+
+     <br><dt><code>$</code><dd>The last line in the buffer.
+
+     <br><dt><var>n</var><dd>The <var>n</var>th, line in the buffer where <var>n</var> is a number in the range
+<span class="samp">0,$</span>.
+
+     <br><dt><code>+</code><dd>The next line. This is equivalent to <span class="samp">+1</span> and may be repeated with
+cumulative effect.
+
+     <br><dt><code>-</code><dd>The previous line. This is equivalent to <span class="samp">-1</span> and may be repeated
+with cumulative effect.
+
+     <br><dt><code>+</code><var>n</var><dt><var>whitespace</var> <var>n</var><dd>The <var>n</var>th next line, where <var>n</var> is a non-negative number. 
+Whitespace followed by a number <var>n</var> is interpreted as
+<span class="samp">+</span><var>n</var>.
+
+     <br><dt><code>-</code><var>n</var><dd>The <var>n</var>th previous line, where <var>n</var> is a non-negative number.
+
+     <br><dt><code>,</code><dd>The first through last lines in the buffer. This is equivalent to the
+address range <span class="samp">1,$</span>.
+
+     <br><dt><code>;</code><dd>The current through last lines in the buffer. This is equivalent to the
+address range <span class="samp">.,$</span>.
+
+     <br><dt><code>/</code><var>re</var><code>/</code><dd>The next line containing the regular expression <var>re</var>. The search
+wraps to the beginning of the buffer and continues down to the current
+line, if necessary. <span class="samp">//</span> repeats the last search.
+
+     <br><dt><code>?</code><var>re</var><code>?</code><dd>The previous line containing the regular expression <var>re</var>. The search
+wraps to the end of the buffer and continues up to the current line, if
+necessary. <span class="samp">??</span> repeats the last search.
+
+     <br><dt><code>'x</code><dd>The apostrophe-x character pair addresses the line previously marked by
+a <span class="samp">k</span> (mark) command, where <span class="samp">x</span> is a lower case letter from
+the portable character set.
+
+   </dl>
+
+<div class="node">
+<p><hr>
+<a name="Regular-Expressions"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Commands">Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Line-Addressing">Line Addressing</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">5 Regular Expressions</h2>
+
+<p>Regular expressions are patterns used in selecting text. For example,
+the <span class="command">ed</span> command
+
+<pre class="example">     g/<var>string</var>/
+</pre>
+   <p class="noindent">prints all lines containing <var>string</var>. Regular expressions are also
+used by the <span class="samp">s</span> command for selecting old text to be replaced with
+new text.
+
+   <p>In addition to a specifying string literals, regular expressions can
+represent classes of strings. Strings thus represented are said to be
+matched by the corresponding regular expression. If it is possible for a
+regular expression to match several strings in a line, then the
+left-most longest match is the one selected.
+
+   <p>The following symbols are used in constructing regular expressions:
+
+     <dl>
+<dt><var>c</var><dd>Any character <var>c</var> not listed below, including <span class="samp">{</span>, <span class="samp">}</span>,
+<span class="samp">(</span>, <span class="samp">)</span>, <span class="samp">&lt;</span> and <span class="samp">&gt;</span>, matches itself.
+
+     <br><dt><code>\</code><var>c</var><dd>Any backslash-escaped character <var>c</var>, other than <span class="samp">{</span>,
+`<span class="samp">}</span>, <span class="samp">(</span>, <span class="samp">)</span>, <span class="samp">&lt;</span>, <span class="samp">&gt;</span>, <span class="samp">b</span>, <span class="samp">B</span>,
+<span class="samp">w</span>, <span class="samp">W</span>, <span class="samp">+</span> and <span class="samp">?</span>, matches itself.
+
+     <br><dt><code>.</code><dd>Matches any single character.
+
+     <br><dt><code>[</code><var>char-class</var><code>]</code><dd>Matches any single character in <var>char-class</var>. To include a <span class="samp">]</span>
+in <var>char-class</var>, it must be the first character. A range of
+characters may be specified by separating the end characters of the
+range with a <span class="samp">-</span>, e.g., <span class="samp">a-z</span> specifies the lower case
+characters. The following literal expressions can also be used in
+<var>char-class</var> to specify sets of characters:
+
+     <pre class="example">          [:alnum:] [:cntrl:] [:lower:] [:space:]
+          [:alpha:] [:digit:] [:print:] [:upper:]
+          [:blank:] [:graph:] [:punct:] [:xdigit:]
+     </pre>
+     <p>If <span class="samp">-</span> appears as the first or last character of <var>char-class</var>,
+then it matches itself. All other characters in <var>char-class</var> match
+themselves.
+
+     <p>Patterns in
+<var>char-class</var>
+of the form:
+     <pre class="example">          [.<var>col-elm</var>.]
+          [=<var>col-elm</var>=]
+     </pre>
+     <p class="noindent">where <var>col-elm</var> is a <dfn>collating element</dfn> are interpreted
+according to <code>locale (5)</code>. See
+<code>regex (3)</code> for an explanation of these constructs.
+
+     <br><dt><code>[^</code><var>char-class</var><code>]</code><dd>Matches any single character, other than newline, not in
+<var>char-class</var>.  <var>char-class</var> is defined as above.
+
+     <br><dt><code>^</code><dd>If <span class="samp">^</span> is the first character of a regular expression, then it
+anchors the regular expression to the beginning of a line. Otherwise,
+it matches itself.
+
+     <br><dt><code>$</code><dd>If <span class="samp">$</span> is the last character of a regular expression, it anchors
+the regular expression to the end of a line. Otherwise, it matches
+itself.
+
+     <br><dt><code>\(</code><var>re</var><code>\)</code><dd>Defines a (possibly null) subexpression <var>re</var>. Subexpressions may be
+nested. A subsequent backreference of the form <span class="samp">\</span><var>n</var>, where
+<var>n</var> is a number in the range [1,9], expands to the text matched by
+the <var>n</var>th subexpression. For example, the regular expression
+<span class="samp">\(a.c\)\1</span> matches the string <span class="samp">abcabc</span>, but not
+<span class="samp">abcadc</span>. Subexpressions are ordered relative to their left
+delimiter.
+
+     <br><dt><code>*</code><dd>Matches the single character regular expression or subexpression
+immediately preceding it zero or more times. If <span class="samp">*</span> is the first
+character of a regular expression or subexpression, then it matches
+itself. The <span class="samp">*</span> operator sometimes yields unexpected results. For
+example, the regular expression <span class="samp">b*</span> matches the beginning of the
+string <span class="samp">abbb</span>, as opposed to the substring <span class="samp">bbb</span>, since a null
+match is the only left-most match.
+
+     <br><dt><code>\{</code><var>n</var><code>,</code><var>m</var><code>\}</code><dt><code>\{</code><var>n</var><code>,\}</code><dt><code>\{</code><var>n</var><code>\}</code><dd>Matches the single character regular expression or subexpression
+immediately preceding it at least <var>n</var> and at most <var>m</var> times. If
+<var>m</var> is omitted, then it matches at least <var>n</var> times. If the comma
+is also omitted, then it matches exactly <var>n</var> times. If any of these
+forms occurs first in a regular expression or subexpression, then it is
+interpreted literally (i.e., the regular expression <span class="samp">\{2\}</span>
+matches the string <span class="samp">{2}</span>, and so on).
+
+     <br><dt><code>\&lt;</code><dt><code>\&gt;</code><dd>Anchors the single character regular expression or subexpression
+immediately following it to the beginning (in the case of <span class="samp">\&lt;</span>) or
+ending (in the case of <span class="samp">\&gt;</span>) of a <dfn>word</dfn>, i.e., in ASCII, a
+maximal string of alphanumeric characters, including the underscore (_).
+
+   </dl>
+
+   <p>The following extended operators are preceded by a backslash <span class="samp">\</span> to
+distinguish them from traditional <span class="command">ed</span> syntax.
+
+     <dl>
+<dt><code>\`</code><dt><code>\'</code><dd>Unconditionally matches the beginning <span class="samp">\`</span> or ending <span class="samp">\'</span> of a line.
+
+     <br><dt><code>\?</code><dd>Optionally matches the single character regular expression or
+subexpression immediately preceding it. For example, the regular
+expression <span class="samp">a[bd]\?c</span> matches the strings <span class="samp">abc</span>, <span class="samp">adc</span>
+and <span class="samp">ac</span>. If <span class="samp">\?</span> occurs at the beginning of a regular
+expressions or subexpression, then it matches a literal <span class="samp">?</span>.
+
+     <br><dt><code>\+</code><dd>Matches the single character regular expression or subexpression
+immediately preceding it one or more times. So the regular expression
+<span class="samp">a+</span> is shorthand for <span class="samp">aa*</span>. If <span class="samp">\+</span> occurs at the
+beginning of a regular expression or subexpression, then it matches a
+literal <span class="samp">+</span>.
+
+     <br><dt><code>\b</code><dd>Matches the beginning or ending (null string) of a word. Thus the
+regular expression <span class="samp">\bhello\b</span> is equivalent to <span class="samp">\&lt;hello\&gt;</span>. 
+However, <span class="samp">\b\b</span> is a valid regular expression whereas <span class="samp">\&lt;\&gt;</span>
+is not.
+
+     <br><dt><code>\B</code><dd>Matches (a null string) inside a word.
+
+     <br><dt><code>\w</code><dd>Matches any character in a word.
+
+     <br><dt><code>\W</code><dd>Matches any character not in a word.
+
+   </dl>
+
+<div class="node">
+<p><hr>
+<a name="Commands"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Limitations">Limitations</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Regular-Expressions">Regular Expressions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">6 Commands</h2>
+
+<p>All <span class="command">ed</span> commands are single characters, though some require
+additonal parameters. If a command's parameters extend over several
+lines, then each line except for the last must be terminated with a
+backslash (<span class="samp">\</span>).
+
+   <p>In general, at most one command is allowed per line. However, most
+commands accept a print suffix, which is any of <span class="samp">p</span> (print),
+<span class="samp">l</span> (list), or <span class="samp">n</span> (enumerate), to print the last line
+affected by the command.
+
+   <p>An interrupt (typically &lt;Control-C&gt;) has the effect of aborting the
+current command and returning the editor to command mode.
+
+   <p><span class="command">ed</span> recognizes the following commands. The commands are shown
+together with the default address or address range supplied if none is
+specified (in parenthesis).
+
+     <dl>
+<dt><code>(.)a</code><dd>Appends text to the buffer after the addressed line, which may be the
+address <span class="samp">0</span> (zero). Text is entered in input mode. The current
+address is set to last line entered.
+
+     <br><dt><code>(.,.)c</code><dd>Changes lines in the buffer. The addressed lines are deleted from the
+buffer, and text is appended in their place. Text is entered in input
+mode. The current address is set to last line entered.
+
+     <br><dt><code>(.,.)d</code><dd>Deletes the addressed lines from the buffer. If there is a line after
+the deleted range, then the current address is set to this line. 
+Otherwise the current address is set to the line before the deleted
+range.
+
+     <br><dt><code>e </code><var>file</var><dd>Edits <var>file</var>, and sets the default filename. If <var>file</var> is not
+specified, then the default filename is used. Any lines in the buffer
+are deleted before the new file is read. The current address is set to
+the last line read.
+
+     <br><dt><code>e !</code><var>command</var><dd>Edits the standard output of <span class="samp">!</span><var>command</var>, (see the <span class="samp">!</span>
+command below). The default filename is unchanged. Any lines in the
+buffer are deleted before the output of <var>command</var> is read. The
+current address is set to the last line read.
+
+     <br><dt><code>E </code><var>file</var><dd>Edits <var>file</var> unconditionally. This is similar to the <span class="samp">e</span>
+command, except that unwritten changes are discarded without warning. 
+The current address is set to the last line read.
+
+     <br><dt><code>f </code><var>file</var><dd>Sets the default filename to <var>file</var>. If <var>file</var> is not specified,
+then the default unescaped filename is printed.
+
+     <br><dt><code>(1,$)g /</code><var>re</var><code>/</code><var>command-list</var><dd>Global command. Applies <var>command-list</var> to each of the addressed
+lines matching a regular expression <var>re</var>. The current address is set
+to the line currently matched before <var>command-list</var> is executed. At
+the end of the <span class="samp">g</span> command, the current address is set to the last
+line affected by <var>command-list</var>.
+
+     <p>At least the first command of <var>command-list</var> must appear on the same
+line as the <span class="samp">g</span> command. All lines of a multi-line
+<var>command-list</var> except the last line must be terminated with a
+backslash (<span class="samp">\</span>). Any commands are allowed, except for <span class="samp">g</span>,
+<span class="samp">G</span>, <span class="samp">v</span>, and <span class="samp">V</span>. By default, a newline alone in
+<var>command-list</var> is equivalent to a <span class="samp">p</span> command. If <span class="command">ed</span>
+is invoked with the command-line option <span class="samp">-G</span>, then a newline in
+<var>command-list</var> is equivalent to a <span class="samp">.+1p</span> command.
+
+     <br><dt><code>(1,$)G /</code><var>re</var><code>/</code><dd>Interactive global command. Interactively edits the addressed lines
+matching a regular expression <var>re</var>. For each matching line, the line
+is printed, the current address is set, and the user is prompted to
+enter a <var>command-list</var>. At the end of the <span class="samp">G</span> command, the
+current address is set to the last line affected by (the last)
+<var>command-list</var>.
+
+     <p>The format of <var>command-list</var> is the same as that of the <span class="samp">g</span>
+command. A newline alone acts as a null command list. A single <span class="samp">&amp;</span>
+repeats the last non-null command list.
+
+     <br><dt><code>H</code><dd>Toggles the printing of error explanations. By default, explanations are
+not printed. It is recommended that ed scripts begin with this command
+to aid in debugging.
+
+     <br><dt><code>h</code><dd>Prints an explanation of the last error.
+
+     <br><dt><code>(.)i</code><dd>Inserts text in the buffer before the current line. The address <span class="samp">0</span>
+(zero) is valid for this command; it is equivalent to address <span class="samp">1</span>. 
+Text is entered in input mode. The current address is set to the last
+line entered.
+
+     <br><dt><code>(.,.+1)j</code><dd>Joins the addressed lines. The addressed lines are deleted from the
+buffer and replaced by a single line containing their joined text. The
+current address is set to the resultant line.
+
+     <br><dt><code>(.)kx</code><dd>Marks a line with a lower case letter <span class="samp">x</span>. The line can then be
+addressed as <span class="samp">'x</span> (i.e., a single quote followed by <span class="samp">x</span>) in
+subsequent commands. The mark is not cleared until the line is deleted
+or otherwise modified.
+
+     <br><dt><code>(.,.)l</code><dd>Prints the addressed lines unambiguously. The end of each line is marked
+with a <span class="samp">$</span>, and every <span class="samp">$</span> character within the text is printed
+with a preceding backslash. The current address is set to the last line
+printed.
+
+     <br><dt><code>(.,.)m(.)</code><dd>Moves lines in the buffer. The addressed lines are moved to after the
+right-hand destination address, which may be the address <span class="samp">0</span>
+(zero). The current address is set to the last line moved.
+
+     <br><dt><code>(.,.)n</code><dd>Prints the addressed lines, preceding each line by its line number and a
+&lt;tab&gt;. The current address is set to the last line printed.
+
+     <br><dt><code>(.,.)p</code><dd>Prints the addressed lines. The current address is set to the last line
+printed.
+
+     <br><dt><code>P</code><dd>Toggles the command prompt on and off. Unless a prompt is specified with
+command-line option <span class="samp">-p</span>, the command prompt is by default turned
+off.
+
+     <br><dt><code>q</code><dd>Quits <span class="command">ed</span>.
+
+     <br><dt><code>Q</code><dd>Quits <span class="command">ed</span> unconditionally. This is similar to the <code>q</code>
+command, except that unwritten changes are discarded without warning.
+
+     <br><dt><code>($)r </code><var>file</var><dd>Reads <var>file</var> to after the addressed line. If <var>file</var> is not
+specified, then the default filename is used. If there is no default
+filename prior to the command, then the default filename is set to
+<var>file</var>. Otherwise, the default filename is unchanged. The current
+address is set to the last line read.
+
+     <br><dt><code>($)r !</code><var>command</var><dd>Reads to after the addressed line the standard output of
+<span class="samp">!command</span>, (see the <span class="samp">!</span> command below). The default filename
+is unchanged. The current address is set to the last line read.
+
+     <br><dt><code>(.,.)s /</code><var>re</var><code>/</code><var>replacement</var><code>/</code><dt><code>(.,.)s /</code><var>re</var><code>/</code><var>replacement</var><code>/g</code><dt><code>(.,.)s /</code><var>re</var><code>/</code><var>replacement</var><code>/</code><var>n</var><dd>Replaces text in the addressed lines matching a regular expression
+<var>re</var> with <var>replacement</var>. By default, only the first match in
+each line is replaced. If the <span class="samp">g</span> (global) suffix is given, then
+every match is replaced. The <var>n</var> suffix, where <var>n</var> is a postive
+number, causes only the <var>n</var>th match to be replaced. It is an error
+if no substitutions are performed on any of the addressed lines. The
+current address is set the last line affected.
+
+     <p><var>re</var> and <var>replacement</var> may be delimited by any character other
+than &lt;space&gt; and &lt;newline&gt; (see the <span class="samp">s</span> command below). If
+one or two of the last delimiters is omitted, then the last line
+affected is printed as if the print suffix <span class="samp">p</span> were specified.
+
+     <p>An unescaped <span class="samp">&amp;</span> in <var>replacement</var> is replaced by the currently
+matched text. The character sequence <span class="samp">\</span><var>m</var> where <var>m</var> is a
+number in the range [1,9], is replaced by the <var>m</var>th backreference
+expression of the matched text. If <var>replacement</var> consists of a
+single <span class="samp">%</span>, then <var>replacement</var> from the last substitution is
+used. Newlines may be embedded in <var>replacement</var> if they are escaped
+with a backslash (<span class="samp">\</span>).
+
+     <br><dt><code>(.,.)s</code><dd>Repeats the last substitution. This form of the <span class="samp">s</span> command accepts
+a count suffix <var>n</var>, or any combination of the characters <span class="samp">r</span>,
+<span class="samp">g</span>, and <span class="samp">p</span>. If a count suffix <var>n</var> is given, then only
+the <var>n</var>th match is replaced. The <span class="samp">r</span> suffix causes the regular
+expression of the last search to be used instead of the that of the last
+substitution. The <span class="samp">g</span> suffix toggles the global suffix of the last
+substitution. The <span class="samp">p</span> suffix toggles the print suffix of the last
+substitution The current address is set to the last line affected.
+
+     <br><dt><code>(.,.)t(.)</code><dd>Copies (i.e., transfers) the addressed lines to after the right-hand
+destination address, which may be the address <span class="samp">0</span> (zero). The
+current address is set to the last line copied.
+
+     <br><dt><code>u</code><dd>Undoes the last command and restores the current address to what it was
+before the command. The global commands <span class="samp">g</span>, <span class="samp">G</span>, <span class="samp">v</span>,
+and <span class="samp">V</span> are treated as a single command by undo. <span class="samp">u</span> is its
+own inverse.
+
+     <br><dt><code>(1,$)v /</code><var>re</var><code>/</code><var>command-list</var><dd>This is similar to the <span class="samp">g</span> command except that it applies
+<var>command-list</var> to each of the addressed lines not matching the
+regular expression <var>re</var>.
+
+     <br><dt><code>(1,$)V /</code><var>re</var><code>/</code><dd>This is similar to the <span class="samp">G</span> command except that it interactively
+edits the addressed lines not matching the regular expression <var>re</var>.
+
+     <br><dt><code>(1,$)w </code><var>file</var><dd>Writes the addressed lines to <var>file</var>. Any previous contents of
+<var>file</var> is lost without warning. If there is no default filename,
+then the default filename is set to <var>file</var>, otherwise it is
+unchanged. If no filename is specified, then the default filename is
+used. The current address is unchanged.
+
+     <br><dt><code>(1,$)w !</code><var>command</var><dd>Writes the addressed lines to the standard input of
+<span class="samp">!</span><var>command</var>, (see the <span class="samp">!</span> command below). The default
+filename and current address are unchanged.
+
+     <br><dt><code>(1,$)wq </code><var>file</var><dd>Writes the addressed lines to <var>file</var>, and then executes a <span class="samp">q</span>
+command.
+
+     <br><dt><code>(1,$)W </code><var>file</var><dd>Appends the addressed lines to the end of <var>file</var>. This is similar to
+the <span class="samp">w</span> command, expect that the previous contents of file is not
+clobbered. The current address is unchanged.
+
+     <br><dt><code>(.)x</code><dd>Copies (puts) the contents of the cut buffer to after the addressed
+line. The current address is set to the last line copied.
+
+     <br><dt><code>(.,.)y</code><dd>Copies (yanks) the addressed lines to the cut buffer. The cut buffer is
+overwritten by subsequent <span class="samp">y</span>, <span class="samp">s</span>, <span class="samp">j</span>, <span class="samp">d</span>, or
+<span class="samp">c</span> commands. The current address is unchanged.
+
+     <br><dt><code>(.+1)z </code><var>n</var><dd>Scrolls <var>n</var> lines at a time starting at addressed line. If <var>n</var>
+is not specified, then the current window size is used. The current
+address is set to the last line printed.
+
+     <br><dt><code>!</code><var>command</var><dd>Executes <var>command</var> via <span class="command">sh (1)</span>. If the first character of
+<var>command</var> is <span class="samp">!</span>, then it is replaced by text of the previous
+<span class="samp">!</span><var>command</var>. <span class="command">ed</span> does not process <var>command</var> for
+backslash (<span class="samp">\</span>) escapes. However, an unescaped <span class="samp">%</span> is replaced
+by the default filename. When the shell returns from execution, a
+<span class="samp">!</span> is printed to the standard output. The current line is
+unchanged.
+
+     <br><dt><code>(.,.)#</code><dd>Begins a comment; the rest of the line, up to a newline, is ignored. If
+a line address followed by a semicolon is given, then the current
+address is set to that address. Otherwise, the current address is
+unchanged.
+
+     <br><dt><code>($)=</code><dd>Prints the line number of the addressed line.
+
+     <br><dt><code>(.+1)&lt;newline&gt;</code><dd>An address alone prints the addressed line. A &lt;newline&gt; alone is
+equivalent to <span class="samp">+1p</span>. the current address is set to the address of
+the printed line.
+
+   </dl>
+
+<div class="node">
+<p><hr>
+<a name="Limitations"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Diagnostics">Diagnostics</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Commands">Commands</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">7 Limitations</h2>
+
+<p>If the terminal hangs up, <span class="command">ed</span> attempts to write the buffer to
+file <span class="file">ed.hup</span>.
+
+   <p><span class="command">ed</span> processes <var>file</var> arguments for backslash escapes, i.e.,
+in a filename, any characters preceded by a backslash (<span class="samp">\</span>) are
+interpreted literally.
+
+   <p>If a text (non-binary) file is not terminated by a newline character,
+then <span class="command">ed</span> appends one on reading/writing it. In the case of a
+binary file, <span class="command">ed</span> does not append a newline on reading/writing.
+
+   <p>Per line overhead: 4 <code>int</code>s.
+
+<div class="node">
+<p><hr>
+<a name="Diagnostics"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#GNU-Free-Documentation-License">GNU Free Documentation License</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Limitations">Limitations</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">8 Diagnostics</h2>
+
+<p>When an error occurs, if <span class="command">ed</span>'s input is from a regular file or
+here document, then it exits, otherwise it prints a <span class="samp">?</span> and returns
+to command mode. An explanation of the last error can be printed with
+the <span class="samp">h</span> (help) command.
+
+   <p>If the <span class="samp">u</span> (undo) command occurs in a global command list, then the
+command list is executed only once.
+
+   <p>Attempting to quit <span class="command">ed</span> or edit another file before writing a
+modified buffer results in an error. If the command is entered a second
+time, it succeeds, but any changes to the buffer are lost.
+
+   <p><span class="command">ed</span> exits with 0 if no errors occurred; otherwise &gt;0.
+
+<div class="node">
+<p><hr>
+<a name="GNU-Free-Documentation-License"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Diagnostics">Diagnostics</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">9 GNU Free Documentation License</h2>
+
+<!-- The GNU Free Documentation License. -->
+<div align="center">Version 1.3, 3 November 2008</div>
+
+<!-- This file is intended to be included within another document, -->
+<!-- hence no sectioning command or @node. -->
+<pre class="display">     Copyright &copy; 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
+     <a href="http://fsf.org/">http://fsf.org/</a>
+     
+     Everyone is permitted to copy and distribute verbatim copies
+     of this license document, but changing it is not allowed.
+</pre>
+     <ol type=1 start=0>
+<li>PREAMBLE
+
+     <p>The purpose of this License is to make a manual, textbook, or other
+functional and useful document <dfn>free</dfn> in the sense of freedom: to
+assure everyone the effective freedom to copy and redistribute it,
+with or without modifying it, either commercially or noncommercially. 
+Secondarily, this License preserves for the author and publisher a way
+to get credit for their work, while not being considered responsible
+for modifications made by others.
+
+     <p>This License is a kind of &ldquo;copyleft&rdquo;, which means that derivative
+works of the document must themselves be free in the same sense.  It
+complements the GNU General Public License, which is a copyleft
+license designed for free software.
+
+     <p>We have designed this License in order to use it for manuals for free
+software, because free software needs free documentation: a free
+program should come with manuals providing the same freedoms that the
+software does.  But this License is not limited to software manuals;
+it can be used for any textual work, regardless of subject matter or
+whether it is published as a printed book.  We recommend this License
+principally for works whose purpose is instruction or reference.
+
+     <li>APPLICABILITY AND DEFINITIONS
+
+     <p>This License applies to any manual or other work, in any medium, that
+contains a notice placed by the copyright holder saying it can be
+distributed under the terms of this License.  Such a notice grants a
+world-wide, royalty-free license, unlimited in duration, to use that
+work under the conditions stated herein.  The &ldquo;Document&rdquo;, below,
+refers to any such manual or work.  Any member of the public is a
+licensee, and is addressed as &ldquo;you&rdquo;.  You accept the license if you
+copy, modify or distribute the work in a way requiring permission
+under copyright law.
+
+     <p>A &ldquo;Modified Version&rdquo; of the Document means any work containing the
+Document or a portion of it, either copied verbatim, or with
+modifications and/or translated into another language.
+
+     <p>A &ldquo;Secondary Section&rdquo; is a named appendix or a front-matter section
+of the Document that deals exclusively with the relationship of the
+publishers or authors of the Document to the Document's overall
+subject (or to related matters) and contains nothing that could fall
+directly within that overall subject.  (Thus, if the Document is in
+part a textbook of mathematics, a Secondary Section may not explain
+any mathematics.)  The relationship could be a matter of historical
+connection with the subject or with related matters, or of legal,
+commercial, philosophical, ethical or political position regarding
+them.
+
+     <p>The &ldquo;Invariant Sections&rdquo; are certain Secondary Sections whose titles
+are designated, as being those of Invariant Sections, in the notice
+that says that the Document is released under this License.  If a
+section does not fit the above definition of Secondary then it is not
+allowed to be designated as Invariant.  The Document may contain zero
+Invariant Sections.  If the Document does not identify any Invariant
+Sections then there are none.
+
+     <p>The &ldquo;Cover Texts&rdquo; are certain short passages of text that are listed,
+as Front-Cover Texts or Back-Cover Texts, in the notice that says that
+the Document is released under this License.  A Front-Cover Text may
+be at most 5 words, and a Back-Cover Text may be at most 25 words.
+
+     <p>A &ldquo;Transparent&rdquo; copy of the Document means a machine-readable copy,
+represented in a format whose specification is available to the
+general public, that is suitable for revising the document
+straightforwardly with generic text editors or (for images composed of
+pixels) generic paint programs or (for drawings) some widely available
+drawing editor, and that is suitable for input to text formatters or
+for automatic translation to a variety of formats suitable for input
+to text formatters.  A copy made in an otherwise Transparent file
+format whose markup, or absence of markup, has been arranged to thwart
+or discourage subsequent modification by readers is not Transparent. 
+An image format is not Transparent if used for any substantial amount
+of text.  A copy that is not &ldquo;Transparent&rdquo; is called &ldquo;Opaque&rdquo;.
+
+     <p>Examples of suitable formats for Transparent copies include plain
+<span class="sc">ascii</span> without markup, Texinfo input format, LaTeX input
+format, <acronym>SGML</acronym> or <acronym>XML</acronym> using a publicly available
+<acronym>DTD</acronym>, and standard-conforming simple <acronym>HTML</acronym>,
+PostScript or <acronym>PDF</acronym> designed for human modification.  Examples
+of transparent image formats include <acronym>PNG</acronym>, <acronym>XCF</acronym> and
+<acronym>JPG</acronym>.  Opaque formats include proprietary formats that can be
+read and edited only by proprietary word processors, <acronym>SGML</acronym> or
+<acronym>XML</acronym> for which the <acronym>DTD</acronym> and/or processing tools are
+not generally available, and the machine-generated <acronym>HTML</acronym>,
+PostScript or <acronym>PDF</acronym> produced by some word processors for
+output purposes only.
+
+     <p>The &ldquo;Title Page&rdquo; means, for a printed book, the title page itself,
+plus such following pages as are needed to hold, legibly, the material
+this License requires to appear in the title page.  For works in
+formats which do not have any title page as such, &ldquo;Title Page&rdquo; means
+the text near the most prominent appearance of the work's title,
+preceding the beginning of the body of the text.
+
+     <p>The &ldquo;publisher&rdquo; means any person or entity that distributes copies
+of the Document to the public.
+
+     <p>A section &ldquo;Entitled XYZ&rdquo; means a named subunit of the Document whose
+title either is precisely XYZ or contains XYZ in parentheses following
+text that translates XYZ in another language.  (Here XYZ stands for a
+specific section name mentioned below, such as &ldquo;Acknowledgements&rdquo;,
+&ldquo;Dedications&rdquo;, &ldquo;Endorsements&rdquo;, or &ldquo;History&rdquo;.)  To &ldquo;Preserve the Title&rdquo;
+of such a section when you modify the Document means that it remains a
+section &ldquo;Entitled XYZ&rdquo; according to this definition.
+
+     <p>The Document may include Warranty Disclaimers next to the notice which
+states that this License applies to the Document.  These Warranty
+Disclaimers are considered to be included by reference in this
+License, but only as regards disclaiming warranties: any other
+implication that these Warranty Disclaimers may have is void and has
+no effect on the meaning of this License.
+
+     <li>VERBATIM COPYING
+
+     <p>You may copy and distribute the Document in any medium, either
+commercially or noncommercially, provided that this License, the
+copyright notices, and the license notice saying this License applies
+to the Document are reproduced in all copies, and that you add no other
+conditions whatsoever to those of this License.  You may not use
+technical measures to obstruct or control the reading or further
+copying of the copies you make or distribute.  However, you may accept
+compensation in exchange for copies.  If you distribute a large enough
+number of copies you must also follow the conditions in section 3.
+
+     <p>You may also lend copies, under the same conditions stated above, and
+you may publicly display copies.
+
+     <li>COPYING IN QUANTITY
+
+     <p>If you publish printed copies (or copies in media that commonly have
+printed covers) of the Document, numbering more than 100, and the
+Document's license notice requires Cover Texts, you must enclose the
+copies in covers that carry, clearly and legibly, all these Cover
+Texts: Front-Cover Texts on the front cover, and Back-Cover Texts on
+the back cover.  Both covers must also clearly and legibly identify
+you as the publisher of these copies.  The front cover must present
+the full title with all words of the title equally prominent and
+visible.  You may add other material on the covers in addition. 
+Copying with changes limited to the covers, as long as they preserve
+the title of the Document and satisfy these conditions, can be treated
+as verbatim copying in other respects.
+
+     <p>If the required texts for either cover are too voluminous to fit
+legibly, you should put the first ones listed (as many as fit
+reasonably) on the actual cover, and continue the rest onto adjacent
+pages.
+
+     <p>If you publish or distribute Opaque copies of the Document numbering
+more than 100, you must either include a machine-readable Transparent
+copy along with each Opaque copy, or state in or with each Opaque copy
+a computer-network location from which the general network-using
+public has access to download using public-standard network protocols
+a complete Transparent copy of the Document, free of added material. 
+If you use the latter option, you must take reasonably prudent steps,
+when you begin distribution of Opaque copies in quantity, to ensure
+that this Transparent copy will remain thus accessible at the stated
+location until at least one year after the last time you distribute an
+Opaque copy (directly or through your agents or retailers) of that
+edition to the public.
+
+     <p>It is requested, but not required, that you contact the authors of the
+Document well before redistributing any large number of copies, to give
+them a chance to provide you with an updated version of the Document.
+
+     <li>MODIFICATIONS
+
+     <p>You may copy and distribute a Modified Version of the Document under
+the conditions of sections 2 and 3 above, provided that you release
+the Modified Version under precisely this License, with the Modified
+Version filling the role of the Document, thus licensing distribution
+and modification of the Modified Version to whoever possesses a copy
+of it.  In addition, you must do these things in the Modified Version:
+
+          <ol type=A start=1>
+<li>Use in the Title Page (and on the covers, if any) a title distinct
+from that of the Document, and from those of previous versions
+(which should, if there were any, be listed in the History section
+of the Document).  You may use the same title as a previous version
+if the original publisher of that version gives permission.
+
+          <li>List on the Title Page, as authors, one or more persons or entities
+responsible for authorship of the modifications in the Modified
+Version, together with at least five of the principal authors of the
+Document (all of its principal authors, if it has fewer than five),
+unless they release you from this requirement.
+
+          <li>State on the Title page the name of the publisher of the
+Modified Version, as the publisher.
+
+          <li>Preserve all the copyright notices of the Document.
+
+          <li>Add an appropriate copyright notice for your modifications
+adjacent to the other copyright notices.
+
+          <li>Include, immediately after the copyright notices, a license notice
+giving the public permission to use the Modified Version under the
+terms of this License, in the form shown in the Addendum below.
+
+          <li>Preserve in that license notice the full lists of Invariant Sections
+and required Cover Texts given in the Document's license notice.
+
+          <li>Include an unaltered copy of this License.
+
+          <li>Preserve the section Entitled &ldquo;History&rdquo;, Preserve its Title, and add
+to it an item stating at least the title, year, new authors, and
+publisher of the Modified Version as given on the Title Page.  If
+there is no section Entitled &ldquo;History&rdquo; in the Document, create one
+stating the title, year, authors, and publisher of the Document as
+given on its Title Page, then add an item describing the Modified
+Version as stated in the previous sentence.
+
+          <li>Preserve the network location, if any, given in the Document for
+public access to a Transparent copy of the Document, and likewise
+the network locations given in the Document for previous versions
+it was based on.  These may be placed in the &ldquo;History&rdquo; section. 
+You may omit a network location for a work that was published at
+least four years before the Document itself, or if the original
+publisher of the version it refers to gives permission.
+
+          <li>For any section Entitled &ldquo;Acknowledgements&rdquo; or &ldquo;Dedications&rdquo;, Preserve
+the Title of the section, and preserve in the section all the
+substance and tone of each of the contributor acknowledgements and/or
+dedications given therein.
+
+          <li>Preserve all the Invariant Sections of the Document,
+unaltered in their text and in their titles.  Section numbers
+or the equivalent are not considered part of the section titles.
+
+          <li>Delete any section Entitled &ldquo;Endorsements&rdquo;.  Such a section
+may not be included in the Modified Version.
+
+          <li>Do not retitle any existing section to be Entitled &ldquo;Endorsements&rdquo; or
+to conflict in title with any Invariant Section.
+
+          <li>Preserve any Warranty Disclaimers.
+          </ol>
+
+     <p>If the Modified Version includes new front-matter sections or
+appendices that qualify as Secondary Sections and contain no material
+copied from the Document, you may at your option designate some or all
+of these sections as invariant.  To do this, add their titles to the
+list of Invariant Sections in the Modified Version's license notice. 
+These titles must be distinct from any other section titles.
+
+     <p>You may add a section Entitled &ldquo;Endorsements&rdquo;, provided it contains
+nothing but endorsements of your Modified Version by various
+parties&mdash;for example, statements of peer review or that the text has
+been approved by an organization as the authoritative definition of a
+standard.
+
+     <p>You may add a passage of up to five words as a Front-Cover Text, and a
+passage of up to 25 words as a Back-Cover Text, to the end of the list
+of Cover Texts in the Modified Version.  Only one passage of
+Front-Cover Text and one of Back-Cover Text may be added by (or
+through arrangements made by) any one entity.  If the Document already
+includes a cover text for the same cover, previously added by you or
+by arrangement made by the same entity you are acting on behalf of,
+you may not add another; but you may replace the old one, on explicit
+permission from the previous publisher that added the old one.
+
+     <p>The author(s) and publisher(s) of the Document do not by this License
+give permission to use their names for publicity for or to assert or
+imply endorsement of any Modified Version.
+
+     <li>COMBINING DOCUMENTS
+
+     <p>You may combine the Document with other documents released under this
+License, under the terms defined in section 4 above for modified
+versions, provided that you include in the combination all of the
+Invariant Sections of all of the original documents, unmodified, and
+list them all as Invariant Sections of your combined work in its
+license notice, and that you preserve all their Warranty Disclaimers.
+
+     <p>The combined work need only contain one copy of this License, and
+multiple identical Invariant Sections may be replaced with a single
+copy.  If there are multiple Invariant Sections with the same name but
+different contents, make the title of each such section unique by
+adding at the end of it, in parentheses, the name of the original
+author or publisher of that section if known, or else a unique number. 
+Make the same adjustment to the section titles in the list of
+Invariant Sections in the license notice of the combined work.
+
+     <p>In the combination, you must combine any sections Entitled &ldquo;History&rdquo;
+in the various original documents, forming one section Entitled
+&ldquo;History&rdquo;; likewise combine any sections Entitled &ldquo;Acknowledgements&rdquo;,
+and any sections Entitled &ldquo;Dedications&rdquo;.  You must delete all
+sections Entitled &ldquo;Endorsements.&rdquo;
+
+     <li>COLLECTIONS OF DOCUMENTS
+
+     <p>You may make a collection consisting of the Document and other documents
+released under this License, and replace the individual copies of this
+License in the various documents with a single copy that is included in
+the collection, provided that you follow the rules of this License for
+verbatim copying of each of the documents in all other respects.
+
+     <p>You may extract a single document from such a collection, and distribute
+it individually under this License, provided you insert a copy of this
+License into the extracted document, and follow this License in all
+other respects regarding verbatim copying of that document.
+
+     <li>AGGREGATION WITH INDEPENDENT WORKS
+
+     <p>A compilation of the Document or its derivatives with other separate
+and independent documents or works, in or on a volume of a storage or
+distribution medium, is called an &ldquo;aggregate&rdquo; if the copyright
+resulting from the compilation is not used to limit the legal rights
+of the compilation's users beyond what the individual works permit. 
+When the Document is included in an aggregate, this License does not
+apply to the other works in the aggregate which are not themselves
+derivative works of the Document.
+
+     <p>If the Cover Text requirement of section 3 is applicable to these
+copies of the Document, then if the Document is less than one half of
+the entire aggregate, the Document's Cover Texts may be placed on
+covers that bracket the Document within the aggregate, or the
+electronic equivalent of covers if the Document is in electronic form. 
+Otherwise they must appear on printed covers that bracket the whole
+aggregate.
+
+     <li>TRANSLATION
+
+     <p>Translation is considered a kind of modification, so you may
+distribute translations of the Document under the terms of section 4. 
+Replacing Invariant Sections with translations requires special
+permission from their copyright holders, but you may include
+translations of some or all Invariant Sections in addition to the
+original versions of these Invariant Sections.  You may include a
+translation of this License, and all the license notices in the
+Document, and any Warranty Disclaimers, provided that you also include
+the original English version of this License and the original versions
+of those notices and disclaimers.  In case of a disagreement between
+the translation and the original version of this License or a notice
+or disclaimer, the original version will prevail.
+
+     <p>If a section in the Document is Entitled &ldquo;Acknowledgements&rdquo;,
+&ldquo;Dedications&rdquo;, or &ldquo;History&rdquo;, the requirement (section 4) to Preserve
+its Title (section 1) will typically require changing the actual
+title.
+
+     <li>TERMINATION
+
+     <p>You may not copy, modify, sublicense, or distribute the Document
+except as expressly provided under this License.  Any attempt
+otherwise to copy, modify, sublicense, or distribute it is void, and
+will automatically terminate your rights under this License.
+
+     <p>However, if you cease all violation of this License, then your license
+from a particular copyright holder is reinstated (a) provisionally,
+unless and until the copyright holder explicitly and finally
+terminates your license, and (b) permanently, if the copyright holder
+fails to notify you of the violation by some reasonable means prior to
+60 days after the cessation.
+
+     <p>Moreover, your license from a particular copyright holder is
+reinstated permanently if the copyright holder notifies you of the
+violation by some reasonable means, this is the first time you have
+received notice of violation of this License (for any work) from that
+copyright holder, and you cure the violation prior to 30 days after
+your receipt of the notice.
+
+     <p>Termination of your rights under this section does not terminate the
+licenses of parties who have received copies or rights from you under
+this License.  If your rights have been terminated and not permanently
+reinstated, receipt of a copy of some or all of the same material does
+not give you any rights to use it.
+
+     <li>FUTURE REVISIONS OF THIS LICENSE
+
+     <p>The Free Software Foundation may publish new, revised versions
+of the GNU Free Documentation License from time to time.  Such new
+versions will be similar in spirit to the present version, but may
+differ in detail to address new problems or concerns.  See
+<a href="http://www.gnu.org/copyleft/">http://www.gnu.org/copyleft/</a>.
+
+     <p>Each version of the License is given a distinguishing version number. 
+If the Document specifies that a particular numbered version of this
+License &ldquo;or any later version&rdquo; applies to it, you have the option of
+following the terms and conditions either of that specified version or
+of any later version that has been published (not as a draft) by the
+Free Software Foundation.  If the Document does not specify a version
+number of this License, you may choose any version ever published (not
+as a draft) by the Free Software Foundation.  If the Document
+specifies that a proxy can decide which future versions of this
+License can be used, that proxy's public statement of acceptance of a
+version permanently authorizes you to choose that version for the
+Document.
+
+     <li>RELICENSING
+
+     <p>&ldquo;Massive Multiauthor Collaboration Site&rdquo; (or &ldquo;MMC Site&rdquo;) means any
+World Wide Web server that publishes copyrightable works and also
+provides prominent facilities for anybody to edit those works.  A
+public wiki that anybody can edit is an example of such a server.  A
+&ldquo;Massive Multiauthor Collaboration&rdquo; (or &ldquo;MMC&rdquo;) contained in the
+site means any set of copyrightable works thus published on the MMC
+site.
+
+     <p>&ldquo;CC-BY-SA&rdquo; means the Creative Commons Attribution-Share Alike 3.0
+license published by Creative Commons Corporation, a not-for-profit
+corporation with a principal place of business in San Francisco,
+California, as well as future copyleft versions of that license
+published by that same organization.
+
+     <p>&ldquo;Incorporate&rdquo; means to publish or republish a Document, in whole or
+in part, as part of another Document.
+
+     <p>An MMC is &ldquo;eligible for relicensing&rdquo; if it is licensed under this
+License, and if all works that were first published under this License
+somewhere other than this MMC, and subsequently incorporated in whole
+or in part into the MMC, (1) had no cover texts or invariant sections,
+and (2) were thus incorporated prior to November 1, 2008.
+
+     <p>The operator of an MMC Site may republish an MMC contained in the site
+under CC-BY-SA on the same site at any time before August 1, 2009,
+provided the MMC is eligible for relicensing.
+
+        </ol>
+
+<h3 class="heading">ADDENDUM: How to use this License for your documents</h3>
+
+<p>To use this License in a document you have written, include a copy of
+the License in the document and put the following copyright and
+license notices just after the title page:
+
+<pre class="smallexample">       Copyright (C)  <var>year</var>  <var>your name</var>.
+       Permission is granted to copy, distribute and/or modify this document
+       under the terms of the GNU Free Documentation License, Version 1.3
+       or any later version published by the Free Software Foundation;
+       with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+       Texts.  A copy of the license is included in the section entitled ``GNU
+       Free Documentation License''.
+</pre>
+   <p>If you have Invariant Sections, Front-Cover Texts and Back-Cover Texts,
+replace the &ldquo;with<small class="dots">...</small>Texts.&rdquo; line with this:
+
+<pre class="smallexample">         with the Invariant Sections being <var>list their titles</var>, with
+         the Front-Cover Texts being <var>list</var>, and with the Back-Cover Texts
+         being <var>list</var>.
+</pre>
+   <p>If you have Invariant Sections without Cover Texts, or some other
+combination of the three, merge those two alternatives to suit the
+situation.
+
+   <p>If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of
+free software license, such as the GNU General Public License,
+to permit their use in free software.
+
+<!-- Local Variables: -->
+<!-- ispell-local-pdict: "ispell-dict" -->
+<!-- End: -->
+</body></html>
+

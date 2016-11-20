@@ -1,0 +1,71 @@
+TIFFSTRIP(3TIFF)                               TIFFSTRIP(3TIFF)
+
+
+
+
+
+NAME
+       TIFFDefaultStripSize,   TIFFStripSize,   TIFFVStripSize,
+       TIFFRawStripSize, TIFFComputeStrip, TIFFNumberOfStrips -
+       strip-related utility routines
+
+SYNOPSIS
+       #include <tiffio.h>
+
+       uint32 TIFFDefaultStripSize(TIFF *tif, uint32 estimate)
+       tsize_t TIFFStripSize(TIFF *tif)
+       tsize_t TIFFVStripSize(TIFF *tif, uint32 nrows)
+       tsize_t TIFFRawStripSize(TIFF *tif, tstrip_t strip)
+       tstrip_t  TIFFComputeStrip(TIFF  *tif, uint32 row, tsam-
+       ple_t sample)
+       tstrip_t TIFFNumberOfStrips(TIFF *tif)
+
+DESCRIPTION
+       TIFFDefaultStripSize returns the number of  rows  for  a
+       reasonable-sized strip according to the current settings
+       of the ImageWidth, BitsPerSample, SamplesPerPixel,  tags
+       and  any compression-specific requirements. If the esti-
+       mate parameter, if non-zero, then  it  is  taken  as  an
+       estimate  of the desired strip size and adjusted accord-
+       ing to any compression-specific requirements. The  value
+       returned  by  this  function is typically used to define
+       the RowsPerStrip tag. In lieu of  any  unusual  require-
+       ments  TIFFDefaultStripSize  tries to create strips that
+       have approximately 8 kilobytes of uncompressed data.
+
+       TIFFStripSize returns the equivalent size for a strip of
+       data as it would be returned in a call to TIFFReadEncod-
+       edStrip or  as  it  would  be  expected  in  a  call  to
+       TIFFWriteEncodedStrip.
+
+       TIFFVStripSize  returns  the  number of bytes in a strip
+       with nrows rows of data.
+
+       TIFFRawStripSize returns the number of bytes  in  a  raw
+       strip (i.e. not decoded).
+
+       TIFFComputeStrip  returns  the  strip  that contains the
+       specified coordinates. A valid strip is always returned;
+       out-of-range coordinate values are clamped to the bounds
+       of the image. The row parameter is always used in calcu-
+       lating  a  strip.  The  sample parameter is used only if
+       data are organized in separate planes  (PlanarConfigura-
+       tion=2).
+
+       TIFFNumberOfStrips  returns  the number of strips in the
+       image.
+
+DIAGNOSTICS
+       None.
+
+SEE ALSO
+       TIFFReadEncodedStrip(3TIFF),    TIFFReadRawStrip(3TIFF),
+       TIFFWriteEncodedStrip(3TIFF),  TIFFWriteRawStrip(3TIFF),
+       libtiff(3TIFF),
+
+       Libtiff  library   home   page:   http://www.remotesens-
+       ing.org/libtiff/
+
+
+
+libtiff                 October 15, 1995       TIFFSTRIP(3TIFF)

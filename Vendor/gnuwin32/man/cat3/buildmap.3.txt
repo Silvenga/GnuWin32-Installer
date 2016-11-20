@@ -1,0 +1,85 @@
+BUILDMAP(3)                                         BUILDMAP(3)
+
+
+
+
+
+NAME
+       buildmap  -  create  a  color map array from an RLE file
+       header.
+
+SYNOPSIS
+       #include <rle.h>
+
+       rle_pixel ** buildmap( the_hdr, minmap, orig_gamma,
+              new_gamma )
+       rle_hdr * the_hdr;
+       int minmap;
+       double orig_gamma, new_gamma;
+
+DESCRIPTION
+       The color map in the rle_hdr(3) structure is not in the
+       most easily used form.  The function buildmap returns a
+       pointer to a colormap array with certain minimum dimen-
+       sions, making it a little easier to implement color map-
+       ping in a program.  The color map from first argument,
+       the_hdr, is used to build the result.  If no map is
+       present in the_hdr, then an identity map of the minimum
+       size will be returned.
+
+       The returned color map will have at least minmap rows or
+       channels, each of which is at least 256 entries long (so
+       that indexing into the color map with an 8 bit rle_pixel
+       value will always succeed.)
+
+       The color map from the_hdr will be composed with a gamma
+       compensation curve to account for the gamma of the dis-
+       play for which the input color map was presumably com-
+       puted.  The argument orig_gamma specifies the gamma of
+       the compensation curve.  It would typically be the gamma
+       of the original display.
+
+       If gamma is 0, then if a picture comment
+       image_gamma=i_gamma is present, gamma will be set to
+       1.0/i_gamma.  Otherwise, if a comment dis-
+       play_gamma=d_gamma is present, gamma will be set to
+       d_gamma.  The gamma compensation value for pixel i is
+       255*(i/255)^gamma.
+
+       If this color map will be used directly for another dis-
+       play, the gamma of this new display should be passed in
+       new_gamma.
+
+       The returned value is a pointer to an array of pointers
+       to arrays of rle_pixel values.  It may be doubly indexed
+       in C code, so that if cmap is the return value, the RGB
+       color mapping for a pixel pixval is (cmap[0][pixval],
+       cmap[1][pixval], cmap[2][pixval]).
+
+NOTES
+       Generally, unless the user explicitly specifies the
+       image or original display gamma (e.g., as with the -i or
+       -I flags of getx11(1), you should pass 0 for orig_gamma.
+       This lets buildmap use the value from the_hdr, if it is
+       present.
+
+       If you are going to use the result of buildmap to gener-
+       ate values to be dithered, new_gamma should always be
+       1.0, and the display gamma (-g in getx11) should be
+       passed to dithermap(3).  If you are not planning to
+       dither, then pass the user supplied display gamma as
+       new_gamma.
+
+       The color map storage allocated by buildmap can be
+       released by calling free( map[0] ).
+
+SEE ALSO
+       dithermap(3), rle_hdr(3), librle(3), RLE(5).
+
+AUTHOR
+       Spencer W. Thomas, University of Utah
+
+
+
+
+3                            3/6/85                 BUILDMAP(3)

@@ -1,0 +1,75 @@
+TIFFWriteEncodedStrip(3TIFF)       TIFFWriteEncodedStrip(3TIFF)
+
+
+
+
+
+NAME
+       TIFFWritedEncodedStrip  -  compress and write a strip of
+       data to an open TIFF file
+
+SYNOPSIS
+       #include <tiffio.h>
+
+       tsize_t TIFFWriteEncodedStrip(TIFF *tif, tstrip_t strip,
+       tdata_t buf, tsize_t size)
+
+DESCRIPTION
+       Compress  size  bytes of raw data from buf and write the
+       result to the specified strip; replacing any  previously
+       written  data.  Note  that the value of strip is a ``raw
+       strip number.'' That  is,  the  caller  must  take  into
+       account  whether  or not the data are organized in sepa-
+       rate planes (PlanarConfiguration=2).
+
+NOTES
+       The library writes encoded data using the native machine
+       byte  order.  Correctly  implemented  TIFF  readers  are
+       expected to do any necessary byte-swapping to  correctly
+       process image data with BitsPerSample greater than 8.
+
+       The  strip number must be valid according to the current
+       settings of the ImageLength and RowsPerStrip  tags.   An
+       image  may  be dynamically grown by increasing the value
+       of ImageLength prior to each call  to  TIFFWriteEncoded-
+       Strip.
+
+RETURN VALUES
+       -1  is  returned if an error was encountered. Otherwise,
+       the value of size is returned.
+
+DIAGNOSTICS
+       All error messages are directed to the  TIFFError(3TIFF)
+       routine.
+
+       %s:  File  not open for writing. The file was opened for
+       reading, not writing.
+
+       Can not write scanlines to a tiled image. The  image  is
+       assumed  to  be organized in tiles because the TileWidth
+       and  TileLength  tags  have  been  set   with   TIFFSet-
+       Field(3TIFF).
+
+       %s:  Must  set  "ImageWidth"  before  writing data.  The
+       image's width has not be set before the first write. See
+       TIFFSetField(3TIFF) for information on how to do this.
+
+       %s:  Must set "PlanarConfiguration" before writing data.
+       The organization of data has not be defined  before  the
+       first  write. See TIFFSetField(3TIFF) for information on
+       how to do this.
+
+       %s: No space for strip arrays".  There  was  not  enough
+       space  for  the  arrays that hold strip offsets and byte
+       counts.
+
+SEE ALSO
+       TIFFOpen(3TIFF), TIFFWriteScanline(3TIFF), TIFFWriteRaw-
+       Strip(3TIFF), libtiff(3TIFF)
+
+       Libtiff           library           home           page:
+       http://www.remotesensing.org/libtiff/
+
+
+
+libtiff                 October 15,TIFFWriteEncodedStrip(3TIFF)

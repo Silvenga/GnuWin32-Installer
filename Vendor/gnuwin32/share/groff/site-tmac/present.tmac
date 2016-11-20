@@ -1,0 +1,615 @@
+.\" Groff Presentation Macros
+.\" date: October 5, 2002
+.\" version: 2.0
+.\" author: Bob Diertens, <bobd@science.uva.nl>
+.ig
+    Copyright (C) 2001, 2002  Bob Diertens
+
+    This macro package is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This macro package is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this macro package; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+..
+.\"*** Initialisation
+.\" depending on tmac.gm
+.if !r .mgm \{\
+'   tm ERROR: no mm macros loaded
+.   ab "aborted"
+.\}
+.nr .mpresent 1
+.\" Defaults
+.VM 0 0
+.nr Hu 1
+.\"nr Ds 0
+.S +8
+.\"*** Page
+.\"width: 10i height: 7.5i page-offset: 0.75i
+.\"extra margin: 0.75i
+.\"PGFORM 8.5i 7.50i 1.5i 1
+.\" we compensate for the extra footer-line with 0.24i.
+.PGFORM 8.5i 7.74i 1.5i 1
+.\"usage: MARGIN left [right]
+.de MARGIN
+.po \\$1+0.75i
+.nr @po \\n[.o]
+.ie \\n[.$]>1 \{\
+.   ll 10i-\\$2-\\$1
+.\}
+.el \{\
+.   ll (10i-(\\$1*2u))
+.\}
+.nr @ll \\n[.l]
+.lt \\n[@ll]u
+..
+.\" *** Colors
+.ds gp-col@default "black
+.ds gp-col@prev "black
+.ds gp-col@cur "black
+.\" set the current color in the environments used by MM
+.am misc@ev-keep
+.mk gp-markvertical
+\\m[\\*[gp-col@cur]]
+.sp |\\n[gp-markvertical]u
+..
+.\"usage: DEFAULTCOLOR color
+.de DEFAULTCOLOR
+.ds gp-col@default \\$1
+.ds gp-col@prev \\$1
+.ds gp-col@cur \\$1
+\\m[\\$1]
+..
+.\"usage: INITCOLOR color
+.\"for setting the color at the start (.COLOR color does not work)
+.de INITCOLOR
+.ds gp-col@prev \\$1
+.ds gp-col@cur \\$1
+\\m[\\$1]
+..
+.\"usage: COLOR color arg1 [arg2]
+.de COLOR
+.ds gp-color \\$1
+.shift
+.ie \\n[.$] \{\
+\\m[\\*[gp-color]]\
+\\&\\$1\
+\\m[\\*[gp-col@cur]]\c
+.   ie \\n[.$]=2 \{\
+\\&\\$2
+.   \}
+.   el \\&
+.\}
+.el \{\
+.   if '\\*[gp-color]'P' .ds gp-color \\*[gp-col@prev]
+.   ds gp-col@prev \\*[gp-col@cur]
+.   ds gp-col@cur \\*[gp-color]
+\\m[\\*[gp-color]]\c
+.\}
+..
+.\"usage: DEFCOLOR name red green blue
+.de DEFCOLOR
+.ds gp-col!\\$1 "\\$2 \\$3 \\$4
+.defcolor \\$1 rgb \\$2 \\$3 \\$4
+.ds col\\$1 "\\m[\\$1]
+..
+.ds colP "\\m[]
+.DEFCOLOR red            1.0  0.0  0.0
+.DEFCOLOR green          0.0  1.0  0.0
+.DEFCOLOR blue           0.0  0.0  1.0
+.DEFCOLOR red9           0.9  0.0  0.0
+.DEFCOLOR green9         0.0  0.9  0.0
+.DEFCOLOR blue9          0.0  0.0  0.9
+.DEFCOLOR red8           0.8  0.0  0.0
+.DEFCOLOR green8         0.0  0.8  0.0
+.DEFCOLOR blue8          0.0  0.0  0.8
+.DEFCOLOR red7           0.7  0.0  0.0
+.DEFCOLOR green7         0.0  0.7  0.0
+.DEFCOLOR blue7          0.0  0.0  0.7
+.DEFCOLOR red6           0.6  0.0  0.0
+.DEFCOLOR green6         0.0  0.6  0.0
+.DEFCOLOR blue6          0.0  0.0  0.6
+.DEFCOLOR red5           0.5  0.0  0.0
+.DEFCOLOR green5         0.0  0.5  0.0
+.DEFCOLOR blue5          0.0  0.0  0.5
+.DEFCOLOR red4           0.4  0.0  0.0
+.DEFCOLOR green4         0.0  0.4  0.0
+.DEFCOLOR blue4          0.0  0.0  0.4
+.DEFCOLOR red3           0.3  0.0  0.0
+.DEFCOLOR green3         0.0  0.3  0.0
+.DEFCOLOR blue3          0.0  0.0  0.3
+.DEFCOLOR red2           0.2  0.0  0.0
+.DEFCOLOR green2         0.0  0.2  0.0
+.DEFCOLOR blue2          0.0  0.0  0.2
+.DEFCOLOR red1           0.1  0.0  0.0
+.DEFCOLOR green1         0.0  0.1  0.0
+.DEFCOLOR blue1          0.0  0.0  0.1
+.DEFCOLOR yellow         1.0  1.0  0.0
+.DEFCOLOR magenta        1.0  0.0  1.0
+.DEFCOLOR cyan           0.0  1.0  1.0
+.DEFCOLOR yellow9        0.9  0.9  0.0
+.DEFCOLOR magenta9       0.9  0.0  0.9
+.DEFCOLOR cyan9          0.0  0.9  0.9
+.DEFCOLOR yellow8        0.8  0.8  0.0
+.DEFCOLOR magenta8       0.8  0.0  0.8
+.DEFCOLOR cyan8          0.0  0.8  0.8
+.DEFCOLOR yellow7        0.7  0.7  0.0
+.DEFCOLOR magenta7       0.7  0.0  0.7
+.DEFCOLOR cyan7          0.0  0.7  0.7
+.DEFCOLOR yellow6        0.6  0.6  0.0
+.DEFCOLOR magenta6       0.6  0.0  0.6
+.DEFCOLOR cyan6          0.0  0.6  0.6
+.DEFCOLOR yellow5        0.5  0.5  0.0
+.DEFCOLOR magenta5       0.5  0.0  0.5
+.DEFCOLOR cyan5          0.0  0.5  0.5
+.DEFCOLOR yellow4        0.4  0.4  0.0
+.DEFCOLOR magenta4       0.4  0.0  0.4
+.DEFCOLOR cyan4          0.0  0.4  0.4
+.DEFCOLOR yellow3        0.3  0.3  0.0
+.DEFCOLOR magenta3       0.3  0.0  0.3
+.DEFCOLOR cyan3          0.0  0.3  0.3
+.DEFCOLOR yellow2        0.2  0.2  0.0
+.DEFCOLOR magenta2       0.2  0.0  0.2
+.DEFCOLOR cyan2          0.0  0.2  0.2
+.DEFCOLOR yellow1        0.1  0.1  0.0
+.DEFCOLOR magenta1       0.1  0.0  0.1
+.DEFCOLOR cyan1          0.0  0.1  0.1
+.DEFCOLOR black          0.0  0.0  0.0
+.DEFCOLOR gray1          0.1  0.1  0.1
+.DEFCOLOR gray2          0.2  0.2  0.2
+.DEFCOLOR gray3          0.3  0.3  0.3
+.DEFCOLOR gray4          0.4  0.4  0.4
+.DEFCOLOR gray5          0.5  0.5  0.5
+.DEFCOLOR gray6          0.6  0.6  0.6
+.DEFCOLOR gray7          0.7  0.7  0.7
+.DEFCOLOR gray8          0.8  0.8  0.8
+.DEFCOLOR gray9          0.9  0.9  0.9
+.DEFCOLOR white          1.0  1.0  1.0
+.\"*** Backgrounds
+.nr gp-bg*x1 54
+.nr gp-bg*y1 12
+.nr gp-bg*x2 774
+.\"nr gp-bg*x2 828
+.nr gp-bg*y2 552
+.\"nr gp-bg*y2 560
+.de FillSolid
+ps: def
+/FillSolid {
+    /y2 exch def
+    /x2 exch def
+    /y1 exch def
+    /x1 exch def
+    gsave
+    x1 y1 moveto
+    x2 y1 lineto
+    x2 y2 lineto
+    x1 y2 lineto
+    closepath
+    setrgbcolor
+    fill
+    grestore
+} bind def
+..
+.de FillGradX
+ps: def
+/FillGradX {
+    /y2 exch def
+    /x2 exch def
+    /y1 exch def
+    /x1 exch def
+    /blue2 exch def
+    /green2 exch def
+    /red2 exch def
+    /blue1 exch def
+    /green1 exch def
+    /red1 exch def
+    /step 2 def
+    /nrsteps x2 x1 sub step div def
+    /incrred red2 red1 sub nrsteps div def
+    /incrgreen green2 green1 sub nrsteps div def
+    /incrblue blue2 blue1 sub nrsteps div def
+    gsave 
+    x1 step x2 {
+	/x exch def
+	x y1 moveto
+	x y2 lineto
+	x step sub y2 lineto
+	x step sub y1 lineto
+	closepath
+	red1 green1 blue1 setrgbcolor fill
+	/red1 red1 incrred add def
+	/green1 green1 incrgreen add def
+	/blue1 blue1 incrblue add def
+    } for
+    grestore
+} bind def
+..
+.de FillGradY
+ps: def
+/FillGradY {
+    /y2 exch def
+    /x2 exch def
+    /y1 exch def
+    /x1 exch def
+    /blue2 exch def
+    /green2 exch def
+    /red2 exch def
+    /blue1 exch def
+    /green1 exch def
+    /red1 exch def
+    /step 2 def
+    /nrsteps y2 y1 sub step div def
+    /incrred red2 red1 sub nrsteps div def
+    /incrgreen green2 green1 sub nrsteps div def
+    /incrblue blue2 blue1 sub nrsteps div def
+    gsave 
+    y1 step y2 {
+	/y exch def
+	x1 y moveto
+	x2 y lineto
+	x2 y step sub lineto
+	x1 y step sub lineto
+	closepath
+	red1 green1 blue1 setrgbcolor fill
+	/red1 red1 incrred add def
+	/green1 green1 incrgreen add def
+	/blue1 blue1 incrblue add def
+    } for
+    grestore
+} bind def
+..
+.de FillGradAngle
+ps: def
+/setupgradfill {	% sr sg sb er eg eb steps angle
+    rotate
+    /numsteps exch def
+    % String to hold synthetic data
+    /gradstr numsteps 3 mul string def 
+    3 index sub numsteps div /ib exch def
+    3 index sub numsteps div /ig exch def
+    3 index sub numsteps div /ir exch def
+    /sb exch def
+    /sg exch def 
+    /sr exch def
+    
+    %(SR SG SB: ) print sr == sb == sg ==
+    %(IR IG IB: ) print ir == ib == ig ==
+
+    % Create a synthetic data string
+    0 1 numsteps 1 sub {	% loop
+	3 mul		        % index
+	gradstr 1 index sr 255 mul round cvi put
+	gradstr 1 index 1 add sg 255 mul round cvi put
+	gradstr 1 index 2 add sb 255 mul round cvi put
+	pop
+	/sr sr ir add def
+	/sg sg ig add def
+	/sb sb ib add def
+    } for
+} bind def
+
+/convbboxtoxywh {	% llx lly urx ury
+    2 index sub exch 3 index sub exch
+} bind def
+
+/gradmatrix matrix def
+
+/gradfill {
+% startred startgreen startblue endred endgreen endblue steps angle
+    save /mysave exch def
+	setupgradfill
+	pathbbox clip convbboxtoxywh	% x y w h
+	0 0 3 -1 roll 6 -2 roll		% w 0 0 h x y
+	gradmatrix astore concat
+	numsteps 1 8 [numsteps 0 0 1 0 0]
+	{
+	    gradstr
+	}
+	false 3 colorimage
+    mysave restore
+} bind def
+
+% Fill the whole page
+/FillGradAngle {
+    /y2 exch def
+    /x2 exch def
+    /y1 exch def
+    /x1 exch def
+    gsave 
+    x1 y1 moveto
+    x1 y2 lineto
+    x2 y2 lineto
+    x2 y1 lineto
+    closepath
+    gradfill
+    grestore
+} bind def
+..
+.nr gp-bg*set 0
+.nr gp-bg*defSolid 0
+.nr gp-bg*defGradX 0
+.nr gp-bg*defGradXS 0
+.nr gp-bg*defGradY 0
+.nr gp-bg*defGradAngle 0
+.\"usage: BACKGROUND method args
+.de BACKGROUND
+.ie '\\$1'None' .nr gp-bg*set 0
+.el \{\
+.   ds gp-bg*method \\$1
+.   nr gp-bg*set 1
+.   ie '\\$1'Solid' .ds gp-bg*args "\\*[gp-col!\\$2]
+.   el \{\
+.       shift
+.       ds gp-bg*args "\\*[gp-col!\\$1] \\*[gp-col!\\$2]
+.       shift
+.       shift
+.       as gp-bg*args " \\$*
+.   \}
+.   as gp-bg*args " \\n[gp-bg*x1] \\n[gp-bg*y1] \\n[gp-bg*x2] \\n[gp-bg*y2]
+.\}
+..
+.de gp-fill*define
+.if !\\n[gp-bg*def\\$1] \{\
+\Y[Fill\\$1]
+.   nr gp-bg*def\\$1 1
+.\}
+..
+.de gp-fill*background
+.if \\n[gp-bg*set] \{\
+.   gp-fill*define \\*[gp-bg*method]
+\\X'ps: exec \\*[gp-bg*args] Fill\\*[gp-bg*method]'
+.\}
+..
+.\"usage: FILL x1 y1 x2 y2 method args
+.de FILL
+.nr gp-fill*x1 (\\$1)/1p+\\n[gp-bg*x1]
+.nr gp-fill*y1 (\\$2)/1p+\\n[gp-bg*y1]
+.nr gp-fill*x2 (\\$3)/1p+\\n[gp-bg*x1]
+.nr gp-fill*y2 (\\$4)/1p+\\n[gp-bg*y1]
+.shift 4
+.ds gp-fill*method \\$1
+.ie '\\$1'Solid' .ds gp-fill*args "\\*[gp-col!\\$2]
+.el \{\
+.   shift
+.   ds gp-fill*args "\\*[gp-col!\\$1] \\*[gp-col!\\$2]
+.   shift 2
+.   as gp-fill*args " \\$*
+.\}
+.as gp-fill*args " \\n[gp-fill*x1] \\n[gp-fill*y1] \\n[gp-fill*x2] \\n[gp-fill*y2]
+.gp-fill*define \\*[gp-fill*method]
+\X'ps: exec \\*[gp-fill*args] Fill\\*[gp-fill*method]'\c
+..
+.\" *** Header
+.de TP
+.ev gp-top
+.ll \\n[@ll]u
+.lt \\n[@ll]u
+.gp-fill*background
+.COLOR \\*[gp-col@default]
+.ie d HEADER .HEADER
+.el .sp 0.1i
+.COLOR P
+\X'ps: exec %%%%ENDTOP'
+.sp -0.10i
+.ev
+..
+.\" *** Footer
+.de EOP
+.ev gp-bop
+.ll \\n[@ll]u
+.lt \\n[@ll]u
+\X'ps: exec %%%%BEGINBOT'\c
+.COLOR \\*[gp-col@default]
+.sp |\\n[footer*start]u
+.if d FOOTER .FOOTER
+.COLOR P
+.br
+.ev
+..
+.\" *** Presentation Macros
+.\" minimum for footer-size is 2
+.\"usage: FOOTERSIZE n
+.de FOOTERSIZE
+.nr pg*footer-size (v;\\$1)
+.nr footer*start \\n[.p]-(\\n[pg*footer-size]-1v)
+.pg@move-trap
+..
+.FOOTERSIZE 3
+.\"usage: PAUSE
+.de PAUSE
+\X'ps: exec %%%%PAUSE'\c
+..
+.\"usage: BLOCKS [once] [x [y [length]]
+.de BLOCKS
+.nr gp-block*once 0
+.if '\\$1'once' \{\
+.   nr gp-block*once 1
+.   shift
+.\}
+.\"\X'ps:exec %%%%PAUSE'\c
+.if \\n[gp-block*once] \X'ps:exec %%%%BEGINONCE'\c
+.nr gp-block*po \\n[@po]u
+.nr gp-block*ll \\n[@ll]u
+.mk gp-BLOCKS
+.if \\n[.$]>=2 .sp |(v;\\$2)
+.if \\n[.$]>=1 \{\
+.   po +\\$1
+.   ie \\n[.$]=3 .ll \\$3
+.   el .ll (n;\\n[@ll]u-\\$1)
+.\}
+..
+.de BLOCKE
+.br
+.po \\n[gp-block*po]u
+.ll \\n[gp-block*ll]u
+.sp |\\n[gp-BLOCKS]u
+.if \\n[gp-block*once] \X'ps:exec %%%%ENDONCE'\c
+.\"\X'ps:exec %%%%PAUSE'\c
+..
+.ds gp-title*color blue4
+.ds gp-subtitle*color blue4
+.ds gp-title
+.ds gp-subtitle
+.ds gp-title*format C
+.nr gp-title*defindent 0.5i
+.nr gp-title*indent \n[gp-title*defindent]
+.ds gp-subtitle*format I
+.nr gp-subtitle*defindent 0.5i
+.nr gp-subtitle*indent \n[gp-subtitle*defindent]
+.\"usage: TITLECOLOR color
+.de TITLECOLOR
+.ds gp-title*color \\$1
+..
+.\"usage: TITLEFORMAT C | L | R | I x
+.de TITLEFORMAT
+.ds gp-title*format \\$1
+.if '\\$1'I' \{\
+.   ie \\n[.$]>=2 .nr gp-title*indent \\$2
+.   el .nr gp-title*indent \\n[gp-title*defindent]
+.\}
+..
+.\"usage: TITLE title
+.de TITLE
+.SP 0.25i
+.S +8
+.if '\\*[gp-title*format]'C' 'ce 99
+.if '\\*[gp-title*format]'L' 'in 0
+.if '\\*[gp-title*format]'R' 'rj 99
+.if '\\*[gp-title*format]'I' 'in \\n[gp-title*indent]u
+.COLOR \\*[gp-title*color] "\\$*"
+.if '\\*[gp-title*format]'C' 'ce 0
+.if '\\*[gp-title*format]'L' 'in
+.if '\\*[gp-title*format]'R' 'rj 0
+.if '\\*[gp-title*format]'I' 'in
+.S -8
+.SP 0.3i
+.ds gp-title "\\$1
+.ds gp-subtitle
+.ADDCONTENT "\\$*"
+..
+.\"usage: SUBTITLECOLOR color
+.de SUBTITLECOLOR
+.ds gp-subtitle*color \\$1
+..
+.\"usage: SUBTITLEFORMAT C | L | R | I x
+.de SUBTITLEFORMAT
+.ds gp-subtitle*format \\$1
+.if '\\$1'I' \{\
+.   ie \\n[.$]>=2 .nr gp-subtitle*indent \\$2
+.   el .nr gp-subtitle*indent \\n[gp-subtitle*defindent]
+.\}
+..
+.\"usage: SUBTITLE title
+.de SUBTITLE
+.SP 0.2i
+.S +4
+.if '\\*[gp-subtitle*format]'C' 'ce 99
+.if '\\*[gp-subtitle*format]'L' 'in 0
+.if '\\*[gp-subtitle*format]'R' 'rj 99
+.if '\\*[gp-subtitle*format]'I' 'in \\n[gp-subtitle*indent]u
+.COLOR \\*[gp-subtitle*color] "\\$*
+.if '\\*[gp-subtitle*format]'C' 'ce 0
+.if '\\*[gp-subtitle*format]'L' 'in
+.if '\\*[gp-subtitle*format]'R' 'rj 0
+.if '\\*[gp-subtitle*format]'I' 'in
+.S -4
+.SP 0.20i
+.ds gp-subtitle "\\$1
+..
+.\"*** Contents
+.\"usage: ADDCONTENT text
+.de ADDCONTENT
+.am gp-toc*list
+.gp-content*set "\\$1" \\n[%]
+\\..
+..
+.de gp-content*set
+.na
+.fi
+.nr gp-collength (\\n[@ll]u*7u)/15u
+.ll \\n[gp-collength]u-\w'\\$2'u-2m
+.ne 2v
+.nr gp-set*oldnl \\n[nl]
+\\$1\h'1m'
+.ll \\n[gp-collength]u
+.sp -1
+.nr gp-sep (u;\\n[.l]-\\n[.n]-\\n[.i]-\w'\\$2')-1m
+\h'|\\n[.n]u'\l'\\n[gp-sep]u.'\h'1m'\\$2\c
+.nr gp-set*x \\n[.o]-2p
+.nr gp-set*w \\n[.l]+4p
+.nr gp-set*h (\\n[nl]-\\n[gp-set*oldnl])+\\n[.v]
+.nr gp-set*y \\n[nl]-(\\n[nl]-\\n[gp-set*oldnl])+(\\n[.v]/4)
+\X'ps: exec %%%%LINK \\n[gp-set*x] \\n[gp-set*y] \\n[gp-set*w] \\n[gp-set*h] \\$2'
+.ll \\n[@ll]u
+..
+.de END
+.if \\n[pg*cols-per-page]>1 .1C 1
+.rm HEADER
+.SK
+.MARGIN 0.75i 0.75i
+.rm FOOTER
+.S -8
+\X'ps: exec %%%%CONTENTS'\c
+\X'ps: def %%%%HASCONTENTS'\c
+.ce
+\\*[Licon]
+.br
+.SP 3
+.2C
+.COLOR \\*[gp-link*color]
+.if d gp-toc*list .gp-toc*list
+.COLOR P
+..
+.\" *** Links
+.ds gp-link*color blue7
+.\" usage: LINK name string
+.de LINK
+.gp-link@set
+.nr gp-link*x1 \\n[.k]
+.nr gp-link*y1 \\n[nl]+(\\n[.v]/4)
+.COLOR \\*[gp-link*color] "\\$2"
+.nr gp-link*x2 \\n[.k]-2p
+.nr gp-link*y2 \\n[nl]+(\\n[.v]/4)
+.ie \\n[gp-link*y1]=\\n[gp-link*y2] \{\
+.   nr gp-link*x1 -2p
+.   nr gp-link*w \\n[gp-link*x2]-\\n[gp-link*x1]
+.   nr gp-link*x1 +\\n[.o]
+\X'ps: exec %%%%LINK \\n[gp-link*x1] \\n[gp-link*y1] \\n[gp-link*w] \\n[.v] \\$1'\c
+.\}
+.el \{\
+.   nr gp-link*x1 +2p
+.   nr gp-link*w \\n[.l]-\\n[gp-link*x1]+2p
+.   nr gp-link*x1 +\\n[.o]
+\X'ps: exec %%%%LINK \\n[gp-link*x1] \\n[gp-link*y1] \\n[gp-link*w] \\n[.v] \\$1'\c
+.   nr gp-link*w \\n[gp-link*x2]+2p
+.   nr gp-link*x1 \\n[.o]-2p
+\X'ps: exec %%%%LINK \\n[gp-link*x1] \\n[gp-link*y2] \\n[gp-link*w] \\n[.v] \\$1'\c
+.\}
+..
+.\" usage: DESTINATION name
+.de DESTINATION
+\X'ps: exec %%%%DEST \\$1 \\n[%]'\c
+..
+.nr gp-link*changed 0
+.\" usage: LINKCOLOR color [border-width [border-color]]
+.de LINKCOLOR
+.ds gp-link*color \\$1
+.if \\n[.$]>1 \{\
+.   ds gp-link*opt "\\$2
+.   if \\n[.$]>2 .as gp-link*opt " \\*[gp-col!\\$3]
+.   nr gp-link*changed 1
+.\}
+..
+.de gp-link@set
+.if \\n[gp-link*changed] \{\
+\X'ps: exec %%%%LINKOPTIONS \\*[gp-link*opt]'\c
+.   nr gp-link*changed 0
+.\}
+..

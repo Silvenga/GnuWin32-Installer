@@ -1,0 +1,256 @@
+NENSCRIPT(1)                                       NENSCRIPT(1)
+
+
+
+
+
+NAME
+       nenscript  -  format  an ASCII file and convert to Post-
+       Script
+
+SYNOPSIS
+       nenscript [ -?12BdGghlNnRrsVWwZ ] [ -ffont ] [  -Ftitle-
+       font  ]  [  -bheader  ]  [  -ifiletitle  ] [ -Llines ] [
+       -pfilename ]  [  -Pprinter  ]  [  -Sclassification  ]  [
+       -U1st_page_classification ] [ -Tpapertype ] [ -ttabstops
+       ] [ -#copies ] [ file...  ]
+
+DESCRIPTION
+       Formats the specified ASCII  files  and  produces  Post-
+       Script  output  conforming to the Adobe Structuring Con-
+       ventions.  The output pages may be in landscape or  por-
+       trait  mode,  with  one  or two columns, with or without
+       headers.
+
+       If no input files are specified, then input is  accepted
+       from stdin.
+
+       Tabs  in  the  input stream are expanded (by default) to
+       eight character positions.
+
+       Formfeed (control-L)  characters  in  the  input  stream
+       cause  a  new  page  or  column to be started. Form feed
+       characters must be at the start start of a line, or pre-
+       ceded  only by whitespace. To make formfeeds work at any
+       point in the line use the -d option.
+
+       PostScript output is directed to  a  printer  using  lpr
+       unless  otherwise  specified  using  the  -p option. The
+       printer to use is set by the PRINTER  environment  vari-
+       able.  If this is not set, then the printer "Postscript"
+       ("prn" for MSDOS) will be used.
+
+       Font specifications are formed from the  font  name  and
+       the  font  size,  i.e.   Courier10  specifies a 10 point
+       Courier font, and Courier-Bold12 specifies  a  bold,  12
+       point Courier font. Sizes can also be given with a deci-
+       mal point, i.e.  Courier7.5 specifies a 7.5 point  font,
+       this  might  however  result  in a marginal error in the
+       size calculations, since a linear approximation  of  the
+       character width is done.
+
+       The  NENSCRIPT  environment  variable may be used to set
+       default values for most configurable attributes.  Values
+       set in this way will be overridden by any options speci-
+       fied on the commands line.
+
+       The current version of nenscript is 1.13.
+
+
+OPTIONS
+       -?     -h Print usage message.
+
+
+       -1     Specifies single column output (default).
+
+
+       -2     Specifies two column output.
+
+
+       -B     Turns off page titles.
+
+
+       -bheader
+              Print the text specified by header as  the  title
+              on  each  page,  rather  than  the default header
+              which is composed of the name of the source file,
+              the current time and date and the page number. If
+              in gaudy mode, the  title  is  displayed  in  the
+              blank area just above the file title.
+
+
+       -d     Handles  formfeeds  in  the  same way that a dot-
+              matrix printer handles them.  Thus a line with  a
+              formfeed  in  the  middle  prints the first part,
+              starts a new page and then prints the rest of the
+              same  line on the first line of the page. In fact
+              using this mode to get anything to print  on  the
+              top  line,  it  must  be  on the same line as the
+              formfeed in the file.
+
+
+       -ffont Use font for printing text. Only Courier in sizes
+              5  to  30  can  be  used  for  printing text. The
+              default font  is  Courier10,  unless  two  column
+              landscape  mode  is  specified  in which case the
+              default font is Courier7.
+
+
+       -Ftitlefont
+              Use titlefont for printing titles.  Any  font  in
+              any   point   size   can  be  used  for  printing
+              titles.The default font is Courier-Bold10.
+
+
+       -G     Enable gaudy mode.
+
+
+       -g     Disable gaudy mode (default).
+
+
+       -ifiletitle
+              Use the specified string as the  displayed  file-
+              name. Useful when inputting from stdin.
+
+
+       -Llines
+              Set  the  maximum  number  of lines which will be
+              printed per page or column. The actual number  of
+              lines which appear may be less depending upon the
+              font and paper size.
+
+
+       -l     Do not set a limit on on the  maximum  number  of
+              lines  per  page,  i.e.  the  number  of lines is
+              determined by the font size and  the  paper  size
+              (default).
+
+
+       -N     Precede  each line with it's line number relative
+              to the start of the file.
+
+
+       -n     Disable line numbering (default).
+
+
+       -pfilename
+              Direct the PostScript to filename rather than the
+              default printer. If '-' is specified as the file-
+              name, then the PostScript is sent to stdout.
+
+
+       -Pprinter
+              Overrides the  PRINTER  environment  variable  in
+              determining  the  printer  to  spool  output  to.
+              Ignored if -p is used.
+
+
+       -R     Don't rotate the page, i.e.  output  in  portrait
+              mode (default).
+
+
+       -r     Rotate the page, i.e. output in landscape mode.
+
+
+       -Sclassification
+              Prints the string argument in Helvetica-Bold28 at
+              the top and bottom of the page in conformance  to
+              regulations for printing classified material.
+
+
+       -U1st_page_classification
+              Print  a  different classification header for the
+              first page.  Useful  for  marking  banner  sheets
+              that  need  to  be  marked with a higher level of
+              classification until the document can be reviewed
+              and declassified.
+
+
+       -s     Disable  a previous heading specified with the -S
+              option.
+
+
+       -Tpapertype
+              Sets the output paper type as per  the  argument.
+              At  the  moment,  only  two  paper types are sup-
+              ported: A4 and US. The default paper size will be
+              A4,  unless the US_VERSION define is specified at
+              compilation time.
+
+
+       -ttabsize
+              Sets the number of  columns  to  which  tabs  are
+              expanded. The default is eight columns.
+
+
+       -V     Display  information  identifying  the version of
+              nenscript. Nothing will be printed regardless  of
+              the other arguments.
+
+
+       -W     Truncate lines which are wide for the page.
+
+
+       -w     Wrap  lines  which are too wide for the page onto
+              successive lines (default).   Continuation  lines
+              are  marked with + character before the left mar-
+              gin.
+
+
+       -Z     Check the first two characters of the  input  for
+              the character string %!. If a match is found, the
+              input is copied directly to the  output  with  no
+              processing.
+
+
+       -#copies
+              Print each page copies times.
+
+
+ENVIRONMENT
+       PRINTER        Specifies  the  name  of  the  printer to
+                      direct PostScript output to. If not  set,
+                      the  default  is  a  printer named "Post-
+                      Script".
+
+
+       NENSCRIPT      If defined, this string is  searched  for
+                      valid  options  before  the  command line
+                      supplied by the user.
+
+
+BUGS
+       As nenscript does not have access to complete PostScript
+       font tables, it must use some other technique for calcu-
+       lating the number of  characters  that  fit  across  the
+       page.  The  solution  was  to  use a fixed table for the
+       Courier font in a range of  sizes.  If  this  table  was
+       extended, other fonts and sizes could be used for print-
+       ing text. Alternatively, if the text processing was done
+       on the printer, then there would be no need to know any-
+       thing about the font sizes...
+
+       No checking is  performed  on  font  names,  other  than
+       checking that only Courier can be specified for the text
+       font. If a font is specified that is  not  available  on
+       the final printer, the result is undetermined.
+
+       No  checking  is  performed  on the input file to detect
+       accidental printing of garbage files. Caveat emptor!
+
+       No mapping of the input characters is performed, so out-
+       put  may  vary depending upon the vagaries of downstream
+       software and hardware.
+
+       No support for manual feed, page prefeed, mail upon com-
+       pletion  or  any  of  the  other  rarely used options of
+       enscript.
+
+       No messages are displayed whilst processing.
+
+       Input line lengths are limited to 8192 characters  after
+       expansion of tabs.
+
+
+
+                        28 October 1997            NENSCRIPT(1)

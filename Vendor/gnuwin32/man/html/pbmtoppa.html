@@ -1,0 +1,298 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pbmtoppa User Manual</TITLE></HEAD>
+<BODY>
+<H1>pbmtoppa</H1>
+Updated: 01 May 2000
+<BR>
+<A HREF="pbmtoppa.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+pbmtoppa - convert PBM image to HP Printer Performance Architecture (PPA)
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pbmtoppa</B>
+[<I>pbm_file</I>
+[<I>ppa_file</I>]]
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<B>pbmtoppa</B> converts page images in PBM format to Hewlett
+Packard's PPA (Printer Performance Architecture) format, which is the
+data stream format expected by some HP &quot;Windows-only&quot;
+printers including the HP Deskjet 820C series, the HP DeskJet 720
+series, and the HP DeskJet 1000 series.
+
+<P><I>pbm_file</I> is the file specification of the input file or
+<B>-</B> for Standard Input.  The default is Standard Input.
+
+<P>The input file contains one or more PBM images, with each one
+being a single page.  Each image must have the exact dimensions of a
+page (at 600 pixels per inch in both directions).  Significantly, this
+is the format that Ghostscript produces.
+
+<P><I>ppa_file</I> is the file specification of the output file or
+<B>-</B> for Standard Output.  The default is Standard Output.
+
+<P>To print Postscript on an HP PPA printer, just use Ghostscript with
+the <B>pbmraw</B> (or <B>pbm</B>) device driver.
+
+<P>You can generate a test page for use with this program with
+<B>pbmpage</B>.
+
+<P>You can also set up a printer filter so you can submit PBM input
+directly to your print queue.  See the documentation for your print
+spooler for information on how to do that, or look in hp820install.doc
+for an example lpd print filter for Postscript and text files.
+
+<P>Sometimes, <B>pbmtoppa</B> generates a file which the printer will
+not print (because <B>pbmtoppa</B>'s input is unprintable).  When this
+happens, all three lights blink to signal the error.  This is usually
+because there is material outside of the printer's printable area.  To
+make the file print, increase the margins via <B>pbmtoppa</B> options
+or a configuration file.  See <a href="pbmtoppa.html#calibration">the section on
+calibration </a> below.
+
+<A NAME="options">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-v</B> <I>version</I>
+
+<DD>
+printer version (720, 820, or 1000)
+
+<DT><B>-x</B> <I>xoff</I>
+
+<DD>
+horizontal offset adjustment in 1/600 inches.
+
+<DT><B>-y</B> <I>yoff</I>
+
+<DD>
+vertical offset adjustment in 1/600 inches.
+
+<DT><B>-t</B> <I>topmarg</I>
+
+<DD>
+top margin in 1/600 inches    (default: 150 = 0.25 inch)
+
+<DT><B>-l</B> <I>leftmarg</I>
+
+<DD>
+left margin in 1/600 inches   (default: 150 = 0.25 inch)
+
+<DT><B>-r</B> <I>rightmarg</I>
+
+<DD>
+right margin in 1/600 inches (default: 150 = 0.25 inch)
+
+<DT><B>-b</B> <I>botmarg</I>
+
+<DD>
+bottom margin in 1/600 inches (default: 150 = 0.25 inch)
+
+<DT><B>-s</B> <I>paper</I>
+
+<DD>paper size: <B>us</B> or <B>a4</B>.  Default is <B>us</B>.
+
+<dt><b>-d</b> <i>dpi</i>
+<dd>
+Print resolution in dots per inch.
+
+<DT><B>-f</B> <I>cfgfile</I>
+
+<DD>Read parameters from the configuration file named <I>cfgfile</I>.
+See <a href="pbmtoppa.html#configfile">CONFIGURATION FILES</a>
+
+</DL>
+
+<P>The offset adjustments you specify with <B>-x</B> and <B>-y</B>
+accumulate.  I.e. if you specify them multiple times, the total offset
+adjustment is the sum of the adjustments you specify.  <b>-x 60 -x 120</b>
+is the same as <b>-x 180</b>.
+
+<P>The <B>-v</B> option undoes any preceding <b>-x</b> and <b>-y</b>
+options, leaving the horizontal and vertical adjustments their
+default values.
+
+
+<H2 id="configfile">CONFIGURATION FILES</H2>
+
+<P>You can use a configuration file to specify parameters rather than
+use invocation options.  <B>pbmtoppa</B> processes the file
+<b>/etc/pbmtoppa.conf</b>, if it exists, before processing any
+options.  It then processes each configuration file named by a
+<B>-f</B> option in order, applying the parameters from the
+configuration file as if they were invocation options used in the
+place of the <B>-f</B> option.
+
+<P>Configuration files have the following format:
+
+<PRE>
+<B>#</B><I>Comment</I>
+<I>key1</I> <I>value1</I>
+<I>key2</I> <I>value2</I>
+[etc.]
+</PRE>
+
+<P>Valid <I>key</I>s are <B>version</B>, <B>xoffset</B>,
+<B>yoffset</B>, <B>topmargin</B>, <B>leftmargin</B>,
+<B>rightmargin</B>, <B>bottommargin</B>, <B>papersize</B>, or any
+non-null prefix of these words.  Valid values are the same as with the
+corresponding invocation parameters.
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>EXAMPLES</H2>
+
+<P>Print a test pattern: 
+<PRE>
+<B>pbmpage | pbmppa &gt;/dev/lp1</B>
+</pre>
+
+<P>
+Print three pages:
+<PRE>
+<B>cat page1.pbm page2.pbm page3.pbm | pbmppa &gt;/dev/lp1</B>
+</pre>
+<P>
+Print the Postscript file myfile.ps:
+<PRE>
+gs -sDEVICE=rawpbm -q -dNOPAUSE -r600 \
+   -sOutputFile=- myfile.ps ;\
+| pbmtoppa | lpr
+</pre>
+
+<A NAME="calibration">&nbsp;</A>
+<H2>CALIBRATION</H2>
+
+<p>To be able to print successfully and properly, you need to tell
+<B>pbmtoppa</B> an X and a Y offset appropriate for your printer to
+use when generating the page.  You can specify these offsets with the
+<B>-x</B> and <B>-y</B> invocation options or with the <B>xoff</B> and
+<B>yoff</B> parameters in a <B>pbmtoppa</B> configuration file.
+
+<P>To determine the correct offsets, use the <B>pbmpage</B> program.
+
+<P>If while trying to do this calibration, the printer refuses to
+print a page, but just blinks all three lights, specify large margins
+(e.g. 600 pixels -- one inch) via <B>pbmpage</B> invocation options
+while doing the calibration.
+
+<P>For example:
+<PRE>
+<B>pbmpage | pbmtoppa &gt;/dev/lp1</B>
+</pre>
+or
+<pre>
+<B>pbmpage | pbmtoppa | lpr -l</B>
+</pre>
+
+(if your printer filter recognizes the '-l' (direct output) parameter).
+
+<P>In the test pattern, the grid is marked off in pixel coordinate
+numbers.  Unfortunately, these coordinates are probably cut off before
+the edge of the paper.  You'll have to use a ruler to estimate the
+pixel coordinate of the left and top edges of the actual sheet of
+paper (should be within +/- 300, may be negative; there are 600 pixels
+per inch).
+
+<P>Add these coordinates to the X and Y offsets by either editing the
+configuration file or using the <B>-x </B> and <B>-y</B> command-line
+parameters.
+
+<P>When <B>pbmtoppa</B> is properly calibrated, the center mark should
+be in the center of the paper.  Also, the margins should be able to be
+as small as 1/4 inch without causing the printer to choke with
+'blinking lights syndrome'.
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>REDHAT LINUX INSTALLATION</H2>
+
+<P>RedHat users may find the following tip from Panayotis Vryonis
+&lt;<A HREF="mailto:vrypan@hol.gr">vrypan@hol.gr</A>&gt; helpful.  The
+same should work for the 820 and 1000, but it hasn't been tested.
+Also, use the pbmraw GSDriver if you have it; it's faster.
+
+<P>Here is a tip to intergrate HP720C support in RedHat's printtool:
+
+<P>Install pbmtoppa. Copy pbmtoppa to /usr/bin.
+
+<P>Edit &quot;printerdb&quot; (in my system it is found in
+/usr/lib/rhs/rhs-printfilters ) and append the following lines:
+
+<PRE>
+----------------------Cut here-----------------------
+
+StartEntry: DeskJet720C
+&nbsp;&nbsp;GSDriver:&nbsp;pbm
+&nbsp;&nbsp;Description:&nbsp;{HP&nbsp;DeskJet&nbsp;720C}
+&nbsp;&nbsp;About:&nbsp;{&nbsp;\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;driver&nbsp;supports&nbsp;the&nbsp;HP&nbsp;DeskJet&nbsp;720C&nbsp;\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inkjet&nbsp;printer.&nbsp;\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;It&nbsp;does&nbsp;does&nbsp;not&nbsp;support&nbsp;color&nbsp;printing.&nbsp;\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IMPORTANT!&nbsp;Insert&nbsp;\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&quot;-&nbsp;|&nbsp;pbm2ppa&nbsp;-&quot;&nbsp;\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;in&nbsp;the&nbsp;&quot;Extra&nbsp;GS&nbsp;Otions&quot;&nbsp;field.\
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}
+
+&nbsp;&nbsp;Resolution:&nbsp;{600}&nbsp;{600}&nbsp;{}
+
+EndEntry
+----------------------------------------------------
+</pre>
+
+<P>Now you can add an HP720C printer just like any other, using
+printtool.
+
+<A NAME="lbAI">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pbmpage.html">pbmpage</A></B>,
+<B><A HREF="pstopnm.html">pstopnm</A></B>,
+<B><A HREF="pbm.html">pbm</A></B>
+
+<P><B>pnm2ppa</B> is not part of Netpbm, but does the same things as
+<B>pbmtoppa</B> except it also works with color and has lots more
+features.  See &lt;<A
+HREF="http://sourceforge.net/projects/pnm2ppa">http://sourceforge.net/projects/pnm2ppa</A>&gt;.
+
+<P>The file INSTALL-MORE in the pbmtoppa directory of the Netpbm
+source code contains detailed instructions on setting up a system to
+use pbmtoppa to allow convenient printing on HP PPA printers.  It was
+written by Michael Buehlmann.
+
+<P>For information about the PPA protocol and the separately
+distributed pbm2ppa program from which <B>pbmtoppa</B> was derived,
+see &lt;<A
+HREF="http://www.httptech.com/ppa">http://www.httptech.com/ppa</A>&gt;.
+
+<A NAME="lbAJ">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+<p>Tim Norman.  Copyright (C) 1998.  Licensed under GNU Public License
+
+<P>Manual page by Bryan Henderson, May 2000.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pbmtoppa.html#lbAB">NAME</A>
+<LI><A HREF="pbmtoppa.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pbmtoppa.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pbmtoppa.html#options">OPTIONS</A>
+<LI><A HREF="pbmtoppa.html#configfile">CONFIGURATION FILES</A>
+<LI><A HREF="pbmtoppa.html#lbAF">EXAMPLES</A>
+<LI><A HREF="pbmtoppa.html#calibration">CALIBRATION</A>
+<LI><A HREF="pbmtoppa.html#lbAH">REDHAT LINUX INSTALLATION</A>
+<LI><A HREF="pbmtoppa.html#lbAI">SEE ALSO</A>
+<LI><A HREF="pbmtoppa.html#lbAJ">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

@@ -1,0 +1,155 @@
+.\" slocal      local ms-macros
+.mso tmac.a4 \" A4
+.mso tmac.color
+.nr PW 21c	\" A4
+.nr LL 13.5c	\" textwidth
+.ll \n(LLu
+.nr FL \n(LL*11/12		\" footnotewidth
+.nr LT \n(LLu			\" titlewidth
+.lt \n(LTu
+.\".nr DD 0                        \" offset displays
+.nr PO (\n(PW-\n(LL)/2		\" page offset (left margin)
+.po \n(POu
+.nr pg*saved-po \n[PO]
+.nr HM 3c		\" headmargin
+.nr FM 3c		\" footmargin
+.ev fn		\" footnote environment
+.ps 9
+.vs 11p
+.ev
+.nr FF 4			\" footnote style number
+.nr PD 0      \" # lines between paragraphs
+.nr PI 3n     \" paragraph indent
+.ds LH		\" remove default page title
+.ds RH
+.ds CH
+.ds LF		\" remove default footer
+.ds RF
+.P1
+.de BP
+.ie '\\n(.z'' .bp \\$1
+.el \!.BP \\$1
+..
+.                 \" do not indent at first paragraph of (sub)section
+.nr NI 1
+.am @NH
+.nr NI 1
+.ne 3
+.\"if \\n(.$ \\$2
+..
+.am @SH
+.nr NI 1
+.ne 3
+.\"if \\n(.$ \\$*
+..
+.am @PP
+.if \\n(NI .ti 0
+.nr NI 0
+..
+.de par*fp!4		\" footnote style no.4
+.@LP
+\&\\*[par@sup-start]\\$1\\*[par@sup-end]\ \c
+..
+.de par*fp!4-no
+.@LP
+\&\\$1\ \c
+..
+.\"ds bs \h'-1n'
+.de mkdtstr
+.if !r\\$2 .nr \\$2 0
+.ds \\$1 \\n[\\$2]
+.if \\n[\\$2]<10 .ds \\$1 0\\n[\\$2]
+..
+.mkdtstr mday dy
+.mkdtstr mon mo
+.ds year \n[year]
+.mkdtstr hours hours
+.mkdtstr minutes minutes
+.mkdtstr seconds seconds
+.mkdtstr gmtoffset gmtoffset
+.ds date \*[mday]-\*[mon]-\*[year]
+.ds time \*[hours]:\*[minutes]:\*[seconds] GMT\*[gmtoffset]
+.\" ***************************
+.\" ******** module nh ********
+.\" ***************************
+.\" Numbered headings.
+.\" nh*hl is the level of the last heading
+.nr nh*hl 0
+.nr H0 0
+.ds APPENDIX Appendix
+.\" start appendix
+.de AP
+.nr H\\$1 0
+.nr nh*AP\\$1 1
+.if \\$1<2 .af H\\$1 A
+..
+.\" numbered heading
+.ds nh*SNprefix
+.ds nh*SNsuffix
+.ds nh*SHtitle
+.de @NH
+.ie '\\$1'S' \{\
+.tm \\$@
+.	shift
+.	nr nh*hl 0
+.	while \\n[.$] \{\
+.		nr nh*hl +1
+.		nr H\\n[nh*hl] 0\\$1
+.		shift
+.	\}
+.	if !\\n[nh*hl] \{\
+.		nr H1 1
+.		nr nh*hl 1
+.		@error missing arguments to .NH S
+.	\}
+.\}
+.el \{\
+.	nr nh*ohl \\n[nh*hl]
+.	ie \\n[.$] \{\
+.		nr nh*hl 0\\$1
+.		ie \\n[nh*hl]<=0 \{\
+.			nr nh*ohl 0
+.			nr nh*hl 1
+.		\}
+.		el \{\
+.			if \\n[nh*hl]-\\n[nh*ohl]>1 \
+.				@warning .NH \\n[nh*ohl] followed by .NH \\n[nh*hl]
+.		\}
+.	\}
+.	el .nr nh*hl 1
+.	while \\n[nh*hl]>\\n[nh*ohl] \{\
+.		nr nh*ohl +1
+.		nr H\\n[nh*ohl] 0
+.	\}
+.	nr H\\n[nh*hl] +1
+.	shift
+.\}
+.ie \\n[.$] .ds nh*SHtitle \\$*
+.el .ds nh*SHtitle
+.ds SN
+.nr nh*i 0
+.while \\n[nh*i]<\\n[nh*hl] \{\
+.	nr nh*i +1
+.	as SN \\n[H\\n[nh*i]].
+.\}
+.if r nh*AP\\n[nh*hl] .if \\n[nh*AP\\n[nh*hl]] .ds nh*SNprefix \\*[APPENDIX] 
+.if !'\\*[nh*SHtitle]'' .ds nh*SHtitle \\*[nh*SNprefix]\\*[SN]\\*[nh*SNsuffix] \\*[nh*SHtitle]
+.SH \\*[nh*SHtitle]
+\\*[nh*SNprefix]\\*[SN]\\*[nh*SNsuffix]
+..
+.de AX
+.ds nh*SNprefix
+.ie \\n[.$] .nr nh*AP\\$1 0
+.el \{\
+.	nr hl 0
+.	while r \\n[H\\n(hl] .nr hl +1
+.	nr ni 1
+.	while \\n(ni<=\\n(hl \{\
+.		nr nh*AP\\n(ni 0
+.		nr ni +1
+.	\}
+.\}
+..
+.de twrule
+\\l'\\n[LL]u'
+..

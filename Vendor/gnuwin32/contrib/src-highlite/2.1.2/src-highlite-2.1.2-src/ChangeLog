@@ -1,0 +1,867 @@
+2005-06-05  Lorenzo Bettini  <bettini@localhost.localdomain>
+
+        * src/lib/tags.cc: removed GlobalTags
+
+2005-06-04  Lorenzo Bettini  <bettini@localhost.localdomain>
+
+        * removed genesc and genhtml, everything is done by
+        GeneratorFactory
+
+2005-05-30  Lorenzo Bettini  <bettini@localhost.localdomain>
+
+	* src/lib/langdefparser.yy (parse_lang_def_file): does not use
+	the path for the very file, but only for future includes.
+
+2005-05-08  Lorenzo Bettini  <bettini@localhost.localdomain>
+
+	* src/src-hilite-lesspipe.sh.in: it is able to handle more
+	files, using also the --failsafe option.
+
+	* src/lib/cmdline.ggo: added option --failsafe, when the
+	input file language is unknown, it simply copies the input
+	file to the output file (useful when used with less)
+
+2005-01-23  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+	* src/regexpengine.cpp (load_line): discard possible
+	\r characters, reported by Martin Gebert
+
+2004-11-26  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+	* src/lib/srcuntabifier.h (class Untabifier): inherit from
+	TextFormatter now
+
+	* src/lib/textformatter.h (class TextFormatter): decorator
+	class to preprocess text
+
+	* src/lib/srcpretranslator.h (struct Pretranslator): removed
+
+2004-10-17    <bettini@gnu.org>
+
+	* src/lib/envmapper.c removed // C99 comments
+
+	* configure.in: check for libintl on sco unix
+
+2004-10-13    <bettini@gnu.org>
+
+	* src/lib/langdefparser.yy: the parser for language definitions
+
+2004-10-01    <bettini@dsi.unifi.it>
+
+	* src/lib/srcuntabifier.cpp (check_tab): use boost::regex
+	to discover tabs inside a string
+
+2004-09-29  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+	* src/lib/chartranslator.cc (translate): use boost::regex_replace
+
+2004-09-26  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+	* src/lib/textgen.h (class TextGenerator): handle all text generation
+	using a string for starting a tag and a string for ending a tag.
+	Decorators classes have been completely removed.
+
+2004-09-05  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+	* src/lib/genfun.cc (processFile): when stdin is used, make sure
+	that the source language is specified
+
+2004-09-03  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+	* src/lib/lineoutputgenerator.h (class LineOutputGenerator): replace
+	the previous LineNumberGenerator decorator, now remove, and generate
+	a line number before each line of the buffered output
+
+	* src/lib/outputgenerator.h (class OutputGenerator): take care of
+	actually generating the buffered output to a stream
+
+	* src/lib/outputbuffer.h (class OutputBuffer): store the output in
+	a structure
+
+2004-09-02  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+	* src/lib/textgen.cc (output): all derived classes call
+	this method instead of writing directly to the output stream
+
+2004-08-26  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+	* src/lib/optparser.yy (yyerror): exit when there's a syntax
+	error in the tags file.
+	check that an option is not declared twice
+
+	* src/lib/generatormap.h (class GeneratorMap): associate a
+	generator to a specific tag
+
+2004-08-22  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+	* src/lib/optscanner.ll: any string is considered a tag
+	handle // comments
+
+	* src/lib/generatorfactory.cc (createGenerators): iterate through
+	tags, instead of using global TextGenerators, that are now
+	removed
+
+2004-08-08  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+	* configure.in: check for the right ar command to use
+
+2004-08-03  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/genhtml/htmldocgenerator.cc: (generate_start_doc),
+        (generate_end_doc) <tt><pre> are on the same line without
+        additional newlines.
+
+2004-07-11  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/syslog_scanner.ll: scanner for log files
+        contributed by Geir Nilsen
+
+        * acinclude.m4 (AC_CXX_HAVE_IOS_BASE): check for ios_base
+
+2004-04-15  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/fileutil.cc: use strings and fstreams,
+        gitrema@users.sourceforge.net
+
+2004-03-04  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/sml_scanner.ll: added scanner for SML
+
+2003-12-12  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/genhtml/htmldecorator.cc (generateAttrVal): use "" for
+        attribute values
+
+2003-11-26  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/caml_scanner.ll: added scanner for CAML
+
+        * src/perl_scanner.ll: treat \" as a symbol when used in regular
+        expressions
+
+        * src/src-hilite-lesspipe.sh.in: Added to be used with less
+
+2003-11-25  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/fileutil.cc (get_file_extension): added
+
+        * src/lib/cmdline.ggo: src-lang is not required
+
+        * src/lib/genfun.cc (processFile): use ScannerMap for invoking
+        the requested scanner and try to infer the scanner to be
+        called according to the file extension
+
+        * src/lib/scanner_map.h (class ScannerMap): added for storing
+        the association between file types and scanners
+
+        * src/cpp_scanner.ll: handle tabs in preprocessing directives
+
+2003-11-25  Marc Côté  <mcote333@sympatico.ca>
+
+        * src/lua_scanner.ll: Added scanner for the language LUA
+
+2003-10-25  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/cmdline.ggo: added --no-doc option to cancel the
+        --doc option even if it is implied
+        added --gen-version flag to disable the generation of
+        source-highlight version in the output file
+
+2003-10-05  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/cpp_scanner.ll: treat \r so that they are generated
+        only outside tags (bug reported by barrett@9hells.org)
+
+        * src/java_scanner.ll: IDEM
+
+        * src/javascript_scanner.ll: IDEM
+
+        * src/prolog_scanner.ll: IDEM
+
+        * src/php3_scanner.ll: IDEM
+
+        * src/perl_scanner.ll: IDEM
+
+        * src/python_scanner.ll: IDEM
+
+        * src/lib/genfun.cc (generateNewLine): accept a string with possible
+        characters before the actual new line (e.g., \r)
+
+2003-08-31  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/javascript_scanner.ll: added scanner for Javascript
+
+        * src/java_scanner.ll: added true and false in the keywords
+
+2003-07-27  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/perl_scanner.ll: correctly treat =head =cut sections
+
+2003-06-29  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/changelog_scanner.ll: e-mail address is printed according
+        to string color.
+        recognize lines starting with * but without a source name
+
+        * src/genhtml/htmldecorator.h (class TagDecorator): use only string
+
+        * src/lib/generatorfactory.h (class GeneratorFactory): use only
+        string
+
+        * src/lib/tags.h (class Tag): do not use char * anymore, use
+        string instead
+
+        * src/lib/colors.h: removed any reference to HTML colors
+
+        * src/lib/generatorfactory.cc (createGenerator): translate the
+        color through the color map
+
+        * src/lib/tags.cc (Tag): the constructor does not translate colors
+        anymore, i.e., it is independent from the target language
+
+        * src/lib/generatorfactory.h (class GeneratorFactory):
+        method createColorMap abstract; it has to be redefined by
+        a specific factory in order to initialize the map of colors
+
+        * src/lib/colormap.h (class ColorMap): store the mapping for
+        colors and it is independent from the target language
+
+2003-06-22  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/genfun.cc (processFile): use GlobalDocGenerator for
+        generating top and bottom
+
+        * src/lib/docgenerator.h (class DocGenerator): added for
+        handling generation of top and bottom part of a document and
+        to abstract from the target language
+
+2003-06-21  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/genesc/escdecorator.h (class EscDecorator): decorator for
+        ESC codes
+
+        * src/lib/generatorfactory.h (class GeneratorFactory): the create
+        methods now return a TextGenerator instead of TextDecorator
+
+2003-06-13  Don Stauffer  <Don@Skyler.com>
+
+        * src/lib/srcuntabifier.h (class Untabifier): inherit from
+        Pretranslator and preprocess tab characters
+
+        * src/lib/srcpretranslator.h (struct Pretranslator): Added for
+        performing any possible needed preprocessing and for
+        directly calling the appropriate generator
+
+2003-03-17  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/Makefile.am: explicit rules do not use $<
+
+2003-02-14  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/changelog_scanner.ll: when generating the string, collect more
+        characters
+
+2003-02-12  Noritsugu Nakamura  <nnakamur@mxq.mesh.ne.jp>
+
+        * src/ruby_scanner.ll: Added scanner for Ruby language
+
+        * tests/test.rb: Added test for ruby
+
+2003-01-30  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * NEWS: Version 1.6.3
+
+        * src/Makefile.am (LDADD): add getopt and yywrap files for
+        systems that do not provide it
+
+2003-01-30  Christian W. Zuckschwerdt <zany@triq.net>
+
+        * source-highlight.spec.in: Added for generating .rpm and .rpm.src
+        from the .tar.gz sources
+
+2003-01-17  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * NEWS: Version 1.6.2
+
+2003-01-01  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * compliant to C++ standard headers (iostream etc.), no more
+        backward compatibility warnings with gcc 3.2
+
+2002-11-05  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * NEWS: Version 1.6.1
+
+2002-10-30  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/Makefile.am (libcommon_a_LIBADD): correctly add possible
+        missing files
+
+2002-10-13  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * NEWS: Version 1.6
+
+2002-09-17  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/source-highlight.cc (main): directly call a StartApp
+
+        * src/genhtml/startapphtml.h (class StartAppHtml): removed
+
+2002-09-16  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/genhtml/cssdecorator.h (class SpanDecorator): moved here
+
+        * src/genhtml/xhtmldecorator.h (class XhtmlTagDecorator): moved here
+
+        * src/genhtml/htmldecorator.h (class TagDecorator): moved here
+
+        * src/lib/decorators.h (class TextDecorator): moved here
+
+        * src/genhtml/cssgeneratorfactory.h (class CssGeneratorFactory):
+        create generators for css based html
+
+        * src/genhtml/xhtmlgeneratorfactory.h (class XHtmlGeneratorFactory):
+        create generators for xhtml
+
+        * src/genhtml/htmlgeneratorfactory.h (class HtmlGeneratorFactory):
+        create generators for html
+
+        * src/lib/generators.cc: only defines the global generators
+
+        * src/lib/generatorfactory.h (class GeneratorFactory): Added abstract
+        factory for generators
+
+2002-08-11  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/Makefile.am (bin_PROGRAMS): build source-highlight-cgi
+        a separate program to use as a cgi
+
+2002-08-08  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * tests/Makefile.am: added tests for flex and changelog
+
+        * src/Makefile.am (source_highlight_SOURCES): correctly include
+        changelog_scanner.ll
+
+2002-08-02  John Millaway  <millaway@acm.org>
+
+        * src/flex_scanner.ll: Added scanner for flex
+
+        * src/changelog_scanner.ll: Added scanner for ChangeLog
+
+        * src/Makefile.am: do not use .stamp files anymore, use flex's prefix
+
+2002-07-30  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * acinclude.m4 (LF_PROG_TXTC): fixed a little bug that shows up
+        only now with the new version of autoconf
+
+        * acconfig.h: removed, no longer needed with autoconf
+
+        * configure.in: use the new AC_LIBOBJ
+
+        * doc/Makefile.am: removed an extra EXTRA_DIST
+
+2002-07-21  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/python_scanner.ll: fixed a problem with string comments
+
+        * src/lib/genfun.cc (processFile): correctly set deleteOStream
+
+        * src/lib/startapp.cc (start): default to stdout also when -i
+        option is used.
+        (start): check whether "STDOUT" was specified as output
+
+        * src/lib/genfun.cc (print_xtop): always generate the correct header
+        for XHTML
+
+2002-07-10  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/python_scanner.ll: the same
+
+        * src/php3_scanner.ll: deal with strings that span more than one
+        lines (useful for line numbers)
+
+2002-07-07  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/python_scanner.ll: Added scanner for Python provided by
+        Martin Gebert <Murphy.Gebert@gmx.de>
+
+2002-05-20  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/decorators.h (class XhtmlColorDecorator): inherit from
+        XhtmlTagDecorator
+
+        * src/lib/genfun.cc (print_xtop): generate correct page style
+        options
+
+        * src/lib/startapp.cc (start): if xhtml is chosen as output format
+        and css is not specified then use Xhtml generators
+
+        * src/lib/generators.cc (createXhtmlGenerator): Added, create
+        an XhtmlTagDecorator
+
+        * src/lib/decorators.h (class XhtmlTagDecorator): inherit from
+        TagDecorator and redefine generateAttrVal
+
+        * src/lib/decorators.cc (generateAttrVal): redefinable method
+        to generate attribute and value
+
+        * src/lib/genfun.cc: (startColor) (endColor) removed
+
+2002-05-19  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/java_scanner.ll: assert is recognized as keyword
+
+        * doc/Hello_xhtml.html: Added
+
+2002-05-16  Christian W. Zuckschwerdt  <zany@triq.net>
+
+        * src/lib/genfun.cc: (print_xtop) output for xhtml
+        (processFile): also get the output format
+
+2002-04-26  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * NEWS: Version 1.4 released
+
+        * src/perl_scanner.ll: tab is correctly scanned
+
+        * src/prolog_scanner.ll: tab is correctly scanned
+
+        * src/java_scanner.ll: keyword if, while, etc. that use '(' ')'
+        are now correctly highlighted as keywords instead of functions
+
+2002-03-31  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/genfun.cc (processFile): default line_num_digit to 5
+        if IO redirection is used
+        (processFile): call LineNumberDecorator::reset so that if many
+        files are processed the current line number is correctly reset
+
+        * src/php3_scanner.ll: Added PHP3 scanner, written by
+        Alain Barbet <alian@alianwebserver.com>
+
+2002-03-23  Lorenzo Bettini  <bettini@gdn.dsi.unifi.it>
+
+        * src/lib/globalostream.h: include iostream.h instead of ostream.h
+
+        * src/lib/fileutil.h: include iostream.h instead of istream.h
+
+2002-03-06  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * NEWS: Version 1.3 released
+
+2002-03-05  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * doc/source-highlight.1.in: Added man page
+
+2002-03-01  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/my_string.h: added for problems with std:string
+
+2002-02-07  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/perl_scanner.ll: Added Perl scanner, written by
+        Alain Barbet <alian@alianwebserver.com>
+
+2002-01-30  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/fileutil.cc (get_line_count): correctly check whether
+        the file can be opened
+
+        * src/lib/genfun.cc (generateTab): translate tabs even if no --tab
+        option is given, when --line-number is given
+
+        * src/lib/startapp.cc: cmdline args_info is now global
+
+        * doc/Makefile.am (Hello_lines.html): Added, example of line number
+        generation
+
+2002-01-29  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/cpp_scanner.ll: idem
+        tabs are handled (bug fixed)
+
+        * src/java_scanner.ll: do not handle \n in COMMENT_STATE,
+        otherwise line numbers would be printed in the same style
+        of comments
+
+        * tests/Makefile.am: Added tests for --line-number
+
+        * src/lib/linenogen.cc (reset): reset static data
+        (startDecorate): call generate_lineno
+        (generateln): do not call generate_lineno, only generate and
+        generate_preproc call generate_lineno
+
+        * src/lib/linenogen.h (class LineNumberDecorator): generated_newline
+        and lineno are static
+
+2002-01-28  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/genfun.cc (_generate): directly print to sout, without
+        using generators (so that line numbers are not generated while
+        generating header and footer)
+
+2002-01-26  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/cmdline.ggo: Added option for numbering lines
+
+        * src/lib/textgen.cc (generate): not const anymore, the same for
+        the other generation methods
+
+        * src/lib/linenogen.h (class LineNumberDecorator): generate
+        line numbers
+
+        * src/lib/linenumdigit.h: contain extern definition of line_num_digit
+
+2002-01-25  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/globalostream.h: contain extern definition of sout
+
+        * src/lib/genfun.cc (processFile): compute the number of digits
+        to represent a line number
+
+        * src/lib/fileutil.cc (get_line_count): count lines in a file
+
+        * src/lib/genfun.cc (processFile): correctly check whether it is
+        possible to open the file for writing
+
+        * tests/Makefile.am (test_header.html): Added test for header
+        and footer
+
+        * src/lib/startapp.cc (start): set entire_doc also if docHeader or
+        docFooter is specified
+
+2001-12-26  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * tests/Makefile.am (check_prolog2html): check for prolog sources
+
+        * tests/test.pl: test for Prolog
+
+        * src/prolog_scanner.ll: Added the scanner for Prolog provided by
+        Martin Gebert <Murphy.Gebert@gmx.de>
+
+        * src/substit_scanner.templ: this is the template from which
+        all *_scanner.sed are automatically generated
+
+        * src/lib/startapp.cc (start): check whether the output format
+        is html
+
+        * configure.in: versions for scanners
+
+        * tests/Makefile.am: call source-highlight with the appropriate
+        command line option instead of java2html and cpp2html
+
+        * src/lib/genfun.cc (processFile): instead of programName and
+        programVersion take as parameter the source language and
+        call the appropriate lexer
+
+        * src/cpp2html.cc: removed
+
+        * src/java2html.cc: removed
+
+        * src/source-highlight.cc (main): now this is the only main file
+
+        * src/cpp_scanner.sed: the same for cpp
+
+        * src/java_scanner.sed: sed file substitution for java scanner
+        generated by flex
+
+        * src/lib/cmdline.ggo: Added option src-lang for specifying the
+        source language (e.g. java, cpp, etc.) and out-format for the
+        output format (for the moment only html)
+
+2001-12-20  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * NEWS: Version 1.2.1 released
+
+        * src/getopt.c: much more modern version taken from GNU C library
+
+        * src/getopt1.c: much more modern version taken from GNU C library
+
+        * src/getopt.h: much more modern version taken from GNU C library
+
+        * src/lib/alloca.c: removed, no longer needed
+
+        * configure.in: removed check for alloca
+
+        * src/lib/my_sstream.h: use using std::ostringstream
+        if the compiler supports it
+
+        * src/lib/my_set.h: use using std::set if the compiler supports it
+
+2001-12-03  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * NEWS: Version 1.2 released
+
+        * configure.in: upgrade to new versions
+
+        * src/lib/fileutil.cc (file_error): use streams instead of fprintf
+
+2001-11-28  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/list.h: removed
+
+        * src/lib/tags.h (struct TagLess): Added for comparing two tags
+        (class Tags): use set as a container
+
+        * src/lib/messages.h: methods and functions get const char *
+
+        * src/lib/optparser.yy (yyerror): use ostringstream instead of
+        strstream
+
+        * src/includes/sstream: Added in case sstream is missing in the
+        standard library
+
+        * configure.in: added check for STL
+
+2001-11-25  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src\lib\fileutil.cc (createOutputFileName): set outputFileName[0]
+        to '\0' in order to make strcat work correctly
+
+2001-09-23  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * tests/test_template.cc: Added to test highlighting of templates
+
+        * src/lib/genfun.cc (print_top): URL fixed
+
+2001-08-24  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/cpp_scanner.ll: use generate_normal for normal text
+        in INITIAL state
+
+        * src/java_scanner.ll: use generate_normal for normal text
+        in INITIAL state
+
+        * src/lib/genfun.cc (generate_normal): Added to print normal text
+
+2001-08-23  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/optparser.yy (parseTags): print the correct tag file name
+
+        * src/lib/messages.h: Added printMessage_noln
+
+        * src/tags2.j2h: Added, use normal text specification
+
+        * src/lib/generators.cc: Added NormalGenerator for normal text
+
+        * src/lib/tags.cc: NULL substituted with 0
+
+        * src/lib/tags.h: NULL substituted with 0
+
+        * src/lib/optscanner.ll: Added "normal" keyword
+
+2001-08-13  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * NEWS: Version 1.1 released
+
+2001-08-04  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/java_scanner.ll: idem
+
+        * src/cpp_scanner.ll: removed useless code for single line comments
+
+        * tests/test_comments.java: idem
+
+        * tests/test_comments.cc: Added in order to test only comments
+
+        * tests/Makefile.am: started to modify it in order to handle
+        more than one single test per program
+
+2001-07-07  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/genfun.cc (get_input_file_name): Added to use
+        CHAROOT_INPUT_DIR
+        (processFile): use get_input_file_name to obtain the complete
+        path of the input file name
+
+        * configure.in: Added --enable-input-chroot
+
+        * src/lib/fileutil.cc (createOutputFileName): Also check for
+        DOS path separator so that it works also under DOS systems
+
+2001-06-27  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * doc/Makefile.am: moved here
+
+        * src/lib/Makefile.am: removed generation of html from sources
+
+        * src/lib/startapp.cc (start): Pass output-dir to
+        createOutputFileName
+
+        * src/lib/cmdline.ggo: Added --output-dir option
+
+2001-06-24  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/fileutil.cc (createOutputFileName): also get the
+        outputDir, but not used yet
+
+        * src/lib/envmapper.c: include ctype for isxdigit
+
+        * src/lib/chartranslator.cc (translate): cast the string character
+        to unsigned so that also extended ASCII is handled (e.g. foreign
+        characters, such as ü).
+
+2001-06-19  Robert Wetzel  <rw8@mail.inf.tu-dresden.de>
+
+        * src/lib/envmapper.c (__convert_char): Added
+        (__convert_string): Added
+        interpret '%XX' 'characters' of 'QUERY_STRING'
+        checks for CGI by scanning REQUEST_METHOD
+        'QUERY_STRING' is determined by REQUEST_METHOD
+        Both http-methods (GET & POST) are supported now.
+        '%'-sequences will be converted, if given correctly.
+
+        * src/lib/envmapper.h: added ENV_REQUEST_METHOD, MAX_QUERY_STRING_LEN,
+        REQUEST_METHOD_GET
+
+2001-06-13  Lorenzo Bettini (LAP)  <bettini@dsi.unifi.it>
+
+        * src/lib/startapp.cc: Added include stdlib.h
+
+2001-06-03  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * Version 1 released
+
+        * src/lib/tags.h (class Tag): darkgreen handled
+
+        * src/lib/optscanner.ll: brightgreen added (bug fixed)
+
+        * src/lib/list.h (class List): comments are in English now
+
+2001-06-02  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/genhtml/startapphtml.h (class StartAppHtml): specialize
+        class StartApp
+
+        * src/genhtml/startapp4html.cc (startapp4html): moved in this
+        directory for html related stuff
+
+        * src/lib/startapp.h (class StartApp): Added, for starting the
+        translation
+
+        * src/lib/startapp4html.cc (print_version): print GNU as well
+
+2001-05-24  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/java_scanner.ll: removed < > & token scanning
+
+        * src/cpp_scanner.ll: removed < > & token scanning
+        call generateString for includes with <>
+
+        * src/lib/textgen.cc (generateEntire): Call generate_preproc instead
+        of generate
+        (beginText): Idem
+        (endText): Idem
+
+2001-05-20  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/textgen.cc (generate_preproc): Added, preprocess the
+        string translate any special characters
+
+        * src/lib/genfun.cc (print_top): print information about
+        source-highlighter
+
+        * src/lib/startapp4html.cc (startapp4html): print help and version
+
+        * src/lib/reportbugs.text: report bugs mail address here
+
+        * src/lib/copyright.text: copyright here
+
+        * src/lib/cmdline.ggo: Added purpose
+
+        * configure.in: versions of java2html and cpp2html are created in
+        config.h
+
+2001-05-19  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/startapp4html.cc (startapp4html): use HtmlCharTranslator
+
+        * src/lib/textgen.h (class TextGenerator): Added constructor to get
+        a CharTranslator
+
+        * src/lib/textgen.cc: Added, implementation moved here
+
+        * src/lib/html_chartranslator.h (class HtmlCharTranslator): Specialize
+        CharTranslator for translating characters for html
+
+        * src/lib/chartranslator.h (class CharTranslator): Added, to translate
+        some special characters, base class
+
+        * src/lib/strdup.c (strdup): Added in case it's not in std library
+
+2001-04-16  Lorenzo Bettini (LAP)  <bettini@dsi.unifi.it>
+
+        * src/lib/startapp4html.cc (startapp4html): if cgi print cgi header
+
+        * src/cpp2html.cc (main): IDEM
+
+        * src/java2html.cc (main): simply call startapp
+
+        * src/lib/startapp.cc (startapp): Added, the entry point to be called
+        in main
+
+2001-04-15  Lorenzo Bettini (LAP)  <bettini@dsi.unifi.it>
+
+        * src/cpp_scanner.ll: IDEM
+
+        * src/java_scanner.ll: \n is put back in the stream while in
+        single line mode, so that single line comments are treated
+        according to HTML standards, as suggested by
+        Robert Wetzel <rw8@mail.inf.tu-dresden.de>
+
+2001-04-11  Robert Wetzel  <rw8@mail.inf.tu-dresden.de>
+
+        * src/lib/envmapper.c (map_environment): in case QUERY_STRING is
+        defined in the environment, translate the string passed by the
+        html page into command line option for the standard program.
+        It is used if the program is used as a CGI
+
+2001-03-18  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/lib/optparser.yy (openTagsFile): First try with the possible
+        specified tag file
+
+        * src/lib/cmdline.ggo: Added --tags-file option for specifying
+        the tag file
+
+        * src/java_scanner.ll: highlight symbols, curly brackets and functions
+        'import' is considered 'preproc' instead of 'keyword'
+
+        * test/Makefile.am: Added test directory for testing
+
+2001-03-17  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * src/cpp2html.cc: Added, replace previous main.cc
+
+        * src/lib/fileutil.cc: Added, contain util functions for files,
+        previously in main
+
+        * src/lib/genfun.cc: Added, contain the gen functions, previously
+        in main
+
+        * src/main.cc: removed
+
+2001-03-15  Lorenzo Bettini  <bettini@dsi.unifi.it>
+
+        * common files for cpp2html and java2html have been moved to
+        directory lib, and are linked into a library
+
+        * configure.in: added check for ranlib
+
+2001-02-11  Geurt Vos  <geurt@xosl.org>
+
+        * src/tags.h (class Tag): Added DirectColor and for handling colors
+        specified with # format
+
+        * src/optscanner.ll: Added keywords and colors for... see below
+        and for for handling colors specified with # format
+
+        * src/main.cc: Added functions for... see below
+
+        * src/generators.cc: Added generators for preproc, function,
+        symbols and bracket
+
+        * src/colors.h: Added teal, gray and darkblue
+

@@ -1,0 +1,58 @@
+# Style sheet for GNUmakefiles
+#
+# Copyright (c) 1999 Alexander Mai
+# $Id: gmake.ssh,v 1.1.1.1.2.1 2007/12/29 01:58:29 mhatta Exp $
+#
+
+#
+# This file is part of a2ps.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+
+# 0.3 am
+#   += fixed, %.:%. added
+
+style GNUMakefile is
+requires a2ps 4.12a
+
+written by "Alexander Mai <st002279@hrzpub.tu-darmstadt.de>"
+version is 0.4
+documentation is
+  "Special tokens of GNUmakefiles and non terminal declarations are highlighted."
+end documentation
+
+# First get the common stuff from make
+ancestors are
+  make
+end ancestors
+
+# extensions unique to GNU make
+operators are
+  # += assignment to variables
+  (/^( *)/             # \1. Leadings spaces
+   /([a-zA-Z0-9_-]+)/  # \2. variable name
+   /( *\\+=)/          # \3. spaces and +=
+   \1 Plain, \2 Label, \3 Plain),
+
+  # Pattern rules (e.g., `%.o : %.c')
+  (/^(%[.][a-zA-Z0-9_-]+)/  # \1. to-pattern
+   /( *: *)/                # \2. colon and spaces
+   /(%\\.[a-zA-Z0-9_-]+)/   # \3. from-pattern
+   \1 Label_strong, \2 Plain, \3 Label_strong)
+end operators
+
+end style

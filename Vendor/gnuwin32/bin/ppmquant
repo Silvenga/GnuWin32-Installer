@@ -1,0 +1,30 @@
+#!/usr/bin/perl -w
+##############################################################################
+#  This is nothing but a compatibility interface for Pnmquant.
+#  An old program coded to call Ppmquant will continue working because
+#  this interface exists.  All new (or newly modified) programs should
+#  call Pnmquant or Pnmremap instead.
+#
+#  In days past, Pnmquant and Pnmremap did not exist.  Ppmquant did
+#  the job of both Pnmremap and Pnmquant, but only on PPM images.
+##############################################################################
+
+use strict;
+
+use Getopt::Long;
+
+my $TRUE=1; my $FALSE = 0;
+
+my @ppmquantArgv = @ARGV;
+
+Getopt::Long::Configure("pass_through");
+
+my $validOptions = GetOptions("mapfile" => \my $mapfileopt);
+
+my $mapfileOptionPresent = ($validOptions && $mapfileopt);
+
+if ($mapfileOptionPresent) {
+    system("pnmremap", @ppmquantArgv);
+} else {
+    system("pnmquant", @ppmquantArgv);
+}

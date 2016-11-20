@@ -1,0 +1,75 @@
+RLE_GET_SETUP(3)                               RLE_GET_SETUP(3)
+
+
+
+
+
+NAME
+       rle_get_setup - Read the header from an RLE file.
+       rle_get_setup_ok  -  Print  error  message  and  exit if
+              rle_get_setup fails.
+       rle_get_error - Print error  message  for  rle_get_setup
+              failure.
+       rle_debug - Turn on or off debugging messages.
+
+SYNOPSIS
+       #include <rle.h>
+
+       rle_get_setup( the_hdr );
+       rle_hdr * the_hdr;
+
+       rle_get_setup_ok( the_hdr, prog_name, file_name );
+       rle_hdr * the_hdr;
+       char * prog_name, * file_name;
+
+       rle_get_error( code, prog_name, file_name )
+       int code;
+       char *prog_name, *file_name;
+
+       rle_debug( on_off )
+       int on_off;
+
+DESCRIPTION
+       Rle_get_setup  is  called  to  initialize the process of
+       reading an RLE(5) file.  It will fill  in  the_hdr  with
+       the  header information from the RLE file, and will ini-
+       tialize state for rle_getrow(3) and rle_getraw(3).   The
+       rle_file  field  of the_hdr should be initialized to the
+       input stream before  calling  rle_get_setup.   The  bits
+       field  is initialized by rle_get_setup to enable reading
+       of all the channels present in the input file.  To  pre-
+       vent rle_getrow or rle_getraw from reading certain chan-
+       nels (e.g., the alpha  channel),  the  appropriate  bits
+       should  be cleared before calling them.  The error codes
+       returned by rle_get_setup are defined in rle.h.
+
+       Rle_get_setup_ok invokes rle_get_setup  and  checks  the
+       return   code.    If   an   error   occurred,  it  calls
+       rle_get_error( err_code, prog_name, file_name ) to print
+       the appropriate error message on stderr, and the program
+       exits with the status code set.
+
+       Rle_get_error can be  called  to  print  an  appropriate
+       error message on the standard error output for the fail-
+       ure code returned by rle_get_setup.  The  prog_name  and
+       file_name parameters are used for the error message.  If
+       file_name is NULL or "-", the string "Standard input" is
+       substituted.
+
+       The  function  rle_debug  is  used  to enable or disable
+       debug printing for the rle_get functions.  If on_off  is
+       non-zero,  all  input  read  from  any  RLE file will be
+       printed in a readable form on the standard error output.
+       Calling rle_debug(0) will turn off this activity.
+
+SEE ALSO
+       rle_hdr(3),   rle_getrow(3),  rle_getraw(3),  librle(3),
+       RLE(5).
+
+AUTHOR
+       Spencer W. Thomas, Todd Fuqua
+       University of Utah
+
+
+
+3                            2/2/87            RLE_GET_SETUP(3)

@@ -1,0 +1,48 @@
+RLE_OP(3)                                             RLE_OP(3)
+
+
+
+
+
+NAME
+       rle_op - Data structure for raw run-length encoded image
+       data.
+
+SYNOPSIS
+       #include <rle.h>
+       #include <rle_raw.h>
+       typedef struct rle_op rle_op;
+
+DESCRIPTION
+       The rle_op data structure is used to describe  a  single
+       run of data in a RLE(5) run-length encoded image.  It is
+       filled by the function rle_getraw(3), and is used by the
+       functions rle_putraw(3) and rle_rawtorow(3).
+
+       The structure is
+           struct rle_op {
+                 int     opcode;   /* One of RByteDataOp or RRunDataOp. */
+                 int     xloc;     /* X starting location of this data. */
+                 int     length;   /* Length of run or data array. */
+                 union {
+                         rle_pixel *pixels;  /* ByteData case. */
+                         int       run_val;  /* RunData case. */
+                 } u;
+            };
+
+       If the opcode has the value RByteDataOp, then the u.pix-
+       els component points to an array of length pixel values.
+       If  the  opcode  has  the  value  RRunDataOp,  then  the
+       u.run_val component contains a pixel value that is to be
+       repeated length times.
+
+SEE ALSO
+       rle_hdr(3), rle_getraw(3), rle_putraw(3), rle_raw-
+       torow(3), librle(3), RLE(5).
+
+AUTHOR
+       Spencer W. Thomas
+
+
+
+3                          July, 1990                 RLE_OP(3)

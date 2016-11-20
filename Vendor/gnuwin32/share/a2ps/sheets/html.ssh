@@ -1,0 +1,64 @@
+# Style sheet for HTML
+# Copyright (c) 1997, 98 Jim Diamond, Akim Demaille, Miguel Santana, Wesley Chun
+# $Id: html.ssh,v 1.1.1.1.2.1 2007/12/29 01:58:30 mhatta Exp $
+#
+
+#
+# This file is part of a2ps.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+#
+# 0.1 akim@freefriends.org:
+#       first version
+#
+# 1.0 wesc@alpha.ece.ucsb.edu:
+#       added comments and bolded HTML tags
+#
+# FIXME: Beware of < and > for regex.
+#
+#
+style HTML is
+
+written by "Akim Demaille <akim@freefriends.org>, Wesley J. Chun <wesc@alpha.ece.ucsb.edu>"
+
+version is 1.1
+requires a2ps 4.12a
+
+documentation is
+  "This style is meant to pretty print HTML source files, not to simulate"
+  "its interpretation (i.e., samp(<bold>foo</bold>)samp does not print samp(foo)samp"
+  "in bold).  If you really meant to print the result of the HTML file"
+  "emph(interpreted)emph, then you should turn the delegations on, and make sure"
+  "samp(a2ps)samp has HTML delegations."
+end documentation
+
+operators in Keyword_strong are
+  (/<([^>]*)>/ "<", \1, ">")
+end operators
+
+sequences are
+  # HTML comments
+  "<!--" Comment "-->",
+
+  # Tags with arguments (E.g., <a>, <img>, <table>...)
+  (/<([[:alpha:]]+) / "<" Keyword_strong, \1 Keyword_strong, " " Plain) Keyword ">" Keyword_strong
+    # Exceptions are double-quoted strings inside tags
+    exceptions are
+        (/"(([^"]|\\\\.)*)"/ "\"" Plain, \1 String, "\"" Plain)
+    end exceptions
+end sequences
+
+end style

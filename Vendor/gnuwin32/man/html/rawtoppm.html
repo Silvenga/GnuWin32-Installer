@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Rawtoppm User Manual</TITLE></HEAD>
+<BODY>
+<H1>rawtoppm</H1>
+Updated: 06 February 1991
+<BR>
+<A HREF="rawtoppm.html#index">Table Of Contents</A>
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+rawtoppm - convert a stream of raw RGB bytes to a PPM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>rawtoppm</B>
+
+[<B>-headerskip</B> <I>N</I>]
+
+[<B>-rowskip</B> <I>N</I>]
+
+[
+<B>-rgb</B>|<B>-rbg</B>|<B>-grb</B>
+|<B>-gbr</B>|<B>-brg</B>|<B>-bgr</B>
+]
+
+[<B>-interpixel</B>|<B>-interrow</B>]
+
+<I>width</i> <i>height</I>
+
+[<I>imagedata</I>]
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>rawtoppm</b> reads raw RGB bytes as input and produces a PPM
+image as output.  The input file is just RGB bytes.  You have to
+specify the width and height on the command line, since the program
+obviously can't get them from the file.  <b>rawtoppm</b> assumes the
+maxval of the input samples is 255, and makes the maxval of the output
+PPM 255.  
+
+<p><b>rawtoppm</b> assumes the pixels come top first in the input stream.
+If they are actually bottom first, the resulting PPM is upside down, so
+run it through <b>pamflip -tb</b>.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-headerskip</B>
+
+<DD>Skip over this many bytes at the beginning of the input stream.
+Use this option when the input has some kind of header followed by
+a raster suitable for <b>rawtoppm</b>.
+
+<DT><B>-rowskip</B>
+
+<DD>Skip this many bytes at the end of each row of the raster.  (Some
+input streams have padding at the end of rows).
+
+<DT><B>-rgb -rbg -grb -gbr -brg -bgr</B>
+
+<DD>This option specifies the order of the color components for each
+pixel.  The default is <B>-rgb</B>.
+
+<DT><B>-interpixel -interrow</B>
+
+<DD>These options specify how the colors are interleaved.  The default
+is <B>-interpixel</B>, meaning interleaved by pixel.  A byte of red, a
+byte of green, and a byte of blue, or whatever color order you
+specified.  <B>-interrow</B> means interleaved by row - a row of red,
+a row of green, a row of blue, assuming standard rgb color order.  An
+<B>-interplane</B> option - all the red pixels, then all the green,
+then all the blue - would be an obvious extension, but is not
+implemented.  You could get the same effect by splitting the file into
+three parts (perhaps using <b>dd</b>), turning each part into a PGM
+file with <b>rawtopgm</b>, and then combining them with <b>rgb3toppm</b>.
+
+</DL>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<A HREF="ppm.html">ppm</A>, 
+<A HREF="rawtopgm.html">rawtopgm</A>, 
+<A HREF="rgb3toppm.html">rgb3toppm</A>, 
+<A HREF="pamflip.html">pamflip</A>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+Copyright (C) 1991 by Jef Poskanzer.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="rawtoppm.html#lbAB">NAME</A>
+<LI><A HREF="rawtoppm.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="rawtoppm.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="rawtoppm.html#lbAE">OPTIONS</A>
+<LI><A HREF="rawtoppm.html#lbAF">SEE ALSO</A>
+<LI><A HREF="rawtoppm.html#lbAG">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

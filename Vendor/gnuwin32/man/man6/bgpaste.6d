@@ -1,0 +1,43 @@
+.TH BGPASTE "6D" "May 5, 2004" "IRIX 6.5
+.SH NAME
+bgpaste - paste an image onto the root window
+.SH SYNOPSIS
+\fBbgpaste\fP \fB[-t\fP \fBr\fP \fBg\fP \fBb]\fP \fB[-o\fP \fBxorig\fP \fByorig]\fP \fBinimage\fP
+\fBbgpaste\fP \fB[-t\fP \fBr\fP \fBg\fP \fBb]\fP \fB-n\fP \fBnumimgs\fP \fBxorg\fP \fByorg\fP \fBimg\fP \fB[xorg\fP \fByorg\fP \fBimg\fP \fB.\fP \fB.\fP \fB.\fP \fB]\fP
+.SH DESCRIPTION
+\fIbgpaste\fP works in one of two distinct ways: either feed it one image,
+which by default is automatically centered (or explicitly specify the
+image's origin), or feed it a list of one or more images preceeded by
+their respective x/y origins to be painted as a composite in the root
+window.
+In the first case, \fIbgpaste\fP centers and pastes inimage onto the root
+window regardless of inimage's size.
+You can override the \[lq]centering\[rq] default and explicitly position your own
+image manually by using the -\fIo\fP option to specify the image's absolute-
+screenspace origin as measured from the bottom-left corner of the
+graphics display screen. The \fIxorig\fP,\fIyorig\fP pair is defined in terms of the
+image's bottom-left corner. Negative values are legal to specify and
+will \[lq]plant\[rq] the image's origin offscreen to the left and/or the bottom
+of the screen origin.
+In the second case, the -\fIn\fP flag tells \fIbgpaste\fP you are including a list of
+\fIn\fP images, where each image is preceeded by its respective x/y origin pair
+(again, negative values are legal). The intersection of the composite
+set of images with that of the root window size is calculated and a
+buffer of that size is allocated which will contain the composite. The
+images will be painted in the order enumerated: the first image listed
+will be painted first, the last will be painted last. Any \[lq]background\[rq]
+within the composite, as well as any remaining area of the root window
+not included in the intersection, will be painted with the default gray
+color or one defined using the -\fIt\fP flag.
+In either of the above descriptions, if either the X or the Y size (or
+both) of inimage/composite is smaller than the screen size, a gray
+background is painted where the image/composite doesn't appear. This
+gray default color can be redefined to be a specific RGB triplet using
+the -\fIt\fP option followed by the \fIr\fP \fIg\fP \fIb\fP integer triplet. Use izoom(6D) if
+you wish to blowup an inmage that is smaller than the screen's X and/or Y
+size.
+.SH NOTE
+When employing \fIbgpaste\fP -\fIn\fP performance will degrade because of the
+creation of the buffer which stores the composite root window image.
+.SH SEE ALSO
+izoom(6D)

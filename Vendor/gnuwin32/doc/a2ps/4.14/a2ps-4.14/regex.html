@@ -1,0 +1,3068 @@
+<html lang="en">
+<head>
+<title>Regex</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Regex">
+<meta name="generator" content="makeinfo 4.7">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc { font-variant:small-caps }
+  span.roman { font-family: serif; font-weight: normal; } 
+--></style>
+</head>
+<body>
+<h1 class="settitle">Regex</h1>
+<div class="node">
+<p><hr>
+<a name="Overview"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Regular-Expression-Syntax">Regular Expression Syntax</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">1 Overview</h2>
+
+<p>A <dfn>regular expression</dfn> (or <dfn>regexp</dfn>, or <dfn>pattern</dfn>) is a text
+string that describes some (mathematical) set of strings.  A regexp
+<var>r</var> <dfn>matches</dfn> a string <var>s</var> if <var>s</var> is in the set of
+strings described by <var>r</var>.
+
+  <p>Using the Regex library, you can:
+
+     <ul>
+<li>see if a string matches a specified pattern as a whole, and
+
+     <li>search within a string for a substring matching a specified pattern.
+
+  </ul>
+
+  <p>Some regular expressions match only one string, i.e., the set they
+describe has only one member.  For example, the regular expression
+<span class="samp">foo</span> matches the string <span class="samp">foo</span> and no others.  Other regular
+expressions match more than one string, i.e., the set they describe has
+more than one member.  For example, the regular expression <span class="samp">f*</span>
+matches the set of strings made up of any number (including zero) of
+<span class="samp">f</span>s.  As you can see, some characters in regular expressions match
+themselves (such as <span class="samp">f</span>) and some don't (such as <span class="samp">*</span>); the
+ones that don't match themselves instead let you specify patterns that
+describe many different strings.
+
+  <p>To either match or search for a regular expression with the Regex
+library functions, you must first compile it with a Regex pattern
+compiling function.  A <dfn>compiled pattern</dfn> is a regular expression
+converted to the internal format used by the library functions.  Once
+you've compiled a pattern, you can use it for matching or searching any
+number of times.
+
+  <p>The Regex library consists of two source files: <span class="file">regex.h</span> and
+<span class="file">regex.c</span>. 
+<a name="index-regex_002eh-1"></a><a name="index-regex_002ec-2"></a>Regex provides three groups of functions with which you can operate on
+regular expressions.  One group&mdash;the <span class="sc">gnu</span> group&mdash;is more powerful
+but not completely compatible with the other two, namely the <span class="sc">posix</span>
+and Berkeley <span class="sc">unix</span> groups; its interface was designed specifically
+for <span class="sc">gnu</span>.  The other groups have the same interfaces as do the
+regular expression functions in <span class="sc">posix</span> and Berkeley
+<span class="sc">unix</span>.
+
+  <p>We wrote this chapter with programmers in mind, not users of
+programs&mdash;such as Emacs&mdash;that use Regex.  We describe the Regex
+library in its entirety, not how to write regular expressions that a
+particular program understands.
+
+<div class="node">
+<p><hr>
+<a name="Regular-Expression-Syntax"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Common-Operators">Common Operators</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">2 Regular Expression Syntax</h2>
+
+<p><a name="index-regular-expressions_002c-syntax-of-3"></a><a name="index-syntax-of-regular-expressions-4"></a>
+<dfn>Characters</dfn> are things you can type.  <dfn>Operators</dfn> are things in
+a regular expression that match one or more characters.  You compose
+regular expressions from operators, which in turn you specify using one
+or more characters.
+
+  <p>Most characters represent what we call the match-self operator, i.e.,
+they match themselves; we call these characters <dfn>ordinary</dfn>.  Other
+characters represent either all or parts of fancier operators; e.g.,
+<span class="samp">.</span> represents what we call the match-any-character operator
+(which, no surprise, matches (almost) any character); we call these
+characters <dfn>special</dfn>.  Two different things determine what
+characters represent what operators:
+
+     <ol type=1 start=1>
+<li>the regular expression syntax your program has told the Regex library to
+recognize, and
+
+     <li>the context of the character in the regular expression.
+       </ol>
+
+  <p>In the following sections, we describe these things in more detail.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Syntax-Bits">Syntax Bits</a>
+<li><a accesskey="2" href="#Predefined-Syntaxes">Predefined Syntaxes</a>
+<li><a accesskey="3" href="#Collating-Elements-vs_002e-Characters">Collating Elements vs. Characters</a>
+<li><a accesskey="4" href="#The-Backslash-Character">The Backslash Character</a>
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Syntax-Bits"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Predefined-Syntaxes">Predefined Syntaxes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Regular-Expression-Syntax">Regular Expression Syntax</a>
+<br>
+</div>
+
+<h3 class="section">2.1 Syntax Bits</h3>
+
+<p><a name="index-syntax-bits-5"></a>
+In any particular syntax for regular expressions, some characters are
+always special, others are sometimes special, and others are never
+special.  The particular syntax that Regex recognizes for a given
+regular expression depends on the value in the <code>syntax</code> field of
+the pattern buffer of that regular expression.
+
+  <p>You get a pattern buffer by compiling a regular expression.  See <a href="#GNU-Pattern-Buffers">GNU Pattern Buffers</a>, and <a href="#POSIX-Pattern-Buffers">POSIX Pattern Buffers</a>, for more information
+on pattern buffers.  See <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a>, <a href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a>, and <a href="#BSD-Regular-Expression-Compiling">BSD Regular Expression Compiling</a>, for more information on compiling.
+
+  <p>Regex considers the value of the <code>syntax</code> field to be a collection
+of bits; we refer to these bits as <dfn>syntax bits</dfn>.  In most cases,
+they affect what characters represent what operators.  We describe the
+meanings of the operators to which we refer in <a href="#Common-Operators">Common Operators</a>,
+<a href="#GNU-Operators">GNU Operators</a>, and <a href="#GNU-Emacs-Operators">GNU Emacs Operators</a>.
+
+  <p>For reference, here is the complete list of syntax bits, in alphabetical
+order:
+
+     
+<a name="index-RE_005fBACKSLASH_005fESCAPE_005fIN_005fLIST-6"></a>
+<dl><dt><code>RE_BACKSLASH_ESCAPE_IN_LISTS</code><dd>If this bit is set, then <span class="samp">\</span> inside a list (see <a href="#List-Operators">List Operators</a>
+quotes (makes ordinary, if it's special) the following character; if
+this bit isn't set, then <span class="samp">\</span> is an ordinary character inside lists. 
+(See <a href="#The-Backslash-Character">The Backslash Character</a>, for what `\' does outside of lists.)
+
+     <p><a name="index-RE_005fBK_005fPLUS_005fQM-7"></a><br><dt><code>RE_BK_PLUS_QM</code><dd>If this bit is set, then <span class="samp">\+</span> represents the match-one-or-more
+operator and <span class="samp">\?</span> represents the match-zero-or-more operator; if
+this bit isn't set, then <span class="samp">+</span> represents the match-one-or-more
+operator and <span class="samp">?</span> represents the match-zero-or-one operator.  This
+bit is irrelevant if <code>RE_LIMITED_OPS</code> is set.
+
+     <p><a name="index-RE_005fCHAR_005fCLASSES-8"></a><br><dt><code>RE_CHAR_CLASSES</code><dd>If this bit is set, then you can use character classes in lists; if this
+bit isn't set, then you can't.
+
+     <p><a name="index-RE_005fCONTEXT_005fINDEP_005fANCHORS-9"></a><br><dt><code>RE_CONTEXT_INDEP_ANCHORS</code><dd>If this bit is set, then <span class="samp">^</span> and <span class="samp">$</span> are special anywhere outside
+a list; if this bit isn't set, then these characters are special only in
+certain contexts.  See <a href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a>, and
+<a href="#Match_002dend_002dof_002dline-Operator">Match-end-of-line Operator</a>.
+
+     <p><a name="index-RE_005fCONTEXT_005fINDEP_005fOPS-10"></a><br><dt><code>RE_CONTEXT_INDEP_OPS</code><dd>If this bit is set, then certain characters are special anywhere outside
+a list; if this bit isn't set, then those characters are special only in
+some contexts and are ordinary elsewhere.  Specifically, if this bit
+isn't set then <span class="samp">*</span>, and (if the syntax bit <code>RE_LIMITED_OPS</code>
+isn't set) <span class="samp">+</span> and <span class="samp">?</span> (or <span class="samp">\+</span> and <span class="samp">\?</span>, depending
+on the syntax bit <code>RE_BK_PLUS_QM</code>) represent repetition operators
+only if they're not first in a regular expression or just after an
+open-group or alternation operator.  The same holds for <span class="samp">{</span> (or
+<span class="samp">\{</span>, depending on the syntax bit <code>RE_NO_BK_BRACES</code>) if
+it is the beginning of a valid interval and the syntax bit
+<code>RE_INTERVALS</code> is set.
+
+     <p><a name="index-RE_005fCONTEXT_005fINVALID_005fOPS-11"></a><br><dt><code>RE_CONTEXT_INVALID_OPS</code><dd>If this bit is set, then repetition and alternation operators can't be
+in certain positions within a regular expression.  Specifically, the
+regular expression is invalid if it has:
+
+          <ul>
+<li>a repetition operator first in the regular expression or just after a
+match-beginning-of-line, open-group, or alternation operator; or
+
+          <li>an alternation operator first or last in the regular expression, just
+before a match-end-of-line operator, or just after an alternation or
+open-group operator.
+
+     </ul>
+
+     <p>If this bit isn't set, then you can put the characters representing the
+repetition and alternation characters anywhere in a regular expression. 
+Whether or not they will in fact be operators in certain positions
+depends on other syntax bits.
+
+     <p><a name="index-RE_005fDOT_005fNEWLINE-12"></a><br><dt><code>RE_DOT_NEWLINE</code><dd>If this bit is set, then the match-any-character operator matches
+a newline; if this bit isn't set, then it doesn't.
+
+     <p><a name="index-RE_005fDOT_005fNOT_005fNULL-13"></a><br><dt><code>RE_DOT_NOT_NULL</code><dd>If this bit is set, then the match-any-character operator doesn't match
+a null character; if this bit isn't set, then it does.
+
+     <p><a name="index-RE_005fINTERVALS-14"></a><br><dt><code>RE_INTERVALS</code><dd>If this bit is set, then Regex recognizes interval operators; if this bit
+isn't set, then it doesn't.
+
+     <p><a name="index-RE_005fLIMITED_005fOPS-15"></a><br><dt><code>RE_LIMITED_OPS</code><dd>If this bit is set, then Regex doesn't recognize the match-one-or-more,
+match-zero-or-one or alternation operators; if this bit isn't set, then
+it does.
+
+     <p><a name="index-RE_005fNEWLINE_005fALT-16"></a><br><dt><code>RE_NEWLINE_ALT</code><dd>If this bit is set, then newline represents the alternation operator; if
+this bit isn't set, then newline is ordinary.
+
+     <p><a name="index-RE_005fNO_005fBK_005fBRACES-17"></a><br><dt><code>RE_NO_BK_BRACES</code><dd>If this bit is set, then <span class="samp">{</span> represents the open-interval operator
+and <span class="samp">}</span> represents the close-interval operator; if this bit isn't
+set, then <span class="samp">\{</span> represents the open-interval operator and
+<span class="samp">\}</span> represents the close-interval operator.  This bit is relevant
+only if <code>RE_INTERVALS</code> is set.
+
+     <p><a name="index-RE_005fNO_005fBK_005fPARENS-18"></a><br><dt><code>RE_NO_BK_PARENS</code><dd>If this bit is set, then <span class="samp">(</span> represents the open-group operator and
+<span class="samp">)</span> represents the close-group operator; if this bit isn't set, then
+<span class="samp">\(</span> represents the open-group operator and <span class="samp">\)</span> represents
+the close-group operator.
+
+     <p><a name="index-RE_005fNO_005fBK_005fREFS-19"></a><br><dt><code>RE_NO_BK_REFS</code><dd>If this bit is set, then Regex doesn't recognize <span class="samp">\</span><var>digit</var> as
+the back reference operator; if this bit isn't set, then it does.
+
+     <p><a name="index-RE_005fNO_005fBK_005fVBAR-20"></a><br><dt><code>RE_NO_BK_VBAR</code><dd>If this bit is set, then <span class="samp">|</span> represents the alternation operator;
+if this bit isn't set, then <span class="samp">\|</span> represents the alternation
+operator.  This bit is irrelevant if <code>RE_LIMITED_OPS</code> is set.
+
+     <p><a name="index-RE_005fNO_005fEMPTY_005fRANGES-21"></a><br><dt><code>RE_NO_EMPTY_RANGES</code><dd>If this bit is set, then a regular expression with a range whose ending
+point collates lower than its starting point is invalid; if this bit
+isn't set, then Regex considers such a range to be empty.
+
+     <p><a name="index-RE_005fUNMATCHED_005fRIGHT_005fPAREN_005fORD-22"></a><br><dt><code>RE_UNMATCHED_RIGHT_PAREN_ORD</code><dd>If this bit is set and the regular expression has no matching open-group
+operator, then Regex considers what would otherwise be a close-group
+operator (based on how <code>RE_NO_BK_PARENS</code> is set) to match <span class="samp">)</span>.
+
+  </dl>
+
+<div class="node">
+<p><hr>
+<a name="Predefined-Syntaxes"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Collating-Elements-vs_002e-Characters">Collating Elements vs. Characters</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Syntax-Bits">Syntax Bits</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Regular-Expression-Syntax">Regular Expression Syntax</a>
+<br>
+</div>
+
+<h3 class="section">2.2 Predefined Syntaxes</h3>
+
+<p>If you're programming with Regex, you can set a pattern buffer's
+(see <a href="#GNU-Pattern-Buffers">GNU Pattern Buffers</a>, and <a href="#POSIX-Pattern-Buffers">POSIX Pattern Buffers</a>)
+<code>syntax</code> field either to an arbitrary combination of syntax bits
+(see <a href="#Syntax-Bits">Syntax Bits</a>) or else to the configurations defined by Regex. 
+These configurations define the syntaxes used by certain
+programs&mdash;<span class="sc">gnu</span> Emacs,
+<a name="index-Emacs-23"></a><span class="sc">posix</span> Awk,
+<a name="index-POSIX-Awk-24"></a>traditional Awk,
+<a name="index-Awk-25"></a>Grep,
+<a name="index-Grep-26"></a><a name="index-Egrep-27"></a>Egrep&mdash;in addition to syntaxes for <span class="sc">posix</span> basic and extended
+regular expressions.
+
+  <p>The predefined syntaxes&ndash;taken directly from <span class="file">regex.h</span>&mdash;are:
+
+<pre class="example">     #define RE_SYNTAX_EMACS 0
+     
+     #define RE_SYNTAX_AWK                                                   \
+       (RE_BACKSLASH_ESCAPE_IN_LISTS | RE_DOT_NOT_NULL                       \
+        | RE_NO_BK_PARENS            | RE_NO_BK_REFS                         \
+        | RE_NO_BK_VBAR               | RE_NO_EMPTY_RANGES                   \
+        | RE_UNMATCHED_RIGHT_PAREN_ORD)
+     
+     #define RE_SYNTAX_POSIX_AWK                                             \
+       (RE_SYNTAX_POSIX_EXTENDED | RE_BACKSLASH_ESCAPE_IN_LISTS)
+     
+     #define RE_SYNTAX_GREP                                                  \
+       (RE_BK_PLUS_QM              | RE_CHAR_CLASSES                         \
+        | RE_HAT_LISTS_NOT_NEWLINE | RE_INTERVALS                            \
+        | RE_NEWLINE_ALT)
+     
+     #define RE_SYNTAX_EGREP                                                 \
+       (RE_CHAR_CLASSES        | RE_CONTEXT_INDEP_ANCHORS                    \
+        | RE_CONTEXT_INDEP_OPS | RE_HAT_LISTS_NOT_NEWLINE                    \
+        | RE_NEWLINE_ALT       | RE_NO_BK_PARENS                             \
+        | RE_NO_BK_VBAR)
+     
+     #define RE_SYNTAX_POSIX_EGREP                                           \
+       (RE_SYNTAX_EGREP | RE_INTERVALS | RE_NO_BK_BRACES)
+     
+     /* P1003.2/D11.2, section 4.20.7.1, lines 5078ff.  */
+     #define RE_SYNTAX_ED RE_SYNTAX_POSIX_BASIC
+     
+     #define RE_SYNTAX_SED RE_SYNTAX_POSIX_BASIC
+     
+     /* Syntax bits common to both basic and extended POSIX regex syntax.  */
+     #define _RE_SYNTAX_POSIX_COMMON                                         \
+       (RE_CHAR_CLASSES | RE_DOT_NEWLINE      | RE_DOT_NOT_NULL              \
+        | RE_INTERVALS  | RE_NO_EMPTY_RANGES)
+     
+     #define RE_SYNTAX_POSIX_BASIC                                           \
+       (_RE_SYNTAX_POSIX_COMMON | RE_BK_PLUS_QM)
+     
+     /* Differs from ..._POSIX_BASIC only in that RE_BK_PLUS_QM becomes
+        RE_LIMITED_OPS, i.e., \? \+ \| are not recognized.  Actually, this
+        isn't minimal, since other operators, such as \`, aren't disabled.  */
+     #define RE_SYNTAX_POSIX_MINIMAL_BASIC                                   \
+       (_RE_SYNTAX_POSIX_COMMON | RE_LIMITED_OPS)
+     
+     #define RE_SYNTAX_POSIX_EXTENDED                                        \
+       (_RE_SYNTAX_POSIX_COMMON | RE_CONTEXT_INDEP_ANCHORS                   \
+        | RE_CONTEXT_INDEP_OPS  | RE_NO_BK_BRACES                            \
+        | RE_NO_BK_PARENS       | RE_NO_BK_VBAR                              \
+        | RE_UNMATCHED_RIGHT_PAREN_ORD)
+     
+     /* Differs from ..._POSIX_EXTENDED in that RE_CONTEXT_INVALID_OPS
+        replaces RE_CONTEXT_INDEP_OPS and RE_NO_BK_REFS is added.  */
+     #define RE_SYNTAX_POSIX_MINIMAL_EXTENDED                                \
+       (_RE_SYNTAX_POSIX_COMMON  | RE_CONTEXT_INDEP_ANCHORS                  \
+        | RE_CONTEXT_INVALID_OPS | RE_NO_BK_BRACES                           \
+        | RE_NO_BK_PARENS        | RE_NO_BK_REFS                             \
+        | RE_NO_BK_VBAR          | RE_UNMATCHED_RIGHT_PAREN_ORD)
+</pre>
+  <div class="node">
+<p><hr>
+<a name="Collating-Elements-vs_002e-Characters"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#The-Backslash-Character">The Backslash Character</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Predefined-Syntaxes">Predefined Syntaxes</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Regular-Expression-Syntax">Regular Expression Syntax</a>
+<br>
+</div>
+
+<h3 class="section">2.3 Collating Elements vs. Characters</h3>
+
+<p><span class="sc">posix</span> generalizes the notion of a character to that of a
+collating element.  It defines a <dfn>collating element</dfn> to be &ldquo;a
+sequence of one or more bytes defined in the current collating sequence
+as a unit of collation.&rdquo;
+
+  <p>This generalizes the notion of a character in
+two ways.  First, a single character can map into two or more collating
+elements.  For example, the German
+collates as the collating element <span class="samp">s</span> followed by another collating
+element <span class="samp">s</span>.  Second, two or more characters can map into one
+collating element.  For example, the Spanish <span class="samp">ll</span> collates after
+<span class="samp">l</span> and before <span class="samp">m</span>.
+
+  <p>Since <span class="sc">posix</span>'s &ldquo;collating element&rdquo; preserves the essential idea of
+a &ldquo;character,&rdquo; we use the latter, more familiar, term in this document.
+
+<div class="node">
+<p><hr>
+<a name="The-Backslash-Character"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Collating-Elements-vs_002e-Characters">Collating Elements vs. Characters</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Regular-Expression-Syntax">Regular Expression Syntax</a>
+<br>
+</div>
+
+<h3 class="section">2.4 The Backslash Character</h3>
+
+<p><a name="index-_0040samp_007b_005c_007d-28"></a>The <span class="samp">\</span> character has one of four different meanings, depending on
+the context in which you use it and what syntax bits are set
+(see <a href="#Syntax-Bits">Syntax Bits</a>).  It can: 1) stand for itself, 2) quote the next
+character, 3) introduce an operator, or 4) do nothing.
+
+     <ol type=1 start=1>
+<li>It stands for itself inside a list
+(see <a href="#List-Operators">List Operators</a>) if the syntax bit
+<code>RE_BACKSLASH_ESCAPE_IN_LISTS</code> is not set.  For example, <span class="samp">[\]</span>
+would match <span class="samp">\</span>.
+
+     <li>It quotes (makes ordinary, if it's special) the next character when you
+use it either:
+
+          <ul>
+<li>outside a list,<a rel="footnote" href="#fn-1" name="fnd-1"><sup>1</sup></a> or
+
+          <li>inside a list and the syntax bit <code>RE_BACKSLASH_ESCAPE_IN_LISTS</code> is set.
+
+     </ul>
+
+     <li>It introduces an operator when followed by certain ordinary
+characters&mdash;sometimes only when certain syntax bits are set.  See the
+cases <code>RE_BK_PLUS_QM</code>, <code>RE_NO_BK_BRACES</code>, <code>RE_NO_BK_VAR</code>,
+<code>RE_NO_BK_PARENS</code>, <code>RE_NO_BK_REF</code> in <a href="#Syntax-Bits">Syntax Bits</a>.  Also:
+
+          <ul>
+<li><span class="samp">\b</span> represents the match-word-boundary operator
+(see <a href="#Match_002dword_002dboundary-Operator">Match-word-boundary Operator</a>).
+
+          <li><span class="samp">\B</span> represents the match-within-word operator
+(see <a href="#Match_002dwithin_002dword-Operator">Match-within-word Operator</a>).
+
+          <li><span class="samp">\&lt;</span> represents the match-beginning-of-word operator <br>
+(see <a href="#Match_002dbeginning_002dof_002dword-Operator">Match-beginning-of-word Operator</a>).
+
+          <li><span class="samp">\&gt;</span> represents the match-end-of-word operator
+(see <a href="#Match_002dend_002dof_002dword-Operator">Match-end-of-word Operator</a>).
+
+          <li><span class="samp">\w</span> represents the match-word-constituent operator
+(see <a href="#Match_002dword_002dconstituent-Operator">Match-word-constituent Operator</a>).
+
+          <li><span class="samp">\W</span> represents the match-non-word-constituent operator
+(see <a href="#Match_002dnon_002dword_002dconstituent-Operator">Match-non-word-constituent Operator</a>).
+
+          <li><span class="samp">\`</span> represents the match-beginning-of-buffer
+operator and <span class="samp">\'</span> represents the match-end-of-buffer operator
+(see <a href="#Buffer-Operators">Buffer Operators</a>).
+
+          <li>If Regex was compiled with the C preprocessor symbol <code>emacs</code>
+defined, then <span class="samp">\s</span><var>class</var> represents the match-syntactic-class
+operator and <span class="samp">\S</span><var>class</var> represents the
+match-not-syntactic-class operator (see <a href="#Syntactic-Class-Operators">Syntactic Class Operators</a>).
+
+     </ul>
+
+     <li>In all other cases, Regex ignores <span class="samp">\</span>.  For example,
+<span class="samp">\n</span> matches <span class="samp">n</span>.
+
+       </ol>
+
+<div class="node">
+<p><hr>
+<a name="Common-Operators"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#GNU-Operators">GNU Operators</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Regular-Expression-Syntax">Regular Expression Syntax</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">3 Common Operators</h2>
+
+<p>You compose regular expressions from operators.  In the following
+sections, we describe the regular expression operators specified by
+<span class="sc">posix</span>; <span class="sc">gnu</span> also uses these.  Most operators have more than one
+representation as characters.  See <a href="#Regular-Expression-Syntax">Regular Expression Syntax</a>, for
+what characters represent what operators under what circumstances.
+
+  <p>For most operators that can be represented in two ways, one
+representation is a single character and the other is that character
+preceded by <span class="samp">\</span>.  For example, either <span class="samp">(</span> or <span class="samp">\(</span>
+represents the open-group operator.  Which one does depends on the
+setting of a syntax bit, in this case <code>RE_NO_BK_PARENS</code>.  Why is
+this so?  Historical reasons dictate some of the varying
+representations, while <span class="sc">posix</span> dictates others.
+
+  <p>Finally, almost all characters lose any special meaning inside a list
+(see <a href="#List-Operators">List Operators</a>).
+
+<ul class="menu">
+<li><a accesskey="1" href="#Match_002dself-Operator">Match-self Operator</a>:                  Ordinary characters. 
+<li><a accesskey="2" href="#Match_002dany_002dcharacter-Operator">Match-any-character Operator</a>:         . 
+<li><a accesskey="3" href="#Concatenation-Operator">Concatenation Operator</a>:               Juxtaposition. 
+<li><a accesskey="4" href="#Repetition-Operators">Repetition Operators</a>:                 *  +  ? {}
+<li><a accesskey="5" href="#Alternation-Operator">Alternation Operator</a>:                 |
+<li><a accesskey="6" href="#List-Operators">List Operators</a>:                       [...]  [^...] 
+<li><a accesskey="7" href="#Grouping-Operators">Grouping Operators</a>:                   (...) 
+<li><a accesskey="8" href="#Back_002dreference-Operator">Back-reference Operator</a>:              \digit
+<li><a accesskey="9" href="#Anchoring-Operators">Anchoring Operators</a>:                  ^  $
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Match_002dself-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002dany_002dcharacter-Operator">Match-any-character Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Common-Operators">Common Operators</a>
+<br>
+</div>
+
+<h3 class="section">3.1 The Match-self Operator (<var>ordinary character</var>)</h3>
+
+<p>This operator matches the character itself.  All ordinary characters
+(see <a href="#Regular-Expression-Syntax">Regular Expression Syntax</a>) represent this operator.  For
+example, <span class="samp">f</span> is always an ordinary character, so the regular
+expression <span class="samp">f</span> matches only the string <span class="samp">f</span>.  In
+particular, it does <em>not</em> match the string <span class="samp">ff</span>.
+
+<div class="node">
+<p><hr>
+<a name="Match_002dany_002dcharacter-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Concatenation-Operator">Concatenation Operator</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002dself-Operator">Match-self Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Common-Operators">Common Operators</a>
+<br>
+</div>
+
+<h3 class="section">3.2 The Match-any-character Operator (<code>.</code>)</h3>
+
+<p><a name="index-_0040samp_007b_002e_007d-29"></a>
+This operator matches any single printing or nonprinting character
+except it won't match a:
+
+     <dl>
+<dt>newline<dd>if the syntax bit <code>RE_DOT_NEWLINE</code> isn't set.
+
+     <br><dt>null<dd>if the syntax bit <code>RE_DOT_NOT_NULL</code> is set.
+
+  </dl>
+
+  <p>The <span class="samp">.</span> (period) character represents this operator.  For example,
+<span class="samp">a.b</span> matches any three-character string beginning with <span class="samp">a</span>
+and ending with <span class="samp">b</span>.
+
+<div class="node">
+<p><hr>
+<a name="Concatenation-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Repetition-Operators">Repetition Operators</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002dany_002dcharacter-Operator">Match-any-character Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Common-Operators">Common Operators</a>
+<br>
+</div>
+
+<h3 class="section">3.3 The Concatenation Operator</h3>
+
+<p>This operator concatenates two regular expressions <var>a</var> and <var>b</var>. 
+No character represents this operator; you simply put <var>b</var> after
+<var>a</var>.  The result is a regular expression that will match a string if
+<var>a</var> matches its first part and <var>b</var> matches the rest.  For
+example, <span class="samp">xy</span> (two match-self operators) matches <span class="samp">xy</span>.
+
+<div class="node">
+<p><hr>
+<a name="Repetition-Operators"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Alternation-Operator">Alternation Operator</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Concatenation-Operator">Concatenation Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Common-Operators">Common Operators</a>
+<br>
+</div>
+
+<h3 class="section">3.4 Repetition Operators</h3>
+
+<p>Repetition operators repeat the preceding regular expression a specified
+number of times.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Match_002dzero_002dor_002dmore-Operator">Match-zero-or-more Operator</a>:   *
+<li><a accesskey="2" href="#Match_002done_002dor_002dmore-Operator">Match-one-or-more Operator</a>:    +
+<li><a accesskey="3" href="#Match_002dzero_002dor_002done-Operator">Match-zero-or-one Operator</a>:    ? 
+<li><a accesskey="4" href="#Interval-Operators">Interval Operators</a>:            {}
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Match_002dzero_002dor_002dmore-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002done_002dor_002dmore-Operator">Match-one-or-more Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Repetition-Operators">Repetition Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">3.4.1 The Match-zero-or-more Operator (<code>*</code>)</h4>
+
+<p><a name="index-_0040samp_007b_002a_007d-30"></a>
+This operator repeats the smallest possible preceding regular expression
+as many times as necessary (including zero) to match the pattern. 
+<span class="samp">*</span> represents this operator.  For example, <span class="samp">o*</span>
+matches any string made up of zero or more <span class="samp">o</span>s.  Since this
+operator operates on the smallest preceding regular expression,
+<span class="samp">fo*</span> has a repeating <span class="samp">o</span>, not a repeating <span class="samp">fo</span>.  So,
+<span class="samp">fo*</span> matches <span class="samp">f</span>, <span class="samp">fo</span>, <span class="samp">foo</span>, and so on.
+
+  <p>Since the match-zero-or-more operator is a suffix operator, it may be
+useless as such when no regular expression precedes it.  This is the
+case when it:
+
+     <ul>
+<li>is first in a regular expression, or
+
+     <li>follows a match-beginning-of-line, open-group, or alternation
+operator.
+
+  </ul>
+
+<p class="noindent">Three different things can happen in these cases:
+
+     <ol type=1 start=1>
+<li>If the syntax bit <code>RE_CONTEXT_INVALID_OPS</code> is set, then the
+regular expression is invalid.
+
+     <li>If <code>RE_CONTEXT_INVALID_OPS</code> isn't set, but
+<code>RE_CONTEXT_INDEP_OPS</code> is, then <span class="samp">*</span> represents the
+match-zero-or-more operator (which then operates on the empty string).
+
+     <li>Otherwise, <span class="samp">*</span> is ordinary.
+
+       </ol>
+
+  <p><a name="index-backtracking-31"></a>The matcher processes a match-zero-or-more operator by first matching as
+many repetitions of the smallest preceding regular expression as it can. 
+Then it continues to match the rest of the pattern.
+
+  <p>If it can't match the rest of the pattern, it backtracks (as many times
+as necessary), each time discarding one of the matches until it can
+either match the entire pattern or be certain that it cannot get a
+match.  For example, when matching <span class="samp">ca*ar</span> against <span class="samp">caaar</span>,
+the matcher first matches all three <span class="samp">a</span>s of the string with the
+<span class="samp">a*</span> of the regular expression.  However, it cannot then match the
+final <span class="samp">ar</span> of the regular expression against the final <span class="samp">r</span> of
+the string.  So it backtracks, discarding the match of the last <span class="samp">a</span>
+in the string.  It can then match the remaining <span class="samp">ar</span>.
+
+<div class="node">
+<p><hr>
+<a name="Match_002done_002dor_002dmore-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002dzero_002dor_002done-Operator">Match-zero-or-one Operator</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002dzero_002dor_002dmore-Operator">Match-zero-or-more Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Repetition-Operators">Repetition Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">3.4.2 The Match-one-or-more Operator (<code>+</code> or <code>\+</code>)</h4>
+
+<p><a name="index-_0040samp_007b_002b_007d-32"></a>
+If the syntax bit <code>RE_LIMITED_OPS</code> is set, then Regex doesn't recognize
+this operator.  Otherwise, if the syntax bit <code>RE_BK_PLUS_QM</code> isn't
+set, then <span class="samp">+</span> represents this operator; if it is, then <span class="samp">\+</span>
+does.
+
+  <p>This operator is similar to the match-zero-or-more operator except that
+it repeats the preceding regular expression at least once;
+see <a href="#Match_002dzero_002dor_002dmore-Operator">Match-zero-or-more Operator</a>, for what it operates on, how some
+syntax bits affect it, and how Regex backtracks to match it.
+
+  <p>For example, supposing that <span class="samp">+</span> represents the match-one-or-more
+operator; then <span class="samp">ca+r</span> matches, e.g., <span class="samp">car</span> and
+<span class="samp">caaaar</span>, but not <span class="samp">cr</span>.
+
+<div class="node">
+<p><hr>
+<a name="Match_002dzero_002dor_002done-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Interval-Operators">Interval Operators</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002done_002dor_002dmore-Operator">Match-one-or-more Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Repetition-Operators">Repetition Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">3.4.3 The Match-zero-or-one Operator (<code>?</code> or <code>\?</code>)</h4>
+
+<p><a name="index-_0040samp_007b_003f_007d-33"></a>
+If the syntax bit <code>RE_LIMITED_OPS</code> is set, then Regex doesn't
+recognize this operator.  Otherwise, if the syntax bit
+<code>RE_BK_PLUS_QM</code> isn't set, then <span class="samp">?</span> represents this operator;
+if it is, then <span class="samp">\?</span> does.
+
+  <p>This operator is similar to the match-zero-or-more operator except that
+it repeats the preceding regular expression once or not at all;
+see <a href="#Match_002dzero_002dor_002dmore-Operator">Match-zero-or-more Operator</a>, to see what it operates on, how
+some syntax bits affect it, and how Regex backtracks to match it.
+
+  <p>For example, supposing that <span class="samp">?</span> represents the match-zero-or-one
+operator; then <span class="samp">ca?r</span> matches both <span class="samp">car</span> and <span class="samp">cr</span>, but
+nothing else.
+
+<div class="node">
+<p><hr>
+<a name="Interval-Operators"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002dzero_002dor_002done-Operator">Match-zero-or-one Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Repetition-Operators">Repetition Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">3.4.4 Interval Operators (<code>{</code> <small class="dots">...</small> <code>}</code> or <code>\{</code> <small class="dots">...</small> <code>\}</code>)</h4>
+
+<p><a name="index-interval-expression-34"></a><a name="index-_0040samp_007b_0040_007b_007d-35"></a><a name="index-_0040samp_007b_0040_007d_007d-36"></a><a name="index-_0040samp_007b_005c_0040_007b_007d-37"></a><a name="index-_0040samp_007b_005c_0040_007d_007d-38"></a>
+If the syntax bit <code>RE_INTERVALS</code> is set, then Regex recognizes
+<dfn>interval expressions</dfn>.  They repeat the smallest possible preceding
+regular expression a specified number of times.
+
+  <p>If the syntax bit <code>RE_NO_BK_BRACES</code> is set, <span class="samp">{</span> represents
+the <dfn>open-interval operator</dfn> and <span class="samp">}</span> represents the
+<dfn>close-interval operator</dfn> ; otherwise, <span class="samp">\{</span> and <span class="samp">\}</span> do.
+
+  <p>Specifically, supposing that <span class="samp">{</span> and <span class="samp">}</span> represent the
+open-interval and close-interval operators; then:
+
+     <dl>
+<dt><code>{</code><var>count</var><code>}</code><dd>matches exactly <var>count</var> occurrences of the preceding regular
+expression.
+
+     <br><dt><code>{</code><var>min</var><code>,}</code><dd>matches <var>min</var> or more occurrences of the preceding regular
+expression.
+
+     <br><dt><code>{</code><var>min</var><code>, </code><var>max</var><code>}</code><dd>matches at least <var>min</var> but no more than <var>max</var> occurrences of
+the preceding regular expression.
+
+  </dl>
+
+  <p>The interval expression (but not necessarily the regular expression that
+contains it) is invalid if:
+
+     <ul>
+<li><var>min</var> is greater than <var>max</var>, or
+
+     <li>any of <var>count</var>, <var>min</var>, or <var>max</var> are outside the range
+zero to <code>RE_DUP_MAX</code> (which symbol <span class="file">regex.h</span>
+defines).
+
+  </ul>
+
+  <p>If the interval expression is invalid and the syntax bit
+<code>RE_NO_BK_BRACES</code> is set, then Regex considers all the
+characters in the would-be interval to be ordinary.  If that bit
+isn't set, then the regular expression is invalid.
+
+  <p>If the interval expression is valid but there is no preceding regular
+expression on which to operate, then if the syntax bit
+<code>RE_CONTEXT_INVALID_OPS</code> is set, the regular expression is invalid. 
+If that bit isn't set, then Regex considers all the characters&mdash;other
+than backslashes, which it ignores&mdash;in the would-be interval to be
+ordinary.
+
+<div class="node">
+<p><hr>
+<a name="Alternation-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#List-Operators">List Operators</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Repetition-Operators">Repetition Operators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Common-Operators">Common Operators</a>
+<br>
+</div>
+
+<h3 class="section">3.5 The Alternation Operator (<code>|</code> or <code>\|</code>)</h3>
+
+<p><a name="index-_0040samp_007b_007c_007d-39"></a><a name="index-_0040samp_007b_005c_007c_007d-40"></a><a name="index-alternation-operator-41"></a><a name="index-or-operator-42"></a>
+If the syntax bit <code>RE_LIMITED_OPS</code> is set, then Regex doesn't
+recognize this operator.  Otherwise, if the syntax bit
+<code>RE_NO_BK_VBAR</code> is set, then <span class="samp">|</span> represents this operator;
+otherwise, <span class="samp">\|</span> does.
+
+  <p>Alternatives match one of a choice of regular expressions:
+if you put the character(s) representing the alternation operator between
+any two regular expressions <var>a</var> and <var>b</var>, the result matches
+the union of the strings that <var>a</var> and <var>b</var> match.  For
+example, supposing that <span class="samp">|</span> is the alternation operator, then
+<span class="samp">foo|bar|quux</span> would match any of <span class="samp">foo</span>, <span class="samp">bar</span> or
+<span class="samp">quux</span>.
+
+  <p>The alternation operator operates on the <em>largest</em> possible
+surrounding regular expressions.  (Put another way, it has the lowest
+precedence of any regular expression operator.) 
+Thus, the only way you can
+delimit its arguments is to use grouping.  For example, if <span class="samp">(</span> and
+<span class="samp">)</span> are the open and close-group operators, then <span class="samp">fo(o|b)ar</span>
+would match either <span class="samp">fooar</span> or <span class="samp">fobar</span>.  (<span class="samp">foo|bar</span> would
+match <span class="samp">foo</span> or <span class="samp">bar</span>.)
+
+  <p><a name="index-backtracking-43"></a>The matcher usually tries all combinations of alternatives so as to
+match the longest possible string.  For example, when matching
+<span class="samp">(fooq|foo)*(qbarquux|bar)</span> against <span class="samp">fooqbarquux</span>, it cannot
+take, say, the first (&ldquo;depth-first&rdquo;) combination it could match, since
+then it would be content to match just <span class="samp">fooqbar</span>.
+
+<!-- xx something about leftmost-longest -->
+<div class="node">
+<p><hr>
+<a name="List-Operators"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Grouping-Operators">Grouping Operators</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Alternation-Operator">Alternation Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Common-Operators">Common Operators</a>
+<br>
+</div>
+
+<h3 class="section">3.6 List Operators (<code>[</code> <small class="dots">...</small> <code>]</code> and <code>[^</code> <small class="dots">...</small> <code>]</code>)</h3>
+
+<p><a name="index-matching-list-44"></a><a name="index-_0040samp_007b_005b_007d-45"></a><a name="index-_0040samp_007b_005d_007d-46"></a><a name="index-_0040samp_007b_005e_007d-47"></a><a name="index-_0040samp_007b_002d_007d-48"></a><a name="index-_0040samp_007b_005c_007d-49"></a><a name="index-_0040samp_007b_005b_005e_007d-50"></a><a name="index-nonmatching-list-51"></a><a name="index-matching-newline-52"></a><a name="index-bracket-expression-53"></a>
+<dfn>Lists</dfn>, also called <dfn>bracket expressions</dfn>, are a set of one or
+more items.  An <dfn>item</dfn> is a character,
+a character class expression, or a range expression.  The syntax bits
+affect which kinds of items you can put in a list.  We explain the last
+two items in subsections below.  Empty lists are invalid.
+
+  <p>A <dfn>matching list</dfn> matches a single character represented by one of
+the list items.  You form a matching list by enclosing one or more items
+within an <dfn>open-matching-list operator</dfn> (represented by <span class="samp">[</span>)
+and a <dfn>close-list operator</dfn> (represented by <span class="samp">]</span>).
+
+  <p>For example, <span class="samp">[ab]</span> matches either <span class="samp">a</span> or <span class="samp">b</span>. 
+<span class="samp">[ad]*</span> matches the empty string and any string composed of just
+<span class="samp">a</span>s and <span class="samp">d</span>s in any order.  Regex considers invalid a regular
+expression with a <span class="samp">[</span> but no matching
+<span class="samp">]</span>.
+
+  <p><dfn>Nonmatching lists</dfn> are similar to matching lists except that they
+match a single character <em>not</em> represented by one of the list
+items.  You use an <dfn>open-nonmatching-list operator</dfn> (represented by
+<span class="samp">[^</span><a rel="footnote" href="#fn-2" name="fnd-2"><sup>2</sup></a>) instead of an open-matching-list operator to start a
+nonmatching list.
+
+  <p>For example, <span class="samp">[^ab]</span> matches any character except <span class="samp">a</span> or
+<span class="samp">b</span>.
+
+  <p>If the <code>posix_newline</code> field in the pattern buffer (see <a href="#GNU-Pattern-Buffers">GNU Pattern Buffers</a> is set, then nonmatching lists do not match a newline.
+
+  <p>Most characters lose any special meaning inside a list.  The special
+characters inside a list follow.
+
+     <dl>
+<dt><span class="samp">]</span><dd>ends the list if it's not the first list item.  So, if you want to make
+the <span class="samp">]</span> character a list item, you must put it first.
+
+     <br><dt><span class="samp">\</span><dd>quotes the next character if the syntax bit <code>RE_BACKSLASH_ESCAPE_IN_LISTS</code> is
+set.
+
+     <br><dt><span class="samp">[:</span><dd>represents the open-character-class operator (see <a href="#Character-Class-Operators">Character Class Operators</a>) if the syntax bit <code>RE_CHAR_CLASSES</code> is set and what
+follows is a valid character class expression.
+
+     <br><dt><span class="samp">:]</span><dd>represents the close-character-class operator if the syntax bit
+<code>RE_CHAR_CLASSES</code> is set and what precedes it is an
+open-character-class operator followed by a valid character class name.
+
+     <br><dt><span class="samp">-</span><dd>represents the range operator (see <a href="#Range-Operator">Range Operator</a>) if it's
+not first or last in a list or the ending point of a range.
+
+  </dl>
+
+<p class="noindent">All other characters are ordinary.  For example, <span class="samp">[.*]</span> matches
+<span class="samp">.</span> and <span class="samp">*</span>.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Character-Class-Operators">Character Class Operators</a>:    [:class:]
+<li><a accesskey="2" href="#Range-Operator">Range Operator</a>:           start-end
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Character-Class-Operators"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Range-Operator">Range Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#List-Operators">List Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">3.6.1 Character Class Operators (<code>[:</code> <small class="dots">...</small> <code>:]</code>)</h4>
+
+<p><a name="index-character-classes-54"></a><a name="index-_0040samp_007b_005b_003a_007d-in-regex-55"></a><a name="index-_0040samp_007b_003a_005d_007d-in-regex-56"></a>
+If the syntax bit <code>RE_CHARACTER_CLASSES</code> is set, then Regex
+recognizes character class expressions inside lists.  A <dfn>character
+class expression</dfn> matches one character from a given class.  You form a
+character class expression by putting a character class name between an
+<dfn>open-character-class operator</dfn> (represented by <span class="samp">[:</span>) and a
+<dfn>close-character-class operator</dfn> (represented by <span class="samp">:]</span>).  The
+character class names and their meanings are:
+
+     <dl>
+<dt><code>alnum</code><dd>letters and digits
+
+     <br><dt><code>alpha</code><dd>letters
+
+     <br><dt><code>blank</code><dd>system-dependent; for <span class="sc">gnu</span>, a space or tab
+
+     <br><dt><code>cntrl</code><dd>control characters (in the <span class="sc">ascii</span> encoding, code 0177 and codes
+less than 040)
+
+     <br><dt><code>digit</code><dd>digits
+
+     <br><dt><code>graph</code><dd>same as <code>print</code> except omits space
+
+     <br><dt><code>lower</code><dd>lowercase letters
+
+     <br><dt><code>print</code><dd>printable characters (in the <span class="sc">ascii</span> encoding, space
+tilde&mdash;codes 040 through 0176)
+
+     <br><dt><code>punct</code><dd>neither control nor alphanumeric characters
+
+     <br><dt><code>space</code><dd>space, carriage return, newline, vertical tab, and form feed
+
+     <br><dt><code>upper</code><dd>uppercase letters
+
+     <br><dt><code>xdigit</code><dd>hexadecimal digits: <code>0</code>&ndash;<code>9</code>, <code>a</code>&ndash;<code>f</code>, <code>A</code>&ndash;<code>F</code>
+
+  </dl>
+
+<p class="noindent">These correspond to the definitions in the C library's <span class="file">&lt;ctype.h&gt;</span>
+facility.  For example, <span class="samp">[:alpha:]</span> corresponds to the standard
+facility <code>isalpha</code>.  Regex recognizes character class expressions
+only inside of lists; so <span class="samp">[[:alpha:]]</span> matches any letter, but
+<span class="samp">[:alpha:]</span> outside of a bracket expression and not followed by a
+repetition operator matches just itself.
+
+<div class="node">
+<p><hr>
+<a name="Range-Operator"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Character-Class-Operators">Character Class Operators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#List-Operators">List Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">3.6.2 The Range Operator (<code>-</code>)</h4>
+
+<p>Regex recognizes <dfn>range expressions</dfn> inside a list. They represent
+those characters
+that fall between two elements in the current collating sequence.  You
+form a range expression by putting a <dfn>range operator</dfn> between two
+characters.<a rel="footnote" href="#fn-3" name="fnd-3"><sup>3</sup></a> <span class="samp">-</span> represents the range operator.  For example,
+<span class="samp">a-f</span> within a list represents all the characters from <span class="samp">a</span>
+through <span class="samp">f</span>
+inclusively.
+
+  <p>If the syntax bit <code>RE_NO_EMPTY_RANGES</code> is set, then if the range's
+ending point collates less than its starting point, the range (and the
+regular expression containing it) is invalid.  For example, the regular
+expression <span class="samp">[z-a]</span> would be invalid.  If this bit isn't set, then
+Regex considers such a range to be empty.
+
+  <p>Since <span class="samp">-</span> represents the range operator, if you want to make a
+<span class="samp">-</span> character itself
+a list item, you must do one of the following:
+
+     <ul>
+<li>Put the <span class="samp">-</span> either first or last in the list.
+
+     <li>Include a range whose starting point collates strictly lower than
+<span class="samp">-</span> and whose ending point collates equal or higher.  Unless a
+range is the first item in a list, a <span class="samp">-</span> can't be its starting
+point, but <em>can</em> be its ending point.  That is because Regex
+considers <span class="samp">-</span> to be the range operator unless it is preceded by
+another <span class="samp">-</span>.  For example, in the <span class="sc">ascii</span> encoding, <span class="samp">)</span>,
+<span class="samp">*</span>, <span class="samp">+</span>, <span class="samp">,</span>, <span class="samp">-</span>, <span class="samp">.</span>, and <span class="samp">/</span> are
+contiguous characters in the collating sequence.  You might think that
+<span class="samp">[)-+--/]</span> has two ranges: <span class="samp">)-+</span> and <span class="samp">--/</span>.  Rather, it
+has the ranges <span class="samp">)-+</span> and <span class="samp">+--</span>, plus the character <span class="samp">/</span>, so
+it matches, e.g., <span class="samp">,</span>, not <span class="samp">.</span>.
+
+     <li>Put a range whose starting point is <span class="samp">-</span> first in the list.
+
+  </ul>
+
+  <p>For example, <span class="samp">[-a-z]</span> matches a lowercase letter or a hyphen (in
+English, in <span class="sc">ascii</span>).
+
+<div class="node">
+<p><hr>
+<a name="Grouping-Operators"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Back_002dreference-Operator">Back-reference Operator</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#List-Operators">List Operators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Common-Operators">Common Operators</a>
+<br>
+</div>
+
+<h3 class="section">3.7 Grouping Operators (<code>(</code> <small class="dots">...</small> <code>)</code> or <code>\(</code> <small class="dots">...</small> <code>\)</code>)</h3>
+
+<p><a name="index-_0028-57"></a><a name="index-_0029-58"></a><a name="index-_005c_0028-59"></a><a name="index-_005c_0029-60"></a><a name="index-grouping-61"></a><a name="index-subexpressions-62"></a><a name="index-parenthesizing-63"></a>
+A <dfn>group</dfn>, also known as a <dfn>subexpression</dfn>, consists of an
+<dfn>open-group operator</dfn>, any number of other operators, and a
+<dfn>close-group operator</dfn>.  Regex treats this sequence as a unit, just
+as mathematics and programming languages treat a parenthesized
+expression as a unit.
+
+  <p>Therefore, using <dfn>groups</dfn>, you can:
+
+     <ul>
+<li>delimit the argument(s) to an alternation operator (see <a href="#Alternation-Operator">Alternation Operator</a>) or a repetition operator (see <a href="#Repetition-Operators">Repetition Operators</a>).
+
+     <li>keep track of the indices of the substring that matched a given group. 
+See <a href="#Using-Registers">Using Registers</a>, for a precise explanation. 
+This lets you:
+
+          <ul>
+<li>use the back-reference operator (see <a href="#Back_002dreference-Operator">Back-reference Operator</a>).
+
+          <li>use registers (see <a href="#Using-Registers">Using Registers</a>).
+
+     </ul>
+
+  </ul>
+
+  <p>If the syntax bit <code>RE_NO_BK_PARENS</code> is set, then <span class="samp">(</span> represents
+the open-group operator and <span class="samp">)</span> represents the
+close-group operator; otherwise, <span class="samp">\(</span> and <span class="samp">\)</span> do.
+
+  <p>If the syntax bit <code>RE_UNMATCHED_RIGHT_PAREN_ORD</code> is set and a
+close-group operator has no matching open-group operator, then Regex
+considers it to match <span class="samp">)</span>.
+
+<div class="node">
+<p><hr>
+<a name="Back_002dreference-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Anchoring-Operators">Anchoring Operators</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Grouping-Operators">Grouping Operators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Common-Operators">Common Operators</a>
+<br>
+</div>
+
+<h3 class="section">3.8 The Back-reference Operator (<dfn>\</dfn><var>digit</var>)</h3>
+
+<p><a name="index-back-references-64"></a>
+If the syntax bit <code>RE_NO_BK_REF</code> isn't set, then Regex recognizes
+back references.  A back reference matches a specified preceding group. 
+The back reference operator is represented by <span class="samp">\</span><var>digit</var>
+anywhere after the end of a regular expression's <var>digit</var>-th<!-- /@w -->
+group (see <a href="#Grouping-Operators">Grouping Operators</a>).
+
+  <p><var>digit</var> must be between <span class="samp">1</span> and <span class="samp">9</span>.  The matcher assigns
+numbers 1 through 9 to the first nine groups it encounters.  By using
+one of <span class="samp">\1</span> through <span class="samp">\9</span> after the corresponding group's
+close-group operator, you can match a substring identical to the
+one that the group does.
+
+  <p>Back references match according to the following (in all examples below,
+<span class="samp">(</span> represents the open-group, <span class="samp">)</span> the close-group, <span class="samp">{</span>
+the open-interval and <span class="samp">}</span> the close-interval operator):
+
+     <ul>
+<li>If the group matches a substring, the back reference matches an
+identical substring.  For example, <span class="samp">(a)\1</span> matches <span class="samp">aa</span> and
+<span class="samp">(bana)na\1bo\1</span> matches <span class="samp">bananabanabobana</span>.  Likewise,
+<span class="samp">(.*)\1</span> matches any (newline-free if the syntax bit
+<code>RE_DOT_NEWLINE</code> isn't set) string that is composed of two
+identical halves; the <span class="samp">(.*)</span> matches the first half and the
+<span class="samp">\1</span> matches the second half.
+
+     <li>If the group matches more than once (as it might if followed
+by, e.g., a repetition operator), then the back reference matches the
+substring the group <em>last</em> matched.  For example,
+<span class="samp">((a*)b)*\1\2</span> matches <span class="samp">aabababa</span>; first group&nbsp;1<!-- /@w --> (the
+outer one) matches <span class="samp">aab</span> and group&nbsp;2<!-- /@w --> (the inner one) matches
+<span class="samp">aa</span>.  Then group&nbsp;1<!-- /@w --> matches <span class="samp">ab</span> and group&nbsp;2<!-- /@w --> matches
+<span class="samp">a</span>.  So, <span class="samp">\1</span> matches <span class="samp">ab</span> and <span class="samp">\2</span> matches
+<span class="samp">a</span>.
+
+     <li>If the group doesn't participate in a match, i.e., it is part of an
+alternative not taken or a repetition operator allows zero repetitions
+of it, then the back reference makes the whole match fail.  For example,
+<span class="samp">(one()|two())-and-(three\2|four\3)</span> matches <span class="samp">one-and-three</span>
+and <span class="samp">two-and-four</span>, but not <span class="samp">one-and-four</span> or
+<span class="samp">two-and-three</span>.  For example, if the pattern matches
+<span class="samp">one-and-</span>, then its group&nbsp;2<!-- /@w --> matches the empty string and its
+group&nbsp;3<!-- /@w --> doesn't participate in the match.  So, if it then matches
+<span class="samp">four</span>, then when it tries to back reference group&nbsp;3<!-- /@w -->&mdash;which it
+will attempt to do because <span class="samp">\3</span> follows the <span class="samp">four</span>&mdash;the match
+will fail because group&nbsp;3<!-- /@w --> didn't participate in the match.
+
+  </ul>
+
+  <p>You can use a back reference as an argument to a repetition operator.  For
+example, <span class="samp">(a(b))\2*</span> matches <span class="samp">a</span> followed by two or more
+<span class="samp">b</span>s.  Similarly, <span class="samp">(a(b))\2{3}</span> matches <span class="samp">abbbb</span>.
+
+  <p>If there is no preceding <var>digit</var>-th<!-- /@w --> subexpression, the regular
+expression is invalid.
+
+<div class="node">
+<p><hr>
+<a name="Anchoring-Operators"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Back_002dreference-Operator">Back-reference Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Common-Operators">Common Operators</a>
+<br>
+</div>
+
+<h3 class="section">3.9 Anchoring Operators</h3>
+
+<p><a name="index-anchoring-65"></a><a name="index-regexp-anchoring-66"></a>
+These operators can constrain a pattern to match only at the beginning or
+end of the entire string or at the beginning or end of a line.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a>:   ^
+<li><a accesskey="2" href="#Match_002dend_002dof_002dline-Operator">Match-end-of-line Operator</a>:         $
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Match_002dbeginning_002dof_002dline-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002dend_002dof_002dline-Operator">Match-end-of-line Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Anchoring-Operators">Anchoring Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">3.9.1 The Match-beginning-of-line Operator (<code>^</code>)</h4>
+
+<p><a name="index-_005e-67"></a><a name="index-beginning_002dof_002dline-operator-68"></a><a name="index-anchors-69"></a>
+This operator can match the empty string either at the beginning of the
+string or after a newline character.  Thus, it is said to <dfn>anchor</dfn>
+the pattern to the beginning of a line.
+
+  <p>In the cases following, <span class="samp">^</span> represents this operator.  (Otherwise,
+<span class="samp">^</span> is ordinary.)
+
+     <ul>
+<li>It (the <span class="samp">^</span>) is first in the pattern, as in <span class="samp">^foo</span>.
+
+     <p><a name="index-RE_005fCONTEXT_005fINDEP_005fANCHORS-_0040r_007b_0028and-_0040samp_007b_005e_007d_0029_007d-70"></a><li>The syntax bit <code>RE_CONTEXT_INDEP_ANCHORS</code> is set, and it is outside
+a bracket expression.
+
+     <p><a name="index-open_002dgroup-operator-and-_0040samp_007b_005e_007d-71"></a><a name="index-alternation-operator-and-_0040samp_007b_005e_007d-72"></a><li>It follows an open-group or alternation operator, as in <span class="samp">a\(^b\)</span>
+and <span class="samp">a\|^b</span>.  See <a href="#Grouping-Operators">Grouping Operators</a>, and <a href="#Alternation-Operator">Alternation Operator</a>.
+
+  </ul>
+
+  <p>These rules imply that some valid patterns containing <span class="samp">^</span> cannot be
+matched; for example, <span class="samp">foo^bar</span> if <code>RE_CONTEXT_INDEP_ANCHORS</code>
+is set.
+
+  <p><a name="index-not_005fbol-_0040r_007bfield-in-pattern-buffer_007d-73"></a>If the <code>not_bol</code> field is set in the pattern buffer (see <a href="#GNU-Pattern-Buffers">GNU Pattern Buffers</a>), then <span class="samp">^</span> fails to match at the beginning of the
+string.  See <a href="#POSIX-Matching">POSIX Matching</a>, for when you might find this useful.
+
+  <p><a name="index-newline_005fanchor-_0040r_007bfield-in-pattern-buffer_007d-74"></a>If the <code>newline_anchor</code> field is set in the pattern buffer, then
+<span class="samp">^</span> fails to match after a newline.  This is useful when you do not
+regard the string to be matched as broken into lines.
+
+<div class="node">
+<p><hr>
+<a name="Match_002dend_002dof_002dline-Operator"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Anchoring-Operators">Anchoring Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">3.9.2 The Match-end-of-line Operator (<code>$</code>)</h4>
+
+<p><a name="index-_0024-75"></a><a name="index-end_002dof_002dline-operator-76"></a><a name="index-anchors-77"></a>
+This operator can match the empty string either at the end of
+the string or before a newline character in the string.  Thus, it is
+said to <dfn>anchor</dfn> the pattern to the end of a line.
+
+  <p>It is always represented by <span class="samp">$</span>.  For example, <span class="samp">foo$</span> usually
+matches, e.g., <span class="samp">foo</span> and, e.g., the first three characters of
+<span class="samp">foo\nbar</span>.
+
+  <p>Its interaction with the syntax bits and pattern buffer fields is
+exactly the dual of <span class="samp">^</span>'s; see the previous section.  (That is,
+&ldquo;beginning&rdquo; becomes &ldquo;end&rdquo;, &ldquo;next&rdquo; becomes &ldquo;previous&rdquo;, and
+&ldquo;after&rdquo; becomes &ldquo;before&rdquo;.)
+
+<div class="node">
+<p><hr>
+<a name="GNU-Operators"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#GNU-Emacs-Operators">GNU Emacs Operators</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Common-Operators">Common Operators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">4 GNU Operators</h2>
+
+<p>Following are operators that <span class="sc">gnu</span> defines (and <span class="sc">posix</span> doesn't).
+
+<ul class="menu">
+<li><a accesskey="1" href="#Word-Operators">Word Operators</a>
+<li><a accesskey="2" href="#Buffer-Operators">Buffer Operators</a>
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Word-Operators"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Buffer-Operators">Buffer Operators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#GNU-Operators">GNU Operators</a>
+<br>
+</div>
+
+<h3 class="section">4.1 Word Operators</h3>
+
+<p>The operators in this section require Regex to recognize parts of words. 
+Regex uses a syntax table to determine whether or not a character is
+part of a word, i.e., whether or not it is <dfn>word-constituent</dfn>.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Non_002dEmacs-Syntax-Tables">Non-Emacs Syntax Tables</a>
+<li><a accesskey="2" href="#Match_002dword_002dboundary-Operator">Match-word-boundary Operator</a>:         \b
+<li><a accesskey="3" href="#Match_002dwithin_002dword-Operator">Match-within-word Operator</a>:           \B
+<li><a accesskey="4" href="#Match_002dbeginning_002dof_002dword-Operator">Match-beginning-of-word Operator</a>:     \&lt;
+<li><a accesskey="5" href="#Match_002dend_002dof_002dword-Operator">Match-end-of-word Operator</a>:           \&gt;
+<li><a accesskey="6" href="#Match_002dword_002dconstituent-Operator">Match-word-constituent Operator</a>:      \w
+<li><a accesskey="7" href="#Match_002dnon_002dword_002dconstituent-Operator">Match-non-word-constituent Operator</a>:  \W
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Non_002dEmacs-Syntax-Tables"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002dword_002dboundary-Operator">Match-word-boundary Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Word-Operators">Word Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">4.1.1 Non-Emacs Syntax Tables</h4>
+
+<p>A <dfn>syntax table</dfn> is an array indexed by the characters in your
+character set.  In the <span class="sc">ascii</span> encoding, therefore, a syntax table
+has 256 elements.  Regex always uses a <code>char *</code> variable
+<code>re_syntax_table</code> as its syntax table.  In some cases, it
+initializes this variable and in others it expects you to initialize it.
+
+     <ul>
+<li>If Regex is compiled with the preprocessor symbols <code>emacs</code> and
+<code>SYNTAX_TABLE</code> both undefined, then Regex allocates
+<code>re_syntax_table</code> and initializes an element <var>i</var> either to
+<code>Sword</code> (which it defines) if <var>i</var> is a letter, number, or
+<span class="samp">_</span>, or to zero if it's not.
+
+     <li>If Regex is compiled with <code>emacs</code> undefined but <code>SYNTAX_TABLE</code>
+defined, then Regex expects you to define a <code>char *</code> variable
+<code>re_syntax_table</code> to be a valid syntax table.
+
+     <li>See <a href="#Emacs-Syntax-Tables">Emacs Syntax Tables</a>, for what happens when Regex is compiled with
+the preprocessor symbol <code>emacs</code> defined.
+
+  </ul>
+
+<div class="node">
+<p><hr>
+<a name="Match_002dword_002dboundary-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002dwithin_002dword-Operator">Match-within-word Operator</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Non_002dEmacs-Syntax-Tables">Non-Emacs Syntax Tables</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Word-Operators">Word Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">4.1.2 The Match-word-boundary Operator (<code>\b</code>)</h4>
+
+<p><a name="index-_0040samp_007b_005cb_007d-78"></a><a name="index-word-boundaries_002c-matching-79"></a>
+This operator (represented by <span class="samp">\b</span>) matches the empty string at
+either the beginning or the end of a word.  For example, <span class="samp">\brat\b</span>
+matches the separate word <span class="samp">rat</span>.
+
+<div class="node">
+<p><hr>
+<a name="Match_002dwithin_002dword-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002dbeginning_002dof_002dword-Operator">Match-beginning-of-word Operator</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002dword_002dboundary-Operator">Match-word-boundary Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Word-Operators">Word Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">4.1.3 The Match-within-word Operator (<code>\B</code>)</h4>
+
+<p><a name="index-_0040samp_007b_005cB_007d-80"></a>
+This operator (represented by <span class="samp">\B</span>) matches the empty string within
+a word. For example, <span class="samp">c\Brat\Be</span> matches <span class="samp">crate</span>, but
+<span class="samp">dirty \Brat</span> doesn't match <span class="samp">dirty rat</span>.
+
+<div class="node">
+<p><hr>
+<a name="Match_002dbeginning_002dof_002dword-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002dend_002dof_002dword-Operator">Match-end-of-word Operator</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002dwithin_002dword-Operator">Match-within-word Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Word-Operators">Word Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">4.1.4 The Match-beginning-of-word Operator (<code>\&lt;</code>)</h4>
+
+<p><a name="index-_0040samp_007b_005c_003c_007d-81"></a>
+This operator (represented by <span class="samp">\&lt;</span>) matches the empty string at the
+beginning of a word.
+
+<div class="node">
+<p><hr>
+<a name="Match_002dend_002dof_002dword-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002dword_002dconstituent-Operator">Match-word-constituent Operator</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002dbeginning_002dof_002dword-Operator">Match-beginning-of-word Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Word-Operators">Word Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">4.1.5 The Match-end-of-word Operator (<code>\&gt;</code>)</h4>
+
+<p><a name="index-_0040samp_007b_005c_003e_007d-82"></a>
+This operator (represented by <span class="samp">\&gt;</span>) matches the empty string at the
+end of a word.
+
+<div class="node">
+<p><hr>
+<a name="Match_002dword_002dconstituent-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002dnon_002dword_002dconstituent-Operator">Match-non-word-constituent Operator</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002dend_002dof_002dword-Operator">Match-end-of-word Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Word-Operators">Word Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">4.1.6 The Match-word-constituent Operator (<code>\w</code>)</h4>
+
+<p><a name="index-_0040samp_007b_005cw_007d-83"></a>
+This operator (represented by <span class="samp">\w</span>) matches any word-constituent
+character.
+
+<div class="node">
+<p><hr>
+<a name="Match_002dnon_002dword_002dconstituent-Operator"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002dword_002dconstituent-Operator">Match-word-constituent Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Word-Operators">Word Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">4.1.7 The Match-non-word-constituent Operator (<code>\W</code>)</h4>
+
+<p><a name="index-_0040samp_007b_005cW_007d-84"></a>
+This operator (represented by <span class="samp">\W</span>) matches any character that is
+not word-constituent.
+
+<div class="node">
+<p><hr>
+<a name="Buffer-Operators"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Word-Operators">Word Operators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#GNU-Operators">GNU Operators</a>
+<br>
+</div>
+
+<h3 class="section">4.2 Buffer Operators</h3>
+
+<p>Following are operators which work on buffers.  In Emacs, a <dfn>buffer</dfn>
+is, naturally, an Emacs buffer.  For other programs, Regex considers the
+entire string to be matched as the buffer.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Match_002dbeginning_002dof_002dbuffer-Operator">Match-beginning-of-buffer Operator</a>:   \`
+<li><a accesskey="2" href="#Match_002dend_002dof_002dbuffer-Operator">Match-end-of-buffer Operator</a>:         \'
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Match_002dbeginning_002dof_002dbuffer-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002dend_002dof_002dbuffer-Operator">Match-end-of-buffer Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Buffer-Operators">Buffer Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">4.2.1 The Match-beginning-of-buffer Operator</h4>
+
+<!-- (@code{\`}) -->
+<p><a name="index-_0040samp_007b_005c_0060_007d-85"></a>
+This operator (represented by <span class="samp">\`</span>) matches the empty string at the
+beginning of the buffer.
+
+<div class="node">
+<p><hr>
+<a name="Match_002dend_002dof_002dbuffer-Operator"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002dbeginning_002dof_002dbuffer-Operator">Match-beginning-of-buffer Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Buffer-Operators">Buffer Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">4.2.2 The Match-end-of-buffer Operator</h4>
+
+<!-- (@code{\'}) -->
+<p><a name="index-_0040samp_007b_005c_0027_007d-86"></a>
+This operator (represented by <span class="samp">\'</span>) matches the empty string at the
+end of the buffer.
+
+<div class="node">
+<p><hr>
+<a name="GNU-Emacs-Operators"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#What-Gets-Matched_003f">What Gets Matched?</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#GNU-Operators">GNU Operators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">5 GNU Emacs Operators</h2>
+
+<p>Following are operators that <span class="sc">gnu</span> defines (and <span class="sc">posix</span> doesn't)
+that you can use only when Regex is compiled with the preprocessor
+symbol <code>emacs</code> defined.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Syntactic-Class-Operators">Syntactic Class Operators</a>
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Syntactic-Class-Operators"></a>Up:&nbsp;<a rel="up" accesskey="u" href="#GNU-Emacs-Operators">GNU Emacs Operators</a>
+<br>
+</div>
+
+<h3 class="section">5.1 Syntactic Class Operators</h3>
+
+<p>The operators in this section require Regex to recognize the syntactic
+classes of characters.  Regex uses a syntax table to determine this.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Emacs-Syntax-Tables">Emacs Syntax Tables</a>
+<li><a accesskey="2" href="#Match_002dsyntactic_002dclass-Operator">Match-syntactic-class Operator</a>:       \sCLASS
+<li><a accesskey="3" href="#Match_002dnot_002dsyntactic_002dclass-Operator">Match-not-syntactic-class Operator</a>:   \SCLASS
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="Emacs-Syntax-Tables"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002dsyntactic_002dclass-Operator">Match-syntactic-class Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Syntactic-Class-Operators">Syntactic Class Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">5.1.1 Emacs Syntax Tables</h4>
+
+<p>A <dfn>syntax table</dfn> is an array indexed by the characters in your
+character set.  In the <span class="sc">ascii</span> encoding, therefore, a syntax table
+has 256 elements.
+
+  <p>If Regex is compiled with the preprocessor symbol <code>emacs</code> defined,
+then Regex expects you to define and initialize the variable
+<code>re_syntax_table</code> to be an Emacs syntax table.  Emacs' syntax
+tables are more complicated than Regex's own (see <a href="#Non_002dEmacs-Syntax-Tables">Non-Emacs Syntax Tables</a>).  See <a href="emacs.html#Syntax">Syntax (The GNU Emacs User's Manual)</a>,
+for a description of Emacs' syntax tables.
+
+<div class="node">
+<p><hr>
+<a name="Match_002dsyntactic_002dclass-Operator"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Match_002dnot_002dsyntactic_002dclass-Operator">Match-not-syntactic-class Operator</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Emacs-Syntax-Tables">Emacs Syntax Tables</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Syntactic-Class-Operators">Syntactic Class Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">5.1.2 The Match-syntactic-class Operator (<code>\s</code><var>class</var>)</h4>
+
+<p><a name="index-_0040samp_007b_005cs_007d-87"></a>
+This operator matches any character whose syntactic class is represented
+by a specified character.  <span class="samp">\s</span><var>class</var> represents this operator
+where <var>class</var> is the character representing the syntactic class you
+want.  For example, <span class="samp">w</span> represents the syntactic
+class of word-constituent characters, so <span class="samp">\sw</span> matches any
+word-constituent character.
+
+<div class="node">
+<p><hr>
+<a name="Match_002dnot_002dsyntactic_002dclass-Operator"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Match_002dsyntactic_002dclass-Operator">Match-syntactic-class Operator</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Syntactic-Class-Operators">Syntactic Class Operators</a>
+<br>
+</div>
+
+<h4 class="subsection">5.1.3 The Match-not-syntactic-class Operator (<code>\S</code><var>class</var>)</h4>
+
+<p><a name="index-_0040samp_007b_005cS_007d-88"></a>
+This operator is similar to the match-syntactic-class operator except
+that it matches any character whose syntactic class is <em>not</em>
+represented by the specified character.  <span class="samp">\S</span><var>class</var> represents
+this operator.  For example, <span class="samp">w</span> represents the syntactic class of
+word-constituent characters, so <span class="samp">\Sw</span> matches any character that is
+not word-constituent.
+
+<div class="node">
+<p><hr>
+<a name="What-Gets-Matched_003f"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Programming-with-Regex">Programming with Regex</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#GNU-Emacs-Operators">GNU Emacs Operators</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">6 What Gets Matched?</h2>
+
+<p>Regex usually matches strings according to the &ldquo;leftmost longest&rdquo;
+rule; that is, it chooses the longest of the leftmost matches.  This
+does not mean that for a regular expression containing subexpressions
+that it simply chooses the longest match for each subexpression, left to
+right; the overall match must also be the longest possible one.
+
+  <p>For example, <span class="samp">(ac*)(c*d[ac]*)\1</span> matches <span class="samp">acdacaaa</span>, not
+<span class="samp">acdac</span>, as it would if it were to choose the longest match for the
+first subexpression.
+
+<div class="node">
+<p><hr>
+<a name="Programming-with-Regex"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Copying">Copying</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#What-Gets-Matched_003f">What Gets Matched?</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">7 Programming with Regex</h2>
+
+<p>Here we describe how you use the Regex data structures and functions in
+C programs.  Regex has three interfaces: one designed for <span class="sc">gnu</span>, one
+compatible with <span class="sc">posix</span> and one compatible with Berkeley <span class="sc">unix</span>.
+
+<ul class="menu">
+<li><a accesskey="1" href="#GNU-Regex-Functions">GNU Regex Functions</a>
+<li><a accesskey="2" href="#POSIX-Regex-Functions">POSIX Regex Functions</a>
+<li><a accesskey="3" href="#BSD-Regex-Functions">BSD Regex Functions</a>
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="GNU-Regex-Functions"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#POSIX-Regex-Functions">POSIX Regex Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Programming-with-Regex">Programming with Regex</a>
+<br>
+</div>
+
+<h3 class="section">7.1 GNU Regex Functions</h3>
+
+<p>If you're writing code that doesn't need to be compatible with either
+<span class="sc">posix</span> or Berkeley <span class="sc">unix</span>, you can use these functions.  They
+provide more options than the other interfaces.
+
+<ul class="menu">
+<li><a accesskey="1" href="#GNU-Pattern-Buffers">GNU Pattern Buffers</a>:          The re_pattern_buffer type. 
+<li><a accesskey="2" href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a>:   re_compile_pattern ()
+<li><a accesskey="3" href="#GNU-Matching">GNU Matching</a>:                 re_match ()
+<li><a accesskey="4" href="#GNU-Searching">GNU Searching</a>:                re_search ()
+<li><a accesskey="5" href="#Matching_002fSearching-with-Split-Data">Matching/Searching with Split Data</a>:   re_match_2 (), re_search_2 ()
+<li><a accesskey="6" href="#Searching-with-Fastmaps">Searching with Fastmaps</a>:      re_compile_fastmap ()
+<li><a accesskey="7" href="#GNU-Translate-Tables">GNU Translate Tables</a>:         The `translate' field. 
+<li><a accesskey="8" href="#Using-Registers">Using Registers</a>:              The re_registers type and related fns. 
+<li><a accesskey="9" href="#Freeing-GNU-Pattern-Buffers">Freeing GNU Pattern Buffers</a>:   regfree ()
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="GNU-Pattern-Buffers"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#GNU-Regex-Functions">GNU Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.1.1 GNU Pattern Buffers</h4>
+
+<p><a name="index-pattern-buffer_002c-definition-of-89"></a><a name="index-re_005fpattern_005fbuffer-_0040r_007bdefinition_007d-90"></a><a name="index-struct-re_005fpattern_005fbuffer-_0040r_007bdefinition_007d-91"></a>
+To compile, match, or search for a given regular expression, you must
+supply a pattern buffer.  A <dfn>pattern buffer</dfn> holds one compiled
+regular expression.<a rel="footnote" href="#fn-4" name="fnd-4"><sup>4</sup></a>
+
+  <p>You can have several different pattern buffers simultaneously, each
+holding a compiled pattern for a different regular expression.
+
+  <p><span class="file">regex.h</span> defines the pattern buffer <code>struct</code> as follows:
+
+<pre class="example">             /* Space that holds the compiled pattern.  It is declared as
+               `unsigned char *' because its elements are
+                sometimes used as array indexes.  */
+       unsigned char *buffer;
+     
+             /* Number of bytes to which `buffer' points.  */
+       unsigned long allocated;
+     
+             /* Number of bytes actually used in `buffer'.  */
+       unsigned long used;
+     
+             /* Syntax setting with which the pattern was compiled.  */
+       reg_syntax_t syntax;
+     
+             /* Pointer to a fastmap, if any, otherwise zero.  re_search uses
+                the fastmap, if there is one, to skip over impossible
+                starting points for matches.  */
+       char *fastmap;
+     
+             /* Either a translate table to apply to all characters before
+                comparing them, or zero for no translation.  The translation
+                is applied to a pattern when it is compiled and to a string
+                when it is matched.  */
+       char *translate;
+     
+             /* Number of subexpressions found by the compiler.  */
+       size_t re_nsub;
+     
+             /* Zero if this pattern cannot match the empty string, one else.
+                Well, in truth it's used only in `re_search_2', to see
+                whether or not we should use the fastmap, so we don't set
+                this absolutely perfectly; see `re_compile_fastmap' (the
+                `duplicate' case).  */
+       unsigned can_be_null : 1;
+     
+             /* If REGS_UNALLOCATED, allocate space in the `regs' structure
+                  for `max (RE_NREGS, re_nsub + 1)' groups.
+                If REGS_REALLOCATE, reallocate space if necessary.
+                If REGS_FIXED, use what's there.  */
+     #define REGS_UNALLOCATED 0
+     #define REGS_REALLOCATE 1
+     #define REGS_FIXED 2
+       unsigned regs_allocated : 2;
+     
+             /* Set to zero when `regex_compile' compiles a pattern; set to one
+                by `re_compile_fastmap' if it updates the fastmap.  */
+       unsigned fastmap_accurate : 1;
+     
+             /* If set, `re_match_2' does not return information about
+                subexpressions.  */
+       unsigned no_sub : 1;
+     
+             /* If set, a beginning-of-line anchor doesn't match at the
+                beginning of the string.  */
+       unsigned not_bol : 1;
+     
+             /* Similarly for an end-of-line anchor.  */
+       unsigned not_eol : 1;
+     
+             /* If true, an anchor at a newline matches.  */
+       unsigned newline_anchor : 1;
+     
+</pre>
+  <div class="node">
+<p><hr>
+<a name="GNU-Regular-Expression-Compiling"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#GNU-Matching">GNU Matching</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#GNU-Pattern-Buffers">GNU Pattern Buffers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#GNU-Regex-Functions">GNU Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.1.2 GNU Regular Expression Compiling</h4>
+
+<p>In <span class="sc">gnu</span>, you can both match and search for a given regular
+expression.  To do either, you must first compile it in a pattern buffer
+(see <a href="#GNU-Pattern-Buffers">GNU Pattern Buffers</a>).
+
+  <p><a name="index-syntax-initialization-92"></a><a name="index-re_005fsyntax_005foptions-_0040r_007binitialization_007d-93"></a>Regular expressions match according to the syntax with which they were
+compiled; with <span class="sc">gnu</span>, you indicate what syntax you want by setting
+the variable <code>re_syntax_options</code> (declared in <span class="file">regex.h</span> and
+defined in <span class="file">regex.c</span>) before calling the compiling function,
+<code>re_compile_pattern</code> (see below).  See <a href="#Syntax-Bits">Syntax Bits</a>, and
+<a href="#Predefined-Syntaxes">Predefined Syntaxes</a>.
+
+  <p>You can change the value of <code>re_syntax_options</code> at any time. 
+Usually, however, you set its value once and then never change it.
+
+  <p><a name="index-pattern-buffer-initialization-94"></a><code>re_compile_pattern</code> takes a pattern buffer as an argument.  You
+must initialize the following fields:
+
+     <dl>
+<dt><code>translate </code><span class="roman">initialization</span>
+<br><dt><code>translate</code><dd><a name="index-translate-_0040r_007binitialization_007d-95"></a>Initialize this to point to a translate table if you want one, or to
+zero if you don't.  We explain translate tables in <a href="#GNU-Translate-Tables">GNU Translate Tables</a>.
+
+     <br><dt><code>fastmap</code><dd><a name="index-fastmap-_0040r_007binitialization_007d-96"></a>Initialize this to nonzero if you want a fastmap, or to zero if you
+don't.
+
+     <br><dt><code>buffer</code><dt><code>allocated</code><dd><a name="index-buffer-_0040r_007binitialization_007d-97"></a><a name="index-allocated-_0040r_007binitialization_007d-98"></a><a name="index-malloc-99"></a>If you want <code>re_compile_pattern</code> to allocate memory for the
+compiled pattern, set both of these to zero.  If you have an existing
+block of memory (allocated with <code>malloc</code>) you want Regex to use,
+set <code>buffer</code> to its address and <code>allocated</code> to its size (in
+bytes).
+
+     <p><code>re_compile_pattern</code> uses <code>realloc</code> to extend the space for
+the compiled pattern as necessary.
+
+  </dl>
+
+  <p>To compile a pattern buffer, use:
+
+  <p><a name="index-re_005fcompile_005fpattern-100"></a>
+<pre class="example">     char *
+     re_compile_pattern (const char *<var>regex</var>, const int <var>regex_size</var>,
+                         struct re_pattern_buffer *<var>pattern_buffer</var>)
+</pre>
+  <p class="noindent"><var>regex</var> is the regular expression's address, <var>regex_size</var> is its
+length, and <var>pattern_buffer</var> is the pattern buffer's address.
+
+  <p>If <code>re_compile_pattern</code> successfully compiles the regular
+expression, it returns zero and sets <code>*</code><var>pattern_buffer</var> to the
+compiled pattern.  It sets the pattern buffer's fields as follows:
+
+     <dl>
+<dt><code>buffer</code><dd><a name="index-buffer-_0040r_007bfield_002c-set-by-_0040code_007bre_005fcompile_005fpattern_007d_007d-101"></a>to the compiled pattern.
+
+     <br><dt><code>used</code><dd><a name="index-used-_0040r_007bfield_002c-set-by-_0040code_007bre_005fcompile_005fpattern_007d_007d-102"></a>to the number of bytes the compiled pattern in <code>buffer</code> occupies.
+
+     <br><dt><code>syntax</code><dd><a name="index-syntax-_0040r_007bfield_002c-set-by-_0040code_007bre_005fcompile_005fpattern_007d_007d-103"></a>to the current value of <code>re_syntax_options</code>.
+
+     <br><dt><code>re_nsub</code><dd><a name="index-re_005fnsub-_0040r_007bfield_002c-set-by-_0040code_007bre_005fcompile_005fpattern_007d_007d-104"></a>to the number of subexpressions in <var>regex</var>.
+
+     <br><dt><code>fastmap_accurate</code><dd><a name="index-fastmap_005faccurate-_0040r_007bfield_002c-set-by-_0040code_007bre_005fcompile_005fpattern_007d_007d-105"></a>to zero on the theory that the pattern you're compiling is different
+than the one previously compiled into <code>buffer</code>; in that case (since
+you can't make a fastmap without a compiled pattern),
+<code>fastmap</code> would either contain an incompatible fastmap, or nothing
+at all.
+
+     <!-- xx what else? -->
+</dl>
+
+  <p>If <code>re_compile_pattern</code> can't compile <var>regex</var>, it returns an
+error string corresponding to one of the errors listed in <a href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a>.
+
+<div class="node">
+<p><hr>
+<a name="GNU-Matching"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#GNU-Searching">GNU Searching</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#GNU-Regex-Functions">GNU Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.1.3 GNU Matching</h4>
+
+<p><a name="index-matching-with-GNU-functions-106"></a>
+Matching the <span class="sc">gnu</span> way means trying to match as much of a string as
+possible starting at a position within it you specify.  Once you've compiled
+a pattern into a pattern buffer (see <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a>), you can ask the matcher to match that pattern against a
+string using:
+
+  <p><a name="index-re_005fmatch-107"></a>
+<pre class="example">     int
+     re_match (struct re_pattern_buffer *<var>pattern_buffer</var>,
+               const char *<var>string</var>, const int <var>size</var>,
+               const int <var>start</var>, struct re_registers *<var>regs</var>)
+</pre>
+  <p class="noindent"><var>pattern_buffer</var> is the address of a pattern buffer containing a
+compiled pattern.  <var>string</var> is the string you want to match; it can
+contain newline and null characters.  <var>size</var> is the length of that
+string.  <var>start</var> is the string index at which you want to
+begin matching; the first character of <var>string</var> is at index zero. 
+See <a href="#Using-Registers">Using Registers</a>, for a explanation of <var>regs</var>; you can safely
+pass zero.
+
+  <p><code>re_match</code> matches the regular expression in <var>pattern_buffer</var>
+against the string <var>string</var> according to the syntax in
+<var>pattern_buffers</var>'s <code>syntax</code> field.  (See <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a>, for how to set it.)  The function returns
+-1 if the compiled pattern does not match any part of
+<var>string</var> and -2 if an internal error happens; otherwise, it
+returns how many (possibly zero) characters of <var>string</var> the pattern
+matched.
+
+  <p>An example: suppose <var>pattern_buffer</var> points to a pattern buffer
+containing the compiled pattern for <span class="samp">a*</span>, and <var>string</var> points
+to <span class="samp">aaaaab</span> (whereupon <var>size</var> should be 6). Then if <var>start</var>
+is 2, <code>re_match</code> returns 3, i.e., <span class="samp">a*</span> would have matched the
+last three <span class="samp">a</span>s in <var>string</var>.  If <var>start</var> is 0,
+<code>re_match</code> returns 5, i.e., <span class="samp">a*</span> would have matched all the
+<span class="samp">a</span>s in <var>string</var>.  If <var>start</var> is either 5 or 6, it returns
+zero.
+
+  <p>If <var>start</var> is not between zero and <var>size</var>, then
+<code>re_match</code> returns -1.
+
+<div class="node">
+<p><hr>
+<a name="GNU-Searching"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Matching_002fSearching-with-Split-Data">Matching/Searching with Split Data</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#GNU-Matching">GNU Matching</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#GNU-Regex-Functions">GNU Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.1.4 GNU Searching</h4>
+
+<p><a name="index-searching-with-GNU-functions-108"></a>
+<dfn>Searching</dfn> means trying to match starting at successive positions
+within a string.  The function <code>re_search</code> does this.
+
+  <p>Before calling <code>re_search</code>, you must compile your regular
+expression.  See <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a>.
+
+  <p>Here is the function declaration:
+
+  <p><a name="index-re_005fsearch-109"></a>
+<pre class="example">     int
+     re_search (struct re_pattern_buffer *<var>pattern_buffer</var>,
+                const char *<var>string</var>, const int <var>size</var>,
+                const int <var>start</var>, const int <var>range</var>,
+                struct re_registers *<var>regs</var>)
+</pre>
+  <p class="noindent"><a name="index-start-_0040r_007bargument-to-_0040code_007bre_005fsearch_007d_007d-110"></a><a name="index-range-_0040r_007bargument-to-_0040code_007bre_005fsearch_007d_007d-111"></a>whose arguments are the same as those to <code>re_match</code> (see <a href="#GNU-Matching">GNU Matching</a>) except that the two arguments <var>start</var> and <var>range</var>
+replace <code>re_match</code>'s argument <var>start</var>.
+
+  <p>If <var>range</var> is positive, then <code>re_search</code> attempts a match
+starting first at index <var>start</var>, then at <var>start</var> + 1 if
+that fails, and so on, up to <var>start</var> + <var>range</var>; if
+<var>range</var> is negative, then it attempts a match starting first at
+index <var>start</var>, then at <var>start</var> -1 if that fails, and so
+on.
+
+  <p>If <var>start</var> is not between zero and <var>size</var>, then <code>re_search</code>
+returns -1.  When <var>range</var> is positive, <code>re_search</code>
+adjusts <var>range</var> so that <var>start</var> + <var>range</var> - 1 is
+between zero and <var>size</var>, if necessary; that way it won't search
+outside of <var>string</var>.  Similarly, when <var>range</var> is negative,
+<code>re_search</code> adjusts <var>range</var> so that <var>start</var> +
+<var>range</var> + 1 is between zero and <var>size</var>, if necessary.
+
+  <p>If the <code>fastmap</code> field of <var>pattern_buffer</var> is zero,
+<code>re_search</code> matches starting at consecutive positions; otherwise,
+it uses <code>fastmap</code> to make the search more efficient. 
+See <a href="#Searching-with-Fastmaps">Searching with Fastmaps</a>.
+
+  <p>If no match is found, <code>re_search</code> returns -1.  If
+a match is found, it returns the index where the match began.  If an
+internal error happens, it returns -2.
+
+<div class="node">
+<p><hr>
+<a name="Matching_002fSearching-with-Split-Data"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Searching-with-Fastmaps">Searching with Fastmaps</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#GNU-Searching">GNU Searching</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#GNU-Regex-Functions">GNU Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.1.5 Matching and Searching with Split Data</h4>
+
+<p>Using the functions <code>re_match_2</code> and <code>re_search_2</code>, you can
+match or search in data that is divided into two strings.
+
+  <p>The function:
+
+  <p><a name="index-re_005fmatch_005f2-112"></a>
+<pre class="example">     int
+     re_match_2 (struct re_pattern_buffer *<var>buffer</var>,
+                 const char *<var>string1</var>, const int <var>size1</var>,
+                 const char *<var>string2</var>, const int <var>size2</var>,
+                 const int <var>start</var>,
+                 struct re_registers *<var>regs</var>,
+                 const int <var>stop</var>)
+</pre>
+  <p class="noindent">is similar to <code>re_match</code> (see <a href="#GNU-Matching">GNU Matching</a>) except that you
+pass <em>two</em> data strings and sizes, and an index <var>stop</var> beyond
+which you don't want the matcher to try matching.  As with
+<code>re_match</code>, if it succeeds, <code>re_match_2</code> returns how many
+characters of <var>string</var> it matched.  Regard <var>string1</var> and
+<var>string2</var> as concatenated when you set the arguments <var>start</var> and
+<var>stop</var> and use the contents of <var>regs</var>; <code>re_match_2</code> never
+returns a value larger than <var>size1</var> + <var>size2</var>.
+
+  <p>The function:
+
+  <p><a name="index-re_005fsearch_005f2-113"></a>
+<pre class="example">     int
+     re_search_2 (struct re_pattern_buffer *<var>buffer</var>,
+                  const char *<var>string1</var>, const int <var>size1</var>,
+                  const char *<var>string2</var>, const int <var>size2</var>,
+                  const int <var>start</var>, const int <var>range</var>,
+                  struct re_registers *<var>regs</var>,
+                  const int <var>stop</var>)
+</pre>
+  <p class="noindent">is similarly related to <code>re_search</code>.
+
+<div class="node">
+<p><hr>
+<a name="Searching-with-Fastmaps"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#GNU-Translate-Tables">GNU Translate Tables</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Matching_002fSearching-with-Split-Data">Matching/Searching with Split Data</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#GNU-Regex-Functions">GNU Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.1.6 Searching with Fastmaps</h4>
+
+<p><a name="index-fastmaps-114"></a>If you're searching through a long string, you should use a fastmap. 
+Without one, the searcher tries to match at consecutive positions in the
+string.  Generally, most of the characters in the string could not start
+a match.  It takes much longer to try matching at a given position in the
+string than it does to check in a table whether or not the character at
+that position could start a match.  A <dfn>fastmap</dfn> is such a table.
+
+  <p>More specifically, a fastmap is an array indexed by the characters in
+your character set.  Under the <span class="sc">ascii</span> encoding, therefore, a fastmap
+has 256 elements.  If you want the searcher to use a fastmap with a
+given pattern buffer, you must allocate the array and assign the array's
+address to the pattern buffer's <code>fastmap</code> field.  You either can
+compile the fastmap yourself or have <code>re_search</code> do it for you;
+when <code>fastmap</code> is nonzero, it automatically compiles a fastmap the
+first time you search using a particular compiled pattern.
+
+  <p>To compile a fastmap yourself, use:
+
+  <p><a name="index-re_005fcompile_005ffastmap-115"></a>
+<pre class="example">     int
+     re_compile_fastmap (struct re_pattern_buffer *<var>pattern_buffer</var>)
+</pre>
+  <p class="noindent"><var>pattern_buffer</var> is the address of a pattern buffer.  If the
+character <var>c</var> could start a match for the pattern,
+<code>re_compile_fastmap</code> makes
+<var>pattern_buffer</var><code>-&gt;fastmap[</code><var>c</var><code>]</code> nonzero.  It returns
+0 if it can compile a fastmap and -2 if there is an
+internal error.  For example, if <span class="samp">|</span> is the alternation operator
+and <var>pattern_buffer</var> holds the compiled pattern for <span class="samp">a|b</span>, then
+<code>re_compile_fastmap</code> sets <code>fastmap['a']</code> and
+<code>fastmap['b']</code> (and no others).
+
+  <p><code>re_search</code> uses a fastmap as it moves along in the string: it
+checks the string's characters until it finds one that's in the fastmap. 
+Then it tries matching at that character.  If the match fails, it
+repeats the process.  So, by using a fastmap, <code>re_search</code> doesn't
+waste time trying to match at positions in the string that couldn't
+start a match.
+
+  <p>If you don't want <code>re_search</code> to use a fastmap,
+store zero in the <code>fastmap</code> field of the pattern buffer before
+calling <code>re_search</code>.
+
+  <p>Once you've initialized a pattern buffer's <code>fastmap</code> field, you
+need never do so again&mdash;even if you compile a new pattern in
+it&mdash;provided the way the field is set still reflects whether or not you
+want a fastmap.  <code>re_search</code> will still either do nothing if
+<code>fastmap</code> is null or, if it isn't, compile a new fastmap for the
+new pattern.
+
+<div class="node">
+<p><hr>
+<a name="GNU-Translate-Tables"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Using-Registers">Using Registers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Searching-with-Fastmaps">Searching with Fastmaps</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#GNU-Regex-Functions">GNU Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.1.7 GNU Translate Tables</h4>
+
+<p>If you set the <code>translate</code> field of a pattern buffer to a translate
+table, then the <span class="sc">gnu</span> Regex functions to which you've passed that
+pattern buffer use it to apply a simple transformation
+to all the regular expression and string characters at which they look.
+
+  <p>A <dfn>translate table</dfn> is an array indexed by the characters in your
+character set.  Under the <span class="sc">ascii</span> encoding, therefore, a translate
+table has 256 elements.  The array's elements are also characters in
+your character set.  When the Regex functions see a character <var>c</var>,
+they use <code>translate[</code><var>c</var><code>]</code> in its place, with one exception: the
+character after a <span class="samp">\</span> is not translated.  (This ensures that, the
+operators, e.g., <span class="samp">\B</span> and <span class="samp">\b</span>, are always distinguishable.)
+
+  <p>For example, a table that maps all lowercase letters to the
+corresponding uppercase ones would cause the matcher to ignore
+differences in case.<a rel="footnote" href="#fn-5" name="fnd-5"><sup>5</sup></a>  Such a table would map all characters except lowercase letters
+to themselves, and lowercase letters to the corresponding uppercase
+ones.  Under the <span class="sc">ascii</span> encoding, here's how you could initialize
+such a table (we'll call it <code>case_fold</code>):
+
+<pre class="example">     for (i = 0; i &lt; 256; i++)
+       case_fold[i] = i;
+     for (i = 'a'; i &lt;= 'z'; i++)
+       case_fold[i] = i - ('a' - 'A');
+</pre>
+  <p>You tell Regex to use a translate table on a given pattern buffer by
+assigning that table's address to the <code>translate</code> field of that
+buffer.  If you don't want Regex to do any translation, put zero into
+this field.  You'll get weird results if you change the table's contents
+anytime between compiling the pattern buffer, compiling its fastmap, and
+matching or searching with the pattern buffer.
+
+<div class="node">
+<p><hr>
+<a name="Using-Registers"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Freeing-GNU-Pattern-Buffers">Freeing GNU Pattern Buffers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#GNU-Translate-Tables">GNU Translate Tables</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#GNU-Regex-Functions">GNU Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.1.8 Using Registers</h4>
+
+<p>A group in a regular expression can match a (posssibly empty) substring
+of the string that regular expression as a whole matched.  The matcher
+remembers the beginning and end of the substring matched by
+each group.
+
+  <p>To find out what they matched, pass a nonzero <var>regs</var> argument to a
+<span class="sc">gnu</span> matching or searching function (see <a href="#GNU-Matching">GNU Matching</a> and
+<a href="#GNU-Searching">GNU Searching</a>), i.e., the address of a structure of this type, as
+defined in <span class="file">regex.h</span>:
+
+<!-- We don't bother to include this directly from regex.h, -->
+<!-- since it changes so rarely. -->
+<pre class="example">     <a name="index-re_005fregisters-116"></a><a name="index-num_005fregs-_0040r_007bin-_0040code_007bstruct-re_005fregisters_007d_007d-117"></a><a name="index-start-_0040r_007bin-_0040code_007bstruct-re_005fregisters_007d_007d-118"></a><a name="index-end-_0040r_007bin-_0040code_007bstruct-re_005fregisters_007d_007d-119"></a>struct re_registers
+     {
+       unsigned num_regs;
+       regoff_t *start;
+       regoff_t *end;
+     };
+</pre>
+  <p>Except for (possibly) the <var>num_regs</var>'th element (see below), the
+<var>i</var>th element of the <code>start</code> and <code>end</code> arrays records
+information about the <var>i</var>th group in the pattern.  (They're declared
+as C pointers, but this is only because not all C compilers accept
+zero-length arrays; conceptually, it is simplest to think of them as
+arrays.)
+
+  <p>The <code>start</code> and <code>end</code> arrays are allocated in various ways,
+depending on the value of the <code>regs_allocated</code>
+<a name="index-regs_005fallocated-120"></a>field in the pattern buffer passed to the matcher.
+
+  <p>The simplest and perhaps most useful is to let the matcher (re)allocate
+enough space to record information for all the groups in the regular
+expression.  If <code>regs_allocated</code> is <code>REGS_UNALLOCATED</code>,
+<a name="index-REGS_005fUNALLOCATED-121"></a>the matcher allocates 1 + <var>re_nsub</var> (another field in the
+pattern buffer; see <a href="#GNU-Pattern-Buffers">GNU Pattern Buffers</a>).  The extra element is set
+to -1, and sets <code>regs_allocated</code> to <code>REGS_REALLOCATE</code>. 
+<a name="index-REGS_005fREALLOCATE-122"></a>Then on subsequent calls with the same pattern buffer and <var>regs</var>
+arguments, the matcher reallocates more space if necessary.
+
+  <p>It would perhaps be more logical to make the <code>regs_allocated</code> field
+part of the <code>re_registers</code> structure, instead of part of the
+pattern buffer.  But in that case the caller would be forced to
+initialize the structure before passing it.  Much existing code doesn't
+do this initialization, and it's arguably better to avoid it anyway.
+
+  <p><code>re_compile_pattern</code> sets <code>regs_allocated</code> to
+<code>REGS_UNALLOCATED</code>,
+so if you use the GNU regular expression
+functions, you get this behavior by default.
+
+  <p>xx document re_set_registers
+
+  <p><span class="sc">posix</span>, on the other hand, requires a different interface:  the
+caller is supposed to pass in a fixed-length array which the matcher
+fills.  Therefore, if <code>regs_allocated</code> is <code>REGS_FIXED</code>
+<a name="index-REGS_005fFIXED-123"></a>the matcher simply fills that array.
+
+  <p>The following examples illustrate the information recorded in the
+<code>re_registers</code> structure.  (In all of them, <span class="samp">(</span> represents the
+open-group and <span class="samp">)</span> the close-group operator.  The first character
+in the string <var>string</var> is at index 0.)
+
+<!-- xx i'm not sure this is all true anymore. -->
+<ul>
+<li>If the regular expression has an <var>i</var>-th<!-- /@w -->
+group not contained within another group that matches a
+substring of <var>string</var>, then the function sets
+<var>regs</var><code>-&gt;<!-- /@w -->start[</code><var>i</var><code>]</code> to the index in <var>string</var> where
+the substring matched by the <var>i</var>-th<!-- /@w --> group begins, and
+<var>regs</var><code>-&gt;<!-- /@w -->end[</code><var>i</var><code>]</code> to the index just beyond that
+substring's end.  The function sets <var>regs</var><code>-&gt;<!-- /@w -->start[0]</code> and
+<var>regs</var><code>-&gt;<!-- /@w -->end[0]</code> to analogous information about the entire
+pattern.
+
+     <p>For example, when you match <span class="samp">((a)(b))</span> against <span class="samp">ab</span>, you get:
+
+          <ul>
+<li>0 in <var>regs</var><code>-&gt;<!-- /@w -->start[0]</code> and 2 in <var>regs</var><code>-&gt;<!-- /@w -->end[0]</code>
+
+          <li>0 in <var>regs</var><code>-&gt;<!-- /@w -->start[1]</code> and 2 in <var>regs</var><code>-&gt;<!-- /@w -->end[1]</code>
+
+          <li>0 in <var>regs</var><code>-&gt;<!-- /@w -->start[2]</code> and 1 in <var>regs</var><code>-&gt;<!-- /@w -->end[2]</code>
+
+          <li>1 in <var>regs</var><code>-&gt;<!-- /@w -->start[3]</code> and 2 in <var>regs</var><code>-&gt;<!-- /@w -->end[3]</code>
+</ul>
+
+     <li>If a group matches more than once (as it might if followed by,
+e.g., a repetition operator), then the function reports the information
+about what the group <em>last</em> matched.
+
+     <p>For example, when you match the pattern <span class="samp">(a)*</span> against the string
+<span class="samp">aa</span>, you get:
+
+          <ul>
+<li>0 in <var>regs</var><code>-&gt;<!-- /@w -->start[0]</code> and 2 in <var>regs</var><code>-&gt;<!-- /@w -->end[0]</code>
+
+          <li>1 in <var>regs</var><code>-&gt;<!-- /@w -->start[1]</code> and 2 in <var>regs</var><code>-&gt;<!-- /@w -->end[1]</code>
+</ul>
+
+     <li>If the <var>i</var>-th<!-- /@w --> group does not participate in a
+successful match, e.g., it is an alternative not taken or a
+repetition operator allows zero repetitions of it, then the function
+sets <var>regs</var><code>-&gt;<!-- /@w -->start[</code><var>i</var><code>]</code> and
+<var>regs</var><code>-&gt;<!-- /@w -->end[</code><var>i</var><code>]</code> to -1.
+
+     <p>For example, when you match the pattern <span class="samp">(a)*b</span> against
+the string <span class="samp">b</span>, you get:
+
+          <ul>
+<li>0 in <var>regs</var><code>-&gt;<!-- /@w -->start[0]</code> and 1 in <var>regs</var><code>-&gt;<!-- /@w -->end[0]</code>
+
+          <li>-1 in <var>regs</var><code>-&gt;<!-- /@w -->start[1]</code> and -1 in <var>regs</var><code>-&gt;<!-- /@w -->end[1]</code>
+</ul>
+
+     <li>If the <var>i</var>-th<!-- /@w --> group matches a zero-length string, then the
+function sets <var>regs</var><code>-&gt;<!-- /@w -->start[</code><var>i</var><code>]</code> and
+<var>regs</var><code>-&gt;<!-- /@w -->end[</code><var>i</var><code>]</code> to the index just beyond that
+zero-length string.
+
+     <p>For example, when you match the pattern <span class="samp">(a*)b</span> against the string
+<span class="samp">b</span>, you get:
+
+          <ul>
+<li>0 in <var>regs</var><code>-&gt;<!-- /@w -->start[0]</code> and 1 in <var>regs</var><code>-&gt;<!-- /@w -->end[0]</code>
+
+          <li>0 in <var>regs</var><code>-&gt;<!-- /@w -->start[1]</code> and 0 in <var>regs</var><code>-&gt;<!-- /@w -->end[1]</code>
+</ul>
+
+     <li>If an <var>i</var>-th<!-- /@w --> group contains a <var>j</var>-th<!-- /@w --> group
+in turn not contained within any other group within group <var>i</var> and
+the function reports a match of the <var>i</var>-th<!-- /@w --> group, then it
+records in <var>regs</var><code>-&gt;<!-- /@w -->start[</code><var>j</var><code>]</code> and
+<var>regs</var><code>-&gt;<!-- /@w -->end[</code><var>j</var><code>]</code> the last match (if it matched) of
+the <var>j</var>-th<!-- /@w --> group.
+
+     <p>For example, when you match the pattern <span class="samp">((a*)b)*</span> against the
+string <span class="samp">abb</span>, group&nbsp;2<!-- /@w --> last matches the empty string, so you
+get what it previously matched:
+
+          <ul>
+<li>0 in <var>regs</var><code>-&gt;<!-- /@w -->start[0]</code> and 3 in <var>regs</var><code>-&gt;<!-- /@w -->end[0]</code>
+
+          <li>2 in <var>regs</var><code>-&gt;<!-- /@w -->start[1]</code> and 3 in <var>regs</var><code>-&gt;<!-- /@w -->end[1]</code>
+
+          <li>2 in <var>regs</var><code>-&gt;<!-- /@w -->start[2]</code> and 2 in <var>regs</var><code>-&gt;<!-- /@w -->end[2]</code>
+</ul>
+
+     <p>When you match the pattern <span class="samp">((a)*b)*</span> against the string
+<span class="samp">abb</span>, group&nbsp;2<!-- /@w --> doesn't participate in the last match, so you
+get:
+
+          <ul>
+<li>0 in <var>regs</var><code>-&gt;<!-- /@w -->start[0]</code> and 3 in <var>regs</var><code>-&gt;<!-- /@w -->end[0]</code>
+
+          <li>2 in <var>regs</var><code>-&gt;<!-- /@w -->start[1]</code> and 3 in <var>regs</var><code>-&gt;<!-- /@w -->end[1]</code>
+
+          <li>0 in <var>regs</var><code>-&gt;<!-- /@w -->start[2]</code> and 1 in <var>regs</var><code>-&gt;<!-- /@w -->end[2]</code>
+</ul>
+
+     <li>If an <var>i</var>-th<!-- /@w --> group contains a <var>j</var>-th<!-- /@w --> group
+in turn not contained within any other group within group <var>i</var>
+and the function sets
+<var>regs</var><code>-&gt;<!-- /@w -->start[</code><var>i</var><code>]</code> and
+<var>regs</var><code>-&gt;<!-- /@w -->end[</code><var>i</var><code>]</code> to -1, then it also sets
+<var>regs</var><code>-&gt;<!-- /@w -->start[</code><var>j</var><code>]</code> and
+<var>regs</var><code>-&gt;<!-- /@w -->end[</code><var>j</var><code>]</code> to -1.
+
+     <p>For example, when you match the pattern <span class="samp">((a)*b)*c</span> against the
+string <span class="samp">c</span>, you get:
+
+          <ul>
+<li>0 in <var>regs</var><code>-&gt;<!-- /@w -->start[0]</code> and 1 in <var>regs</var><code>-&gt;<!-- /@w -->end[0]</code>
+
+          <li>-1 in <var>regs</var><code>-&gt;<!-- /@w -->start[1]</code> and -1 in <var>regs</var><code>-&gt;<!-- /@w -->end[1]</code>
+
+          <li>-1 in <var>regs</var><code>-&gt;<!-- /@w -->start[2]</code> and -1 in <var>regs</var><code>-&gt;<!-- /@w -->end[2]</code>
+</ul>
+
+  </ul>
+
+<div class="node">
+<p><hr>
+<a name="Freeing-GNU-Pattern-Buffers"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Using-Registers">Using Registers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#GNU-Regex-Functions">GNU Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.1.9 Freeing GNU Pattern Buffers</h4>
+
+<p>To free any allocated fields of a pattern buffer, you can use the
+<span class="sc">posix</span> function described in <a href="#Freeing-POSIX-Pattern-Buffers">Freeing POSIX Pattern Buffers</a>,
+since the type <code>regex_t</code>&mdash;the type for <span class="sc">posix</span> pattern
+buffers&mdash;is equivalent to the type <code>re_pattern_buffer</code>.  After
+freeing a pattern buffer, you need to again compile a regular expression
+in it (see <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a>) before passing it to
+a matching or searching function.
+
+<div class="node">
+<p><hr>
+<a name="POSIX-Regex-Functions"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#BSD-Regex-Functions">BSD Regex Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#GNU-Regex-Functions">GNU Regex Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Programming-with-Regex">Programming with Regex</a>
+<br>
+</div>
+
+<h3 class="section">7.2 POSIX Regex Functions</h3>
+
+<p>If you're writing code that has to be <span class="sc">posix</span> compatible, you'll need
+to use these functions. Their interfaces are as specified by <span class="sc">posix</span>,
+draft 1003.2/D11.2.
+
+<ul class="menu">
+<li><a accesskey="1" href="#POSIX-Pattern-Buffers">POSIX Pattern Buffers</a>:                The regex_t type. 
+<li><a accesskey="2" href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a>:   regcomp ()
+<li><a accesskey="3" href="#POSIX-Matching">POSIX Matching</a>:                       regexec ()
+<li><a accesskey="4" href="#Reporting-Errors">Reporting Errors</a>:                     regerror ()
+<li><a accesskey="5" href="#Using-Byte-Offsets">Using Byte Offsets</a>:                   The regmatch_t type. 
+<li><a accesskey="6" href="#Freeing-POSIX-Pattern-Buffers">Freeing POSIX Pattern Buffers</a>:        regfree ()
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="POSIX-Pattern-Buffers"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#POSIX-Regex-Functions">POSIX Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.2.1 POSIX Pattern Buffers</h4>
+
+<p>To compile or match a given regular expression the <span class="sc">posix</span> way, you
+must supply a pattern buffer exactly the way you do for <span class="sc">gnu</span>
+(see <a href="#GNU-Pattern-Buffers">GNU Pattern Buffers</a>).  <span class="sc">posix</span> pattern buffers have type
+<code>regex_t</code>, which is equivalent to the <span class="sc">gnu</span> pattern buffer
+type <code>re_pattern_buffer</code>.
+
+<div class="node">
+<p><hr>
+<a name="POSIX-Regular-Expression-Compiling"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#POSIX-Matching">POSIX Matching</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#POSIX-Pattern-Buffers">POSIX Pattern Buffers</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#POSIX-Regex-Functions">POSIX Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.2.2 POSIX Regular Expression Compiling</h4>
+
+<p>With <span class="sc">posix</span>, you can only search for a given regular expression; you
+can't match it.  To do this, you must first compile it in a
+pattern buffer, using <code>regcomp</code>.
+
+  <p>To compile a pattern buffer, use:
+
+  <p><a name="index-regcomp-124"></a>
+<pre class="example">     int
+     regcomp (regex_t *<var>preg</var>, const char *<var>regex</var>, int <var>cflags</var>)
+</pre>
+  <p class="noindent"><var>preg</var> is the initialized pattern buffer's address, <var>regex</var> is
+the regular expression's address, and <var>cflags</var> is the compilation
+flags, which Regex considers as a collection of bits.  Here are the
+valid bits, as defined in <span class="file">regex.h</span>:
+
+     <dl>
+<dt><code>REG_EXTENDED</code><dd><a name="index-REG_005fEXTENDED-125"></a>says to use <span class="sc">posix</span> Extended Regular Expression syntax; if this isn't
+set, then says to use <span class="sc">posix</span> Basic Regular Expression syntax. 
+<code>regcomp</code> sets <var>preg</var>'s <code>syntax</code> field accordingly.
+
+     <br><dt><code>REG_ICASE</code><dd><a name="index-REG_005fICASE-126"></a><a name="index-ignoring-case-127"></a>says to ignore case; <code>regcomp</code> sets <var>preg</var>'s <code>translate</code>
+field to a translate table which ignores case, replacing anything you've
+put there before.
+
+     <br><dt><code>REG_NOSUB</code><dd><a name="index-REG_005fNOSUB-128"></a>says to set <var>preg</var>'s <code>no_sub</code> field; see <a href="#POSIX-Matching">POSIX Matching</a>,
+for what this means.
+
+     <br><dt><code>REG_NEWLINE</code><dd><a name="index-REG_005fNEWLINE-129"></a>says that a:
+
+          <ul>
+<li>match-any-character operator (see <a href="#Match_002dany_002dcharacter-Operator">Match-any-character Operator</a>) doesn't match a newline.
+
+          <li>nonmatching list not containing a newline (see <a href="#List-Operators">List Operators</a>) matches a newline.
+
+          <li>match-beginning-of-line operator (see <a href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a>) matches the empty string immediately after a newline,
+regardless of how <code>REG_NOTBOL</code> is set (see <a href="#POSIX-Matching">POSIX Matching</a>, for
+an explanation of <code>REG_NOTBOL</code>).
+
+          <li>match-end-of-line operator (see <a href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a>) matches the empty string immediately before a newline,
+regardless of how <code>REG_NOTEOL</code> is set (see <a href="#POSIX-Matching">POSIX Matching</a>,
+for an explanation of <code>REG_NOTEOL</code>).
+
+     </ul>
+
+  </dl>
+
+  <p>If <code>regcomp</code> successfully compiles the regular expression, it
+returns zero and sets <code>*</code><var>pattern_buffer</var> to the compiled
+pattern. Except for <code>syntax</code> (which it sets as explained above), it
+also sets the same fields the same way as does the <span class="sc">gnu</span> compiling
+function (see <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a>).
+
+  <p>If <code>regcomp</code> can't compile the regular expression, it returns one
+of the error codes listed here.  (Except when noted differently, the
+syntax of in all examples below is basic regular expression syntax.)
+
+     <dl>
+<!-- repetitions -->
+<dt><code>REG_BADRPT</code><dd>For example, the consecutive repetition operators <span class="samp">**</span> in
+<span class="samp">a**</span> are invalid.  As another example, if the syntax is extended
+regular expression syntax, then the repetition operator <span class="samp">*</span> with
+nothing on which to operate in <span class="samp">*</span> is invalid.
+
+     <br><dt><code>REG_BADBR</code><dd>For example, the <var>count</var> <span class="samp">-1</span> in <span class="samp">a\{-1</span> is invalid.
+
+     <br><dt><code>REG_EBRACE</code><dd>For example, <span class="samp">a\{1</span> is missing a close-interval operator.
+
+     <!-- lists -->
+<br><dt><code>REG_EBRACK</code><dd>For example, <span class="samp">[a</span> is missing a close-list operator.
+
+     <br><dt><code>REG_ERANGE</code><dd>For example, the range ending point <span class="samp">z</span> that collates lower than
+does its starting point <span class="samp">a</span> in <span class="samp">[z-a]</span> is invalid.  Also, the
+range with the character class <span class="samp">[:alpha:]</span> as its starting point in
+<span class="samp">[[:alpha:]-|]</span>.
+
+     <br><dt><code>REG_ECTYPE</code><dd>For example, the character class name <span class="samp">foo</span> in <span class="samp">[[:foo:]</span> is
+invalid.
+
+     <!-- groups -->
+<br><dt><code>REG_EPAREN</code><dd>For example, <span class="samp">a\)</span> is missing an open-group operator and <span class="samp">\(a</span>
+is missing a close-group operator.
+
+     <br><dt><code>REG_ESUBREG</code><dd>For example, the back reference <span class="samp">\2</span> that refers to a nonexistent
+subexpression in <span class="samp">\(a\)\2</span> is invalid.
+
+     <!-- unfinished business -->
+<br><dt><code>REG_EEND</code><dd>Returned when a regular expression causes no other more specific error.
+
+     <br><dt><code>REG_EESCAPE</code><dd>For example, the trailing backslash <span class="samp">\</span> in <span class="samp">a\</span> is invalid, as is the
+one in <span class="samp">\</span>.
+
+     <!-- kitchen sink -->
+<br><dt><code>REG_BADPAT</code><dd>For example, in the extended regular expression syntax, the empty group
+<span class="samp">()</span> in <span class="samp">a()b</span> is invalid.
+
+     <!-- internal -->
+<br><dt><code>REG_ESIZE</code><dd>Returned when a regular expression needs a pattern buffer larger than
+65536 bytes.
+
+     <br><dt><code>REG_ESPACE</code><dd>Returned when a regular expression makes Regex to run out of memory.
+
+  </dl>
+
+<div class="node">
+<p><hr>
+<a name="POSIX-Matching"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Reporting-Errors">Reporting Errors</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#POSIX-Regex-Functions">POSIX Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.2.3 POSIX Matching</h4>
+
+<p>Matching the <span class="sc">posix</span> way means trying to match a null-terminated
+string starting at its first character.  Once you've compiled a pattern
+into a pattern buffer (see <a href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a>), you
+can ask the matcher to match that pattern against a string using:
+
+  <p><a name="index-regexec-130"></a>
+<pre class="example">     int
+     regexec (const regex_t *<var>preg</var>, const char *<var>string</var>,
+              size_t <var>nmatch</var>, regmatch_t <var>pmatch</var>[], int <var>eflags</var>)
+</pre>
+  <p class="noindent"><var>preg</var> is the address of a pattern buffer for a compiled pattern. 
+<var>string</var> is the string you want to match.
+
+  <p>See <a href="#Using-Byte-Offsets">Using Byte Offsets</a>, for an explanation of <var>pmatch</var>.  If you
+pass zero for <var>nmatch</var> or you compiled <var>preg</var> with the
+compilation flag <code>REG_NOSUB</code> set, then <code>regexec</code> will ignore
+<var>pmatch</var>; otherwise, you must allocate it to have at least
+<var>nmatch</var> elements.  <code>regexec</code> will record <var>nmatch</var> byte
+offsets in <var>pmatch</var>, and set to -1 any unused elements up to
+<var>pmatch</var><code>[</code><var>nmatch</var><code>]</code> - 1.
+
+  <p><var>eflags</var> specifies <dfn>execution flags</dfn>&mdash;namely, the two bits
+<code>REG_NOTBOL</code> and <code>REG_NOTEOL</code> (defined in <span class="file">regex.h</span>).  If
+you set <code>REG_NOTBOL</code>, then the match-beginning-of-line operator
+(see <a href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a>) always fails to match. 
+This lets you match against pieces of a line, as you would need to if,
+say, searching for repeated instances of a given pattern in a line; it
+would work correctly for patterns both with and without
+match-beginning-of-line operators.  <code>REG_NOTEOL</code> works analogously
+for the match-end-of-line operator (see <a href="#Match_002dend_002dof_002dline-Operator">Match-end-of-line Operator</a>); it exists for symmetry.
+
+  <p><code>regexec</code> tries to find a match for <var>preg</var> in <var>string</var>
+according to the syntax in <var>preg</var>'s <code>syntax</code> field. 
+(See <a href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a>, for how to set it.)  The
+function returns zero if the compiled pattern matches <var>string</var> and
+<code>REG_NOMATCH</code> (defined in <span class="file">regex.h</span>) if it doesn't.
+
+<div class="node">
+<p><hr>
+<a name="Reporting-Errors"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Using-Byte-Offsets">Using Byte Offsets</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#POSIX-Matching">POSIX Matching</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#POSIX-Regex-Functions">POSIX Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.2.4 Reporting Errors</h4>
+
+<p>If either <code>regcomp</code> or <code>regexec</code> fail, they return a nonzero
+error code, the possibilities for which are defined in <span class="file">regex.h</span>. 
+See <a href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a>, and <a href="#POSIX-Matching">POSIX Matching</a>, for
+what these codes mean.  To get an error string corresponding to these
+codes, you can use:
+
+  <p><a name="index-regerror-131"></a>
+<pre class="example">     size_t
+     regerror (int <var>errcode</var>,
+               const regex_t *<var>preg</var>,
+               char *<var>errbuf</var>,
+               size_t <var>errbuf_size</var>)
+</pre>
+  <p class="noindent"><var>errcode</var> is an error code, <var>preg</var> is the address of the pattern
+buffer which provoked the error, <var>errbuf</var> is the error buffer, and
+<var>errbuf_size</var> is <var>errbuf</var>'s size.
+
+  <p><code>regerror</code> returns the size in bytes of the error string
+corresponding to <var>errcode</var> (including its terminating null).  If
+<var>errbuf</var> and <var>errbuf_size</var> are nonzero, it also returns in
+<var>errbuf</var> the first <var>errbuf_size</var> - 1 characters of the
+error string, followed by a null. 
+<var>errbuf_size</var> must be a nonnegative number less than or equal to the
+size in bytes of <var>errbuf</var>.
+
+  <p>You can call <code>regerror</code> with a null <var>errbuf</var> and a zero
+<var>errbuf_size</var> to determine how large <var>errbuf</var> need be to
+accommodate <code>regerror</code>'s error string.
+
+<div class="node">
+<p><hr>
+<a name="Using-Byte-Offsets"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Freeing-POSIX-Pattern-Buffers">Freeing POSIX Pattern Buffers</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Reporting-Errors">Reporting Errors</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#POSIX-Regex-Functions">POSIX Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.2.5 Using Byte Offsets</h4>
+
+<p>In <span class="sc">posix</span>, variables of type <code>regmatch_t</code> hold analogous
+information, but are not identical to, <span class="sc">gnu</span>'s registers (see <a href="#Using-Registers">Using Registers</a>).  To get information about registers in <span class="sc">posix</span>, pass to
+<code>regexec</code> a nonzero <var>pmatch</var> of type <code>regmatch_t</code>, i.e.,
+the address of a structure of this type, defined in
+<span class="file">regex.h</span>:
+
+  <p><a name="index-regmatch_005ft-132"></a>
+<pre class="example">     typedef struct
+     {
+       regoff_t rm_so;
+       regoff_t rm_eo;
+     } regmatch_t;
+</pre>
+  <p>When reading in <a href="#Using-Registers">Using Registers</a>, about how the matching function
+stores the information into the registers, substitute <var>pmatch</var> for
+<var>regs</var>, <var>pmatch</var><code>[</code><var>i</var><code>]-&gt;<!-- /@w -->rm_so</code> for
+<var>regs</var><code>-&gt;<!-- /@w -->start[</code><var>i</var><code>]</code> and
+<var>pmatch</var><code>[</code><var>i</var><code>]-&gt;<!-- /@w -->rm_eo</code> for
+<var>regs</var><code>-&gt;<!-- /@w -->end[</code><var>i</var><code>]</code>.
+
+<div class="node">
+<p><hr>
+<a name="Freeing-POSIX-Pattern-Buffers"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Using-Byte-Offsets">Using Byte Offsets</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#POSIX-Regex-Functions">POSIX Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.2.6 Freeing POSIX Pattern Buffers</h4>
+
+<p>To free any allocated fields of a pattern buffer, use:
+
+  <p><a name="index-regfree-133"></a>
+<pre class="example">     void
+     regfree (regex_t *<var>preg</var>)
+</pre>
+  <p class="noindent"><var>preg</var> is the pattern buffer whose allocated fields you want freed. 
+<code>regfree</code> also sets <var>preg</var>'s <code>allocated</code> and <code>used</code>
+fields to zero.  After freeing a pattern buffer, you need to again
+compile a regular expression in it (see <a href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a>) before passing it to the matching function (see <a href="#POSIX-Matching">POSIX Matching</a>).
+
+<div class="node">
+<p><hr>
+<a name="BSD-Regex-Functions"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#POSIX-Regex-Functions">POSIX Regex Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Programming-with-Regex">Programming with Regex</a>
+<br>
+</div>
+
+<h3 class="section">7.3 BSD Regex Functions</h3>
+
+<p>If you're writing code that has to be Berkeley <span class="sc">unix</span> compatible,
+you'll need to use these functions whose interfaces are the same as those
+in Berkeley <span class="sc">unix</span>.
+
+<ul class="menu">
+<li><a accesskey="1" href="#BSD-Regular-Expression-Compiling">BSD Regular Expression Compiling</a>:     re_comp ()
+<li><a accesskey="2" href="#BSD-Searching">BSD Searching</a>:                        re_exec ()
+</ul>
+
+<div class="node">
+<p><hr>
+<a name="BSD-Regular-Expression-Compiling"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#BSD-Searching">BSD Searching</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#BSD-Regex-Functions">BSD Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.3.1 BSD Regular Expression Compiling</h4>
+
+<p>With Berkeley <span class="sc">unix</span>, you can only search for a given regular
+expression; you can't match one.  To search for it, you must first
+compile it.  Before you compile it, you must indicate the regular
+expression syntax you want it compiled according to by setting the
+variable <code>re_syntax_options</code> (declared in <span class="file">regex.h</span> to some
+syntax (see <a href="#Regular-Expression-Syntax">Regular Expression Syntax</a>).
+
+  <p>To compile a regular expression use:
+
+  <p><a name="index-re_005fcomp-134"></a>
+<pre class="example">     char *
+     re_comp (char *<var>regex</var>)
+</pre>
+  <p class="noindent"><var>regex</var> is the address of a null-terminated regular expression. 
+<code>re_comp</code> uses an internal pattern buffer, so you can use only the
+most recently compiled pattern buffer.  This means that if you want to
+use a given regular expression that you've already compiled&mdash;but it
+isn't the latest one you've compiled&mdash;you'll have to recompile it.  If
+you call <code>re_comp</code> with the null string (<em>not</em> the empty
+string) as the argument, it doesn't change the contents of the pattern
+buffer.
+
+  <p>If <code>re_comp</code> successfully compiles the regular expression, it
+returns zero.  If it can't compile the regular expression, it returns
+an error string.  <code>re_comp</code>'s error messages are identical to those
+of <code>re_compile_pattern</code> (see <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a>).
+
+<div class="node">
+<p><hr>
+<a name="BSD-Searching"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#BSD-Regular-Expression-Compiling">BSD Regular Expression Compiling</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#BSD-Regex-Functions">BSD Regex Functions</a>
+<br>
+</div>
+
+<h4 class="subsection">7.3.2 BSD Searching</h4>
+
+<p>Searching the Berkeley <span class="sc">unix</span> way means searching in a string
+starting at its first character and trying successive positions within
+it to find a match.  Once you've compiled a pattern using <code>re_comp</code>
+(see <a href="#BSD-Regular-Expression-Compiling">BSD Regular Expression Compiling</a>), you can ask Regex
+to search for that pattern in a string using:
+
+  <p><a name="index-re_005fexec-135"></a>
+<pre class="example">     int
+     re_exec (char *<var>string</var>)
+</pre>
+  <p class="noindent"><var>string</var> is the address of the null-terminated string in which you
+want to search.
+
+  <p><code>re_exec</code> returns either 1 for success or 0 for failure.  It
+automatically uses a <span class="sc">gnu</span> fastmap (see <a href="#Searching-with-Fastmaps">Searching with Fastmaps</a>).
+
+<div class="node">
+<p><hr>
+<a name="Copying"></a>Next:&nbsp;<a rel="next" accesskey="n" href="#Index">Index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Programming-with-Regex">Programming with Regex</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="appendix">Appendix A GNU GENERAL PUBLIC LICENSE</h2>
+
+<div align="center">Version 2, June 1991</div>
+
+<pre class="display">     Copyright &copy; 1989, 1991 Free Software Foundation, Inc.
+     675 Mass Ave, Cambridge, MA 02139, USA
+     
+     Everyone is permitted to copy and distribute verbatim copies
+     of this license document, but changing it is not allowed.
+</pre>
+  <h3 class="unnumberedsec">Preamble</h3>
+
+<p>The licenses for most software are designed to take away your
+freedom to share and change it.  By contrast, the GNU General Public
+License is intended to guarantee your freedom to share and change free
+software&mdash;to make sure the software is free for all its users.  This
+General Public License applies to most of the Free Software
+Foundation's software and to any other program whose authors commit to
+using it.  (Some other Free Software Foundation software is covered by
+the GNU Library General Public License instead.)  You can apply it to
+your programs, too.
+
+  <p>When we speak of free software, we are referring to freedom, not
+price.  Our General Public Licenses are designed to make sure that you
+have the freedom to distribute copies of free software (and charge for
+this service if you wish), that you receive source code or can get it
+if you want it, that you can change the software or use pieces of it
+in new free programs; and that you know you can do these things.
+
+  <p>To protect your rights, we need to make restrictions that forbid
+anyone to deny you these rights or to ask you to surrender the rights. 
+These restrictions translate to certain responsibilities for you if you
+distribute copies of the software, or if you modify it.
+
+  <p>For example, if you distribute copies of such a program, whether
+gratis or for a fee, you must give the recipients all the rights that
+you have.  You must make sure that they, too, receive or can get the
+source code.  And you must show them these terms so they know their
+rights.
+
+  <p>We protect your rights with two steps: (1) copyright the software, and
+(2) offer you this license which gives you legal permission to copy,
+distribute and/or modify the software.
+
+  <p>Also, for each author's protection and ours, we want to make certain
+that everyone understands that there is no warranty for this free
+software.  If the software is modified by someone else and passed on, we
+want its recipients to know that what they have is not the original, so
+that any problems introduced by others will not reflect on the original
+authors' reputations.
+
+  <p>Finally, any free program is threatened constantly by software
+patents.  We wish to avoid the danger that redistributors of a free
+program will individually obtain patent licenses, in effect making the
+program proprietary.  To prevent this, we have made it clear that any
+patent must be licensed for everyone's free use or not licensed at all.
+
+  <p>The precise terms and conditions for copying, distribution and
+modification follow.
+
+     <ol type=1 start=1>
+<li>This License applies to any program or other work which contains
+a notice placed by the copyright holder saying it may be distributed
+under the terms of this General Public License.  The &ldquo;Program&rdquo;, below,
+refers to any such program or work, and a &ldquo;work based on the Program&rdquo;
+means either the Program or any derivative work under copyright law:
+that is to say, a work containing the Program or a portion of it,
+either verbatim or with modifications and/or translated into another
+language.  (Hereinafter, translation is included without limitation in
+the term &ldquo;modification&rdquo;.)  Each licensee is addressed as &ldquo;you&rdquo;.
+
+     <p>Activities other than copying, distribution and modification are not
+covered by this License; they are outside its scope.  The act of
+running the Program is not restricted, and the output from the Program
+is covered only if its contents constitute a work based on the
+Program (independent of having been made by running the Program). 
+Whether that is true depends on what the Program does.
+
+     <li>You may copy and distribute verbatim copies of the Program's
+source code as you receive it, in any medium, provided that you
+conspicuously and appropriately publish on each copy an appropriate
+copyright notice and disclaimer of warranty; keep intact all the
+notices that refer to this License and to the absence of any warranty;
+and give any other recipients of the Program a copy of this License
+along with the Program.
+
+     <p>You may charge a fee for the physical act of transferring a copy, and
+you may at your option offer warranty protection in exchange for a fee.
+
+     <li>You may modify your copy or copies of the Program or any portion
+of it, thus forming a work based on the Program, and copy and
+distribute such modifications or work under the terms of Section 1
+above, provided that you also meet all of these conditions:
+
+          <ol type=a start=1>
+<li>You must cause the modified files to carry prominent notices
+stating that you changed the files and the date of any change.
+
+          <li>You must cause any work that you distribute or publish, that in
+whole or in part contains or is derived from the Program or any
+part thereof, to be licensed as a whole at no charge to all third
+parties under the terms of this License.
+
+          <li>If the modified program normally reads commands interactively
+when run, you must cause it, when started running for such
+interactive use in the most ordinary way, to print or display an
+announcement including an appropriate copyright notice and a
+notice that there is no warranty (or else, saying that you provide
+a warranty) and that users may redistribute the program under
+these conditions, and telling the user how to view a copy of this
+License.  (Exception: if the Program itself is interactive but
+does not normally print such an announcement, your work based on
+the Program is not required to print an announcement.)
+          </ol>
+
+     <p>These requirements apply to the modified work as a whole.  If
+identifiable sections of that work are not derived from the Program,
+and can be reasonably considered independent and separate works in
+themselves, then this License, and its terms, do not apply to those
+sections when you distribute them as separate works.  But when you
+distribute the same sections as part of a whole which is a work based
+on the Program, the distribution of the whole must be on the terms of
+this License, whose permissions for other licensees extend to the
+entire whole, and thus to each and every part regardless of who wrote it.
+
+     <p>Thus, it is not the intent of this section to claim rights or contest
+your rights to work written entirely by you; rather, the intent is to
+exercise the right to control the distribution of derivative or
+collective works based on the Program.
+
+     <p>In addition, mere aggregation of another work not based on the Program
+with the Program (or with a work based on the Program) on a volume of
+a storage or distribution medium does not bring the other work under
+the scope of this License.
+
+     <li>You may copy and distribute the Program (or a work based on it,
+under Section 2) in object code or executable form under the terms of
+Sections 1 and 2 above provided that you also do one of the following:
+
+          <ol type=a start=1>
+<li>Accompany it with the complete corresponding machine-readable
+source code, which must be distributed under the terms of Sections
+1 and 2 above on a medium customarily used for software interchange; or,
+
+          <li>Accompany it with a written offer, valid for at least three
+years, to give any third party, for a charge no more than your
+cost of physically performing source distribution, a complete
+machine-readable copy of the corresponding source code, to be
+distributed under the terms of Sections 1 and 2 above on a medium
+customarily used for software interchange; or,
+
+          <li>Accompany it with the information you received as to the offer
+to distribute corresponding source code.  (This alternative is
+allowed only for noncommercial distribution and only if you
+received the program in object code or executable form with such
+an offer, in accord with Subsection b above.)
+          </ol>
+
+     <p>The source code for a work means the preferred form of the work for
+making modifications to it.  For an executable work, complete source
+code means all the source code for all modules it contains, plus any
+associated interface definition files, plus the scripts used to
+control compilation and installation of the executable.  However, as a
+special exception, the source code distributed need not include
+anything that is normally distributed (in either source or binary
+form) with the major components (compiler, kernel, and so on) of the
+operating system on which the executable runs, unless that component
+itself accompanies the executable.
+
+     <p>If distribution of executable or object code is made by offering
+access to copy from a designated place, then offering equivalent
+access to copy the source code from the same place counts as
+distribution of the source code, even though third parties are not
+compelled to copy the source along with the object code.
+
+     <li>You may not copy, modify, sublicense, or distribute the Program
+except as expressly provided under this License.  Any attempt
+otherwise to copy, modify, sublicense or distribute the Program is
+void, and will automatically terminate your rights under this License. 
+However, parties who have received copies, or rights, from you under
+this License will not have their licenses terminated so long as such
+parties remain in full compliance.
+
+     <li>You are not required to accept this License, since you have not
+signed it.  However, nothing else grants you permission to modify or
+distribute the Program or its derivative works.  These actions are
+prohibited by law if you do not accept this License.  Therefore, by
+modifying or distributing the Program (or any work based on the
+Program), you indicate your acceptance of this License to do so, and
+all its terms and conditions for copying, distributing or modifying
+the Program or works based on it.
+
+     <li>Each time you redistribute the Program (or any work based on the
+Program), the recipient automatically receives a license from the
+original licensor to copy, distribute or modify the Program subject to
+these terms and conditions.  You may not impose any further
+restrictions on the recipients' exercise of the rights granted herein. 
+You are not responsible for enforcing compliance by third parties to
+this License.
+
+     <li>If, as a consequence of a court judgment or allegation of patent
+infringement or for any other reason (not limited to patent issues),
+conditions are imposed on you (whether by court order, agreement or
+otherwise) that contradict the conditions of this License, they do not
+excuse you from the conditions of this License.  If you cannot
+distribute so as to satisfy simultaneously your obligations under this
+License and any other pertinent obligations, then as a consequence you
+may not distribute the Program at all.  For example, if a patent
+license would not permit royalty-free redistribution of the Program by
+all those who receive copies directly or indirectly through you, then
+the only way you could satisfy both it and this License would be to
+refrain entirely from distribution of the Program.
+
+     <p>If any portion of this section is held invalid or unenforceable under
+any particular circumstance, the balance of the section is intended to
+apply and the section as a whole is intended to apply in other
+circumstances.
+
+     <p>It is not the purpose of this section to induce you to infringe any
+patents or other property right claims or to contest validity of any
+such claims; this section has the sole purpose of protecting the
+integrity of the free software distribution system, which is
+implemented by public license practices.  Many people have made
+generous contributions to the wide range of software distributed
+through that system in reliance on consistent application of that
+system; it is up to the author/donor to decide if he or she is willing
+to distribute software through any other system and a licensee cannot
+impose that choice.
+
+     <p>This section is intended to make thoroughly clear what is believed to
+be a consequence of the rest of this License.
+
+     <li>If the distribution and/or use of the Program is restricted in
+certain countries either by patents or by copyrighted interfaces, the
+original copyright holder who places the Program under this License
+may add an explicit geographical distribution limitation excluding
+those countries, so that distribution is permitted only in or among
+countries not thus excluded.  In such case, this License incorporates
+the limitation as if written in the body of this License.
+
+     <li>The Free Software Foundation may publish revised and/or new versions
+of the General Public License from time to time.  Such new versions will
+be similar in spirit to the present version, but may differ in detail to
+address new problems or concerns.
+
+     <p>Each version is given a distinguishing version number.  If the Program
+specifies a version number of this License which applies to it and &ldquo;any
+later version&rdquo;, you have the option of following the terms and conditions
+either of that version or of any later version published by the Free
+Software Foundation.  If the Program does not specify a version number of
+this License, you may choose any version ever published by the Free Software
+Foundation.
+
+     <li>If you wish to incorporate parts of the Program into other free
+programs whose distribution conditions are different, write to the author
+to ask for permission.  For software which is copyrighted by the Free
+Software Foundation, write to the Free Software Foundation; we sometimes
+make exceptions for this.  Our decision will be guided by the two goals
+of preserving the free status of all derivatives of our free software and
+of promoting the sharing and reuse of software generally.
+
+     <li>BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.  EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE PROGRAM &ldquo;AS IS&rdquo; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS
+TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE
+PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING,
+REPAIR OR CORRECTION.
+
+     <li>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING
+OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED
+TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY
+YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER
+PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES.
+       </ol>
+
+<h3 class="unnumberedsec">Appendix: How to Apply These Terms to Your New Programs</h3>
+
+<p>If you develop a new program, and you want it to be of the greatest
+possible use to the public, the best way to achieve this is to make it
+free software which everyone can redistribute and change under these terms.
+
+  <p>To do so, attach the following notices to the program.  It is safest
+to attach them to the start of each source file to most effectively
+convey the exclusion of warranty; and each file should have at least
+the &ldquo;copyright&rdquo; line and a pointer to where the full notice is found.
+
+<pre class="smallexample">     <var>one line to give the program's name and a brief idea of what it does.</var>
+     Copyright (C) 19<var>yy</var>  <var>name of author</var>
+     
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+     the Free Software Foundation; either version 2 of the License, or
+     (at your option) any later version.
+     
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+     GNU General Public License for more details.
+     
+     You should have received a copy of the GNU General Public License
+     along with this program; if not, write to the Free Software
+     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+</pre>
+  <p>Also add information on how to contact you by electronic and paper mail.
+
+  <p>If the program is interactive, make it output a short notice like this
+when it starts in an interactive mode:
+
+<pre class="smallexample">     Gnomovision version 69, Copyright (C) 19<var>yy</var> <var>name of author</var>
+     Gnomovision comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+     This is free software, and you are welcome to redistribute it
+     under certain conditions; type `show c' for details.
+</pre>
+  <p>The hypothetical commands <span class="samp">show w</span> and <span class="samp">show c</span> should show
+the appropriate parts of the General Public License.  Of course, the
+commands you use may be called something other than <span class="samp">show w</span> and
+<span class="samp">show c</span>; they could even be mouse-clicks or menu items&mdash;whatever
+suits your program.
+
+  <p>You should also get your employer (if you work as a programmer) or your
+school, if any, to sign a &ldquo;copyright disclaimer&rdquo; for the program, if
+necessary.  Here is a sample; alter the names:
+
+<pre class="example">     Yoyodyne, Inc., hereby disclaims all copyright interest in the program
+     `Gnomovision' (which makes passes at compilers) written by James Hacker.
+     
+     <var>signature of Ty Coon</var>, 1 April 1989
+     Ty Coon, President of Vice
+</pre>
+  <p>This General Public License does not permit incorporating your program into
+proprietary programs.  If your program is a subroutine library, you may
+consider it more useful to permit linking proprietary applications with the
+library.  If this is what you want to do, use the GNU Library General
+Public License instead of this License.
+
+<div class="node">
+<p><hr>
+<a name="Index"></a>Previous:&nbsp;<a rel="previous" accesskey="p" href="#Copying">Copying</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="unnumbered">Index</h2>
+
+<ul class="index-cp" compact>
+<li><a href="#index-_0024-75"><code>$</code></a>: <a href="#Match_002dend_002dof_002dline-Operator">Match-end-of-line Operator</a></li>
+<li><a href="#index-_0028-57"><code>(</code></a>: <a href="#Grouping-Operators">Grouping Operators</a></li>
+<li><a href="#index-_0029-58"><code>)</code></a>: <a href="#Grouping-Operators">Grouping Operators</a></li>
+<li><a href="#index-_0040samp_007b_002a_007d-30"><span class="samp">*</span></a>: <a href="#Match_002dzero_002dor_002dmore-Operator">Match-zero-or-more Operator</a></li>
+<li><a href="#index-_0040samp_007b_002b_007d-32"><span class="samp">+</span></a>: <a href="#Match_002done_002dor_002dmore-Operator">Match-one-or-more Operator</a></li>
+<li><a href="#index-_0040samp_007b_002d_007d-48"><span class="samp">-</span></a>: <a href="#List-Operators">List Operators</a></li>
+<li><a href="#index-_0040samp_007b_002e_007d-29"><span class="samp">.</span></a>: <a href="#Match_002dany_002dcharacter-Operator">Match-any-character Operator</a></li>
+<li><a href="#index-_0040samp_007b_003a_005d_007d-in-regex-56"><span class="samp">:]</span> in regex</a>: <a href="#Character-Class-Operators">Character Class Operators</a></li>
+<li><a href="#index-_0040samp_007b_003f_007d-33"><span class="samp">?</span></a>: <a href="#Match_002dzero_002dor_002done-Operator">Match-zero-or-one Operator</a></li>
+<li><a href="#index-_0040samp_007b_005b_007d-45"><span class="samp">[</span></a>: <a href="#List-Operators">List Operators</a></li>
+<li><a href="#index-_0040samp_007b_005b_003a_007d-in-regex-55"><span class="samp">[:</span> in regex</a>: <a href="#Character-Class-Operators">Character Class Operators</a></li>
+<li><a href="#index-_0040samp_007b_005b_005e_007d-50"><span class="samp">[^</span></a>: <a href="#List-Operators">List Operators</a></li>
+<li><a href="#index-_0040samp_007b_005c_007d-49"><span class="samp">\</span></a>: <a href="#List-Operators">List Operators</a></li>
+<li><a href="#index-_0040samp_007b_005c_007d-28"><span class="samp">\</span></a>: <a href="#The-Backslash-Character">The Backslash Character</a></li>
+<li><a href="#index-_0040samp_007b_005c_0027_007d-86"><span class="samp">\'</span></a>: <a href="#Match_002dend_002dof_002dbuffer-Operator">Match-end-of-buffer Operator</a></li>
+<li><a href="#index-_005c_0028-59"><code>\(</code></a>: <a href="#Grouping-Operators">Grouping Operators</a></li>
+<li><a href="#index-_005c_0029-60"><code>\)</code></a>: <a href="#Grouping-Operators">Grouping Operators</a></li>
+<li><a href="#index-_0040samp_007b_005c_003c_007d-81"><span class="samp">\&lt;</span></a>: <a href="#Match_002dbeginning_002dof_002dword-Operator">Match-beginning-of-word Operator</a></li>
+<li><a href="#index-_0040samp_007b_005c_003e_007d-82"><span class="samp">\&gt;</span></a>: <a href="#Match_002dend_002dof_002dword-Operator">Match-end-of-word Operator</a></li>
+<li><a href="#index-_0040samp_007b_005c_0060_007d-85"><span class="samp">\`</span></a>: <a href="#Match_002dbeginning_002dof_002dbuffer-Operator">Match-beginning-of-buffer Operator</a></li>
+<li><a href="#index-_0040samp_007b_005cB_007d-80"><span class="samp">\B</span></a>: <a href="#Match_002dwithin_002dword-Operator">Match-within-word Operator</a></li>
+<li><a href="#index-_0040samp_007b_005cb_007d-78"><span class="samp">\b</span></a>: <a href="#Match_002dword_002dboundary-Operator">Match-word-boundary Operator</a></li>
+<li><a href="#index-_0040samp_007b_005cs_007d-87"><span class="samp">\s</span></a>: <a href="#Match_002dsyntactic_002dclass-Operator">Match-syntactic-class Operator</a></li>
+<li><a href="#index-_0040samp_007b_005cS_007d-88"><span class="samp">\S</span></a>: <a href="#Match_002dnot_002dsyntactic_002dclass-Operator">Match-not-syntactic-class Operator</a></li>
+<li><a href="#index-_0040samp_007b_005cW_007d-84"><span class="samp">\W</span></a>: <a href="#Match_002dnon_002dword_002dconstituent-Operator">Match-non-word-constituent Operator</a></li>
+<li><a href="#index-_0040samp_007b_005cw_007d-83"><span class="samp">\w</span></a>: <a href="#Match_002dword_002dconstituent-Operator">Match-word-constituent Operator</a></li>
+<li><a href="#index-_0040samp_007b_005c_0040_007b_007d-37"><span class="samp">\{</span></a>: <a href="#Interval-Operators">Interval Operators</a></li>
+<li><a href="#index-_0040samp_007b_005c_007c_007d-40"><span class="samp">\|</span></a>: <a href="#Alternation-Operator">Alternation Operator</a></li>
+<li><a href="#index-_0040samp_007b_005c_0040_007d_007d-38"><span class="samp">\}</span></a>: <a href="#Interval-Operators">Interval Operators</a></li>
+<li><a href="#index-_0040samp_007b_005d_007d-46"><span class="samp">]</span></a>: <a href="#List-Operators">List Operators</a></li>
+<li><a href="#index-_0040samp_007b_005e_007d-47"><span class="samp">^</span></a>: <a href="#List-Operators">List Operators</a></li>
+<li><a href="#index-_005e-67"><code>^</code></a>: <a href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a></li>
+<li><a href="#index-allocated-_0040r_007binitialization_007d-98"><code>allocated </code><span class="roman">initialization</span></a>: <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a></li>
+<li><a href="#index-alternation-operator-41">alternation operator</a>: <a href="#Alternation-Operator">Alternation Operator</a></li>
+<li><a href="#index-alternation-operator-and-_0040samp_007b_005e_007d-72">alternation operator and <span class="samp">^</span></a>: <a href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a></li>
+<li><a href="#index-anchoring-65">anchoring</a>: <a href="#Anchoring-Operators">Anchoring Operators</a></li>
+<li><a href="#index-anchors-77">anchors</a>: <a href="#Match_002dend_002dof_002dline-Operator">Match-end-of-line Operator</a></li>
+<li><a href="#index-anchors-69">anchors</a>: <a href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a></li>
+<li><a href="#index-Awk-25">Awk</a>: <a href="#Predefined-Syntaxes">Predefined Syntaxes</a></li>
+<li><a href="#index-back-references-64">back references</a>: <a href="#Back_002dreference-Operator">Back-reference Operator</a></li>
+<li><a href="#index-backtracking-43">backtracking</a>: <a href="#Alternation-Operator">Alternation Operator</a></li>
+<li><a href="#index-backtracking-31">backtracking</a>: <a href="#Match_002dzero_002dor_002dmore-Operator">Match-zero-or-more Operator</a></li>
+<li><a href="#index-beginning_002dof_002dline-operator-68">beginning-of-line operator</a>: <a href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a></li>
+<li><a href="#index-bracket-expression-53">bracket expression</a>: <a href="#List-Operators">List Operators</a></li>
+<li><a href="#index-buffer-_0040r_007bfield_002c-set-by-_0040code_007bre_005fcompile_005fpattern_007d_007d-101"><code>buffer </code><span class="roman">field, set by </span><code>re_compile_pattern</code></a>: <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a></li>
+<li><a href="#index-buffer-_0040r_007binitialization_007d-97"><code>buffer </code><span class="roman">initialization</span></a>: <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a></li>
+<li><a href="#index-character-classes-54">character classes</a>: <a href="#Character-Class-Operators">Character Class Operators</a></li>
+<li><a href="#index-Egrep-27">Egrep</a>: <a href="#Predefined-Syntaxes">Predefined Syntaxes</a></li>
+<li><a href="#index-Emacs-23">Emacs</a>: <a href="#Predefined-Syntaxes">Predefined Syntaxes</a></li>
+<li><a href="#index-end-_0040r_007bin-_0040code_007bstruct-re_005fregisters_007d_007d-119"><code>end </code><span class="roman">in </span><code>struct re_registers</code></a>: <a href="#Using-Registers">Using Registers</a></li>
+<li><a href="#index-end_002dof_002dline-operator-76">end-of-line operator</a>: <a href="#Match_002dend_002dof_002dline-Operator">Match-end-of-line Operator</a></li>
+<li><a href="#index-fastmap-_0040r_007binitialization_007d-96"><code>fastmap </code><span class="roman">initialization</span></a>: <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a></li>
+<li><a href="#index-fastmap_005faccurate-_0040r_007bfield_002c-set-by-_0040code_007bre_005fcompile_005fpattern_007d_007d-105"><code>fastmap_accurate </code><span class="roman">field, set by </span><code>re_compile_pattern</code></a>: <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a></li>
+<li><a href="#index-fastmaps-114">fastmaps</a>: <a href="#Searching-with-Fastmaps">Searching with Fastmaps</a></li>
+<li><a href="#index-Grep-26">Grep</a>: <a href="#Predefined-Syntaxes">Predefined Syntaxes</a></li>
+<li><a href="#index-grouping-61">grouping</a>: <a href="#Grouping-Operators">Grouping Operators</a></li>
+<li><a href="#index-ignoring-case-127">ignoring case</a>: <a href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a></li>
+<li><a href="#index-interval-expression-34">interval expression</a>: <a href="#Interval-Operators">Interval Operators</a></li>
+<li><a href="#index-matching-list-44">matching list</a>: <a href="#List-Operators">List Operators</a></li>
+<li><a href="#index-matching-newline-52">matching newline</a>: <a href="#List-Operators">List Operators</a></li>
+<li><a href="#index-matching-with-GNU-functions-106">matching with GNU functions</a>: <a href="#GNU-Matching">GNU Matching</a></li>
+<li><a href="#index-newline_005fanchor-_0040r_007bfield-in-pattern-buffer_007d-74"><code>newline_anchor </code><span class="roman">field in pattern buffer</span></a>: <a href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a></li>
+<li><a href="#index-nonmatching-list-51">nonmatching list</a>: <a href="#List-Operators">List Operators</a></li>
+<li><a href="#index-not_005fbol-_0040r_007bfield-in-pattern-buffer_007d-73"><code>not_bol </code><span class="roman">field in pattern buffer</span></a>: <a href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a></li>
+<li><a href="#index-num_005fregs-_0040r_007bin-_0040code_007bstruct-re_005fregisters_007d_007d-117"><code>num_regs </code><span class="roman">in </span><code>struct re_registers</code></a>: <a href="#Using-Registers">Using Registers</a></li>
+<li><a href="#index-open_002dgroup-operator-and-_0040samp_007b_005e_007d-71">open-group operator and <span class="samp">^</span></a>: <a href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a></li>
+<li><a href="#index-or-operator-42">or operator</a>: <a href="#Alternation-Operator">Alternation Operator</a></li>
+<li><a href="#index-parenthesizing-63">parenthesizing</a>: <a href="#Grouping-Operators">Grouping Operators</a></li>
+<li><a href="#index-pattern-buffer-initialization-94">pattern buffer initialization</a>: <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a></li>
+<li><a href="#index-pattern-buffer_002c-definition-of-89">pattern buffer, definition of</a>: <a href="#GNU-Pattern-Buffers">GNU Pattern Buffers</a></li>
+<li><a href="#index-POSIX-Awk-24">POSIX Awk</a>: <a href="#Predefined-Syntaxes">Predefined Syntaxes</a></li>
+<li><a href="#index-range-_0040r_007bargument-to-_0040code_007bre_005fsearch_007d_007d-111"><code>range </code><span class="roman">argument to </span><code>re_search</code></a>: <a href="#GNU-Searching">GNU Searching</a></li>
+<li><a href="#index-RE_005fBACKSLASH_005fESCAPE_005fIN_005fLIST-6"><code>RE_BACKSLASH_ESCAPE_IN_LIST</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fBK_005fPLUS_005fQM-7"><code>RE_BK_PLUS_QM</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fCHAR_005fCLASSES-8"><code>RE_CHAR_CLASSES</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fCONTEXT_005fINDEP_005fANCHORS-9"><code>RE_CONTEXT_INDEP_ANCHORS</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fCONTEXT_005fINDEP_005fANCHORS-_0040r_007b_0028and-_0040samp_007b_005e_007d_0029_007d-70"><code>RE_CONTEXT_INDEP_ANCHORS </code><span class="roman">(and ^)</span></a>: <a href="#Match_002dbeginning_002dof_002dline-Operator">Match-beginning-of-line Operator</a></li>
+<li><a href="#index-RE_005fCONTEXT_005fINDEP_005fOPS-10"><code>RE_CONTEXT_INDEP_OPS</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fCONTEXT_005fINVALID_005fOPS-11"><code>RE_CONTEXT_INVALID_OPS</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fDOT_005fNEWLINE-12"><code>RE_DOT_NEWLINE</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fDOT_005fNOT_005fNULL-13"><code>RE_DOT_NOT_NULL</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fINTERVALS-14"><code>RE_INTERVALS</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fLIMITED_005fOPS-15"><code>RE_LIMITED_OPS</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fNEWLINE_005fALT-16"><code>RE_NEWLINE_ALT</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fNO_005fBK_005fBRACES-17"><code>RE_NO_BK_BRACES</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fNO_005fBK_005fPARENS-18"><code>RE_NO_BK_PARENS</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fNO_005fBK_005fREFS-19"><code>RE_NO_BK_REFS</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fNO_005fBK_005fVBAR-20"><code>RE_NO_BK_VBAR</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-RE_005fNO_005fEMPTY_005fRANGES-21"><code>RE_NO_EMPTY_RANGES</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-re_005fnsub-_0040r_007bfield_002c-set-by-_0040code_007bre_005fcompile_005fpattern_007d_007d-104"><code>re_nsub </code><span class="roman">field, set by </span><code>re_compile_pattern</code></a>: <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a></li>
+<li><a href="#index-re_005fpattern_005fbuffer-_0040r_007bdefinition_007d-90"><code>re_pattern_buffer </code><span class="roman">definition</span></a>: <a href="#GNU-Pattern-Buffers">GNU Pattern Buffers</a></li>
+<li><a href="#index-re_005fregisters-116"><code>re_registers</code></a>: <a href="#Using-Registers">Using Registers</a></li>
+<li><a href="#index-re_005fsyntax_005foptions-_0040r_007binitialization_007d-93"><code>re_syntax_options </code><span class="roman">initialization</span></a>: <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a></li>
+<li><a href="#index-RE_005fUNMATCHED_005fRIGHT_005fPAREN_005fORD-22"><code>RE_UNMATCHED_RIGHT_PAREN_ORD</code></a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-REG_005fEXTENDED-125"><code>REG_EXTENDED</code></a>: <a href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a></li>
+<li><a href="#index-REG_005fICASE-126"><code>REG_ICASE</code></a>: <a href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a></li>
+<li><a href="#index-REG_005fNEWLINE-129"><code>REG_NEWLINE</code></a>: <a href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a></li>
+<li><a href="#index-REG_005fNOSUB-128"><code>REG_NOSUB</code></a>: <a href="#POSIX-Regular-Expression-Compiling">POSIX Regular Expression Compiling</a></li>
+<li><a href="#index-regex_002ec-2"><code>regex.c</code></a>: <a href="#Overview">Overview</a></li>
+<li><a href="#index-regex_002eh-1"><code>regex.h</code></a>: <a href="#Overview">Overview</a></li>
+<li><a href="#index-regexp-anchoring-66">regexp anchoring</a>: <a href="#Anchoring-Operators">Anchoring Operators</a></li>
+<li><a href="#index-regmatch_005ft-132"><code>regmatch_t</code></a>: <a href="#Using-Byte-Offsets">Using Byte Offsets</a></li>
+<li><a href="#index-regs_005fallocated-120"><code>regs_allocated</code></a>: <a href="#Using-Registers">Using Registers</a></li>
+<li><a href="#index-REGS_005fFIXED-123"><code>REGS_FIXED</code></a>: <a href="#Using-Registers">Using Registers</a></li>
+<li><a href="#index-REGS_005fREALLOCATE-122"><code>REGS_REALLOCATE</code></a>: <a href="#Using-Registers">Using Registers</a></li>
+<li><a href="#index-REGS_005fUNALLOCATED-121"><code>REGS_UNALLOCATED</code></a>: <a href="#Using-Registers">Using Registers</a></li>
+<li><a href="#index-regular-expressions_002c-syntax-of-3">regular expressions, syntax of</a>: <a href="#Regular-Expression-Syntax">Regular Expression Syntax</a></li>
+<li><a href="#index-searching-with-GNU-functions-108">searching with GNU functions</a>: <a href="#GNU-Searching">GNU Searching</a></li>
+<li><a href="#index-start-_0040r_007bargument-to-_0040code_007bre_005fsearch_007d_007d-110"><code>start </code><span class="roman">argument to </span><code>re_search</code></a>: <a href="#GNU-Searching">GNU Searching</a></li>
+<li><a href="#index-start-_0040r_007bin-_0040code_007bstruct-re_005fregisters_007d_007d-118"><code>start </code><span class="roman">in </span><code>struct re_registers</code></a>: <a href="#Using-Registers">Using Registers</a></li>
+<li><a href="#index-struct-re_005fpattern_005fbuffer-_0040r_007bdefinition_007d-91"><code>struct re_pattern_buffer </code><span class="roman">definition</span></a>: <a href="#GNU-Pattern-Buffers">GNU Pattern Buffers</a></li>
+<li><a href="#index-subexpressions-62">subexpressions</a>: <a href="#Grouping-Operators">Grouping Operators</a></li>
+<li><a href="#index-syntax-bits-5">syntax bits</a>: <a href="#Syntax-Bits">Syntax Bits</a></li>
+<li><a href="#index-syntax-_0040r_007bfield_002c-set-by-_0040code_007bre_005fcompile_005fpattern_007d_007d-103"><code>syntax </code><span class="roman">field, set by </span><code>re_compile_pattern</code></a>: <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a></li>
+<li><a href="#index-syntax-initialization-92">syntax initialization</a>: <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a></li>
+<li><a href="#index-syntax-of-regular-expressions-4">syntax of regular expressions</a>: <a href="#Regular-Expression-Syntax">Regular Expression Syntax</a></li>
+<li><a href="#index-translate-_0040r_007binitialization_007d-95"><code>translate </code><span class="roman">initialization</span></a>: <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a></li>
+<li><a href="#index-used-_0040r_007bfield_002c-set-by-_0040code_007bre_005fcompile_005fpattern_007d_007d-102"><code>used </code><span class="roman">field, set by </span><code>re_compile_pattern</code></a>: <a href="#GNU-Regular-Expression-Compiling">GNU Regular Expression Compiling</a></li>
+<li><a href="#index-word-boundaries_002c-matching-79">word boundaries, matching</a>: <a href="#Match_002dword_002dboundary-Operator">Match-word-boundary Operator</a></li>
+<li><a href="#index-_0040samp_007b_0040_007b_007d-35"><span class="samp">{</span></a>: <a href="#Interval-Operators">Interval Operators</a></li>
+<li><a href="#index-_0040samp_007b_007c_007d-39"><span class="samp">|</span></a>: <a href="#Alternation-Operator">Alternation Operator</a></li>
+<li><a href="#index-_0040samp_007b_0040_007d_007d-36"><span class="samp">}</span></a>: <a href="#Interval-Operators">Interval Operators</a></li>
+  </ul>
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Overview" href="#Overview">1 Overview</a>
+<li><a name="toc_Regular-Expression-Syntax" href="#Regular-Expression-Syntax">2 Regular Expression Syntax</a>
+<ul>
+<li><a href="#Syntax-Bits">2.1 Syntax Bits</a>
+<li><a href="#Predefined-Syntaxes">2.2 Predefined Syntaxes</a>
+<li><a href="#Collating-Elements-vs_002e-Characters">2.3 Collating Elements vs. Characters</a>
+<li><a href="#The-Backslash-Character">2.4 The Backslash Character</a>
+</li></ul>
+<li><a name="toc_Common-Operators" href="#Common-Operators">3 Common Operators</a>
+<ul>
+<li><a href="#Match_002dself-Operator">3.1 The Match-self Operator (<var>ordinary character</var>)</a>
+<li><a href="#Match_002dany_002dcharacter-Operator">3.2 The Match-any-character Operator (<code>.</code>)</a>
+<li><a href="#Concatenation-Operator">3.3 The Concatenation Operator</a>
+<li><a href="#Repetition-Operators">3.4 Repetition Operators</a>
+<ul>
+<li><a href="#Match_002dzero_002dor_002dmore-Operator">3.4.1 The Match-zero-or-more Operator (<code>*</code>)</a>
+<li><a href="#Match_002done_002dor_002dmore-Operator">3.4.2 The Match-one-or-more Operator (<code>+</code> or <code>\+</code>)</a>
+<li><a href="#Match_002dzero_002dor_002done-Operator">3.4.3 The Match-zero-or-one Operator (<code>?</code> or <code>\?</code>)</a>
+<li><a href="#Interval-Operators">3.4.4 Interval Operators (<code>{</code> <small class="dots">...</small> <code>}</code> or <code>\{</code> <small class="dots">...</small> <code>\}</code>)</a>
+</li></ul>
+<li><a href="#Alternation-Operator">3.5 The Alternation Operator (<code>|</code> or <code>\|</code>)</a>
+<li><a href="#List-Operators">3.6 List Operators (<code>[</code> <small class="dots">...</small> <code>]</code> and <code>[^</code> <small class="dots">...</small> <code>]</code>)</a>
+<ul>
+<li><a href="#Character-Class-Operators">3.6.1 Character Class Operators (<code>[:</code> <small class="dots">...</small> <code>:]</code>)</a>
+<li><a href="#Range-Operator">3.6.2 The Range Operator (<code>-</code>)</a>
+</li></ul>
+<li><a href="#Grouping-Operators">3.7 Grouping Operators (<code>(</code> <small class="dots">...</small> <code>)</code> or <code>\(</code> <small class="dots">...</small> <code>\)</code>)</a>
+<li><a href="#Back_002dreference-Operator">3.8 The Back-reference Operator (<dfn>\</dfn><var>digit</var>)</a>
+<li><a href="#Anchoring-Operators">3.9 Anchoring Operators</a>
+<ul>
+<li><a href="#Match_002dbeginning_002dof_002dline-Operator">3.9.1 The Match-beginning-of-line Operator (<code>^</code>)</a>
+<li><a href="#Match_002dend_002dof_002dline-Operator">3.9.2 The Match-end-of-line Operator (<code>$</code>)</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_GNU-Operators" href="#GNU-Operators">4 GNU Operators</a>
+<ul>
+<li><a href="#Word-Operators">4.1 Word Operators</a>
+<ul>
+<li><a href="#Non_002dEmacs-Syntax-Tables">4.1.1 Non-Emacs Syntax Tables</a>
+<li><a href="#Match_002dword_002dboundary-Operator">4.1.2 The Match-word-boundary Operator (<code>\b</code>)</a>
+<li><a href="#Match_002dwithin_002dword-Operator">4.1.3 The Match-within-word Operator (<code>\B</code>)</a>
+<li><a href="#Match_002dbeginning_002dof_002dword-Operator">4.1.4 The Match-beginning-of-word Operator (<code>\&lt;</code>)</a>
+<li><a href="#Match_002dend_002dof_002dword-Operator">4.1.5 The Match-end-of-word Operator (<code>\&gt;</code>)</a>
+<li><a href="#Match_002dword_002dconstituent-Operator">4.1.6 The Match-word-constituent Operator (<code>\w</code>)</a>
+<li><a href="#Match_002dnon_002dword_002dconstituent-Operator">4.1.7 The Match-non-word-constituent Operator (<code>\W</code>)</a>
+</li></ul>
+<li><a href="#Buffer-Operators">4.2 Buffer Operators</a>
+<ul>
+<li><a href="#Match_002dbeginning_002dof_002dbuffer-Operator">4.2.1 The Match-beginning-of-buffer Operator</a>
+<li><a href="#Match_002dend_002dof_002dbuffer-Operator">4.2.2 The Match-end-of-buffer Operator</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_GNU-Emacs-Operators" href="#GNU-Emacs-Operators">5 GNU Emacs Operators</a>
+<ul>
+<li><a href="#Syntactic-Class-Operators">5.1 Syntactic Class Operators</a>
+<ul>
+<li><a href="#Emacs-Syntax-Tables">5.1.1 Emacs Syntax Tables</a>
+<li><a href="#Match_002dsyntactic_002dclass-Operator">5.1.2 The Match-syntactic-class Operator (<code>\s</code><var>class</var>)</a>
+<li><a href="#Match_002dnot_002dsyntactic_002dclass-Operator">5.1.3 The Match-not-syntactic-class Operator (<code>\S</code><var>class</var>)</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_What-Gets-Matched_003f" href="#What-Gets-Matched_003f">6 What Gets Matched?</a>
+<li><a name="toc_Programming-with-Regex" href="#Programming-with-Regex">7 Programming with Regex</a>
+<ul>
+<li><a href="#GNU-Regex-Functions">7.1 GNU Regex Functions</a>
+<ul>
+<li><a href="#GNU-Pattern-Buffers">7.1.1 GNU Pattern Buffers</a>
+<li><a href="#GNU-Regular-Expression-Compiling">7.1.2 GNU Regular Expression Compiling</a>
+<li><a href="#GNU-Matching">7.1.3 GNU Matching</a>
+<li><a href="#GNU-Searching">7.1.4 GNU Searching</a>
+<li><a href="#Matching_002fSearching-with-Split-Data">7.1.5 Matching and Searching with Split Data</a>
+<li><a href="#Searching-with-Fastmaps">7.1.6 Searching with Fastmaps</a>
+<li><a href="#GNU-Translate-Tables">7.1.7 GNU Translate Tables</a>
+<li><a href="#Using-Registers">7.1.8 Using Registers</a>
+<li><a href="#Freeing-GNU-Pattern-Buffers">7.1.9 Freeing GNU Pattern Buffers</a>
+</li></ul>
+<li><a href="#POSIX-Regex-Functions">7.2 POSIX Regex Functions</a>
+<ul>
+<li><a href="#POSIX-Pattern-Buffers">7.2.1 POSIX Pattern Buffers</a>
+<li><a href="#POSIX-Regular-Expression-Compiling">7.2.2 POSIX Regular Expression Compiling</a>
+<li><a href="#POSIX-Matching">7.2.3 POSIX Matching</a>
+<li><a href="#Reporting-Errors">7.2.4 Reporting Errors</a>
+<li><a href="#Using-Byte-Offsets">7.2.5 Using Byte Offsets</a>
+<li><a href="#Freeing-POSIX-Pattern-Buffers">7.2.6 Freeing POSIX Pattern Buffers</a>
+</li></ul>
+<li><a href="#BSD-Regex-Functions">7.3 BSD Regex Functions</a>
+<ul>
+<li><a href="#BSD-Regular-Expression-Compiling">7.3.1 BSD Regular Expression Compiling</a>
+<li><a href="#BSD-Searching">7.3.2 BSD Searching</a>
+</li></ul>
+</li></ul>
+<li><a name="toc_Copying" href="#Copying">Appendix A GNU GENERAL PUBLIC LICENSE</a>
+<ul>
+<li><a href="#Copying">Preamble</a>
+<li><a href="#Copying">Appendix: How to Apply These Terms to Your New Programs</a>
+</li></ul>
+<li><a name="toc_Index" href="#Index">Index</a>
+</li></ul>
+</div>
+
+<div class="footnote">
+<hr>
+<a name="texinfo-footnotes-in-document"></a><h4>Footnotes</h4><p class="footnote"><small>[<a name="fn-1" href="#fnd-1">1</a>]</small> Sometimes
+you don't have to explicitly quote special characters to make
+them ordinary.  For instance, most characters lose any special meaning
+inside a list (see <a href="#List-Operators">List Operators</a>).  In addition, if the syntax bits
+<code>RE_CONTEXT_INVALID_OPS</code> and <code>RE_CONTEXT_INDEP_OPS</code>
+aren't set, then (for historical reasons) the matcher considers special
+characters ordinary if they are in contexts where the operations they
+represent make no sense; for example, then the match-zero-or-more
+operator (represented by <span class="samp">*</span>) matches itself in the regular
+expression <span class="samp">*foo</span> because there is no preceding expression on which
+it can operate.  It is poor practice, however, to depend on this
+behavior; if you want a special character to be ordinary outside a list,
+it's better to always quote it, regardless.</p>
+
+  <p class="footnote"><small>[<a name="fn-2" href="#fnd-2">2</a>]</small> Regex therefore doesn't consider the <span class="samp">^</span> to be
+the first character in the list.  If you put a <span class="samp">^</span> character first
+in (what you think is) a matching list, you'll turn it into a
+nonmatching list.</p>
+
+  <p class="footnote"><small>[<a name="fn-3" href="#fnd-3">3</a>]</small> You can't use a character class for the starting
+or ending point of a range, since a character class is not a single
+character.</p>
+
+  <p class="footnote"><small>[<a name="fn-4" href="#fnd-4">4</a>]</small> Regular expressions are also referred to as
+&ldquo;patterns,&rdquo; hence the name &ldquo;pattern buffer.&rdquo;</p>
+
+  <p class="footnote"><small>[<a name="fn-5" href="#fnd-5">5</a>]</small> A table that maps all uppercase letters to
+the corresponding lowercase ones would work just as well for this
+purpose.</p>
+
+  <p><hr></div>
+
+</body></html>
+

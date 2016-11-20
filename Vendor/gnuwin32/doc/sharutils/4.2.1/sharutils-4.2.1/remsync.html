@@ -1,0 +1,782 @@
+<html lang="en">
+<head>
+<title>`remsync' reference manual</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="`remsync' reference manual">
+<meta name="generator" content="makeinfo 4.6">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+--></style>
+</head>
+<body>
+<h1 class="settitle">`remsync' reference manual</h1>
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Overview">Overview</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Remsync">Remsync</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">1 Overview of <code>remsync</code> and friends</h2>
+
+<p>The <code>remsync</code> program allows for transmitting, over email, selected
+parts of directories for trying to maintain up-to-date files over many
+sites.  It sends out and processes incoming specially packaged files
+using <code>shar</code>, <code>tar</code>, <code>gzip</code> and electronic mail programs.
+
+   <p>There is no <em>master</em> site, each site has an equal opportunity to
+modify files, and modified files are propagated.  Among many other
+commands, the <code>broadcast</code> command sends an update package from the
+current site to all others, the <code>process</code> command is used to apply
+update packages locally after reception from remote sites.
+
+   <p>The unit of transmission is whole files.  For now, whenever a module is
+modified, it is silently synchronized only if it has been modified at
+only one place.  The merging has to be done at the site where the
+discrepancy is observed, from where it is propagated again.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Internals">Internals</a>:            How <code>remsync</code> works
+<li><a accesskey="2" href="#Quick%20start">Quick start</a>:          Quick start at using <code>remsync</code>
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Internals">Internals</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Quick%20start">Quick start</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Overview">Overview</a>
+<br>
+</div>
+
+<h3 class="section">1.1 How <code>remsync</code> works</h3>
+
+<p>How does <code>remsync</code> keep track of what is in sync, and what isn't? 
+See <a href="#Xremsync">Xremsync</a>, for a the documentation on the <code>.remsync</code> file
+format.  I understand that a mere description of the format does not
+replace an explanation, but in the meantime, you might guess from the
+format how the program works.
+
+   <p>All files are summarized by a checksum, computed by the <code>sum</code> program. 
+There are a few variants of <code>sum</code> computing checksums in incompatible
+ways, under the control of options.  <code>remsync</code> attempts to retrieve on
+each site a compatible way to do it, and complains if it cannot.
+
+   <p><code>remsync</code> does not compare dates or sizes.  Experience shown that the
+best version of a file is not necessarily the one with the latest
+timestamp.  The best version for a site is the current version on this
+site, as decided by its maintainer there, and this is this version
+that will be propagated.
+
+   <p>Each site has an idea of the checksum of a file for all other sites. 
+These checksums are not necessarily identical, for sites do not
+necessarily propagate to all others, and the propagation network maybe
+incomplete or asymmetrical in various ways.
+
+   <p>Propagation is never done unattended.  The user on a site has to call
+<code>remsync broadcast</code> to issue synchronization packages for other sites. 
+If this is never done, the local modifications will never leave the
+site.  The user also has to call <code>remsync process</code> to apply received
+synchronization packages.  Applying a package does not automatically
+broadcast it further (maybe this could change?).
+
+   <p>If a site <var>A</var> propagates some files to sites <var>B</var> and <var>D</var>,
+but not <var>C</var>, site <var>B</var> is informed that site <var>D</var> also
+received these files, and site <var>D</var> is informed that site <var>B</var>
+also received these files, so they will not propagate again the same
+files to one another.  However, both site <var>B</var> and <var>D</var> are
+susceptible to propagate further the same files to site <var>C</var>.
+
+   <p>It may happen that a site refuses to update a file, or modifies a file
+after having been received, or merges versions, or whatever.  So,
+sites may have a wrong opinion of the file contents on other sites. 
+These differences level down after a few exchanges, and it is very
+unlikely that a file would not be propagated when it should have.
+
+   <p>This scheme works only when the various people handling the various
+files have confidence in one each other.  If site <var>B</var> modifies a
+file after having received it from site <var>A</var>, the file will
+eventually be propagated back to site <var>A</var>.  If the original file
+stayed undisturbed on site <var>A</var>, that is, if <code>remsync</code> proves
+that site <var>B</var> correctly knew the checksum of the original file, then
+the file will be replaced on site <var>A</var> without any user confirmation. 
+So, the user on site A has to trust the changes made by the user on site
+<var>B</var>.
+
+   <p>If the original file on site <var>A</var> had been modified after having been
+sent in a synchronization package, than it is the responsibility of the
+user on site <var>A</var> to correctly merge the local modifications with the
+modifications observed in the file as received from site <var>B</var>.  This
+responsibility is real, since the merged file will later be propagated
+to the other sites in an authoritative way.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Quick%20start">Quick start</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Internals">Internals</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Overview">Overview</a>
+<br>
+</div>
+
+<h3 class="section">1.2 Quick start at using <code>remsync</code></h3>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Remsync">Remsync</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Services">Services</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Overview">Overview</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">2 Specifications of program <code>remsync</code></h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Invoking%20remsync">Invoking remsync</a>:     The <code>remsync</code> command and arguments
+<li><a accesskey="2" href="#Conveniences">Conveniences</a>:         Automatic mechanisms in the <code>remsync</code> program
+<li><a accesskey="3" href="#Commands">Commands</a>:             Commands for <code>remsync</code>
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Invoking%20remsync">Invoking remsync</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Conveniences">Conveniences</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Remsync">Remsync</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Remsync">Remsync</a>
+<br>
+</div>
+
+<h3 class="section">2.1 The <code>remsync</code> command and arguments</h3>
+
+<p>At the shell prompt, calling the command <code>remsync</code> without any
+parameters initiates an interactive dialog, in which the user types
+commands and receives feedback from the program.
+
+   <p>The command <code>remsync</code>, given at the shell prompt, may have
+arguments, in which case these arguments taken together form one
+<code>remsync</code> interactive command.  However, <code>--help</code> and
+<code>--version</code> options are interpreted especially, with their usual
+effect in GNU.  Once this command has been executed, no more commands
+are taken from the user and <code>remsync</code> terminates execution. 
+This allows for using <code>remsync</code> in some kind of batch mode. 
+It is unwise to redirect <code>remsync</code> standard input, because
+user interactions might often be needed in ways difficult to predict
+in advance.
+
+   <p>The two most common usages of <code>remsync</code> are the commands:
+
+<pre class="example">     remsync b
+     remsync p
+     </pre>
+
+   <p>The first example executes the <code>broadcast</code> command, which sends
+synchronization packages to all connected remote sites for the current
+local directory tree.
+
+   <p>The second example executes the <code>process</code> command, which studies
+and complies with a synchronisation package saved in the current
+directory (not necessarily into the synchronized directory tree), under
+the usual file name <code>remsync.tar.gz</code>.
+
+<ul class="menu">
+<li><a accesskey="1" href="#Conveniences">Conveniences</a>:         Automatic mechanisms in the <code>remsync</code> program
+<li><a accesskey="2" href="#Commands">Commands</a>:             Commands for <code>remsync</code>
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Conveniences">Conveniences</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Commands">Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invoking%20remsync">Invoking remsync</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Remsync">Remsync</a>
+<br>
+</div>
+
+<h3 class="section">2.2 Automatic mechanisms in the <code>remsync</code> program</h3>
+
+<p>The following points apply to many of the <code>remsync</code> commands. 
+We describe them here once and for all.
+
+     <ul>
+
+     <li>The file <code>.remsync</code> describes the various properties for the
+current synchronization.  It is kept right in the top directory of a
+synchronized directory tree.  Some commands may be executed without any
+need for this file.  The program waits as far as possible before reading
+it.
+
+     <li>If the <code>.remsync</code> file is not found when required, and only then,
+the user is interactively asked to fill a questionnaire about it.
+
+     <li>If the <code>.remsync</code> file has been logically modified after having
+been read, or if it just has been created, the program will save it back
+on disk.  But it will do so only before reading another <code>.remsync</code>
+file, or just before exit.  A preexisting <code>.remsync</code> will be
+renamed to <code>.remsync.bak</code> before it is rewritten, when this is
+done, any previous <code>.remsync.bak</code> file is discarded.
+
+     <li>Many commands refer to previously entered information by repeating this
+information.  For example, one can refer to a particular <code>scan</code>
+statement by entering the wildcard to be scanned by this statement. 
+An alternative method of specifying a statement consists in using the
+decimal number which appears between square brackets in the result
+of a <code>list</code> command.
+
+     <li>Whenever a site list must be given, it is a space separated list of
+remote sites.  If the list is preceeded by a bang (&lt;!&gt;), the list is
+complemented, that is, the sites that will be operated upon are all
+those <em>not</em> appearing in the list.  As a special case, if the site
+list is completely empty, then all sites are selected.
+
+   </ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Commands">Commands</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Conveniences">Conveniences</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Remsync">Remsync</a>
+<br>
+</div>
+
+<h3 class="section">2.3 Commands for <code>remsync</code></h3>
+
+<p>Program commands to <code>remsync</code> may be given interactively by the
+user sitten at a terminal.  They can come from the arguments of the
+<code>remsync</code> call at the shell level.  Internally, the <code>process</code>
+command might obey many sub-commands found in a received synchronization
+package.
+
+   <p>Program commands are given one per line.  Lines beginning with a sharp
+(&lt;#&gt;) and white lines are ignored, they are meant to increase
+clarity or to introduce user comments.  With only a few exceptions,
+commands are introduced by a keyword and often contains other keywords. 
+In all cases, the keywords specific to <code>remsync</code> may be abbreviated
+to their first letter.  When there are many keywords in succession, the
+space separating them may be omitted.  So the following commands are
+all equivalent:
+
+<pre class="example">     list remote
+     l remote
+     list r
+     l r
+     listremote
+     lr
+     </pre>
+
+<p>while the following are not legal:
+
+<pre class="example">     l rem
+     lisremote
+     </pre>
+
+   <p>Below, for clarity, keywords are written in full and separated by
+spaces.  Commands often accept parameters, which are then separated by
+spaces.  All available commands are given in the table.  The first few
+commands do not pre-require the file <code>.remsync</code>.  The last three
+commands are almost never used interactively, but rather automatically
+triggered while <code>process</code>'ing received synchronization packages.
+
+     <dl>
+
+     <br><dt><code>?</code>
+     <dd>
+Display a quick help summary of available commands.
+
+     <br><dt><code>!</code> [ <var>shell-command</var> ]
+     <dd>
+If <var>shell-command</var> has been given, execute it right now as a shell
+command.  When not given, rather start an interactive shell.  Exiting
+from the shell will return to this program.  The started shell is taken
+from the <code>SHELL</code> environment variable if set, else <code>sh</code> is
+used.
+
+     <br><dt><code>quit</code>
+     <dd>
+Leave the program normally and return to the shell.
+
+     <br><dt><code>abort</code>
+     <dd>
+Leave the program with a nonzero exit status and return to the shell. 
+No attempt is made to save a logically modified <code>.remsync</code> file.
+
+     <br><dt><code>visit</code> <var>directory</var>
+     <dd>
+Select another synchronized directory tree for any subsequent operation. 
+<var>directory</var> is the top directory of the synchronized directory tree.
+
+     <br><dt><code>process</code> [ <var>file</var> ]
+     <dd>
+<br><dt><code>list</code> [ <var>type</var> ]
+     <dd>
+List all known statements about some information <var>type</var>.  Allowable
+keywords for <var>type</var> are <code>local</code>, <code>remote</code>, <code>scan</code>,
+<code>ignore</code> and <code>files</code>.  The keyword <code>files</code> asks for all
+empty statements (see later).  If <var>type</var> is omitted, then list all
+known statements for all types, except those given by <code>files</code>.
+
+     <br><dt>[ <code>create</code> ] <var>type</var> <var>value</var>
+     <dd>
+Create a new statement introducing a <var>value</var> for a given <var>type</var>. 
+Allowable keywords for <var>type</var> are <code>remote</code>, <code>scan</code> and
+<code>ignore</code>.  The <code>create</code> keyword may be omitted.
+
+     <p>For <code>create</code> <code>ignore</code>, when the pattern is preceeded by a bang
+(&lt;!&gt;), the condition is reversed.  That is, only those files which
+do match the pattern will be kept for synchronization.
+
+     <br><dt><code>delete</code> <var>type</var> <var>value</var>
+     <dd>
+Delete an existing statement supporting some <var>value</var> for a given
+<var>type</var>.  Allowable keywords for <var>type</var> are <code>remote</code>,
+<code>scan</code> and <code>ignore</code>.
+
+     <br><dt><code>email</code> <var>remote</var> <var>value</var>
+     <dd>
+Modify the electronic mail address associated with some <var>remote</var>
+site, giving it a new <var>value</var>.  The special <code>local</code> keyword for
+<var>remote</var> may be used to modify the local electronic mail address.
+
+     <br><dt><code>home</code> <var>remote</var> <var>value</var>
+     <dd>
+Modify the top directory of the synchronized directory tree associated
+with some <var>remote</var> site, giving it a new <var>value</var>.  The special
+<code>local</code> keyword for <var>remote</var> may be used to modify the local
+top directory.
+
+     <br><dt><code>broadcast</code> <var>site_list</var>
+     <dd>
+Send by electronic mail an update package to all sites from
+<var>site_list</var>, containing for each site all and only those files which
+are known to be different between the remote site and here.
+
+     <br><dt><code>version</code> <var>version</var>
+     <dd>
+This command is not meant for interactive use.  It establishes the
+<code>remsync</code> version needed to process the incoming commands.
+
+     <br><dt><code>from</code> <var>site_list</var>
+     <dd>
+This command is not really meant for interactive use.  The first site
+from the <var>site_list</var> is the remote site which originated the
+synchronization package.  All the others are all the sites, including
+here, which were meant to be synchronized by the <code>broadcast</code>
+command that was issued at the originating remote site.
+
+     <br><dt><code>sum</code> <var>file</var> <var>checksum</var>
+     <dd>
+This command is not really meant for interactive use.  It declares the
+<var>checksum</var> value of a particular <var>file</var> at the originating
+remote site.  Also, if at least one <code>sum</code> command is received, then
+it is guaranteed that the originating remote site sent one <code>sum</code>
+command for each and every file to be synchronized, so any found local
+file which was not subject of any <code>sum</code> command does not exist
+remotely.
+
+     <br><dt><code>if</code> <var>file</var> <var>checksum</var> <var>packaged</var>
+     <dd>
+This command is not really meant for interactive use.  It directs the
+<code>remsync</code> program to check if a local <var>file</var> has a given
+<var>checksum</var>.  If the checksum agrees, then the local file will be
+replaced by the <var>packaged</var> file, as found in the received
+synchronization invoice.
+
+   </dl>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Services">Services</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Formats">Formats</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Remsync">Remsync</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">3 Specifications of other service programs</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Invoking%20mailshar">Invoking mailshar</a>:    The <code>mailshar</code> command and arguments
+<li><a accesskey="2" href="#Invoking%20mail-files">Invoking mail-files</a>:   The <code>mail-files</code> command and arguments
+<li><a accesskey="3" href="#Invoking%20find-mailer">Invoking find-mailer</a>:   The <code>find-mailer</code> command and arguments
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Invoking%20mailshar">Invoking mailshar</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Invoking%20mail-files">Invoking mail-files</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Services">Services</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Services">Services</a>
+<br>
+</div>
+
+<h3 class="section">3.1 The <code>mailshar</code> command and arguments</h3>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Invoking%20mail-files">Invoking mail-files</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Invoking%20find-mailer">Invoking find-mailer</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invoking%20mailshar">Invoking mailshar</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Services">Services</a>
+<br>
+</div>
+
+<h3 class="section">3.2 The <code>mail-files</code> command and arguments</h3>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Invoking%20find-mailer">Invoking find-mailer</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Invoking%20mail-files">Invoking mail-files</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Services">Services</a>
+<br>
+</div>
+
+<h3 class="section">3.3 The <code>find-mailer</code> command and arguments</h3>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Formats">Formats</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Miscellaneous">Miscellaneous</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Services">Services</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">4 Related file formats</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#Xremsync">Xremsync</a>:             Format of the <code>.remsync</code> file
+<li><a accesskey="2" href="#Package">Package</a>:              Format of transiting packages
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Xremsync">Xremsync</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Package">Package</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Formats">Formats</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Formats">Formats</a>
+<br>
+</div>
+
+<h3 class="section">4.1 Format of the <code>.remsync</code> file</h3>
+
+<p>The <code>.remsync</code> file saves all the information a site needs for
+properly synchronizing a directory tree with remote sites.  Even if it
+is meant to be editable using any ASCII editor, it has a very precise
+format and one should be very careful while modifying it.  The
+<code>.remsync</code> file is better handled through the <code>remsync</code>
+program and commands.
+
+   <p>The <code>.remsync</code> file is made up of statements, one per line.  Each
+line begins with a statement keyword followed by a single &lt;TAB&gt;,
+then by one or more parameters.  The keyword may be omitted, in this
+case, the keyword is said to be <em>empty</em>, and the line begins
+immediately with the &lt;TAB&gt;.  After the &lt;TAB&gt;, if there are two
+parameters or more, they should all be separated with a single space. 
+There should not be any space between the last parameter and the end of
+line (unless there are explicit empty parameters).
+
+   <p>The following table gives the possible keywords.  Their order of
+presentation in the table is also the order of appearance in the
+<code>.remsync</code> file.
+
+     <dl>
+
+     <br><dt><code>remsync</code>
+     <dd>This statement identifies the <code>.remsync</code> format.  The only
+parameter states the file format version.
+
+     <br><dt><code>local</code>
+     <dd>This statement should appear exactly once, and has exactly two
+parameters.  The first parameter gives the electronic mail address the
+other sites should use for sending synchronization packages here.  The
+second parameter gives the name of the local directory tree to
+synchronize, in absolute notation.
+
+     <br><dt><code>remote</code>
+     <dd>This statement may appear zero, one or more times.  Each occurrence
+connects the synchronized directory tree to another tree on a remote
+site.  The first parameter gives one electronic mail address where to
+send remote synchronization packages.  The second parameter gives the
+name of the corresponding directory tree for this remote electronic mail
+address, in absolute notation.
+
+     <br><dt><code>scan</code>
+     <dd>This statement may appear zero, one or more times.  When it does not
+appear at all, the whole local directory tree will always be scanned,
+searching for files to synchronize.  When the statement appears at least
+once, the whole local directory tree will not be scanned, but only those
+files or directories appearing in one of these statements.  Each
+<code>scan</code> statement has exactly one parameter, giving one file or
+directory to be studied.  These are usually given relative to top
+directory of the local synchronization directory tree.  Shell wildcards
+are acceptable.
+
+     <br><dt><code>ignore</code>
+     <dd>This statement may appear zero, one or more times.  Each occurrence has
+one parameter giving a regular expression, according to Perl syntax for
+regular expressions.  These <var>regexp</var>s are applied against each file
+resulting from the scan.  If any of the <code>ignore</code> expression matches
+one of resulting file, the file is discarded and is not subject to
+remote synchronization.
+
+   </dl>
+
+   <p>After all the statements beginning by the previous keywords, the
+<code>.remsync</code> file usually contains many statements having the empty
+keyword.  The empty keyword statement may appear zero, one or more
+times.  Each occurrence list one file being remotely synchronized.  The
+first parameter gives an explicit file name, usually given relative to
+the top directory of the local synchronized directory tree.  Shell
+wildcards are <em>not</em> acceptable.
+
+   <p>Besides the file name parameter, there are supplementary parameters to
+each empty keyword statement, each corresponding to one remote statement
+in the <code>.remsync</code> file.  The second parameter corresponds to the
+first remote, the third parameter corresponds to the second remote, etc. 
+If there are more remote statements than supplementary parameters,
+missing parameters are considered to be empty.
+
+   <p>Each supplementary parameter usually gives the last known checksum
+value for this particular file, as computed on its corresponding
+<em>remote</em> site.  The parameter contains a dash <kbd>-</kbd> while the
+remote checksum is unknown.  The checksum value for the <em>local</em>
+copy of the file is never kept anywhere in the <code>.remsync</code> file. 
+The special value <code>666</code> indicates a checksum from hell, used
+when the remote file is known to exist, but for which contradictory
+information has been received from various sources.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Package">Package</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Xremsync">Xremsync</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Formats">Formats</a>
+<br>
+</div>
+
+<h3 class="section">4.2 Format of transiting packages</h3>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Miscellaneous">Miscellaneous</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Formats">Formats</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+<br>
+</div>
+
+<h2 class="chapter">5 Various considerations</h2>
+
+<ul class="menu">
+<li><a accesskey="1" href="#News">News</a>:                 Using News distribution instead? 
+<li><a accesskey="2" href="#Previous">Previous</a>:             Documentation for obsolete scripts
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="News">News</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#Previous">Previous</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Miscellaneous">Miscellaneous</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Miscellaneous">Miscellaneous</a>
+<br>
+</div>
+
+<h3 class="section">5.1 Using News distribution instead?</h3>
+
+<p>One correspondent thinks that perhaps the news distribution mechanism
+could be pressed into service for this job.  I could have started
+from C-news, say, instead of from scratch, and have progressively
+bent C-news to behave like I wanted.
+
+   <p>My feeling is that the route was shorter as I did it, from scratch,
+that it would have been from C-news.  Of course, I could have
+removed the heavy administrative details of C-news: the history and
+<code>expire</code>, the daemons, the <code>cron</code> entries, etc., then added
+the interactive features and specialized behaviors, but all this clean
+up would certainly have took energies.  Right now, non counting the
+subsidiary scripts and shar/unshar sources, the heart of the result
+is a single (1200 lines) script written in Perl, which I find fairly
+more smaller and maintainable than a patched C-news distribution
+would have been.
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="Previous">Previous</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#News">News</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Miscellaneous">Miscellaneous</a>
+<br>
+</div>
+
+<h3 class="section">5.2 Documentation for obsolete scripts</h3>
+
+<p>This is merely a place holder for previous documentation, waiting that I
+clean it up.  You have no interest in reading further down.
+
+<ul class="menu">
+<li><a accesskey="1" href="#mailsync">mailsync</a>:             mailsync
+<li><a accesskey="2" href="#resync">resync</a>:               resync
+</ul>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="mailsync">mailsync</a>,
+Next:&nbsp;<a rel="next" accesskey="n" href="#resync">resync</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Previous">Previous</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Previous">Previous</a>
+<br>
+</div>
+
+<h3 class="subsection">5.2.1 mailsync</h4>
+
+<pre class="example">     Usage: mailsync [ OPTION ] ... [ EMAIL_ADDRESS ] [ DIRECTORY ]
+        or: mailsync [ OPTION ] ... SYNC_DIRECTORY
+     </pre>
+
+   <p>Option -i simply sends a <code>ihave</code> package, with no bulk files. 
+Option -n inhibits any destructive operation and mailing.
+
+   <p>In the first form of the call, find a synchronisation directory in
+DIRECTORY aimed towards some EMAIL_ADDRESS, then proceed with this
+synchronisation directory.  EMAIL_ADDRESS may be the name of a file
+containing a distribution list.  If EMAIL_ADDRESS is not specified,
+all the synchronisation directories at the top level in DIRECTORY are
+processed in turn.  If DIRECTORY is not specified, the current
+directory is used.
+
+   <p>In the second form of the call, proceed only with the given
+synchronisation directory SYNC_DIRECTORY.
+
+   <p>For proceeding with a synchronisation directory, whatever the form of
+the call was, this script reads the <code>ident</code> files it contains to set
+the local user and directory and the remote user and directory.  Then,
+selected files under the local directory which are modified in regard
+to the corresponding files in the remote directory are turned into a
+synchronisation package which is mailed to the remote user.
+
+   <p>The list of selected files or directories to synchronize from the
+local directory are given in the <code>list</code> file in the synchronisation
+directory.  If this <code>list</code> file is missing, all files under the
+local directory are synchronized.
+
+   <p>What I usually do is to <code>cd</code> at the top of the directory tree to be
+synchronized, then to type <code>mailsync</code> without parameters.  This will
+automatically prepare as many synchronisation packages as there are
+mirror systems, then email multipart shars to each of them.  Note that
+the synchronisation package is not identical for each mirror system,
+because they do not usually have the same state of synchronisation.
+
+   <p><code>mailsync</code> will refuse to work if anything needs to be hand cleaned
+from a previous execution of <code>mailsync</code> or <code>resync</code>.  Check
+for some remaining <code>_syncbulk</code> or <code>_synctemp</code> directory, or
+for a <code>_syncrm</code> script.
+
+<pre class="example">     TODO:
+     - interrogate the user if <code>ident</code> file missing.
+     - automatically construct the local user address.
+     - create the synchronisation directory on the fly.
+     - avoid duplicating work as far as possible for multiple sends.
+     - have a quicker mode, depending on stamps, not on checksums.
+     - never send core, executables, backups, <code>.nsf*</code>, <code>*/_synctemp/*</code>, etc.
+     </pre>
+
+<div class="node">
+<p><hr>
+Node:&nbsp;<a name="resync">resync</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#mailsync">mailsync</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Previous">Previous</a>
+<br>
+</div>
+
+<h3 class="subsection">5.2.2 resync</h4>
+
+<pre class="example">     Usage: resync [ OPTION ]... TAR_FILE
+        or: resync [ OPTION ]... UNTARED_DIRECTORY
+     </pre>
+
+   <p>Given a tar file produced by mailsync at some remote end and already
+reconstructed on this end using unshar, or a directory containing the
+already untared invoice, apply the synchronization package locally.
+
+   <p>Option -n inhibits destroying or creating files, but does everything
+else.  It will in particular create a synchronization directory if
+necessary, produce the <code>_syncbulk</code> directory and the <code>_syncrm</code>
+script.
+
+   <p>The synchronization directory for the package is automatically
+retrieved or, if not found, created and initialized.  <code>resync</code> keeps
+telling you what it is doing.
+
+   <p>There are a few cases when a resync should not complete without manual
+intervention.  The common case is that several sites update the very
+same files differently since they were last resync'ed, and then
+mailsync to each other.  The prerequisite checksum will then fail, and
+the files are then kept into the <code>_syncbulk</code> tree, which has a shape
+similar to the directory tree in which the files where supposed to go. 
+For GNU Emacs users, a very handy package, called emerge, written by
+Dale Worley &lt;drw@kutta.mit.edu&gt;, helps reconciling two files
+interactiveley.  The <code>_syncbulk</code> tree should be explicitely deleted
+after the hand synchronisation.
+
+   <p>Another case of human intervention is when files are deleted at the
+mailsync'ing site.  By choice, all deletions on the receiving side are
+accumulated in a <code>_syncrm</code> script, which is not executed automatically. 
+Explicitely executed, <code>_syncrm</code> will remove any file in the receiving
+tree which does not exist anymore on the sender system.  I often edit
+<code>_syncrm</code> before executing it, to remove the unwanted deletions (beware
+the double negation :-).  The script removes itself.
+
+   <p>All the temporary files, while resynchronizing, are held in <code>_synctemp</code>,
+which is deleted afterwards; if something goes wrong, this directory
+should also be cleaned out by hand.  <code>resync</code> will refuse to work if
+anything remains to be hand cleaned.
+
+<pre class="display">     TODO:
+     - interrogates the user if missing receiving directory in <code>ident</code>.
+     - allow <code>remote.sum</code> to be empty or non-existent.
+     </pre>
+
+
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Overview" href="#Overview">1 Overview of <code>remsync</code> and friends</a>
+<ul>
+<li><a href="#Internals">1.1 How <code>remsync</code> works</a>
+<li><a href="#Quick%20start">1.2 Quick start at using <code>remsync</code></a>
+</li></ul>
+<li><a name="toc_Remsync" href="#Remsync">2 Specifications of program <code>remsync</code></a>
+<ul>
+<li><a href="#Invoking%20remsync">2.1 The <code>remsync</code> command and arguments</a>
+<li><a href="#Conveniences">2.2 Automatic mechanisms in the <code>remsync</code> program</a>
+<li><a href="#Commands">2.3 Commands for <code>remsync</code></a>
+</li></ul>
+<li><a name="toc_Services" href="#Services">3 Specifications of other service programs</a>
+<ul>
+<li><a href="#Invoking%20mailshar">3.1 The <code>mailshar</code> command and arguments</a>
+<li><a href="#Invoking%20mail-files">3.2 The <code>mail-files</code> command and arguments</a>
+<li><a href="#Invoking%20find-mailer">3.3 The <code>find-mailer</code> command and arguments</a>
+</li></ul>
+<li><a name="toc_Formats" href="#Formats">4 Related file formats</a>
+<ul>
+<li><a href="#Xremsync">4.1 Format of the <code>.remsync</code> file</a>
+<li><a href="#Package">4.2 Format of transiting packages</a>
+</li></ul>
+<li><a name="toc_Miscellaneous" href="#Miscellaneous">5 Various considerations</a>
+<ul>
+<li><a href="#News">5.1 Using News distribution instead?</a>
+<li><a href="#Previous">5.2 Documentation for obsolete scripts</a>
+<ul>
+<li><a href="#mailsync">5.2.1 mailsync</a>
+<li><a href="#resync">5.2.2 resync</a>
+</li></ul>
+</li></ul>
+</li></ul>
+</div>
+
+   </body></html>
+

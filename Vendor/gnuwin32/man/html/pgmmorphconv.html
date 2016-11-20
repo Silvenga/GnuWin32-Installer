@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD><TITLE>Pgmmorphconv User Manual</TITLE></HEAD>
+<BODY>
+<H1>pgmmorphconv</H1>
+Updated: 29 October 2002
+<BR>
+<A HREF="pgmmorphconv.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pgmmorphconv - perform morphological convolutions: dilation, erosion
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pgmmorphconv</B>
+[ <b>-erode</b> | <b>-dilate</b> | <b>-open</b> | <b>-close</b> ]
+<I>templatefile</I>
+[<I>pgmfile</I>]
+
+<P>Minimum unique abbreviation of option is acceptable.  You may use
+double hyphens instead of single hyphen to denote options.  You may use
+white space in place of the equals sign to separate an option name
+from its value.
+
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<P><b>pgmmorphconv</b> performs morphological convolutions on a
+PGM image: dilation and erosion.
+
+<p><b>pgmmorphconv</b> performs a "topological" convolution.  For each
+pixel of the input, <b>pgmmorphconv</b> generates an output pixel in
+the same position.  To determine the intensity of the output pixel,
+<b>pgmmorphconv</b> lays the template image over the input image such
+that the middle pixel of the template is over the input pixel in
+question.  <b>pgmmorphconv</b> looks at the input pixels underneath each
+white pixel in the template.  For a dilation, the maximum intensity of
+all those pixels is the intensity of the output pixel.  For an erosion,
+it is the minimum.
+
+<p>Thus, the dilation effect is that bright areas of the input get bigger
+and dark areas smaller.  The erosion effect is the opposite.  The simplest
+template image would be one with a white pixel in the middle and the rest
+black.  This would produce an output image identical to the input.  Another
+simple template image is a fully white square.  This causes bright or dark
+areas to expand in all directions.  A template image that is white on the
+left side and black on the right would smear the image to the right.
+
+<p>The template file named by <i>templatefile</i> contains the
+template image as a PBM image.  It must have an odd number of rows and
+an odd number of columns, so there is a definite middle pixel.  It
+must contain at least one white pixel.
+
+<p>This is similar to the continuous convolution done by
+<b>pnmconvol</b>, except that with <b>pnmconvol</b> the output intensity is
+a weighted average of nearby input pixels instead of a minimum or maximum.
+
+<p>This convolution changes the three Minkowski integrals in a predefined
+way, an can be used to filter an image to enhance certain features, to
+ease their automatic recognition.
+
+<p>The options <b>-erode</b> and <b>-dilate</b> obviously produce an
+erosion or dilation, respectively.  <p>The <b>-open</b> option causes
+<b>pgmmorphconv</b> to perform first an erode and then a dilate
+operation.  The <b>-close</b> option causes a dilate first and then an
+erode.  If you specify none of these options, it is the same as
+<b>-dilate</b>.
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pgmminkowski.html">pgmminkowski</A></B>
+<B><A HREF="pnmconvol.html">pnmconvolz</A></B>
+<B><A HREF="pgm.html">pgm</A></B>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>AUTHORS</H2>
+
+Luuk van Dijk, 2001.
+
+<p>Based on work which is Copyright (C) 1989, 1991 by Jef Poskanzer.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pgmmorphconv.html#lbAB">NAME</A>
+<LI><A HREF="pgmmorphconv.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pgmmorphconv.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pgmmorphconv.html#lbAE">SEE ALSO</A>
+<LI><A HREF="pgmmorphconv.html#lbAF">AUTHORS</A>
+</UL>
+</BODY>
+</HTML>

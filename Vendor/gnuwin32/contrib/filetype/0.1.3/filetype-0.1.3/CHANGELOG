@@ -1,0 +1,105 @@
+06-Apr-04
+	PLD: Cleared new source code by running by valgrind
+
+	PLD: Added filetype.1, filetype-compile.1, updated Makefile
+			and accepted reformatted documents from Brixen. 
+
+         Added 'make validate' for local testing purposes here
+
+
+29-Mar-04
+	PLD: Ripped out old Xamime code out of libfiletype (which was never
+			actually compiled in due to it being left out from the #ifdef
+			clauses.
+
+			Added FILETYPE_is_file_of_type() which is a function which will
+			test to see if a file matches the type description supplied as
+			apposed to testing the type /index/ (as with FILETYPE_is_filetype())
+
+
+24-Oct-03
+	PLD: Fixed possible underrun on result counter in FILETYPE_is_binary
+			thanks to dimitry for noticing the segfault.
+
+05-Mar-03
+	PLD: FileType now additionally searches for a filetype.spec file
+			in the directory where the filetype program is invoked
+			(based on the path specified when invoking filetype, ie
+			/usr/local/bin/filetype will cause filetype to look for
+			a specfile in /usr/local/bin )
+
+	PLD: Applied patches from Karl-Heinz Bussian to make FileType
+			compile on WIN32 platforms.  A special makefile, 
+			makefile.vc has been added to the -dev package
+
+03-Mar-03
+	PLD: Activated -d/--debug parameters
+
+	PLD: Removed dependency on 'key' values from the filetype engine,
+			now filetype spec lists can just start with a '-:' char
+			sequence to indicate that there's no specific key value
+			for this filetype.  This allows for the simpler generation
+			of new filetype lists.
+
+			FILETYPE_get_filetype() returns an array index of the 
+			currently loaded filetypes, you use this index to get the
+			various attributes of the filetype with calls such as:
+
+			FILETYPE_get_name_by_index()
+			FILETYPE_get_comment_by_index()
+			FILETYPE_get_fullclass_by_index()
+
+		or you can get a pointer to the actual filetype record:
+
+			FILETYPE_get_details_by_index()
+		
+			It should be noted that using the _by_index() calls is 
+			faster by the order of the length of the list.  Previously
+			we would have to scan through all the list entries until a
+			key match was found. This is no longer a required method 
+			although the existing methods do exist for software using
+			them - they will be classified as depricated at some stage.
+
+	PLD: Cleaned up logger reports in libfiletype, there were still some
+			which were specific to the Xamime engine and thus would have
+			lead to possible confusion.
+	
+
+02-Mar-03
+	PLD: Added ability to accept filename lists from STDIN or multiple
+			textfile lists.  Filenames are seperated by line breaks. It's
+			now possible to do something like:
+
+		filetype -f lista -f listb -f - * < listc
+
+			This will result in filetype testing for all the files in ( in order )
+			lista, listb, listc and then any files matching the shell
+			expansion of '*'.  If multiple '-f -' parameter pairs occur, only the
+			first one will apply.
+
+	PLD: Set filetype count limit to 10,000 and number of loadable lists to
+			100. These values can be changed if required to higher values
+			but will [naturally] require a recompile.
+
+	PLD: Finished up changes to allow filetype to load multiple filetype lists
+			and cleanly free allocated memory at the end of the process.  
+
+24-Feb-03
+	PLD: Changed name of FILETYPE_load() to FILETYPE_import_list() so as to 
+		ensure that people do not attempt to use FILETYPE_load() as a 
+		general routine thinking that it's the binary-loader for the
+		spec database. _import_list() is used to convert a filetype.list
+		text based file into a binary .spec file
+
+	PLD: Added stripping of binaries to Makefile make install
+	PLD: Altered _readb() specfile loading routine to facilitate the future
+		ability of loading multiple specfiles and have them appended.
+	PLD: Applied patch for Makefile performace/ordering (Heikki Orsila)
+	PLD: Applied patch for additional Amiga filetypes (Heikki Orsila)
+	PLD: Added fix for home directory path searching, as recommended by
+		Heikki Orsila.
+	PLD: Added verbosity options ( although there is little to be verbose
+		about at this point in the development )
+
+21-Feb-03
+	PLD: Initial release

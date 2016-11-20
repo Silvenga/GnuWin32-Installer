@@ -1,0 +1,159 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Pnmconvol User Manual</TITLE></HEAD>
+<BODY>
+<H1>pnmconvol</H1>
+Updated: 17 April 2005
+<BR>
+<A HREF="pnmconvol.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+pnmconvol - general MxN convolution on a PNM image
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>pnmconvol</B>
+
+<I>convolution_matrix_file</I>
+[-nooffset]
+[<I>pnmfile</I>]
+
+<p>Minimum unique abbreviation of option is acceptable.  You may use double
+hyphens instead of single hyphen to denote options.  You may use white
+space in place of the equals sign to separate an option name from its value.
+
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>pnmconvol</b> reads two PNM images as input, convolves the
+second using the first, and writes a PNM image as output.
+
+<P>Convolution means replacing each pixel with a weighted average of
+the nearby pixels.  The weights and the area to average are determined
+by the convolution matrix (sometimes called a convolution kernel),
+which you supply by way of the PNM image in the file you identify with
+the <i>convolution_matrix_file</i> argument.  There are two ways
+<b>pnmconvol</b> interprets the PNM convolution matrix image pixels as
+weights: with offsets, and without offsets.
+
+<p>The simpler of the two is without offsets.  That is what happens
+when you specify the <b>-nooffset</b> option.  In that case,
+<b>pnmconvol</b> simply normalizes the sample values in the PNM image
+by dividing by the maxval.
+
+<p>For example, here is a sample convolution file that causes an output pixel
+to be a simple average of its corresponding input pixel and its 8 neighbors,
+resulting in a smoothed image:
+
+<PRE>
+    P2
+    3 3
+    18
+    2 2 2
+    2 2 2
+    2 2 2
+</PRE>
+
+<b>pnmconvol</b> divides each of the sample values (2) by the maxval
+(18) so the weight of each of the 9 input pixels gets is 1/9, which is
+exactly what you want to keep the overall brightness of the image the
+same.  <b>pnmconvol</b> creates an output pixel by multiplying the
+values of each of 9 pixels by 1/9 and adding.
+
+<p>Note that with maxval 18, the range of possible values is 0 to 18.
+After scaling, the range is 0 to 1.
+
+<p>For a normal convolution, where you're neither adding nor
+subtracting total value from the image, but merely moving it around,
+you'll want to make sure that all the scaled values in (each plane of)
+your convolution PNM add up to 1, which means all the actual sample
+values add up to the maxval.
+
+<p>When you <em>don't</em> specify <b>-nooffset</b>, <b>pnmconvol</b>
+applies an offset, the purpose of which is to allow you to indicate
+negative weights even though PNM sample values are never negative.  In
+this case, <b>pnmconvol</b> subtracts half the maxval from each sample
+and then normalizes by dividing by half the maxval.  So to get the
+same result as we did above with <b>-nooffset</b>, the convolution
+matrix PNM image would have to look like this:
+
+<PRE>
+    P2
+    3 3
+    18
+    10 10 10
+    10 10 10
+    10 10 10
+</PRE>
+
+<P>To see how this works, do the above-mentioned offset: 10 - 18/2
+gives 1.  The normalization step divides by 18/2 = 9, which makes it
+1/9 - exactly what you want.  The equivalent matrix for 5x5 smoothing
+would have maxval 50 and be filled with 26.
+
+<p>Note that with maxval 18, the range of possible values is 0 to 18.
+After offset, that's -9 to 9, and after normalizing, the range is -1 to 1.
+
+<p>For a normal convolution, where you're neither adding nor
+subtracting total value from the image, but merely moving it around,
+you'll want to make sure that all the offset, scaled values in (each
+plane of) your convolution PNM add up to 1.  That means the actual
+sample values, less half the maxval, add up to half the maxval as in
+the example above.
+
+<P>The convolution file will usually be a PGM, so that the same
+convolution gets applied to each color component.  However, if you
+want to use a PPM and do a different convolution to different
+colors, you can certainly do that.
+
+<P>At the edges of the convolved image, where the convolution matrix
+would extend over the edge of the image, <B>pnmconvol</B> just copies
+the input pixels directly to the output.
+
+<p>The convolution computation can result in a value which is outside the
+range representable in the output.  When that happens, <b>pnmconvol</b> just
+clips the output, which means brightness is not conserved.
+
+<A NAME="history">&nbsp;</A>
+<H2>HISTORY</H2>
+<p>The <b>-nooffset</b> option was new in Netpbm 10.23 (July 2004).
+
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="pnmsmooth.html">pnmsmooth</A></B>,
+<B><A HREF="pgmmorphconv.html">pgmmorphconv</A></B>,
+<B><A HREF="pnmnlfilt.html">pnmnlfilt</A></B>,
+<B><A HREF="pgmkernel.html">pgmkernel</A></B>,
+<B><A HREF="pamgauss.html">pamgauss</A></B>,
+<B><A HREF="pnm.html">pnm</A></B>
+
+<A NAME="lbAF">&nbsp;</A>
+<H2>AUTHORS</H2>
+
+Copyright (C) 1989, 1991 by Jef Poskanzer.
+<BR>
+
+Modified 26 November 1994 by Mike Burns, <A
+HREF="mailto:burns@chem.psu.edu">burns@chem.psu.edu</A>
+
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="pnmconvol.html#lbAB">NAME</A>
+<LI><A HREF="pnmconvol.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="pnmconvol.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="pnmconvol.html#lbAE">SEE ALSO</A>
+<LI><A HREF="pnmconvol.html#history">HISTORY</A>
+<LI><A HREF="pnmconvol.html#lbAF">AUTHORS</A>
+</UL>
+</BODY>
+</HTML>

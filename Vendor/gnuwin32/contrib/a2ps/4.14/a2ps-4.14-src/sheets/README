@@ -1,0 +1,77 @@
+
+Here is a list of the changes that occured in the style sheet
+language.
+
+Version 4.9.10
+	* Enforced the rule that the last read is wining.  Before
+	sequences are
+	  "%%" Comment,
+	  "%" Comment
+	end sequence
+	had %% checked first, and
+	sequences are
+	  "%" Comment
+	end sequence
+	sequences are
+	  "%%" Comment,
+	end sequence
+	had %% checked first.
+	Now, no matter if it comes from an ancestor, or a previous
+	definition block, or it is after another in the same block,
+	it is *always* the last one which wins.
+	* Regex can be spread on several lines.  E.g. (from mail.ssh)
+     /^\\(From: \\)/		# \1. The From
+     /\\([[:blank:]]*\\)/	# \2. Some blanks
+     /\\([^(]+(\\)/		# \3. The email
+     /\\([^)]+\\)/		# \4. Name of the sender (between paren)
+     /\\().*\n\\)/		# \5. End of line
+	\1 Keyword_strong, \2 Plain, 
+	\3 Label_strong, \4 (Label_strong + Tag2), \5 Label_strong)
+	* Matching is now first on strings, then on regexp.  This makes
+	  easier to handle exceptions in regex.  I noticed no difference
+	  with the existing style sheets.
+	* The "default" face is no longer Plain, but Invisible.
+	  In pratice this means that
+	  "Foo" Tag1
+	  with former a2pses was "Foo" Plain + Tag1
+	  and now it is          "Foo" Invisible + Tag1
+
+Version 4.9.8
+	* Special constructs in documentation:
+	  - url(address)url(name)url (cf. claire.ssh)
+	  - @example
+            Blah
+            @end example
+	    For text that must not be justified (cf gnuc.ssh).
+	  - @itemize
+	    @item
+            Blah
+	    @item
+            Blah 2
+	    @end itemize
+	    For enumerations (cf. claire.ssh).
+
+Version 4.9.7
+	* "alphabets are" can be used as a shortcut.
+	* "ancestors are" to extend existing style sheets.
+	* "comment is" is replaced by "documentation is",
+	   which is more explicit.
+	* "closers are" for closing alternatives of sequences.
+	* "requires" to specify needed a2ps version.
+
+Version 4.9.6
+	* There can be several strings ("string1" "string2" ...)
+	  in "comments are".  An end-of-line is inserted between
+	  each one (string1\nstring2...").
+
+Version 4.9.5
+	* The name of the files *must* (please respect this)
+	  be 8+3, with no special chars.  They *all* should
+	  be lower case, alphanumerical.  Nothing more!
+	  This is of course for portability issues.
+	  *Note*  The name of the style is not related to this.
+	  It can be anything you want.
+
+Version 4.9.4
+	* "version is" is new.
+	* "written by" is new.

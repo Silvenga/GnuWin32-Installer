@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML><HEAD><TITLE>Ppmtoxpm User Manual</TITLE></HEAD>
+<BODY>
+<H1>ppmtoxpm</H1>
+Updated: Feb 22 2003
+<BR>
+<A HREF="ppmtoxpm.html#index">Table Of Contents</A>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+ppmtoxpm - convert a PPM image to an X11 pixmap
+
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNOPSIS</H2>
+
+<B>ppmtoxpm </B>
+[<B>-name=</B><I>xpmname</I>]
+[<B>-hexonly</B>]
+[<B>-rgb=</B><I>rgb-textfile</I>]
+[<B>-alphamask=</B><I>pgmfile</I>]
+[<I>ppmfile</I>]
+
+<p>Minimum unique abbreviation of option is acceptable.  You may use double
+hyphens instead of single hyphen to denote options.  You may use white
+space in place of the equals sign to separate an option name from its value.
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<p>This program is part of <a href="index.html">Netpbm</a>.
+
+<p><b>ppmtoxpm</b> reads a PPM image as input and produces X11 pixmap
+(version 3) as output.  This format can be loaded by the XPM library.
+
+<P>In the XPM output, colors may be identified by name, such as "Red", or
+in hexadecimal, for example "#FF0000".  In the hexadecimal format, there
+may be from 1 through 4 hexadecimal digits per RGB component.
+
+<p>By default, <b>ppmtoxpbm</b> tries to find a name for each color in
+the image in the <a href="libppm.html#rgb.txt">system color
+dictionary</a>, and if it finds one, uses it.  If it doesn't it uses
+hexadecimal.  You can force <b>ppmtoxpbm</b> to use hexadecimal only
+with the <b>-hexonly</b> option.  You can specify a different color
+dictionary with the <b>-rgb</b> option.
+
+<p>When <b>ppmtoxpm</b> uses the hexadecimal format for identifying a color,
+it uses the one that uses the least number of hexadecimal digits that it
+takes to represent the maxval of the input PPM.  E.g. if the maxval of the
+input PPM is 100, <b>ppmtoxpm</b> uses 2 digits per component, as in
+"#FF0000".
+
+<p>Some programs do not properly handle one-digit-per-component
+hexadecimal color specifiers.  They see the wrong colors.  To produce
+an XPM that such a program can handle, make sure the maxval of the input PPM
+is greater than 15, such as by running it through <B>pnmdepth 255</b>.
+
+<h3>Color Code Lengths - Image Size</h3>
+
+<p>In the XPM format, there is a palette (&quot;color map&quot;) that
+assigns each color in the image to a unique sequence of printable
+characters called a color code, and a raster that identifies the color
+of each pixel of the image with one of those color codes.  The length
+of the color code affects the size of the image stream.  
+
+<p>All color codes in an image are the same length, and
+<b>ppmtoxpm</b> tries to make it as short as possible.  That length
+is, of course, determined by the number of colors in the image.
+<b>ppmtoxpm</b> counts the colors in the image, excluding those that
+will be transparent in the output due to your alpha mask, and chooses
+a color code length accordingly.  There are 92 printable characters
+that can be used in a color code.  Therefore, if you have 92 or fewer
+colors, your color codes will be one character.  If you have more than
+92 but not more than 92 * 92, your color codes will be two characters.
+And so on.
+
+<p>There's one exception to the above: If you specify an alpha mask
+(the <b>-alpha</b> option, one unique color code represents
+&quot;transparent.&quot;  This is true even if the alpha mask doesn't 
+actually produce any transparent pixels.  So subtract one from the number
+of possible colors if you use <b>-alpha</b>.
+
+
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<DL COMPACT>
+<DT><B>-name=</B><I>xpmname</I>
+
+<DD>This option specifies the prefix string which is specified in the
+resulting XPM output.  If you don't use the <b>-name</b> otpion,
+<b>ppmtoxpm</b> defaults to the filename (without extension) of the
+<i>ppmfile</i> parameter.  If you do not specify <B>-name</B> or
+<I>ppmfile</I> (i.e. your input is from Standard Input), the prefix
+string defaults to the string <B>noname</B>.
+
+<DT><B>-hexonly</B>
+
+<DD>This option says never to put color names in the XPM file, but rather
+to identify names by hexadecimal strings that explicitly identify RGB
+component intensities.  This means the reader of the file need not have
+access to a suitable color dictionary to interpret it.
+
+<P>This option was introduced in Netpbm 10.15 (April 2003).  Before that,
+it was the default, overridden by specifying <b>-rgb</b>.
+
+<DT><B>-rgb=</B><I>rgb-textfile</I>
+
+<DD>This option names the file in which the color dictionary you want
+to use resides.  By default, <b>ppmtoxpm</b> uses the <a
+href="libppm.html#rgb.txt">system color dictionary</a>. 
+
+<P>This option in meaningless when you specify <b>-hexonly</b>.
+
+<P>Before Netpbm 10.15 (April 2003), <b>ppmtoxpm</b> did not default
+to the system color dictionary.  If you didn't specify <b>-rgb</b>,
+<b>ppmtoxpbm</b> would use only hexadecimal color specifiers.
+
+<DT><B>-alphamask=</B><I>pgmfile</I>
+
+<DD> This option names a PGM file to use as an alpha (transparency)
+mask.  The file must contain an image the same dimensions as the input
+image.  <B>ppmtoxpm</B> marks as transparent any pixel whose position
+in the alpha mask image is at most half white.  
+
+<P>If you don't specify <B>-alphamask</B>, <B>ppmtoxpm</B> makes all
+pixels in the output opaque.  
+
+<P><B>ppmcolormask</B> is one way to generate an alpha mask file.  You
+might also generate it by extracting transparency information from an
+XPM file with the <B>-alphaout</B> option to <B>xpmtoppm</B>.
+
+<P>There are similar options on other Netpbm converters that convert from
+formats that include transparency information too.
+</DL>
+
+<A NAME="lbAG">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<B><A HREF="ppmcolormask.html">ppmcolormask</A></B>,
+<B><A HREF="xpmtoppm.html">xpmtoppm</A></B>,
+<B><A HREF="pnmdepth.html">pnmdepth</A></B>,
+<B><A HREF="ppm.html">ppm</A></B>
+
+<BR>
+XPM Manual by Arnaud Le Hors <A
+HREF="mailto:lehors@mirsa.inria.fr">lehors@mirsa.inria.fr</A>
+
+<A NAME="lbAH">&nbsp;</A>
+<H2>AUTHOR</H2>
+
+<p>
+Copyright (C) 1990 by Mark W. Snitily.
+<P>
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted, provided
+that the above copyright notice appear in all copies and that both that
+copyright notice and this permission notice appear in supporting
+documentation.  This software is provided &quot;as is&quot; without express or
+implied warranty.
+<P>
+This tool was developed for Schlumberger Technologies, ATE Division, and
+with their permission is being made available to the public with the above
+copyright notice and permission notice.
+
+<P>Upgraded to XPM2 by Paul Breslaw, Mecasoft SA, Zurich, Switzerland (<A
+HREF="mailto:paul@mecazh.uu.ch">paul@mecazh.uu.ch</A>), November 8,
+1990.
+
+<P>Upgraded to XPM version 3 by Arnaud Le Hors(<A
+HREF="mailto:lehors@mirsa.inria.fr">lehors@mirsa.inria.fr</A>), April
+9, 1991.
+
+<HR>
+<A NAME="index">&nbsp;</A>
+<H2>Table Of Contents</H2>
+<UL>
+<LI><A HREF="ppmtoxpm.html#lbAB">NAME</A>
+<LI><A HREF="ppmtoxpm.html#lbAC">SYNOPSIS</A>
+<LI><A HREF="ppmtoxpm.html#lbAD">DESCRIPTION</A>
+<LI><A HREF="ppmtoxpm.html#lbAE">OPTIONS</A>
+<LI><A HREF="ppmtoxpm.html#lbAG">SEE ALSO</A>
+<LI><A HREF="ppmtoxpm.html#lbAH">AUTHOR</A>
+</UL>
+</BODY>
+</HTML>

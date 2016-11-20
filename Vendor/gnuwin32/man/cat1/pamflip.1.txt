@@ -1,0 +1,212 @@
+Pamflip User Manual(0)                   Pamflip User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       pamflip - flip or rotate a PAM or PNM image
+
+
+SYNOPSIS
+       pamflip  { -leftright | -lr | -topbottom | -tb | -trans-
+       pose | -xy | -rotate90 | -r90 | -cw | -rotate270 | -r270
+       |    -ccw    |    -rotate180    |    -r180    -null    |
+       -xform=xform1,xform2...  } [-memsize=mebibytes]  [-page-
+       size=bytes] [pamfile]
+
+       All  options can be abbreviated to their shortest unique
+       prefix.  You may use two hyphens instead of one to  des-
+       ignate  an option.  You may use either white space or an
+       equals sign between an option name and its value.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       pamflip flips a PAM or PNM image top for bottom or  left
+       for  right, or transposes it horizontal for vertical, or
+       rotates it 1, 2, or 3 quarter turns.
+
+       To rotate at other angles, use pnmrotate.   It  is  much
+       slower, though.
+
+       The input image is pamfile, or Standard Input if pamfile
+       is not specified.
+
+       To flip/rotate a JFIF (JPEG) image losslessly, use jpeg-
+       tran.   jpegtran is part of the Independent Jpeg Group's
+       compression library package, not part  of  Netpbm.   The
+       normal  Netpbm  way to flip a JFIF file would be to con-
+       vert it to PNM, use pamflip, and convert back  to  JFIF.
+       But since JPEG compression is lossy, the resulting image
+       would have less quality than the original.  jpegtran, on
+       the  other  hand,  can do this particular transformation
+       directly on the compressed data without loss.
+
+
+
+OPTIONS
+       You must supply exactly one of the following options:
+
+       pamflip's predecessor (before Netpbm 10.7 - August 2002)
+       pnmflip  did  not  have  the  -xform  option and instead
+       allowed you to specify any number of the other  options,
+       including  zero.  It applied all the indicated transfor-
+       mations, in the order given, just  like  with  pamflip's
+       -xform  option.   (Reason  for  the change: this kind of
+       interpretation of options is inconsistent with the  rest
+       of  Netpbm  and most of the Unix world, and thus hard to
+       understand and to implement).
+
+
+
+       -leftright
+
+       -lr    Flip left for right.
+
+
+       -topbottom
+
+       -tb    Flip top for bottom.
+
+
+       -transpose
+
+       -xy    Transpose horizontal for vertical.  I.e. make the
+              pixel at (x,y) be at (y,x).
+
+
+       -rotate90
+
+       -r90
+
+       -ccw   Rotate counterclockwise 90 degrees.
+
+
+       -rotate180
+
+       -r180  Rotate 180 degrees.
+
+
+       -rotate270
+
+       -r270
+
+       -cw    Rotate counterclockwise 270 degrees (clockwise 90
+              degrees)
+
+
+       -null  No change.  (The purpose of this  option  is  the
+              convenience of programs that invoke pamflip after
+              computing the  kind  of  transformation  desired,
+              including none at all).
+
+              This  option  was  new  in Netpbm 10.13 (December
+              2002).
+
+
+       -xform=xform1,xform2...
+              Apply all the transforms listed, in  order.   The
+              valid  values  for  the transforms are as follows
+              and have the same  meanings  as  the  identically
+              named options above.
+
+
+       o      leftright
+
+       o      topbottom
+
+       o      transpose
+
+
+              This  option  was  new  in Netpbm 10.13 (December
+              2002).
+
+
+
+       The following options  help  pamflip  use  memory  effi-
+       ciently.   Some flipping operations on very large images
+       can cause pamflip to have  a  very  large  working  set,
+       which  means  if  you don't have enough real memory, the
+       program can page thrash, which means it takes a  ridicu-
+       lous  amount  time to run.  If your entire image fits in
+       real memory, you don't have a problem.  If  you're  just
+       flipping  top  for  bottom  or left for right, you don't
+       have a problem.  Otherwise, pay  attention.   If  you're
+       interested  in  the details of the thrashing problem and
+       how pamflip approaches it, you're invited to read a com-
+       plete explanation in comments in the source code.
+
+
+
+       -memsize=mebibytes
+              mebibytes   is   the   size   in  mebibytes  (aka
+              megabytes) of real memory (not virtual) available
+              for  pamflip.   pamflip  does  nothing special to
+              allocate real memory or control  it's  allocation
+              --  it  gets whatever it gets just by referencing
+              virtual memory normally.   This  is  the  maximum
+              amount  that  pamflip  can  be expected to end up
+              with by doing that.  This is just about  impossi-
+              ble for you to know, of course, but you can esti-
+              mate.  The  total  real  memory  in  your  system
+              should be a major factor in your estimate.
+
+              When you specify -memsize and are doing a row for
+              column type of transformation, pamflip  does  the
+              transformation  in multiple passes, each one with
+              a working set size less than the specified value.
+
+              If your estimate is even slightly too large, it's
+              the same as infinity.  If you estimate too small,
+              pamflip  will  use  more passes than it needs to,
+              and thus  will  slow  down  proportional  to  the
+              underestimate.
+
+              If  you  do not specify -memsize, pamflip assumes
+              infinite real memory and does the  entire  trans-
+              formation in one pass.
+
+              This  option  did  not  exist  before Netpbm 10.7
+              (August 2002).
+
+
+       -pagesize=bytes
+              bytes is the size in bytes of a  paging  unit  --
+              the amount of memory that gets paged in or out as
+              an indivisible  unit  --  in  your  system.   The
+              default is 4KiB.
+
+              This  option  did  not  exist  before Netpbm 10.7
+              (August 2002).
+
+
+
+              Miscellaneous options:
+
+
+       -verbose
+              This option causes pamflip to issue  messages  to
+              Standard Error about its progress.
+
+
+
+
+SEE ALSO
+       pnmrotate(1), pnm(1), jpegtran manual
+
+HISTORY
+       pamflip  replaced  pnmflip  in  Netpbm  10.13  (December
+       2002).  pamflip is backward compatible, but  also  works
+       on PAM images.
+
+
+
+AUTHOR
+       Copyright (C) 1989 by Jef Poskanzer.
+
+
+
+netpbm documentation    18 February 2005 Pamflip User Manual(0)

@@ -1,0 +1,1557 @@
+.\"-*-nroff-*-
+.\" This file is (c) 1998-2006 Ted Faber (faber@lunabase.org) see
+.\" COPYRIGHT for the full copyright and limitations of liabilities.
+.Dd March 11, 2006
+.Os
+.Dt GRAP 1
+.Sh NAME
+.Nm grap 
+.Nd Kernighan and Bentley's language for typesetting graphs
+.Sh SYNOPSIS
+.Nm
+.Op Fl d Ar defines_file
+.Op Fl D
+.Op Fl l
+.Op Fl M Ar include path
+.Op Fl R
+.Op Fl r
+.Op Fl v
+.Op Fl u
+.Op Fl C
+.Op Fl c
+.Op Fl h
+.Op Ar filename ...
+.Sh DESCRIPTION
+.Nm
+is an implementation of Kernighan and Bentley's language for
+typesetting graphs, as described in ``Grap-A Language for Typesetting
+Graphs, Tutorial and User Manual,'' by Jon L. Bentley and Brian W.
+Kernighan, revised May 1991, which is the primary source for
+information on how to use
+.Nm grap .
+As of this writing, it is available electronically at 
+.Li http://www.kohala.com/start/troff/cstr114.ps .
+Additional documentation and examples, packaged with
+.Nm ,
+may have been installed locally as well.  If available, paths to them
+can be displayed using
+.Nm
+.Fl h
+or 
+.Nm
+.Fl v
+(or 
+.Nm
+.Fl -help
+/
+.Nm
+.Fl -version )
+.Pp
+This version is a black box implementation of 
+.Nm grap ,
+and some inconsistencies are to be expected.  The remainder of this
+manual page will briefly outline the
+.Nm
+language as implemented here.
+.Pp
+.Nm
+is a 
+.Xr pic 1
+pre-processor.  It takes commands embedded in a 
+.Xr troff 1
+source file which are surrounded by 
+.Ic .G1
+and
+.Ic .G2
+macros, and rewrites them into 
+.Xr pic
+commands to display the graph.
+Other lines are copied.  Output is always to the standard output,
+which is usually redirected.  Input is from the given
+.Ar filename Ns No s ,
+which are read in order.  A 
+.Ar filename 
+of 
+.Fl 
+is the standard input.
+If no 
+.Ar filename Ns No s
+are given, input is read from the standard input.
+.Pp
+Because
+.Nm
+is a 
+.Xr pic 
+preprocessor, and GNU 
+.Xr pic 
+will output TeX, it is possible to use
+.Nm
+with TeX.
+.Pp
+The 
+.Fl d
+option specifies a file of macro definitions to be read at startup,
+and defaults to /usr/local/share/grap/grap.defines .
+The
+.Fl D
+option inhibits the reading of any initial macros file
+(the
+.Fl l
+flag is a synonym for 
+.Fl D ,
+though I do not remember why).  The defines
+file can also be given using the 
+.Ev GRAP_DEFINES
+environment variable. (See below).
+.Pp
+.Fl v
+prints the version information on the standard output and exits.
+.Fl -version
+is a synonym for 
+.Fl v .
+.Pp
+.Fl u
+makes labels unaligned by default.  This version of 
+.Nm
+uses new features of GNU 
+.Xr pic
+to align the left and right labels with
+the axes, that is that the left and right labels run at right angles
+to the text of the paper.  This may be useful in porting old 
+.Nm 
+programs.
+.Fl c
+makes plot strings unclipped by default.  Some versions of 
+.Nm
+allow users to place a string anywhere in the coordinate space, rather than
+only in the frame.  By default this version of 
+.Nm
+does not plot any string centered outside the frame.  
+.Fl c
+allows strings to be placed anywhere.  See also the 
+.Ic clipped
+and 
+.Ic unclipped
+string modifiers described in the
+.Ic plot
+statement.
+.Pp
+.Fl M
+is followed by a colon-separated list of directories used to search
+for relative pathnames included via 
+.Ic copy .
+The path is also used to locate the defines file, so if the 
+.Fl d
+changes the defines file name to a relative name, it will be searched
+for in the path given by 
+.Fl M .
+The search path always includes the current directory, and by default
+that directory is searched last.
+.Pp
+All numbers used internally by 
+.Nm
+are double precision floating point values.  Sometimes using floating point
+numbers has unintended consequences.  To help avoid these problems,
+.Nm
+can use two thresholds for comparison of floating point numbers, set by
+.Fl R
+or 
+.Fl r .
+The 
+.Fl R
+flag sets coarse comparison mode, which is suitable for most applications.  If
+you are plotting small values \(en less than 1e-6 or so \(en consider using
+.Fl r
+which uses very fine comparisons between numbers.  You may also want to rescale your plotted values to be larger in magnitude. The coarse comarisons are
+used by default.
+.Pp
+To be precise, the value by which two numbers must differ for 
+.Nm
+to consider them not equal is called the comparison limit and the smallest
+non-zero number is called the minimum value.  The values a given version of 
+.Nm
+uses for these are included in the output of
+.Fl v
+or 
+.Fl h .
+.Pp
+All
+.Nm
+commands are included between 
+.Ic .G1
+and
+.Ic .G2
+macros, which are consumed by 
+.Nm grap .
+The output contains 
+.Xr pic
+between
+.Ic .PS
+and
+.Ic .PE
+macros.  Any arguments to the
+.Ic .G1
+macro in the input are arguments to the
+.Ic .PS
+macro in the output, so graphs can be scaled just like 
+.Xr pic
+diagrams.
+If 
+.Fl C
+is given, any macro beginning with \&.G1 or \&.G2 is treated as a \&.G1 or
+\&.G2 macro, for compatibility with old versions of troff.  Using 
+.Fl C
+also forces pure troff syntax on embedded font change commands when strings
+have the
+.Ic size
+attribute, and all strings to be 
+.Ic unclipped .
+.Pp
+The 
+.Fl h
+flag prints a brief help message and exits.  
+.Fl -help 
+is a synonym for
+.Fl h .
+.Pp
+It is possible for someone to cause 
+.Nm
+to fail by passing a bad format string and data to the
+.Ic sprintf
+command.  If 
+.Nm
+is integrated as part of the printing system, this could conceivably
+provided a path to breaching security on the machine.  If you choose to
+use 
+.Nm
+as part of a printing system run by the super-user, you should disable
+.Ic sprintf 
+commands.  This can be done by calling 
+.Nm
+with the 
+.Fl S
+flag, setting the
+.Ev GRAP_SAFER
+environment variable, or compiling with the GRAP_SAFER preprocessor
+symbol defined.  (The GNU configure script included with
+.Nm
+will define that preprocessor symbol if the
+.Fl -with-grap-safe
+option is given.)
+.Pp
+The 
+.Nm
+commands are sketched below.  Refer to Kernighan and Bentley's paper
+for the details.
+.Pp
+New versions of
+.Xr groff 1
+will invoke 
+.Nm
+if 
+.Fl G
+is given.
+.Ss Commands
+.Pp
+Commands are separated from one another by newlines or semicolons (;).
+.Pp
+.Ic frame 
+.Op Ar line_description 
+.Oo
+.Bk -words
+.Cm ht Ar height No \(or Cm wid Ar width
+.Ek
+.Oc
+.Oo
+.Bk -words
+.Oo
+.Sm off
+.Cm ( top No \(or Cm bottom No \(or 
+.Cm left No \(or 
+.Sm on
+.Cm right )
+.Ar line_description 
+.Ek
+.Oc
+\&...
+.Oc
+.sp
+.Ic frame 
+.Oo
+.Bk -words
+.Cm ht Ar height No \(or Cm wid Ar width
+.Ek
+.Oc
+.Op Ar line_description 
+.Oo
+.Bk -words
+.Oo
+.Sm off
+.Cm ( top No \(or Cm bottom No \(or 
+.Cm left No \(or 
+.Sm on
+.Cm right )
+.Ar line_description 
+.Ek
+.Oc
+\&...
+.Oc
+.Bd -filled -offset indent
+This describes how the axes for the graph are drawn. A
+.Ar line_description 
+is a 
+.Xr pic
+line description, e.g., 
+.Li dashed 
+.Li 0.5 , 
+or the literal
+.Li solid .
+It may also include a 
+.Ic color
+keyword followed by the color to draw the string in double quotes.  Any color
+understood by the underlying groff system can be used.  Color can only be used
+under GNU pic, and is not available in compatibility mode.  Similarly, for 
+pic implementations that understand
+.Ic thickness ,
+that attribute may be used with a real valued parameter.  
+.Ic Thickness
+is not available in compatibility mode.
+.Pp
+If the first 
+.Ar line_description 
+is given, the frame is drawn with that style.  The default is 
+.Li solid .
+The height and width of the frame can also be specified in inches.
+The default line style can be over-ridden for sides of the frame by
+specifying additional parameters to
+.Ic frame .
+.Pp
+If no plotting commands have been given before the 
+.Ic frame
+command is issued, the frame will be output at that point in the
+plotting stream relative to embedded 
+.Xr troff 
+or
+.Xr pic 
+commands.  Otherwise the frame is output before the first plotted
+object (even invisible ones).
+.Pp
+.Ic ht
+and
+.Ic wid
+are in inches by default, but can be any
+.Xr groff
+unit.  If omitted, the dimensions are 2 inches high by 3 inches wide.
+.Ed 
+.Pp
+.Ic coord
+.Op Ar name
+.Op Cm x Ar expr , expr
+.Op Cm y Ar expr , expr
+.Oo
+.Cm log x No \(or
+.Cm log y No \(or
+.Cm log log 
+.Oc
+.Bd -filled -offset indent
+The
+.Ic coord
+command specifies a new coordinate system or sets limits on the
+default system.  It defines the largest and smallest values that can
+be plotted, and therefore the scale of the data in the frame.  The
+limits for the x and y coordinate systems can be given separately.  If
+a 
+.Ar name
+is given, that coordinate system is defined, if not the default system
+is modified.
+.Pp
+A coordinate system created by one 
+.Ic coord
+command may be modified by subsequent 
+.Ic coord
+commands.  A
+.Nm
+program may declare a coordinate space using
+.Ic coord ,
+.Ic copy
+a file of data through a macro that plots the data and finds its
+maxima and minima, and then define the size of the coordinate system
+with a second 
+.Ic coord
+statement.
+.Pp
+This command also determines if a scale is plotted logarithmically.  
+.Cm log log
+means the same thing as 
+.Cm log x log y .
+.Ed
+.Pp
+.Ic draw
+.Op Ar line_name
+.Op Ar line_description
+.Op Ar plot_string 
+.Bd -filled -offset indent
+The
+.Ic draw
+command defines the style with which a given line will be plotted.  If
+.Ar line_name 
+is given, the style is associated with that name, otherwise the
+default style is set.  
+.Ar line_description
+is a 
+.Xr pic
+line description, and the optional
+.Ar plot_string
+is a string to be centered at each point.  The default line
+description is
+.Li invis ,
+and the default plotting string is a centered bullet, so by default
+each point is a filled circle, and they are unconnected.
+If points are being connected, each
+.Ic draw
+command ends any current line and begins a new one.
+.Pp
+When defining a line style, that is the first 
+.Ic draw
+command for a given line name, specifying no plot string means that
+there are to be no plot strings.  Omitting the plot string on
+subsequent 
+.Ic draw
+commands addressing the same named line means not to change the plot
+string.  If a line has been defined with a plot string, and the format
+is changed by a subsequent
+.Ic draw
+statement, the plot string can be removed by specifying "" in the
+.Ic draw
+statement.
+.Pp
+The plot string can have its format changed through several string_modifiers.
+String_modifiers are described in the description of the 
+.Ic plot 
+command.
+.Pp
+The standard defines file includes several macros useful as plot strings, 
+including 
+.Ic bullet ,
+.Ic square , 
+and
+.Ic delta .
+.Pp
+.Ic new
+is a synonym for 
+.Ic draw .
+.Ed 
+.Pp
+.Ic next
+.Op Ar line_name
+.Cm at
+.Op Ar coordinates_name 
+.Ar expr ,  expr
+.Op Ar line_description 
+.Bd -filled -offset indent
+The 
+.Ic next
+command plots the given point using the line style given by
+.Ar line_name ,
+or the default if none is given.  If
+.Ar line_name
+is given, it should have been defined by an earlier
+.Ic draw
+command, if not a new line style with that name is created,
+initialized the same way as the default style.  The two expressions
+give the point's x and y values, relative to the optional coordinate
+system.  That system should have been defined by an earlier
+.Ic coord
+command, if not, grap will exit.  If the optional
+.Ar line_description
+is given, it overrides the style's default line description.  You
+cannot over-ride the plotting string.  To use a different plotting
+string use the 
+.Ic plot
+command.
+.Pp
+The coordinates may optionally be enclosed in parentheses: 
+.Ar ( expr ,  expr )
+.Ed
+.Pp
+.Ar quoted_string 
+.Op Ar string_modifiers 
+.Oo
+.No , Ar quoted_string 
+.Oo 
+.Ar string_modifiers
+.Oc
+.Oc
+\&...
+.Cm at
+.Op Ar coordinates_name 
+.Ar expr , expr
+.Pp
+.Ic plot 
+.Ar expr
+.Op Ar format_string 
+.Cm at
+.Op Ar coordinates_name 
+.Ar expr , expr
+.Bd -filled -offset indent
+These commands both plot a string at the given point.  In the first
+case the literal strings are stacked above each other.  The string_modifiers
+include the
+.Xr pic 
+justification modifiers 
+.Ns No ( Ic ljust , 
+.Ic rjust ,
+.Ic above ,
+and
+.Ic below Ns No ),
+and absolute and relative
+.Li size
+modifiers.  See the
+.Xr pic
+documentation for the description of the justification modifiers.
+.Nm
+also supports the 
+.Ic aligned
+and
+.Ic unaligned 
+modifiers which are briefly noted in the description of the 
+.Ic label
+command.
+.Pp
+The standard defines file includes several macros useful as plot strings, 
+including 
+.Ic bullet ,
+.Ic square , 
+and
+.Ic delta .
+.Pp
+Strings placed by either format of the 
+.Ic plot
+command are restricted to being within the frame.  This can be overriden by
+using the 
+.Ic unclipped
+attribute, which allows a string to be plotted in or out of the frame.  The 
+.Fl c
+and 
+.Fl C
+flags set 
+.Ic unclipped
+on all strings, and to prevent a string from being plotted outside the frame
+when those flags are active, the 
+.Ic clipped 
+attribute can be used to retore clipping behavior.  Though 
+.Ic clipped
+or 
+.Ic unclipped
+can be applied to any string, it only has meaning for 
+.Ic plot
+statements.
+.Pp
+.Li size
+.Ar expr
+sets the string size to 
+.Ar expr
+points.  If 
+.Ar expr
+is preceded by a + or -, the size is increased or decreased by that
+many points.
+.Pp
+If 
+.Ic color
+and a color name in double quotes appears, the string will be rendered in that
+color under a version of GNU troff that supports color.  Color is not available
+in compatibility mode.
+.Pp
+In the second version, the 
+.Ar expr
+is converted to a string and placed on the graph.  
+.Ar format_string 
+is a 
+.Xr printf 3
+format string.  Only formatting escapes for printing
+floating point numbers make sense.  The format string is only respected
+if the 
+.Ic sprintf 
+command is also active.  See the description of 
+.Ic sprintf
+for the various ways to disable it.  
+.Ic Plot
+and 
+.Ic sprintf
+respond differently when 
+.Nm
+is running safely.  
+.Ic Sprintf
+ignores any arguments, passing the format string through without
+substitution. 
+.Ic plot
+ignores the format string completely, plotting
+.Ar expr
+using the 
+.Qq %g 
+format.
+.Pp
+Points are specified the same way as for 
+.Ic next
+commands, with the same consequences for undefined coordinate systems.
+.Pp
+The second form of this command is because the first form can be used
+with a
+.Nm
+.Ic sprintf
+expression (See
+.Sx Expressions ) .
+.Ed
+.Pp
+.Ic ticks
+.Sm off
+.Xo ( Cm left No \(or Cm right 
+.No \(or Cm top No \(or Cm bottom )
+.Xc
+.Oo
+.Sm on
+.Xo ( Cm in Ns No \(or Ns Cm out )
+.Xc
+.Op Ar expr
+.Oc
+.Sm off
+.Oo 
+.Cm on \(or Cm auto
+.Sm on
+.Ar coord_name
+.Oc
+.Pp
+.Ic ticks 
+.Sm off
+.Xo ( Cm left No \(or Cm right No \(or Cm top No \(or Cm bottom )
+.Xc
+.Sm on
+.Xo ( Cm in Ns No \(or Ns Cm out )
+.Xc
+.Op Ar expr
+.Oo
+.Cm up Ar expr No \(or
+.Cm down Ar expr No \(or
+.Cm left Ar expr No \(or
+.Cm right Ar expr
+.Oc
+.Cm at
+.Op Ar coord_name
+.Ar expr
+.Op Ar format_string
+.Oo
+.Oo
+.No , Ar expr
+.Oo
+.Ar format_string
+.Oc
+.Oc
+.No ...
+.Oc
+.Pp
+.Ic ticks 
+.Sm off
+.Xo ( Cm left No \(or Cm right 
+.No \(or Cm top No \(or Cm bottom )
+.Xc
+.Sm on
+.Xo ( Cm in Ns No \(or Ns Cm out )
+.Xc
+.Op Ar expr
+.Oo
+.Cm up Ar expr No \(or
+.Cm down Ar expr No \(or
+.Cm left Ar expr No \(or
+.Cm right Ar expr
+.Oc
+.Cm from
+.Op coord_name
+.Ar start_expr
+.Cm to
+.Ar end_expr
+.Oo 
+.Cm by 
+.Sm off
+.Oo
+.No + \(or - \(or * \(or /
+.Sm on
+.Oc
+.Ar by_expr
+.Oc
+.Op format_string
+.Pp
+.Ic ticks
+.Sm off
+.Oo
+.Cm left Xo No \(or Cm right 
+.No \(or Cm top No \(or Cm bottom
+.Oc
+.Xc
+.Sm on
+.Cm off
+.Bd -filled -offset indent
+This command controls the placement of ticks on the frame.  By
+default, ticks are automatically generated on the left and bottom
+sides of the frame.
+.Pp
+The first version of this command turns on the automatic tick
+generation for a given side.  The 
+.Cm in
+or
+.Cm out
+parameter controls the direction and length of the ticks.  If a 
+.Ar coord_name
+is specified, the ticks are automatically generated using that
+coordinate system.  If no system is specified, the default coordinate
+system is used.  As with
+.Ic next
+and
+.Ic plot ,
+the coordinate system must be declared before the 
+.Ic ticks
+statement that references it.  This syntax for requesting
+automatically generated ticks is an extension, and will not port to
+older 
+.Nm
+implementations.
+.Pp
+The second version of the
+.Ic ticks
+command overrides the automatic placement of the ticks by specifying
+a list of coordinates at which to place the ticks.  If the ticks are
+not defined with respect to the default coordinate system, the
+.Ar coord_name
+parameter must be given.  For each tick a 
+.Xr printf 3
+style format string can be given.  The
+.Ar format_string
+defaults to
+.Qq %g .
+The format string can also take string modifiers as described in the 
+.Ic plot
+command.
+To place ticks with no labels, specify 
+.Ar format_string 
+as
+.Qq \& .
+.Pp
+If 
+.Ic sprintf
+is disabled, 
+.Ic ticks
+behaves as
+.Ic plot
+with respect to the format string.
+.Pp
+The labels on the ticks may be shifted by specifying a direction and
+the distance in inches to offset the label.  That is the optional
+direction and expression immediately preceding the 
+.Cm at .
+.Pp
+The third format of the 
+.Ic ticks
+command over-rides the default tick generation with a set of ticks ar
+regular intervals.  The syntax is reminiscent of programming
+language for loops.  Ticks are placed starting at
+.Ar start_expr
+ending at
+.Ar end_expr
+one unit apart.  If the
+.Cm by
+clause is specified, ticks are
+.Ar by_expr
+units apart.  If an operator appears before
+.Ar by_expr
+each tick is operated on by that operator instead of +.  For example
+.Bd -literal -offset indent-two
+ticks left out from 2 to 32 by *2
+.Ed
+.Pp
+will put ticks at 2, 4, 8, 16, and 32.  If
+.Ar format_string
+is specified, all ticks are formatted using it.
+.Pp
+The parameters preceding the
+.Cm from
+act as described above.
+.Pp
+The 
+.Cm at
+and 
+.Cm for
+forms of tick command may both be issued on the same
+side of a frame.  For example:
+.Bd -literal -offset indent-two
+ticks left out from 2 to 32 by *2
+ticks left in 3, 5, 7
+.Ed
+.Pp
+will put ticks on the left side of the frame pointing out at 2, 4, 8,
+16, and 32 and in at 3, 5, and 7.
+.Pp
+The final form of 
+.Ic ticks
+turns off ticks on a given side.  If no side is given the ticks for
+all sides are cancelled.
+.Pp
+.Ic tick
+is a synonym for 
+.Ic ticks .
+.Ed
+.Pp
+.Ic grid
+.Sm off
+.Xo ( Cm left No \(or Cm right 
+.No \(or Cm top No \(or Cm bottom )
+.Xc
+.Sm on
+.Op Li ticks off
+.Op Ar line_description
+.Oo
+.Cm up Ar expr No \(or
+.Cm down Ar expr No \(or
+.Cm left Ar expr No \(or
+.Cm right Ar expr
+.Oc
+.Oo
+.Sm off
+.Cm on \(or Cm auto
+.Sm on
+.Op Ar coord_name
+.Oc
+.Pp
+.Ic grid
+.Sm off
+.Xo ( Cm left No \(or Cm right 
+.No \(or Cm top No \(or Cm bottom )
+.Xc
+.Sm on
+.Op Li ticks off
+.Op Ar line_description
+.Oo
+.Cm up Ar expr No \(or
+.Cm down Ar expr No \(or
+.Cm left Ar expr No \(or
+.Cm right Ar expr
+.Oc
+.Cm at
+.Op Ar coord_name
+.Ar expr
+.Op Ar format_string
+.Oo
+.Oo
+.No , Ar expr
+.Oo
+.Ar format_string
+.Oc
+.Oc
+.No ...
+.Oc
+.Pp
+.Ic grid 
+.Sm off
+.Xo ( Cm left No \(or Cm right 
+.No \(or Cm top No \(or Cm bottom )
+.Xc
+.Sm on
+.Op Li ticks off
+.Op Ar line_description
+.Oo
+.Cm up Ar expr No \(or
+.Cm down Ar expr No \(or
+.Cm left Ar expr No \(or
+.Cm right Ar expr
+.Oc
+.Cm from
+.Op coord_name
+.Ar start_expr
+.Cm to
+.Ar end_expr
+.Oo 
+.Cm by 
+.Sm off
+.Oo
+.No + \(or - \(or * \(or /
+.Sm on
+.Oc
+.Ar by_expr
+.Oc
+.Op format_string
+.Bd -filled -offset indent
+The
+.Ic grid
+command is similar to the 
+.Ic ticks
+command except that 
+.Ic grid
+specifies the placement of lines in the frame.  The syntax is similar
+to 
+.Ic ticks
+as well.  
+.Pp
+By specifying 
+.Li ticks off
+in the command, no ticks are drawn on that side of the frame.  If
+ticks appear on a side by default, or have been declared by an earlier
+.Ic ticks
+command, 
+.Ic grid
+does not cancel them unless 
+.Li ticks off
+is specified.
+.Pp
+Instead of a direction for ticks, 
+.Ic grid
+allows the user to pick a line description for the grid lines.  The
+usual
+.Xr pic 
+line descriptions are allowed.
+.Pp
+Grids are labelled by default.  To omit labels, specify the format
+string as 
+.Qq \& .
+.Pp
+If 
+.Ic sprintf
+is disabled, 
+.Ic grid
+behaves as
+.Ic plot
+with respect to the format string.
+.Ed
+.Pp
+.Ic label
+.Sm off
+.Xo ( Cm left No \(or Cm right 
+.No \(or Cm top No \(or Cm bottom )
+.Xc
+.Sm on
+.Ar quoted_string 
+.Op Ar string_modifiers 
+.Oo
+.No , Ar quoted_string 
+.Oo 
+.Ar string_modifiers
+.Oc
+.Oc
+\&...
+.Oo
+.Cm up Ar expr No \(or
+.Cm down Ar expr No \(or
+.Cm left Ar expr No \(or
+.Cm right Ar expr
+.Oc
+.Bd -filled -offset indent
+The 
+.Ic label
+command places a label on the given axis.  It is possible to specify
+several labels, which will be stacked over each other as in 
+.Xr pic .
+The final argument, if present, specifies how many inches the label is
+shifted from the axis.
+.Pp
+By default the labels on the left and right labels run parallel to the
+frame.  You can cancel this by specifying 
+.Li unaligned 
+as a 
+.Ar string_modifier .
+.Ed
+.Pp
+.Ic circle
+.Cm at
+.Op Ar coordinate_name
+.Ar expr , expr
+.Op Cm radius Ar expr
+.Op Ar linedesc
+.Bd -filled -offset indent
+This draws an circle at the point indicated.  By default, the
+circle is small, 0.025 inches.  This can be over-ridden by specifying
+a radius.  The coordinates of the point are relative to the named
+coordinate system, or the default system if none is specified.
+.Pp
+This command has been extended to take a line description,
+e.g., 
+.Li dotted .
+It also accepts the filling extensions described below in the
+.Ic bar
+command.  It will also accept a 
+.Ic color
+keyword that gives the color of the outline of the circle in double
+quotes and a
+.Ic fillcolor
+command that sets the color to fill the circle with similarly.  Colors
+are only available when compatibility mode is off, and using a version
+of GNU pic that supports color.
+.Ed
+.Pp
+.Ic line 
+.Op Ar line_description
+.Cm from
+.Op Ar coordinate_name
+.Ar expr , expr
+.Cm to 
+.Op Ar coordinate_name
+.Ar expr , expr
+.Op Ar line_description
+.Pp
+.Ic arrow
+.Op Ar line_description
+.Cm from
+.Op Ar coordinate_name
+.Ar expr , expr
+.Cm to 
+.Op Ar coordinate_name
+.Ar expr , expr
+.Op Ar line_description
+.Bd -filled -offset indent
+This draws a line or arrow from the first point to the second using
+the given style.  The default line style is 
+.Li solid .
+The 
+.Ar line_description
+can be given either before the
+.Cm from
+or after the 
+.Cm to
+clause.  If both are given the second is used.  It is possible to
+specify one point in one coordinate system and one in another, note
+that if both points are in a named coordinate system (even if they are
+in the same named coordinate system), both points must have
+.Ar coordinate_name
+given.
+.Ed
+.Pp
+.Pp
+.Ic copy
+.Op Qq Ar filename
+.Op Cm until Qq Ar string
+.Op Cm thru Ar macro
+.Bd -filled -offset indent
+The
+.Ic copy
+command imports data from another file into the current graph.  The
+form with only a filename given is a simple file inclusion; the
+included file is simply read into the input stream and can contain
+arbitrary
+.Nm
+commands.  The more common case is that it is a number list; see
+.Sx Number Lists
+below.
+.Pp
+The second form takes lines from the file, splits them into words
+delimited by one or more spaces, and calls the given macro with those
+words as parameters.  The macro may either be defined here, or be a
+macro defined earlier.  See
+.Sx Macros
+for more information on macros.
+.Pp
+The
+.Ar filename
+may be omitted if the 
+.Cm until
+clause is present.  If so the current file is treated as the input
+file until
+.Ar string
+is encountered at the beginning of the line.
+.Pp
+.Ic copy
+is one of the workhorses of 
+.Nm grap .
+Check out the paper and 
+.Pa /usr/local/share/examples/grap
+for more details.  Confirm the location of the examples directory using the 
+.Fl v
+flag.
+.Ed
+.Ic print 
+.Sm off 
+.Ar ( expr \(or string )
+.Sm on
+.Bd -filled -offset indent
+Prints its argument to the standard error.
+.Ed
+.Pp
+.Ic sh Ar block
+.Bd -filled -offset indent
+This passes 
+.Ar block
+to 
+.Xr sh 1 .
+Unlike K&B 
+.Nm
+no macro or variable expansion is done.  I believe that this is also
+true for GNU 
+.Xr pic
+version 1.10.  See the 
+.Sx Macros
+section for information on defining blocks.
+.Ed
+.Pp
+.Ic pic Ar pic_statement
+.Bd -filled -offset indent
+This issues the given 
+.Xr pic
+statements  in the enclosing
+.Ic .PS
+and 
+.Ic .PE
+at the point where the command is issued.
+.Pp
+Statements that begin with a period are considered to be 
+.Xr troff statements
+and are output in the enclosing
+.Ic .PS
+and 
+.Ic .PE
+at the point where the command appears.
+.Pp
+For the purposes of relative placement of 
+.Xr pic
+or 
+.Xr troff
+commands, the frame is output immediately before the first plotted
+object, or the 
+.Ic frame
+statement, if any.  If the user specifies
+.Xr pic
+or 
+.Xr troff
+commands and neither any plotable object nor a 
+.Ic frame 
+command, the commands will not be output.
+.Ed
+.Pp
+.Ic graph Ar Name pic_commands
+.Bd -filled -offset indent
+This command is used to position graphs with respect to each other.
+The current graph is given the
+.Xr pic
+name
+.Ar Name
+(names used by 
+.Xr pic
+begin with capital letters).  Any 
+.Xr pic
+commands following the graph are used to position the next graph.  The
+frame of the graph is available for use with
+.Xr pic
+name
+.Li Frame.  
+The following places a second graph below the first:
+.Bd -literal -offset indent-two
+graph Linear
+[ graph description ]
+graph Exponential with .Frame.n at \\
+	Linear.Frame.s - (0, .05)
+[ graph description ]
+.Ed
+.Ed
+.Pp
+.Ar name = expr
+.Bd -filled -offset indent
+This assigns 
+.Ar expr 
+to the variable
+.Ar name .
+.Nm
+has only numeric (double) variables.
+.Pp
+Assignment creates a variable if it does not exist.  Variables persist
+across graphs.  Assignments can cascade; 
+.Li a = b = 35
+assigns 35 to 
+.Li a
+and 
+.Li b .
+.Ed
+.Pp
+.Ic bar 
+.Sm off
+.No ( Cm up No \(or Cm right )
+.Sm on
+.Op Ar coordinates_name
+.Ar offset
+.Cm ht
+.Ar height
+.Op Cm wid Ar width
+.Op Cm base Ar base_offset
+.Op Ar line_description
+.Pp
+.Ic bar
+.Op Ar coordinates_name
+.Ar expr , expr ,
+.Op Ar coordinates_name
+.Ar expr , expr ,
+.Op Ar line_description
+.Bd -filled -offset indent
+The 
+.Ic bar
+command facilitates drawing bar graphs.  The first form of the
+command describes the bar somewhat generally and has 
+.Nm
+place it.
+The bar may extend up or to the right, is centered on 
+.Ar offset
+and extends up or right 
+.Ar height 
+units (in the given coordinate system).  For example
+.Bd -literal -offset indent-two
+bar up 3 ht 2
+.Ed
+.Pp
+draws a 2 unit high bar sitting on the x axis, centered on x=3.  By
+default bars are 1 unit wide, but this can be changed with the 
+.Ic wid
+keyword.  By default bars sit on the base axis, i.e., bars directed up
+will extend from y=0.  That may be overridden by the 
+.Ic base
+keyword.  (The bar described above has corners (2.5, 0) and (3.5, 2).)
+.Pp
+The line description has been extended to include a 
+.Ic fill Ar expr
+keyword that specifies the shading inside the bar.  Bars may be drawn
+in any line style.  They support the
+.Ic color
+and 
+.Ic fillcolor
+keywords described under
+.Ic circle .
+.Pp
+The second form of the command draws a box with the two points as
+corners.  This can be used to draw boxes highlighting certain data as
+well as bar graphs.  Note that filled bars will cover data drawn under
+them.
+.Ed
+.Ss Control Flow
+.Pp
+.Ic if Ar expr Ic then Ar block
+.Op Ic else Ar block
+.Bd -filled -offset indent
+The
+.Ic if
+statement provides simple conditional execution.  If
+.Ar expr 
+is non-zero, the 
+.Ar block 
+after the 
+.Ic then
+statement is executed.  If not the 
+.Ar block 
+after the
+.Ic else
+is executed, if present.  See
+.Sx Macros
+for the definition of blocks.  Early versions of this implementation
+of
+.Nm
+treated the blocks as macros that were defined and expanded in place.
+This led to unnecessary confusion because explicit separators were
+sometimes called for.  Now,
+.Nm
+inserts a separator (;) after the last character in 
+.Ar block ,
+so constructs like 
+.Bd -literal
+if (x == 3) { y = y + 1 }
+x = x + 1
+
+.Ed
+behave as expected.  A separator is also appended to the end of a
+.Ic for
+block.
+.Ed
+.Pp
+.Ic for Ar name Ic from Ar from_expr Ic to Ar to_expr
+.Oo
+.Ic by 
+.Op No +\(or-\(or*\(or/
+.Ar by_expr
+.Oc
+.Ic do
+.Ar block
+.Bd -filled -offset indent
+This command executes 
+.Ar block
+iteratively.  The variable
+.Ar name
+is set to 
+.Ar from_expr
+and incremented by
+.Ar by_expr 
+until it exceeds 
+.Ar to_expr .
+The iteration has the semantics defined in the 
+.Ic ticks 
+command.  The definition of
+.Ar block
+is discussed in 
+.Sx Marcos .
+See also the note about implicit separators in the description of the
+.Ic if
+command.
+.Pp
+An 
+.Ic =
+can be used in place of 
+.Ic from .
+.Ed
+.Ss Expressions
+.Pp
+.Nm
+supports most standard arithmetic operators: + - / * ^.  The carat
+(^) is exponentiation.  In an 
+.Ic if
+statement
+.Nm
+also supports the C logical operators ==, !=,
+&&, || and unary !.  Also in an
+.Ic if ,
+== and != are overloaded for the comparison of
+quoted strings.  Parentheses are used for grouping.  
+.Pp
+Assignment is not allowed in an expression in any context, except for
+simple cascading of assignments.
+.Li a = b = 35
+works as expected;
+.Li a = 3.5 * (b = 10)
+does not execute.
+.Pp
+.Nm
+supports the following functions that take one argument:
+.Ic log , exp , int , sin , cos , sqrt , rand .
+The logarithms are base 10 and the trigonometric functions are in
+radians.  
+.Ic eexp
+returns Euler's number to the given power and
+.Ic ln
+returns the natural logarithm.  The natural log and exponentiation
+functions are extensions and are probably not available in other
+.Nm
+implementations.
+.Pp
+.Ic rand
+returns a random number uniformly
+distributed on [0,1).  The following two-argument functions are supported:
+.Ic atan2 , min , max .
+.Ic atan2 
+works just like
+.Xr atan2 3 .
+The random number generator can be seeded by calling 
+.Ic srand
+with a single parameter (converted internally to an integer).  Because
+its return value is of no use, you must use 
+.Ic srand
+as a separate statement, it is not part of a valid expression.
+.Ic srand
+is not portable.
+.Pp
+The
+.Ic getpid
+function takes no arguments and returns the process id.  This may be
+used to seed the random number generator, but do not expect
+cryptographically random values to result.
+.Pp
+Other than string comparison, no expressions can use strings.  One
+string valued function exists: 
+.Ic sprintf ( Ar format ,
+.Oo
+.Ar expr 
+.Op Ar \&, expr
+.Oc
+).  It operates like
+.Xr sprintf 3 ,
+except returning the value.  It can be used anywhere a quoted string
+is used.  If 
+.Nm
+is run with 
+.Fl S ,
+the environment variable
+.Ev GRAP_SAFER
+is defined, or 
+.Nm
+has been compiled for safer operation, the 
+.Ic sprintf
+command will return the format string.  This mode of operation is only
+intended to be used only if
+.Nm
+is being used as part of a super-user enabled print system.
+.Ss Macros
+.Nm
+has a simple but powerful macro facility.  Macros are defined using
+the 
+.Ic define
+command :
+.Pp
+.Ic define Ar name block
+.br
+.Ic undefine Ar name 
+.Bd -filled -offset indent
+Every occurrence of 
+.Ar name
+in the program text is replaced by the contents of 
+.Ar block .
+.Ar block
+is defined by a series of statements in nested { }'s, or a series of
+statements surrounded by the same letter.  An example of the latter is
+.Bd -literal -offset indent-two
+define foo  X coord x 1,3 X
+.Ed
+Each time 
+.Li foo
+appears in the text, it will be replaced by 
+.Li coord x 1,3 .
+Macros are literal, and can contain newlines.  If a macro does not
+span multiple lines, it should end in a semicolon to avoid parsing
+errors.
+.Pp
+Macros can take parameters, too.  If a macro call is followed by a
+parenthesized, comma-separated list the values starting with $1 will
+be replaced in the macro with the elements of the list.  A $ not
+followed by a digit is left unchanged.  This parsing
+is very rudimentary; no nesting or parentheses or escaping of commas
+is allowed.  Also, there is no way to say argument 1 followed by a
+digit (${1}0 in sh(1)).
+.Pp
+The following will draw a line with slope 1.
+.Bd -literal -offset indent-two
+define foo { next at $1, $2 }
+for i from 1 to 5 { foo(i,i) }
+.Ed
+Macros persist across graphs.  The file 
+.Pa /usr/local/share/grap/grap.defines
+contains simple macros for plotting common characters.  The 
+.Ic undefine
+command deletes a macro.
+.Pp
+See the directory
+.Pa /usr/local/share/examples/grap
+for more examples of macros.
+Confirm the location of the examples directory using the 
+.Fl v
+flag.
+.Ed
+.Ss Number Lists
+.Pp
+A whitespace-separated list of numbers is treated specially.  The list
+is taken to be points to be plotted using the default line style on
+the default coordinate system.  If more than two numbers are given,
+the extra numbers are taken to be additional y values to plot at the
+first x value.  Number lists in DWB 
+.Nm
+can be comma-separated, and this 
+.Nm
+supports that as well.  More precisely, numbers in number lists can be
+separated by either whitespace, commas, or both.
+.Bd -literal -offset indent
+1 2 3
+4 5 6
+.Ed
+.sp
+Will plot points using the default line style at (1,2), (1,3),(4,5)
+and (4,6).  A simple way to plot a set of numbers in a file named 
+.Pa ./data
+is:
+.Bd -literal -offset indent
+\&.G1
+copy "./data"
+\&.G2
+.Ed
+.Ss Pic Macros
+.Pp
+.Nm
+defines pic macros that can be used in embedded pic code to place
+elements in the graph.  The macros are
+.Ic x_gg ,
+.Ic y_gg ,
+and
+.Ic xy_gg .
+These macros define pic distances that correspond to the given
+argument.  They can be used to size boxes or to plot pic constructs on
+the graph.  To place a given construct on the graph, you should add
+Frame.Origin to it.
+Other coordinate spaces can be used by replacing 
+.Ic gg
+with the name of the coordinate space.  A coordinate space named
+.Ic gg
+cannot be reliably accessed by these macros.
+.Pp
+The macros are emitted immediately before the frame is drawn.
+.Pp
+DWB
+.Nm
+may use these as part of its implementation.  This
+.Nm
+provides them only for compatibility.  Note that these are very simple
+macros, and may not do what you expect under complex conditions.
+.Sh ENVIRONMENT VARIABLES
+.Pp
+If the environment variable 
+.Ev GRAP_DEFINES
+is defined, 
+.Nm
+will look for its defines file there.  If that value is a relative path
+name the path specified in the
+.Fl M
+option will be searched for it.
+.Ev GRAP_DEFINES
+overrides the compiled in location of the defines file, but may be
+overridden by the
+.Fl d
+or
+.Fl D
+flags.
+.Pp
+If
+.Ev GRAP_SAFER
+is set, 
+.Ic sprintf
+is disabled to prevent forcing 
+.Nm
+to core dump or smash the stack.
+.Sh FILES
+.Pa /usr/local/share/grap/grap.defines
+.Sh SEE ALSO
+.Xr atan2 3 ,
+.Xr groff 1 ,
+.Xr pic 1 ,
+.Xr printf 3 ,
+.Xr sh 1 ,
+.Xr sprintf 3 ,
+.Xr troff 1
+.Pp
+If documentation and examples have been installed, 
+.Nm 
+.Fl -version
+or 
+.Nm 
+.Fl -help
+will display the locations.
+.Sh BUGS
+.Pp
+There are several small incompatibilities with K&R
+.Nm grap .
+They include the
+.Ic sh
+command not expanding variables and macros, and a more strict
+adherence to parameter order in the internal commands.
+.Pp
+Although much improved, the error reporting code can still be
+confused.  Notably, an error in a macro is not detected until the
+macro is used, and it produces unusual output in the error message.
+.Pp
+Iterating many times over a macro with no newlines can run 
+.Nm
+out of memory.
+.Sh AUTHOR
+This implementation was done by
+.An Ted Faber Ao faber@lunabase.org Ac Ns .
+.An Bruce Lilly Ao blilly@erols.com Ac
+contributed many bug fixes, including a considerable revamp of the
+error reporting code.  If you can actually find an error in your  
+.Nm
+code, you can probably thank him.
+.Nm
+was designed and specified by 
+.An Brian Kernighan
+and 
+.An Jon Bentley .

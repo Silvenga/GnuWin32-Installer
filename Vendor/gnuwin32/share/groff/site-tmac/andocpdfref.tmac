@@ -1,0 +1,46 @@
+.do mso pdfref.tmac
+.nr anpdfref*firstTH 1
+.de CAPS
+.di \$1
+.tr <_/_
+\$2
+.di
+.tr <<//
+..
+.de CAPSOFF
+.tr <<//
+..
+.de anpdfref*init
+.nr anpdfref*newTH 1
+.ds anpdfref*str \\$1
+.de mkanpdfref*secstr
+.tr <_/_
+.tm tr
+.di anpdfref*secstr 
+\\\\$1
+.di
+.tr <<//
+.shift
+.while \\\\n[.$]>0 \\{\
+.ds anpdfref*secstr \\\\*[anpdfref*secstr]_\\\\$1
+.shift
+.\\}
+\\..
+.mkanpdfref*secstr \\$1
+.nr s2 \\$2
+.ds anpdfref*secno \\n[s2]
+.ds anpdfref*secnostr \\$2
+..
+.de anpdfref*BM
+.if \\n[an*firstman] \{\
+.pdfcreator "Groff \n(.x.\n(.y.\n(.Y with Pdfref macros"
+.pdfdate "D:\\*[year]\\*[mon]\\*[mday]\\*[hours]\\*[minutes]\\*[seconds]\\*[offsetsign]\\*[gmtoffhh]'\\*[gmtoffmm]'"
+.pdfuseoutlines
+.nr anpdfref*firstTH 0
+.\}
+.if \\n[anpdfref*newTH] \{\
+.nr BM +1
+.pdfbookmark 0 "section.\\*[anpdfref*secstr].\\*[anpdfref*secno].\\n(BM" "\\*[anpdfref*str] (\\*[anpdfref*secnostr])"
+.\}
+.nr anpdfref*newTH 0
+..

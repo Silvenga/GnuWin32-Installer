@@ -1,0 +1,107 @@
+Pamtotga User Manual(0)                 Pamtotga User Manual(0)
+
+
+
+Table Of Contents
+
+
+NAME
+       pamtotga  - convert a Netpbm image to a TrueVision Targa
+       file
+
+
+SYNOPSIS
+       pamtotga [-mono|-cmap|-rgb] [-norle] [pamfile]
+
+       All options can be abbreviated to their shortest  unique
+       prefix.   You may use two hyphens instead of one to des-
+       ignate an option.  You may use  either  white  space  or
+       equals signs between an option name and its value.
+
+
+DESCRIPTION
+       This program is part of Netpbm(1).
+
+       pamtotga  reads  a  PBM, PGM, PPM, or PAM image as input
+       and produces a TrueVision Targa file as output.  The PAM
+       image  may be either a BLACKANDWHITE, GRAYSCALE, RGB, or
+       RGB_ALPHA image.
+
+       To create a TGA image with transparency  (i.e.  with  an
+       alpha  mask), use RGB_ALPHA PAM input.  Some Netpbm pro-
+       grams that generate images  with  alpha  masks  generate
+       them  in  that  format.   For  another way to create the
+       proper input stream, see pamstack(1).
+
+       It is unclear that anything except pamtotga knows  about
+       TGAs with transparency.  The history behind this feature
+       of pamtotga is not clear.  The format pamtotga  produces
+       is  simply  the same as an ordinary RGB TGA image except
+       with a 4th plane added for transparency.  The  PixelSize
+       field  of the TGA header specifies 32 bits instead of 24
+       and the raster has an extra byte added to each pixel, at
+       the tail end.  The value of that byte has the same mean-
+       ing as in a PAM image with maxval 255.
+
+
+OPTIONS
+       -cmap  Make output  Targa  file  of  type  24  bit  col-
+              ormapped.   Input  must  contain no more than 256
+              distinct colors.
+
+
+       -mono  Make output Targa file of type 8 bit  monochrome.
+              Input  must be PBM or PGM or a PAM with BLACKAND-
+              WHITE or GRAYSCALE tuple type.  See -cmap.
+
+              You may specify at most one of -mono, -cmap,  and
+              -rgb.   If you specify neither, the default image
+              type is the most  highly  constrained  compatible
+              type  is  used,  where  monochrome  is  more con-
+              strained than colormapped which is in  turn  more
+              constrained than unmapped.
+
+
+       -rgb   Make  output  Targa  file of type 24 bit unmapped
+              color.  See -cmap.
+
+
+       -norle Do not use  run-length  encoding  in  the  output
+              Targa   file.    Run-length   encoded  files  are
+              smaller, but Some Targa readers can't  read  run-
+              length encoded files.
+
+
+
+
+SEE ALSO
+       tgatoppm(1), pnmquant(1), pamstack(1), pam(1) pnm(1)
+
+
+HISTORY
+       This program was called ppmtotga until Netpbm 10.6 (July
+       2002).  That was always a misnomer,  though,  because  a
+       PPM  class program would not be able to tell the differ-
+       ence between PGM and PPM input (it would all  look  like
+       PPM),  and  thus could not choose the output Targa image
+       type based on the type of the input.  Netpbm  10.6  also
+       added  the  ability  to  handle  an alpha channel, so it
+       became a PAM class program.
+
+       In Netpbm 10.15 (April 2003),  the  program  became  the
+       first  in the Netpbm package to recognize an alpha chan-
+       nel in a PAM.  It recognized  tuple  type  'RGBA'.   But
+       when  this  kind of PAM image was later added to the PAM
+       specification,  it  was  specified   with   tuple   type
+       'RGB_ALPHA'.   So  in  Netpbm 10-26 (January 2005), pam-
+       totga  changed  to  recognize  'RGB_ALPHA'  instead   of
+       'RGBA'.
+
+
+AUTHOR
+       Copyright   (C)   1989,  1991  by  Mark  Shand  and  Jef
+       Poskanzer.
+
+
+
+netpbm documentation      21 July 2002  Pamtotga User Manual(0)

@@ -1,0 +1,260 @@
++----------------------------------------------------------------------+
+| tiff2png - converts a Tagged Image File Format (TIFF) file into      |
+|            a Portable Network Graphics (PNG) file                    |
+|                                                                      |
+| Copyright 1996,2000 Willem van Schaik, Singapore (willem@schaik.com) |
+| Copyright 1999-2002 Greg Roelofs (newt@pobox.com)                    |
+|                                                                      |
+| version 0.91 - September 2002 [see GRR NOTES / CHANGELOG below]      |
++----------------------------------------------------------------------+
+
+  This is the first attempt for a tiff2png program. Reason to develop
+  it was the lack of conversion possibilities for TIFF files containing
+  alpha channels. 
+
+  Especially NeXT users create lots of TIFF files that have the rather
+  exceptional 2-bit gray and 4-bit color formats, where both can have
+  an alpha channel besides the graphics info. Because PBMplus is not
+  supporting alpha, that path "tifftopnm <file> | pnmtopng > <file>"
+  makes that the alpha and transparency gets lost.
+
+  I have chosen to use PNG formats as similar as possible to the
+  format of the original TIFF file. Thus, paletted TIFF files will be
+  converted into PNG files with color-type 3 (= paletted). Only for
+  some cased the bit-depth had to be altered to accommodate both
+  standards.
+
+  At this moment the program supports grayscale images, full-color RGB
+  images, and colormapped (palette) images. This is all in 1 to 16 bits
+  per sample (i.e., up to 64-bit RGBA).  The compression is as good as
+  or better than libtiff is, which is pretty OK. I also implemented
+  support for both single-image-planes as well as separated-color-planes.
+  Support for so-called tiled images I have left out, for the time being.
+  [partial support for tiled images added as of version 0.9]
+
+  Major headaches were the PhotometricInterpretation parameters
+  "min-is-white" and "min-is-black". I couldn't yet figure it out for
+  100%, but I suspect incompatibilities between older (netpbm) version
+  2.4 of libtiff and the later v3.x.  The "-invert" option is available
+  in case there are still problems with some images.
+
+  The major decoding and coding work is done by the libtiff, libpng, and
+  zlib libraries; newer versions of libtiff can optionally use libjpeg,
+  as well.  So you need to get those as well.  The latest versions of
+  libtiff can be found here:
+
+	http://www.libtiff.org/
+
+  Older versions may still exist here:
+
+	ftp://ftp.sgi.com/graphics/tiff/tiff-v3.4-tar.gz
+	ftp://ftp.x.org/R5contrib/netpbm-1mar1994.tar.gz   [contains 2.4]
+
+  libpng and zlib may be found at these sites:
+
+	http://www.libpng.org/pub/png/libpng.html
+	http://www.zlib.org/
+
+  or here:
+
+	ftp://swrinde.nde.swri.edu/pub/png/src/ (libpng* or lpng*, and zlib*)
+
+  libjpeg is available here:
+
+	http://www.ijg.org/
+	ftp://ftp.uu.net/graphics/jpeg/
+
+  To build, first make zlib, libpng, libjpeg, and libtiff according to
+  their build instructions.  Then edit the tiff2png makefile so that the
+  locations of the libraries are correct, and type "make".  A separate
+  archive, tiff2png-images.zip, contains some test files; the included
+  script Alpha.sh will convert all of the TIFFs, overwriting the PNGs at
+  the same time. :-) If you have a web browser with adequate alpha support
+  (see http://www.libpng.org/pub/png/pngapbr.html for info and links),
+  you can test the results by loading Alpha.html in your browser and see
+  what happens when you change the background color of the page.
+
+  I also tested this utility against the test pictures at ftp.sgi.com.
+  With the exception of the tiled images (not retested since support for
+  tiled images was added in tiff2png 0.9), the results were good. But
+  there can and will still be many TIFF files that don't convert correctly.
+  Please send Greg a copy if you come across such a beast--as long as
+  it's not multi-megabytes in size!
+  
+  For the time being I concentrated on straightforward support of as
+  many formats as possible. Future plans are to create PNG chunks for
+  all those informational fields that TIFF also contains, like Name,
+  Date, Position, Resolution, etc. A somewhat bolder plan is to
+  convert the ColorResponseCurves field into PNG gamma/chromaticity
+  or iCCP chunks. We'll see. At the moment there is a command-line
+  parameter to add a gamma chunk to your PNG file; if you know what
+  color space the image pixels are in (e.g., sRGB -> gamma 1/2.2 =
+  0.45455), you can (and should!) add this information to the PNG
+  file(s).
+
+  The tiff2png web page is here:
+
+	http://www.libpng.org/pub/png/apps/tiff2png.html
+
+  Willem's home page is here:
+
+	http://www.schaik.com/
+
+  Please send bug reports to Greg Roelofs (newt@pobox.com) and thanks
+  to Willem (willem@schaik.com).
+
++----------------------------------------------------------------------+
+
+GRR NOTES / CHANGELOG:
+=====================
+
+16 September 1999 - version 0.7:
+
+  I updated tiff2png 0.6 of May 1996 to version 0.7 in July 1999.  My
+  changes include the following:
+
+	- slightly generalized Makefile, including static-library build
+	- updated libpng interface
+	- new libpng error handler (avoids jmp_buf size mismatches between
+	   library and application)
+	- new usage() function
+	- PNG pHYs support (aspect ratio, resolution)
+	- optional new -faxpect option (only if compiled with FAXPECT defined)
+
+  The last item is somewhat special-purpose, which is why it's ifdef'd.  At
+  least in my tests with efax 0.9, a Supra fax modem, and the various fax
+  machines to which I have access at work (including all of their "fineness"
+  options), *all* incoming faxes arrive with doubled horizontal resolution.
+  With -faxpect, tiff2png will detect if the aspect ratio is close to 2:1
+  and, if so, halve the horizontal resolution to give a near-1:1 aspect
+  ratio.  The algorithm is trivial:  if both neighboring pixels are white,
+  the result pixel is white; if both black, black; and if there's one of
+  each, the result is mid-level gray (127).  (This necessarily means the
+  output file is 2-bit palette-based, not grayscale, since only 8-bit PNG
+  grayscale includes the mid-level gray, and compression can't recover the
+  factor-of-four increase in pixel depth.)  The results look pretty decent.
+
+  Also note that even libtiff 3.4beta028 needs the OLDTIFF macro defined
+  (see the Makefile comments), at least in all the cases I was able to test.
+  I don't know what the difference is between my system and Willem's.
+
+  Finally, I've removed the (very) old libtiff from the tiff2png 0.7 tar
+  distribution; newer versions are available from the SGI web site mentioned
+  above (ftp://ftp.sgi.com/graphics/tiff/).
+
+
+26 January 2000 - version 0.8:
+
+  I updated tiff2png 0.7 to version 0.8 in January 2000 and tested it
+  with libpng 3.5.4.  Changes include:
+
+	- improved Makefile (thanks to tenthumbs@cybernex.net)
+	- improved memory/resource management (TIFFClose(), fclose(), etc.)
+	- added -compression option to set zlib compression level
+	- added multi-file support, including -destdir option
+
+  The last item breaks command-line compatibility with earlier versions
+  (which required exactly one TIFF input name and one PNG output name),
+  but it brings tiff2png more in line with gif2png--that is, you can now
+  do "tiff2png *.tif *.tiff" and get the expected conversion of many TIFF
+  files all at once.  (Alternatively, you can do "tiff2png -destdir /here
+  /there/*.tif" to convert TIFFs /there to PNGs /here.  The destination
+  directory must exist and be writable, of course.)  The program replaces
+  the ".tif" or ".tiff" extension with ".png"; if neither extension is
+  found, ".png" is simply appended to the TIFF filename.
+
+  Oh, and I also took the liberty of changing the capitalization to
+  "tiff2png"; not only does that match both the actual binary name and
+  gif2png's convention, it also seemed more logical.  (That is, "TIFF"
+  is an acronym; either all letters should be capitalized or none of them
+  should be.  Ditto for PNG.)
+
+
+13 February 2000 - version 0.81:
+
+  Version 0.81 consists only of fixes/improvements to the -destdir option;
+  now if no target directory is given, the current directory is assumed.
+  Thanks to TenThumbs once again.
+
+  (Well, I also fixed a compiler warning and made a minor modification to
+  the makefile, but you get the general idea.)
+
+
+5 August 2000:
+
+  Willem is back and will be taking over maintenance of tiff2png once
+  again!  (Also, tiff2png URL corrected above.)
+
+
+4 November 2000 - version 0.81b:
+
+  Willem released a version 0.82 in July, but it doesn't include the changes
+  from either 0.8 or 0.81 (see above).  In particular, it still expects both
+  an input name and an output name on the command line, and it doesn't check
+  whether the output file exists before overwriting it, which is quite dan-
+  gerous for those of us who have grown accustomed to typing "tiff2png *.tiff"
+  under Unix.  (In such a case, the second TIFF file would be overwritten
+  with the PNG conversion of the first TIFF file.)  Willem's version can be
+  found at http://www.schaik.com/png/tiff2png.html, for those who want to
+  try it anyway.
+
+  In the meantime, back in September I made a version 0.81b with the following
+  two bug fixes:
+
+	- fixed 16-bit-per-sample support (copied from Willem's version 0.82)
+	- fixed Makefile (no attempt to install non-existent man page)
+
+  Presumably Willem will reintegrate his other changes (e.g., -invert option
+  and contributed multipage support) at some point in the near future.
+
+
+12 November 2000 - version 0.81c:
+
+  Oops, I overlooked one of Willem's 16-bit changes, and both of us missed an
+  earlier, critical bug in the 16-bit code.  Thanks to some 16-bit grayscale
+  test images supplied by Ron Emaus of Pfizer, I was able to do a bit of real
+  testing and track down the latter problem; version 0.81c fixes all known
+  16-bit bugs (although I still don't have any big-endian test files).  It
+  also includes Willem's -invert option, support for YCbCr images with JPEG
+  compression and for Log(L) images with SGILog compression, and a new Win32
+  makefile (tested with MSVC 5.0, libtiff 3.5.5, libjpeg 6b, libpng 1.0.8,
+  and zlib 1.1.3).
+
+
+1 July 2002 - version 0.9:
+
+  Willem has passed the maintainership of his fine utility to me, and this
+  release merely incorporates a bunch of saved-up patches, mostly from other
+  folks.  Frank A. Palmieri added support for tiled TIFFs (contiguous only);
+  TenThumbs (SJT) added auto-detection of 8-bit color data in 16-bit palettes
+  (which _appears_ to be a long-standing bug in a number of TIFFs, including
+  some immense geophysical ones from the US NOAA); Nelson Beebe pointed out
+  a number of C++ comments, which aren't accepted by some C compilers; and I
+  added support for wildcards under emx+gcc and added some more checks for
+  out-of-memory conditions.  I also updated much of this README to be a little
+  more coherent.  (No, less schizophrenic!  No, more coherent! ;-) )
+
+  Version 1.0 should be the next release, hopefully soon, and it will finally
+  merge the rest of Willem's 0.82 changes.  (That said, this utility has been
+  quite stable for quite a few years already, so it can already be considered
+  "post-1.0" in all but name...er, number.)
+
+
+12 September 2002 - version 0.91:
+
+  No merge or version 1.0 yet, but two fixes:  correct scaling for sub-8-bps
+  RGB and RGBA, and correct big- and little-endian support for 16-bps images.
+  (Many thanks to Rhett Sutphin for providing test images and quick feedback
+  on both big- and little-endian machines!)
+
+  I also documented a couple more potential gotchas that I can't test at the
+  moment:  lack of MINISWHITE support for RGB and RGBA, and lack of support
+  for non-contiguous (separated-plane) tiled images.  I suspect both are
+  valid according to the TIFF spec (what isn't...), but I haven't verified
+  this.
+
+  (Btw, 1.0 and the final merge will still happen as soon as time permits.)
+
+
+Greg Roelofs
+newt@pobox.com
