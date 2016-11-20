@@ -1,0 +1,1 @@
+"C:\Program Files (x86)\WiX Toolset v3.10\bin\heat.exe" dir "Vendor\gnuwin32" -gg -sfrag -template fragment -out "GnuWin32\Directory.wxs" -cg GnuWin32Bin -dr GnuWin32BinDirRef -srd -sreg -g1

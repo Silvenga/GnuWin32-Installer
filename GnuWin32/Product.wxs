@@ -1,36 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="GnuWin32" Language="1033" Version="1.0.0.0" Manufacturer="Silvenga" 
-           UpgradeCode="31712c9f-3be0-4c84-9e7a-4093a9739b91">
-    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
+  <Product Id="*" Name="GnuWin32" Language="1033" Version="1.0.0.0" Manufacturer="Silvenga"
+           UpgradeCode="199dcdab-7578-4f5d-af6e-897f76394995">
+
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <MediaTemplate EmbedCab="yes" />
+    <Condition Message="You need to be an administrator to install this product.">Privileged</Condition>
 
     <Icon Id="gnuwin32.ico" SourceFile="gnuwin32.ico" />
+    <Property Id="ARPPRODUCTICON" Value="gnuwin32.ico" />
 
-    <Feature Id="ProductFeature" Title="GnuWin32" Level="1">
-      <ComponentRef Id="GnuWin32bin" />
-    </Feature>
-  </Product>
-
-  <Fragment>
-    <Condition Message="You need to be an administrator to install this product.">
-      AdminUser
-    </Condition>
-  </Fragment>
-  
-  <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFilesFolder">
-        <Directory Id="INSTALLFOLDER" Name="GnuWin32">
-          <Component Id='GnuWin32bin' Guid='F80EF228-5751-4150-9A39-E2A367908513'>
-            <RemoveFolder Id='INSTALLFOLDER' On='uninstall' />
-          </Component>
+        <Directory Id="GnuWin32BinDirRef" Name="GnuWin32">
         </Directory>
       </Directory>
+      <Component Id="GnuWin32Path" Guid="57DB6020-18EB-48B1-8D7B-F2C74EE1F2A0">
+        <Environment Id="PATH" Name="PATH" Value="[GnuWin32BinDirRef]bin" Permanent="no" Part="last" Action="set"
+                     System="yes" />
+      </Component>
     </Directory>
-  </Fragment>
-  
+
+    <Feature Id="Complete" Title="GnuWin32" Level="1">
+      <ComponentGroupRef Id="GnuWin32Bin" />
+      <ComponentRef Id="GnuWin32Path" />
+    </Feature>
+
+  </Product>
+
 </Wix>
