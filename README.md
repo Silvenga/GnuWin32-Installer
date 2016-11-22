@@ -22,3 +22,7 @@ Mark Lopez (Authority) <m@silvenga.com>
 4096R/FEF78709
 DC75 80D8 0D67 53DC F209 2A54 37F1 A037 FEF7 8709
 ```
+
+## TODO
+
+- [ ] Project icon
